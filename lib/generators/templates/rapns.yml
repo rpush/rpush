@@ -1,0 +1,7 @@
+development:
+  host: gateway.sandbox.push.apple.com
+  port: 2195
+
+production:
+  host: gateway.push.apple.com
+  port: 2195

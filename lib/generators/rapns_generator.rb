@@ -9,4 +9,8 @@ class RapnsGenerator < Rails::Generators::Base
   def copy_migration
      migration_template "create_rapns_notifications.rb", "db/migrate/create_rapns_notifications.rb"
   end
+
+  def copy_config
+    copy_file "rapns.yml", "config/rapns/rapns.yml"
+  end
 end
