@@ -1,3 +1,8 @@
+PATH
+  remote: .
+  specs:
+    rapns (0.0.1)
+
 GEM
   specs:
     activemodel (3.0.10)
@@ -32,5 +37,6 @@ PLATFORMS
 DEPENDENCIES
   activerecord
   pg
+  rapns!
   rspec
   shoulda
