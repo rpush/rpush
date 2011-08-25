@@ -2,6 +2,7 @@ require "rapns/daemon/configuration"
 require "rapns/daemon/certificate"
 require "rapns/daemon/connection"
 require "rapns/daemon/runner"
+require "rapns/daemon/logger"
 
 module Rapns
   def self.logger
@@ -10,7 +11,7 @@ module Rapns
 
   module Daemon
     def self.start(environment, options)
-      setup_logger
+      Rapns.instance_variable_set("@logger", Logger.new(options[:foreground]))
       Configuration.load(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
       Certificate.load(Configuration.certificate)
       Connection.connect
@@ -31,13 +32,6 @@ module Rapns
       STDIN.reopen '/dev/null'
       STDOUT.reopen '/dev/null', 'a'
       STDERR.reopen STDOUT
-    end
-
-    def self.setup_logger
-      log_path = File.join(Rails.root, "log", "rapns.log")
-      logger = ActiveSupport::BufferedLogger.new(log_path, Rails.logger.level)
-      logger.auto_flushing = Rails.logger.auto_flushing
-      Rapns.instance_variable_set("@logger", logger)
     end
   end
 end

@@ -91,3 +91,47 @@ describe Rapns::Daemon::Connection, "when shuting down the connection" do
     Rapns::Daemon::Connection.shutdown_socket
   end
 end
+
+describe Rapns::Daemon::Connection, "when the connection is lost" do
+  before do
+    Rapns::Daemon::Connection.stub(:connect_socket)
+    @ssl_socket = mock("SSLSocket")
+    Rapns::Daemon::Connection.instance_variable_set("@ssl_socket", @ssl_socket)
+    @ssl_socket.stub(:write).and_raise(Errno::EPIPE)
+    @logger = mock("Logger", :warn => nil)
+    Rapns.stub(:logger).and_return(@logger)
+    Rapns::Daemon::Connection.stub(:sleep)
+  end
+
+  it "should log a warning" do
+    Rapns::Daemon::Configuration.stub(:host).and_return("localhost")
+    Rapns::Daemon::Configuration.stub(:port).and_return(123)
+    Rapns.logger.should_receive("warn").with("Lost connection to localhost:123, reconnecting.")
+    begin
+      Rapns::Daemon::Connection.write(nil)
+    rescue Rapns::Daemon::Connection::ConnectionError
+    end
+  end
+
+  it "should retry to make a connection 3 times" do
+    Rapns::Daemon::Connection.should_receive(:connect_socket).exactly(3).times
+    begin
+      Rapns::Daemon::Connection.write(nil)
+    rescue Rapns::Daemon::Connection::ConnectionError
+    end
+  end
+
+  it "should raise a ConnectionError after 3 attempts at reconnecting" do
+    expect do
+      Rapns::Daemon::Connection.write(nil)
+    end.to raise_error(Rapns::Daemon::Connection::ConnectionError, "Tried 3 times to reconnect but failed: #<Errno::EPIPE: Broken pipe>")
+  end
+
+  it "should sleep 1 second before retrying the connection" do
+    Rapns::Daemon::Connection.should_receive(:sleep).with(1)
+    begin
+      Rapns::Daemon::Connection.write(nil)
+    rescue Rapns::Daemon::Connection::ConnectionError
+    end
+  end
+end

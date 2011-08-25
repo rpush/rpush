@@ -9,19 +9,16 @@ module Rapns
         begin
           Rapns::Notification.undelivered.each do |notification|
             Rapns::Daemon::Connection.write(notification.to_binary)
-            delivered_at = Time.now
 
             notification.delivered = true
-            notification.delivered_at = delivered_at
+            notification.delivered_at = Time.now
             notification.save(:validate => false)
 
-            msg = "[#{delivered_at.to_s(:db)}] notification #{notification.id} delivered to #{notification.device_token}"
-            Rapns.logger.info(msg)
+            msg = Rapns.logger.info("notification #{notification.id} delivered to #{notification.device_token}")
             puts msg if options[:foreground]
           end
         rescue Exception => e
-          msg = "[ERROR] [#{Time.now.to_s(:db)}] #{e.class.name}, #{e.message}"
-          Rapns.logger.error(msg)
+          msg = Rapns.logger.error("#{e.class.name}, #{e.message}")
           puts msg if options[:foreground]
         end
 

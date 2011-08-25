@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class Connection
+      class ConnectionError < Exception; end
+
       def self.connect
         @ssl_context = setup_ssl_context
         @tcp_socket, @ssl_socket = connect_socket
@@ -8,8 +10,24 @@ module Rapns
       end
 
       def self.write(data)
-        @ssl_socket.write(data)
-        @ssl_socket.flush
+        retry_count = 0
+
+        begin
+          @ssl_socket.write(data)
+          @ssl_socket.flush
+        rescue Errno::EPIPE => e
+          Rapns.logger.warn("Lost connection to #{Configuration.host}:#{Configuration.port}, reconnecting.")
+          connect_socket
+
+          retry_count += 1
+
+          if retry_count < 3
+            sleep 1
+            retry
+          else
+            raise ConnectionError, "Tried #{retry_count} times to reconnect but failed: #{e.inspect}"
+          end
+        end
       end
 
       protected

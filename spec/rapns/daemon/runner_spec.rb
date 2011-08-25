@@ -49,34 +49,12 @@ describe Rapns::Daemon::Runner do
   it "should log errors" do
     e = Exception.new("bork")
     Rapns::Daemon::Connection.stub(:write).and_raise(e)
-    Rapns.logger.should_receive(:error).with("[ERROR] [#{@now.to_s(:db)}] Exception, bork")
+    Rapns.logger.should_receive(:error).with("Exception, bork")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
-  end
-
-  it "should print out the error if running in the foreground" do
-    e = Exception.new("bork")
-    Rapns::Daemon::Connection.stub(:write).and_raise(e)
-    Rapns::Daemon::Runner.should_receive(:puts).with("[ERROR] [#{@now.to_s(:db)}] Exception, bork")
-    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => true)
-  end
-
-  it "should not print out the error if not running in the foreground" do
-    Rapns::Daemon::Runner.should_not_receive(:puts)
-    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => false)
   end
 
   it "should log the notification delivery" do
-    Rapns.logger.should_receive(:info).with("[#{@now.to_s(:db)}] notification #{@notification.id} delivered to #{@notification.device_token}")
+    Rapns.logger.should_receive(:info).with("notification #{@notification.id} delivered to #{@notification.device_token}")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
-  end
-
-  it "should print out the notification delivery message if running in the foreground" do
-    Rapns::Daemon::Runner.should_receive(:puts).with("[#{@now.to_s(:db)}] notification #{@notification.id} delivered to #{@notification.device_token}")
-    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => true)
-  end
-
-  it "should not print out the notification delivery message if not running in the foreground" do
-    Rapns::Daemon::Runner.should_not_receive(:puts)
-    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => false)
   end
 end

@@ -1,16 +1,6 @@
 require "spec_helper"
 
 describe Rapns::Daemon do
-  module Rails
-    def self.logger
-      @logger
-    end
-
-    def self.logger=(logger)
-      @logger = logger
-    end
-  end
-
   before do
     Rapns::Daemon::Configuration.stub(:load)
     Rapns::Daemon::Configuration.stub(:certificate)
@@ -19,9 +9,8 @@ describe Rapns::Daemon do
     Rapns::Daemon::Runner.stub(:start)
     Rapns::Daemon.stub(:fork)
     Rails.stub(:root).and_return("/rails_root")
-    logger = mock("BufferedLogger", :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
-    Rails.logger = logger
-    ActiveSupport::BufferedLogger.stub(:new).and_return(logger)
+    @logger = mock("Logger")
+    Rapns::Daemon::Logger.stub(:new).and_return(@logger)
   end
 
   it "should load the configuration" do
@@ -53,5 +42,11 @@ describe Rapns::Daemon do
   it "should start the runner, passing the poll frequency as an argument" do
     Rapns::Daemon::Runner.should_receive(:start).with({:poll => 2})
     Rapns::Daemon.start("development", {:poll => 2})
+  end
+
+  it "should setup the logger" do
+    Rapns::Daemon::Logger.should_receive(:new).with(true).and_return(@logger)
+    Rapns::Daemon.start("development", {:poll => 2, :foreground => true})
+    Rapns.logger.should == @logger
   end
 end
