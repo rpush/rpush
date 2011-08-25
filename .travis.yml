@@ -4,3 +4,5 @@ rvm:
   1.9.2
   rbx
   rbx-2.0
+before_script:
+  - "psql -c 'create database rapns_test;' -U postgres >/dev/null"
