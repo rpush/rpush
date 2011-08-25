@@ -3,10 +3,9 @@ require "rapns"
 require "rapns/daemon"
 
 options = {:poll => 2, :foreground => false}
-new_argv = ARGV.clone
-environment = new_argv.shift
+environment = ARGV[0]
 banner = "Usage: rapns <environment> [options]"
-new_argv.options do |opts|
+ARGV.options do |opts|
   opts.banner = banner
   opts.on("-p", "--poll=SECONDS", Integer, "Frequency in seconds to check the database for new notifications. Default: #{options[:poll]}") { |v| options[:poll] = v }
   opts.on("-f", "--foreground", "Run in the foreground.") { options[:foreground] = true }
