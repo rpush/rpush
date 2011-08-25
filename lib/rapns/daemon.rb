@@ -22,9 +22,9 @@ module Rapns
     protected
 
     def self.fork
-      fork && exit
+      exit if pid = fork
       Process.setsid
-      fork && exit
+      exit if pid = fork
 
       Dir.chdir '/'
       File.umask 0000
