@@ -1,4 +1,4 @@
-rapns
+rapns [![Test Status](https://secure.travis-ci.org/ileitch/rapns.png)][3]
 =====
 
 Easy to use library for Apple's Push Notification Service with Rails 3.
