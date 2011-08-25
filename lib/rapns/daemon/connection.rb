@@ -18,6 +18,7 @@ module Rapns
         ssl_context = OpenSSL::SSL::SSLContext.new
         ssl_context.key = OpenSSL::PKey::RSA.new(Certificate.certificate, '')
         ssl_context.cert = OpenSSL::X509::Certificate.new(Certificate.certificate)
+        ssl_context
       end
 
       def self.connect_socket
