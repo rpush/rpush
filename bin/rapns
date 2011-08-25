@@ -22,6 +22,6 @@ if environment.nil?
 end
 
 ENV["RAILS_ENV"] = environment
-load "config/application.rb"
+load "config/environment.rb"
 
 Rapns::Daemon.start(environment, options)
