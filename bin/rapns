@@ -12,6 +12,7 @@ new_argv.options do |opts|
   opts.on("-f", "--foreground", "Run in the foreground.") { options[:foreground] = true }
   opts.on("-v", "--version", "Print this version of rapns.") { puts "rapns #{Rapns::VERSION}"; exit }
   opts.on("-h", "--help", "You're looking at it.") { puts opts; exit }
+  opts.parse!
 end
 
 if environment.nil?
