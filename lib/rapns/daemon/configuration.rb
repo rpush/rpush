@@ -11,6 +11,7 @@ module Rapns
         config = config[environment]
         set_variable(:host, config, environment, config_path)
         set_variable(:port, config, environment, config_path)
+        set_variable(:certificate, config, environment, config_path)
       end
 
       def self.host
@@ -19,6 +20,10 @@ module Rapns
 
       def self.port
         @port
+      end
+
+      def self.certificate
+        File.join(Rails.root, "config", "rapns", @certificate)
       end
 
       protected

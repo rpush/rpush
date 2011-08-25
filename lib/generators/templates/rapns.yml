@@ -1,7 +1,9 @@
 development:
   host: gateway.sandbox.push.apple.com
   port: 2195
+  certificate: development.pem
 
 production:
   host: gateway.push.apple.com
   port: 2195
+  certificate: production.pem
