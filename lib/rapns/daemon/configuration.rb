@@ -1,4 +1,4 @@
-require "syck"
+require "yaml"
 
 module Rapns
   class ConfigurationError < Exception; end
@@ -30,7 +30,7 @@ module Rapns
 
       def self.read_config(environment, config_path)
         ensure_config_exists(config_path)
-        File.open(config_path) { |fd| Syck.load(fd) }
+        File.open(config_path) { |fd| YAML.load(fd) }
       end
 
       def self.set_variable(key, config, environment, config_path)
