@@ -15,13 +15,13 @@ module Rapns
       Configuration.load(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
       Certificate.load(Configuration.certificate)
       Connection.connect
-      fork unless options[:foreground]
+      daemonize unless options[:foreground]
       Runner.start(options)
     end
 
     protected
 
-    def self.fork
+    def self.daemonize
       exit if pid = fork
       Process.setsid
       exit if pid = fork

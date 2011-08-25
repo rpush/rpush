@@ -9,7 +9,7 @@ banner = "Usage: rapns <environment> [options]"
 new_argv.options do |opts|
   opts.banner = banner
   opts.on("-p", "--poll=SECONDS", Integer, "Frequency in seconds to check the database for new notifications. Default: #{options[:poll]}") { |v| options[:poll] = v }
-  opts.on("-f", "--foreground", "Run in the forefround.") { options[:foreground] = true }
+  opts.on("-f", "--foreground", "Run in the foreground.") { options[:foreground] = true }
   opts.on("-v", "--version", "Print this version of rapns.") { puts "rapns #{Rapns::VERSION}"; exit }
   opts.on("-h", "--help", "You're looking at it.") { puts opts; exit }
 end
