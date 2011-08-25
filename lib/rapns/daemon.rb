@@ -15,7 +15,7 @@ module Rapns
       Certificate.load(Configuration.certificate)
       Connection.connect
       fork unless options[:foreground]
-      Runner.start(options[:poll])
+      Runner.start(options)
     end
 
     protected

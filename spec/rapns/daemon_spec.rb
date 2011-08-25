@@ -51,7 +51,7 @@ describe Rapns::Daemon do
   end
 
   it "should start the runner, passing the poll frequency as an argument" do
-    Rapns::Daemon::Runner.should_receive(:start).with(2)
+    Rapns::Daemon::Runner.should_receive(:start).with({:poll => 2})
     Rapns::Daemon.start("development", {:poll => 2})
   end
 end
