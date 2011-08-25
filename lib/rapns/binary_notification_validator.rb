@@ -1,5 +1,3 @@
-require "active_model"
-
 module Rapns
   class BinaryNotificationValidator < ActiveModel::Validator
 
