@@ -7,6 +7,8 @@ module Rapns
 
     validates_with Rapns::BinaryNotificationValidator
 
+    scope :undelivered, where(:delivered => false)
+
     def device_token=(token)
       write_attribute(:device_token, token.delete(" <>")) if !token.nil?
     end

@@ -1,0 +1,79 @@
+require "spec_helper"
+
+describe Rapns::Daemon::Runner do
+  before do
+    Rapns::Daemon::Runner.stub(:sleep)
+    @notification = Rapns::Notification.create!(:device_token => "a" * 64)
+    Rapns::Notification.stub(:undelivered).and_return([@notification])
+    @logger = mock("Logger", :info => nil, :error => nil)
+    Rapns.stub(:logger).and_return(@logger)
+    Rapns::Daemon::Connection.stub(:write)
+    @now = Time.now
+    Time.stub(:now).and_return(@now)
+  end
+
+  it "should only attempt to deliver undelivered notificatons" do
+    Rapns::Notification.should_receive(:undelivered).and_return([])
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
+  it "should send the binary version of the notification" do
+    @notification.should_receive(:to_binary).and_return("i'm binary... not")
+    Rapns::Daemon::Connection.should_receive(:write).with("i'm binary... not")
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
+  it "should mark the notification as delivered" do
+    expect { Rapns::Daemon::Runner.deliver_notifications(:poll => 1) }.to change(@notification, :delivered).to(true)
+  end
+
+  it "should set the time the notification was delivered" do
+    @notification.delivered_at.should be_nil
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+    @notification.delivered_at.should be_kind_of(Time)
+  end
+
+  it "should not trigger validations when saving the notification" do
+    @notification.should_receive(:save).with(:validate => false)
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
+  it "should sleep for the given period" do
+    Rapns::Daemon::Runner.should_receive(:sleep).with(1)
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
+  it "should log errors" do
+    e = Exception.new("bork")
+    Rapns::Daemon::Connection.stub(:write).and_raise(e)
+    Rapns.logger.should_receive(:error).with("[ERROR] [#{@now.to_s(:db)}] Exception, bork")
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
+  it "should print out the error if running in the foreground" do
+    e = Exception.new("bork")
+    Rapns::Daemon::Connection.stub(:write).and_raise(e)
+    Rapns::Daemon::Runner.should_receive(:puts).with("[ERROR] [#{@now.to_s(:db)}] Exception, bork")
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => true)
+  end
+
+  it "should not print out the error if not running in the foreground" do
+    Rapns::Daemon::Runner.should_not_receive(:puts)
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => false)
+  end
+
+  it "should log the notification delivery" do
+    Rapns.logger.should_receive(:info).with("[#{@now.to_s(:db)}] notification #{@notification.id} delivered to #{@notification.device_token}")
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
+  it "should print out the notification delivery message if running in the foreground" do
+    Rapns::Daemon::Runner.should_receive(:puts).with("[#{@now.to_s(:db)}] notification #{@notification.id} delivered to #{@notification.device_token}")
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => true)
+  end
+
+  it "should not print out the notification delivery message if not running in the foreground" do
+    Rapns::Daemon::Runner.should_not_receive(:puts)
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1, :foreground => false)
+  end
+end

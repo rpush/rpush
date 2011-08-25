@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+
 require "optparse"
 require "rapns"
 require "rapns/daemon"
@@ -8,9 +9,9 @@ new_argv = ARGV.clone
 environment = new_argv.shift
 new_argv.options do |opts|
   opts.banner = "Usage: rapns <environment> [options]"
-  opts.on("-p", "--poll=SECONDS", Fixnum, "Frequency in seconds to check the database for new notifications. Default: 2") { |v| options[:poll] = v }
+  opts.on("-p", "--poll=SECONDS", Fixnum, "Frequency in seconds to check the database for new notifications. Default: #{options[:poll]}") { |v| options[:poll] = v }
   opts.on("-f", "--foreground", "Run in the forefround.") { options[:forefround] = true }
-  opts.on("-v", "--version", "Display this version of rapns.") { puts "rapns #{Rapns::VERSION}"; exit }
+  opts.on("-v", "--version", "Print this version of rapns.") { puts "rapns #{Rapns::VERSION}"; exit }
   opts.on("-h", "--help", "You're looking at it.") { puts opts; exit }
 end
 
