@@ -7,7 +7,7 @@ describe Rapns::Daemon do
     Rapns::Daemon::Certificate.stub(:load)
     Rapns::Daemon::Connection.stub(:connect)
     Rapns::Daemon::Runner.stub(:start)
-    Rapns::Daemon.stub(:fork)
+    Rapns::Daemon.stub(:daemonize)
     Rails.stub(:root).and_return("/rails_root")
     @logger = mock("Logger")
     Rapns::Daemon::Logger.stub(:new).and_return(@logger)
@@ -30,12 +30,12 @@ describe Rapns::Daemon do
   end
 
   it "should fork a child process if the foreground option is false" do
-    Rapns::Daemon.should_receive(:fork)
+    Rapns::Daemon.should_receive(:daemonize)
     Rapns::Daemon.start("development", {:foreground => false})
   end
 
   it "should not fork a child process if the foreground option is true" do
-    Rapns::Daemon.should_not_receive(:fork)
+    Rapns::Daemon.should_not_receive(:daemonize)
     Rapns::Daemon.start("development", {:foreground => true})
   end
 

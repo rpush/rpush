@@ -14,12 +14,10 @@ module Rapns
             notification.delivered_at = Time.now
             notification.save(:validate => false)
 
-            msg = Rapns.logger.info("notification #{notification.id} delivered to #{notification.device_token}")
-            puts msg if options[:foreground]
+            Rapns.logger.info("notification #{notification.id} delivered to #{notification.device_token}")
           end
         rescue Exception => e
-          msg = Rapns.logger.error("#{e.class.name}, #{e.message}")
-          puts msg if options[:foreground]
+          Rapns.logger.error("#{e.class.name}, #{e.message}")
         end
 
         sleep options[:poll]
