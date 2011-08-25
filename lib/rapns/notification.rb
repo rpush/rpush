@@ -33,7 +33,8 @@ module Rapns
     end
 
     def as_json
-      json = {'aps' => {}}
+      json = ActiveSupport::OrderedHash.new
+      json['aps'] = ActiveSupport::OrderedHash.new
       json['aps']['alert'] = alert if alert
       json['aps']['badge'] = badge if badge
       json['aps']['sound'] = sound if sound
