@@ -16,8 +16,8 @@ module Rapns
           @ssl_socket.write(data)
           @ssl_socket.flush
         rescue Errno::EPIPE => e
-          Rapns.logger.warn("Lost connection to #{Configuration.host}:#{Configuration.port}, reconnecting.")
-          connect_socket
+          Rapns.logger.warn("Lost connection to #{Configuration.host}:#{Configuration.port}, reconnecting...")
+          @tcp_socket, @ssl_socket = connect_socket
 
           retry_count += 1
 
