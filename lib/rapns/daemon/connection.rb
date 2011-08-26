@@ -44,6 +44,7 @@ module Rapns
         ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
         ssl_socket.sync = true
         ssl_socket.connect
+        Rapns::Daemon.logger.info("Connected to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}")
         [tcp_socket, ssl_socket]
       end
 

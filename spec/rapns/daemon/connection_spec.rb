@@ -44,6 +44,8 @@ describe Rapns::Daemon::Connection, "when connecting the socket" do
     OpenSSL::SSL::SSLSocket.stub(:new).and_return(@ssl_socket)
     configuration = mock("Configuration", :host => "localhost", :port => 123)
     Rapns::Daemon.stub(:configuration).and_return(configuration)
+    @logger = mock("Logger", :info => nil)
+    Rapns::Daemon.stub(:logger).and_return(@logger)
   end
 
   it "should create a TCP socket using the configured host and port" do
