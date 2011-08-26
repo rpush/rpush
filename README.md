@@ -31,13 +31,13 @@ Generate the migration, rapns.yml and migrate:
 6. If you decide to set a password for your exported certificate, please read the Configuration section below.
 7. Convert the certificate to a .pem, where <environment> should be `development` or `production`, depending on the certificate you exported.
 
-    openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem 
+    `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
       
 8. Move the .pem file into your Rails application under config/rapns.
 
 ## Configuration
 
-Environment configuration lives in config/rapns/rapns.yml. For common setups you probably wont need to change this file.
+Environment configuration lives in `config/rapns/rapns.yml`. For common setups you probably wont need to change this file.
 
 If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
 

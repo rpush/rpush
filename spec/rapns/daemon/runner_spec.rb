@@ -5,24 +5,26 @@ describe Rapns::Daemon::Runner do
     Rapns::Daemon::Runner.stub(:sleep)
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     @logger = mock("Logger", :info => nil, :error => nil)
-    Rapns.stub(:logger).and_return(@logger)
-    Rapns::Daemon::Connection.stub(:write)
+    Rapns::Daemon.stub(:logger).and_return(@logger)
+    @connection = Rapns::Daemon::Connection.new
+    Rapns::Daemon.stub(:connection).and_return(@connection)
+    @connection.stub(:write)
     @now = Time.now
     Time.stub(:now).and_return(@now)
   end
 
   it "should only attempt to deliver undelivered notificatons" do
-    Rapns::Daemon::Connection.should_receive(:write)
+    @connection.should_receive(:write)
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
     @notification.update_attributes(:delivered => true, :delivered_at => Time.now)
-    Rapns::Daemon::Connection.should_not_receive(:write)
+    @connection.should_not_receive(:write)
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
 
   it "should send the binary version of the notification" do
     Rapns::Notification.stub(:undelivered).and_return([@notification])
     @notification.stub((:to_binary)).and_return("hi mom")
-    Rapns::Daemon::Connection.should_receive(:write).with("hi mom")
+    @connection.should_receive(:write).with("hi mom")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
 
@@ -50,13 +52,13 @@ describe Rapns::Daemon::Runner do
 
   it "should log errors" do
     e = Exception.new("bork")
-    Rapns::Daemon::Connection.stub(:write).and_raise(e)
-    Rapns.logger.should_receive(:error).with("Exception, bork")
+    @connection.stub(:write).and_raise(e)
+    Rapns::Daemon.logger.should_receive(:error).with("Exception, bork")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
 
   it "should log the notification delivery" do
-    Rapns.logger.should_receive(:info).with("Notification #{@notification.id} delivered to #{@notification.device_token}")
+    Rapns::Daemon.logger.should_receive(:info).with("Notification #{@notification.id} delivered to #{@notification.device_token}")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
 end

@@ -8,16 +8,16 @@ module Rapns
       def self.deliver_notifications(options)
         begin
           Rapns::Notification.undelivered.each do |notification|
-            Rapns::Daemon::Connection.write(notification.to_binary)
+            Rapns::Daemon.connection.write(notification.to_binary)
 
             notification.delivered = true
             notification.delivered_at = Time.now
             notification.save(:validate => false)
 
-            Rapns.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
+            Rapns::Daemon.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
           end
         rescue Exception => e
-          Rapns.logger.error("#{e.class.name}, #{e.message}")
+          Rapns::Daemon.logger.error("#{e.class.name}, #{e.message}")
         end
 
         sleep options[:poll]
