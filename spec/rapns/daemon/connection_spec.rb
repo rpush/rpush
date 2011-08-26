@@ -94,9 +94,9 @@ end
 
 describe Rapns::Daemon::Connection, "when the connection is lost" do
   before do
-    Rapns::Daemon::Connection.stub(:connect_socket)
     @ssl_socket = mock("SSLSocket")
     Rapns::Daemon::Connection.instance_variable_set("@ssl_socket", @ssl_socket)
+    Rapns::Daemon::Connection.stub(:connect_socket).and_return([mock("TCPSocket"), @ssl_socket])
     @ssl_socket.stub(:write).and_raise(Errno::EPIPE)
     @logger = mock("Logger", :warn => nil)
     Rapns.stub(:logger).and_return(@logger)
@@ -106,7 +106,7 @@ describe Rapns::Daemon::Connection, "when the connection is lost" do
   it "should log a warning" do
     Rapns::Daemon::Configuration.stub(:host).and_return("localhost")
     Rapns::Daemon::Configuration.stub(:port).and_return(123)
-    Rapns.logger.should_receive("warn").with("Lost connection to localhost:123, reconnecting.")
+    Rapns.logger.should_receive("warn").with("Lost connection to localhost:123, reconnecting...")
     begin
       Rapns::Daemon::Connection.write(nil)
     rescue Rapns::Daemon::Connection::ConnectionError

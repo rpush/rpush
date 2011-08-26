@@ -14,7 +14,7 @@ module Rapns
             notification.delivered_at = Time.now
             notification.save(:validate => false)
 
-            Rapns.logger.info("notification #{notification.id} delivered to #{notification.device_token}")
+            Rapns.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
           end
         rescue Exception => e
           Rapns.logger.error("#{e.class.name}, #{e.message}")
