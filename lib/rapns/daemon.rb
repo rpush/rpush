@@ -7,7 +7,11 @@ require "rapns/daemon/logger"
 module Rapns
   module Daemon
     class << self
-      attr_accessor :logger, :configuration, :certificate, :connection
+      attr_accessor :logger, :configuration, :certificate, :connection, :shutdown
+
+      def shutdown?
+        @shutdown == true
+      end
     end
 
     def self.start(environment, options)
@@ -27,6 +31,13 @@ module Rapns
     end
 
     protected
+
+    def self.setup_signal_hooks
+      Signal.trap("INT") do
+        puts "Shuting down..."
+        Rapns::Daemon.shutdown = true
+      end
+    end
 
     def self.daemonize
       exit if pid = fork

@@ -2,7 +2,10 @@ module Rapns
   module Daemon
     class Runner
       def self.start(options)
-        loop { deliver_notifications(options) }
+        loop do
+          break if Rapns::Daemon.shutdown?
+          deliver_notifications(options)
+        end
       end
 
       def self.deliver_notifications(options)
