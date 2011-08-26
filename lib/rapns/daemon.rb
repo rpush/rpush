@@ -5,16 +5,23 @@ require "rapns/daemon/runner"
 require "rapns/daemon/logger"
 
 module Rapns
-  def self.logger
-    @logger
-  end
-
   module Daemon
+    class << self
+      attr_accessor :logger, :configuration, :certificate, :connection
+    end
+
     def self.start(environment, options)
-      Rapns.instance_variable_set("@logger", Logger.new(options[:foreground]))
-      Configuration.load(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
-      Certificate.load(Configuration.certificate)
-      Connection.connect
+      self.logger = Logger.new(options[:foreground])
+
+      self.configuration = Configuration.new(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
+      configuration.load
+
+      self.certificate = Certificate.new(configuration.certificate)
+      certificate.load
+
+      self.connection = Connection.new
+      connection.connect
+
       daemonize unless options[:foreground]
       Runner.start(options)
     end

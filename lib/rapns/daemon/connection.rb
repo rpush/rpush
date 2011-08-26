@@ -3,20 +3,20 @@ module Rapns
     class Connection
       class ConnectionError < Exception; end
 
-      def self.connect
+      def connect
         @ssl_context = setup_ssl_context
         @tcp_socket, @ssl_socket = connect_socket
         setup_at_exit_hook
       end
 
-      def self.write(data)
+      def write(data)
         retry_count = 0
 
         begin
           @ssl_socket.write(data)
           @ssl_socket.flush
         rescue Errno::EPIPE => e
-          Rapns.logger.warn("Lost connection to #{Configuration.host}:#{Configuration.port}, reconnecting...")
+          Rapns::Daemon.logger.warn("Lost connection to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}, reconnecting...")
           @tcp_socket, @ssl_socket = connect_socket
 
           retry_count += 1
@@ -32,26 +32,26 @@ module Rapns
 
       protected
 
-      def self.setup_ssl_context
+      def setup_ssl_context
         ssl_context = OpenSSL::SSL::SSLContext.new
-        ssl_context.key = OpenSSL::PKey::RSA.new(Certificate.certificate, '')
-        ssl_context.cert = OpenSSL::X509::Certificate.new(Certificate.certificate)
+        ssl_context.key = OpenSSL::PKey::RSA.new(Rapns::Daemon.certificate.certificate, Rapns::Daemon.configuration.certificate_password)
+        ssl_context.cert = OpenSSL::X509::Certificate.new(Rapns::Daemon.certificate.certificate)
         ssl_context
       end
 
-      def self.connect_socket
-        tcp_socket = TCPSocket.new(Configuration.host, Configuration.port)
+      def connect_socket
+        tcp_socket = TCPSocket.new(Rapns::Daemon.configuration.host, Rapns::Daemon.configuration.port)
         ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
         ssl_socket.sync = true
         ssl_socket.connect
         [tcp_socket, ssl_socket]
       end
 
-      def self.setup_at_exit_hook
+      def setup_at_exit_hook
         Kernel.at_exit { shutdown_socket }
       end
 
-      def self.shutdown_socket
+      def shutdown_socket
         @ssl_socket.close if @ssl_socket
         @tcp_socket.close if @tcp_socket
       end

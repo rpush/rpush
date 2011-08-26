@@ -2,7 +2,13 @@
 
 Easy to use library for Apple's Push Notification Service with Rails 3.
 
-Apple recommends keeping a persistent connection open to its Push Notification Service. To achieve this rapns provides a daemon process which runs unattended in the background, sending notifications as they are created.
+## Features
+
+* Works with Rails 3 and Ruby 1.9.
+* Uses a daemon process to keep open a persistent connection to the Push Notification Service, as recommended by Apple.
+* Uses the [enhanced binary format](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4) (Figure 5-2) so that delivery errors can be reported.
+* Airbrake (Hoptoad) integration.
+* Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
 
 ## Getting Started
 
@@ -22,16 +28,28 @@ Generate the migration, rapns.yml and migrate:
 3. Select both the certificate and private key.
 4. Right click and select `Export 2 items...`.
 5. Save the file as `cert.p12`, make sure the File Format is `Personal Information Exchange (p12)`.
-6. Convert the certificate to a .pem, where <environment> should be `development` or `production`, depending on the certificate you exported.
+6. If you decide to set a password for your exported certificate, please read the Configuration section below.
+7. Convert the certificate to a .pem, where <environment> should be `development` or `production`, depending on the certificate you exported.
 
     openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem 
       
-7. Move the .pem file into your Rails application under config/rapns.
+8. Move the .pem file into your Rails application under config/rapns.
 
 ## Configuration
 
 Environment configuration lives in config/rapns/rapns.yml. For common setups you probably wont need to change this file.
 
-If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development and production, depending on which iOS Push Certificate you wish to use.
+If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
 
 The `certificate` entry assumes .pem files exist under config/rapns. If your .pem files must exist in a different location, you can set `certificate` to an absolute path.
+
+If you set a password on your certificate, you'll need to set the `certificate_password` entry too.
+
+## Running rapns
+
+    bundle exec rapns <environment>
+    
+### Options
+
+* `--foreground` will prevent rapns from forking into a daemon. Activity information will be printed to the screen.
+* `--poll=SECONDS` defines how frequently to check the database for new notifications to deliver.
