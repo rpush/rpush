@@ -29,7 +29,7 @@ Generate the migration, rapns.yml and migrate:
 4. Right click and select `Export 2 items...`.
 5. Save the file as `cert.p12`, make sure the File Format is `Personal Information Exchange (p12)`.
 6. If you decide to set a password for your exported certificate, please read the Configuration section below.
-7. Convert the certificate to a .pem, where <environment> should be `development` or `production`, depending on the certificate you exported.
+7. Convert the certificate to a .pem, where `<environment>` should be `development` or `production`, depending on the certificate you exported.
 
     `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
       
@@ -45,7 +45,7 @@ The `certificate` entry assumes .pem files exist under `config/rapns`. If your .
 
 If you set a password on your certificate, you'll need to set the `certificate_password` entry too.
 
-## Running rapns
+## Starting the rapns Daemon
 
     bundle exec rapns <environment>
     
@@ -69,8 +69,8 @@ If you set a password on your certificate, you'll need to set the `certificate_p
 * `expiry` is the time in seconds the APNs will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
 
-### Assigning a Hash to `alert`
+### Assigning a Hash to alert
 
-Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) for this feature.
+Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Tables 3-1 and 3-2).
 
 Not yet implemented!
