@@ -15,6 +15,8 @@ module Rapns
     end
 
     def self.start(environment, options)
+      setup_signal_hooks
+
       self.logger = Logger.new(options[:foreground])
 
       self.configuration = Configuration.new(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
@@ -33,8 +35,8 @@ module Rapns
     protected
 
     def self.setup_signal_hooks
-      Signal.trap("INT") do
-        puts "Shuting down..."
+      Signal.trap("SIGINT") do
+        puts "Shutting down..."
         Rapns::Daemon.shutdown = true
       end
     end
