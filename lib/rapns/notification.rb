@@ -4,6 +4,7 @@ module Rapns
 
     validates :device_token, :presence => true, :format => { :with => /^[a-z0-9]{64}$/ }
     validates :badge, :numericality => true, :allow_nil => true
+    validates :expiry, :numericality => true, :presence => true
 
     validates_with Rapns::BinaryNotificationValidator
 
