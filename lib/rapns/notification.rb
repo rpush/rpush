@@ -14,16 +14,6 @@ module Rapns
       write_attribute(:device_token, token.delete(" <>")) if !token.nil?
     end
 
-    def sound=(value)
-      if value.is_a?(TrueClass)
-        write_attribute(:sound, "1.aiff")
-      elsif value.is_a?(FalseClass)
-        write_attribute(:sound, nil)
-      else
-        write_attribute(:sound, value)
-      end
-    end
-
     def attributes_for_device=(attrs)
       raise ArgumentError, "attributes_for_device must be a Hash" if !attrs.is_a?(Hash)
       write_attribute(:attributes_for_device, ActiveSupport::JSON.encode(attrs))

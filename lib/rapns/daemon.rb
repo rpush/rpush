@@ -36,7 +36,7 @@ module Rapns
 
     def self.setup_signal_hooks
       Signal.trap("SIGINT") do
-        puts "Shutting down..."
+        puts "\nShutting down..."
         Rapns::Daemon.shutdown = true
       end
     end

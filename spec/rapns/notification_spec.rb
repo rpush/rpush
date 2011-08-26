@@ -18,22 +18,13 @@ describe Rapns::Notification do
     notification.valid?.should be_false
     notification.errors[:base].include?("APN notification cannot be larger than 256 bytes. Try condensing your alert and device attributes.").should be_true
   end
-end
 
-describe Rapns::Notification, "when assigning the sound" do
-  it "should set the sound to 1.aiff when true is given" do
-    notification = Rapns::Notification.new(:sound => true)
-    notification.sound.should == "1.aiff"
+  it "should default the sound to 1.aiff" do
+    Rapns::Notification.new.sound.should == "1.aiff"
   end
 
-  it "should set the sound to nil when false is given" do
-    notification = Rapns::Notification.new(:sound => false)
-    notification.sound.should be_nil
-  end
-
-  it "should set the sound to name of the sound file given" do
-    notification = Rapns::Notification.new(:sound => "my_sound.aiff")
-    notification.sound.should == "my_sound.aiff"
+  it "should default the expiry to 1 day" do
+    Rapns::Notification.new.expiry.should == 1.day.to_i
   end
 end
 
@@ -109,7 +100,7 @@ describe Rapns::Notification, "to_binary" do
   it "should correctly convert the notification to binary" do
     notification = Rapns::Notification.new
     notification.device_token = "a" * 64
-    notification.sound = true
+    notification.sound = "1.aiff"
     notification.badge = 3
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.attributes_for_device = {:hi => :mom}
