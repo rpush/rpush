@@ -23,7 +23,11 @@ module Rapns
       end
 
       def self.certificate
-        File.join(Rails.root, "config", "rapns", @certificate)
+        if Pathname.new(@certificate).absolute?
+          @certificate
+        else
+          File.join(Rails.root, "config", "rapns", @certificate)
+        end
       end
 
       protected

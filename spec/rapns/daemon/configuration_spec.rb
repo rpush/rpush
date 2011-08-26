@@ -50,4 +50,12 @@ describe Rapns::Daemon::Configuration do
     Rapns::Daemon::Configuration.load("production", "/some/config.yml")
     Rapns::Daemon::Configuration.certificate.should == "/rails_root/config/rapns/production.pem"
   end
+
+  it "should keep the absolute path of the certificate if it has one" do
+    Rails.stub(:root).and_return("/rails_root")
+    @config["certificate"] = "/different_path/to/production.pem"
+    Rapns::Daemon::Configuration.stub(:read_config).and_return({"production" => @config})
+    Rapns::Daemon::Configuration.load("production", "/some/config.yml")
+    Rapns::Daemon::Configuration.certificate.should == "/different_path/to/production.pem"
+  end
 end
