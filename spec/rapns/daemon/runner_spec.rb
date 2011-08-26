@@ -20,7 +20,9 @@ describe Rapns::Daemon::Runner do
   end
 
   it "should send the binary version of the notification" do
-    Rapns::Daemon::Connection.should_receive(:write).with("\x01\x00\x00\x00\x02\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00\n{\"aps\":{}}")
+    Rapns::Notification.stub(:undelivered).and_return([@notification])
+    @notification.stub((:to_binary)).and_return("hi mom")
+    Rapns::Daemon::Connection.should_receive(:write).with("hi mom")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
 
