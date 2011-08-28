@@ -23,6 +23,10 @@ module Rapns
       private
 
       def log(where, msg, prefix = nil)
+        if msg.is_a?(Exception)
+          msg = "#{msg.class.name}, #{msg.message}"
+        end
+
         formatted_msg = "[#{Time.now.to_s(:db)}] "
         formatted_msg << "[#{prefix}] " if prefix
         formatted_msg << msg

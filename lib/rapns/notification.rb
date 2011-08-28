@@ -38,7 +38,7 @@ module Rapns
     def to_binary(options = {})
       id_for_pack = options[:for_validation] ? 0 : id
       json = as_json.to_json
-      [1, id_for_pack, expiry, 0, 32, device_token, 0, json.size, json].pack("cNNccH*cca*")
+      [1, id_for_pack, expiry, 0, 32, device_token, 0, json.size, json].pack("cNNccH*cna*")
     end
   end
 end

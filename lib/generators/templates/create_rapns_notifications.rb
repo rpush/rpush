@@ -9,6 +9,10 @@ class CreateRapnsNotifications < ActiveRecord::Migration
       t.integer   :expiry,                :null => false, :default => 1.day.to_i
       t.boolean   :delivered,             :null => false, :default => false
       t.timestamp :delivered_at,          :null => true
+      t.boolean   :failed,                :null => false, :default => false
+      t.timestamp :failed_at,             :null => true
+      t.integer   :error_code,            :null => true
+      t.string    :error_description,     :null => true
       t.timestamps
     end
 

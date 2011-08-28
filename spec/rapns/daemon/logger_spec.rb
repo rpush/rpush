@@ -54,4 +54,11 @@ describe Rapns::Daemon::Logger do
     @buffered_logger.should_receive(:warn).with(/#{Regexp.escape("[WARNING]")}/)
     logger.warn("eeek")
   end
+
+  it "should handle an Exception instance" do
+    e = RuntimeError.new("hi mom")
+    logger = Rapns::Daemon::Logger.new(false)
+    @buffered_logger.should_receive(:error).with(/RuntimeError, hi mom/)
+    logger.error(e)
+  end
 end

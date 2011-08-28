@@ -3,7 +3,7 @@ module Rapns
     class Runner
       def self.start(options)
         loop do
-          break if Rapns::Daemon.shutdown?
+          break if @stop
           deliver_notifications(options)
         end
       end
@@ -11,7 +11,7 @@ module Rapns
       def self.deliver_notifications(options)
         begin
           Rapns::Notification.undelivered.each do |notification|
-            Rapns::Daemon.connection.write(notification.to_binary)
+            Rapns::Daemon.connection_pool.write(notification.to_binary)
 
             notification.delivered = true
             notification.delivered_at = Time.now
@@ -20,10 +20,14 @@ module Rapns
             Rapns::Daemon.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
           end
         rescue Exception => e
-          Rapns::Daemon.logger.error("#{e.class.name}, #{e.message}")
+          Rapns::Daemon.logger.error(e)
         end
 
         sleep options[:poll]
+      end
+
+      def self.stop
+        @stop = true
       end
     end
   end

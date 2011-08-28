@@ -33,7 +33,7 @@ Generate the migration, rapns.yml and migrate:
 
     `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
       
-8. Move the .pem file into your Rails application under config/rapns.
+8. Move the .pem file into your Rails application under `config/rapns`.
 
 ## Configuration
 
