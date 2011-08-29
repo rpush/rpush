@@ -40,8 +40,8 @@ module Rapns
 
         if defined?(Airbrake)
           Airbrake.notify(e)
-        elsif defined?(HoptoadNotify)
-          HoptoadNotify.notify(e)
+        elsif defined?(HoptoadNotifier)
+          HoptoadNotifier.notify(e)
         end
       end
     end

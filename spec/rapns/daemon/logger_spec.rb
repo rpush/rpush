@@ -11,7 +11,7 @@ describe Rapns::Daemon::Logger do
     end
   end
 
-  module HoptoadNotify
+  module HoptoadNotifier
     def self.notify(e)
     end
   end
