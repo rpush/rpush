@@ -13,16 +13,26 @@ describe Rapns::Daemon::Runner do
     Time.stub(:now).and_return(@now)
   end
 
-  it "should only attempt to deliver undelivered notificatons" do
+  it "should deliver and undelivered notification" do
+    @notification.update_attributes!(:delivered => false)
     @connection_pool.should_receive(:write)
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
-    @notification.update_attributes(:delivered => true, :delivered_at => Time.now)
+  end
+
+  it "should not attempt to deliver a previously delivered notification" do
+    @notification.update_attributes!(:delivered => true, :delivered_at => Time.now)
     @connection_pool.should_not_receive(:write)
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
 
+  it "should not attempt to deliver a notification that has previously failed delivery" do
+    @notification.update_attributes!(:delivered => false, :failed => true)
+    Rapns::Daemon.connection_pool.should_not_receive(:write)
+    Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
+  end
+
   it "should send the binary version of the notification" do
-    Rapns::Notification.stub(:undelivered).and_return([@notification])
+    Rapns::Notification.stub(:ready_for_delivery).and_return([@notification])
     @notification.stub((:to_binary)).and_return("hi mom")
     @connection_pool.should_receive(:write).with("hi mom")
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
@@ -40,7 +50,7 @@ describe Rapns::Daemon::Runner do
   end
 
   it "should not trigger validations when saving the notification" do
-    Rapns::Notification.stub(:undelivered).and_return([@notification])
+    Rapns::Notification.stub(:ready_for_delivery).and_return([@notification])
     @notification.should_receive(:save).with(:validate => false)
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)
   end
@@ -51,7 +61,7 @@ describe Rapns::Daemon::Runner do
   end
 
   it "should log errors" do
-    e = Exception.new("bork")
+    e = StandardError.new("bork")
     @connection_pool.stub(:write).and_raise(e)
     Rapns::Daemon.logger.should_receive(:error).with(e)
     Rapns::Daemon::Runner.deliver_notifications(:poll => 1)

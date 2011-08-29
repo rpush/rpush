@@ -1,5 +1,5 @@
 module Rapns
-  class CertificateError < Exception; end
+  class CertificateError < StandardError; end
 
   module Daemon
     class Certificate

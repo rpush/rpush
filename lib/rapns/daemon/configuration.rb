@@ -1,7 +1,7 @@
 require "yaml"
 
 module Rapns
-  class ConfigurationError < Exception; end
+  class ConfigurationError < StandardError; end
 
   module Daemon
     class Configuration

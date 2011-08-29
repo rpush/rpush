@@ -8,7 +8,7 @@ module Rapns
 
     validates_with Rapns::BinaryNotificationValidator
 
-    scope :undelivered, lambda { where(:delivered => false) }
+    scope :ready_for_delivery, lambda { where(:delivered => false, :failed => false) }
 
     def device_token=(token)
       write_attribute(:device_token, token.delete(" <>")) if !token.nil?

@@ -76,3 +76,24 @@ Notification of errors to Airbrake (Hoptoad) is enabled by default and handled f
 Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Tables 3-1 and 3-2).
 
 Not yet implemented!
+
+## Delivery Failures
+
+The APN service provides two mechanism for delivery failure notification:
+
+### Immediately, when processing a notification for delivery.
+
+Although rapns makes such errors highly unlikely due to validation, the APNs reports processing errors immediately after being sent a notification. These errors are all centred around the well-formedness of the notification payload. Should a notification be rejected due to such an error, rapns will update the following attributes on the notification and send a notification via Airbrake/Hoptoad (if configured):
+
+`failed` flag is set to true.
+`failed_at` is set to the time of failure.
+`error` is set to Apple's code for the error.
+`error_description` is set to a (somewhat brief) description of the error.
+
+rapns will not attempt to deliver the notification again. 
+
+### Via the Feedback Service.
+
+Not implemented yet!
+
+

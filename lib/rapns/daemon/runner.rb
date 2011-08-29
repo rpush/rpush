@@ -10,7 +10,7 @@ module Rapns
 
       def self.deliver_notifications(options)
         begin
-          Rapns::Notification.undelivered.each do |notification|
+          Rapns::Notification.ready_for_delivery.each do |notification|
             Rapns::Daemon.connection_pool.write(notification.to_binary)
 
             notification.delivered = true
@@ -19,7 +19,7 @@ module Rapns
 
             Rapns::Daemon.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
           end
-        rescue Exception => e
+        rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end
 

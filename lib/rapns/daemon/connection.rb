@@ -1,7 +1,9 @@
 module Rapns
+  class DeliveryError < StandardError; end
+
   module Daemon
     class Connection
-      class ConnectionError < Exception; end
+      class ConnectionError < StandardError; end
 
       CLOSE_CMD = 0x666
       SELECT_TIMEOUT = 0.5
@@ -65,7 +67,7 @@ module Rapns
           else
             raise ConnectionError, "#{@name} tried #{retry_count} times to reconnect but failed: #{e.inspect}"
           end
-        rescue Exception => e
+        rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end
       end
@@ -89,7 +91,8 @@ module Rapns
         # Catch exceptions so they don't bubble up as we need to ensure the connection is closed after the error.
         begin
           description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
-          Rapns::Daemon.logger.error("[#{@name}] Received APN error #{status} (#{description}) for notification #{notification_id}")
+          error = DeliveryError.new("Received APN error #{status} (#{description}) for notification #{notification_id}")
+          Rapns::Daemon.logger.error(error)
 
           if notification = Rapns::Notification.find_by_id(notification_id)
             notification.delivered = false
@@ -99,9 +102,8 @@ module Rapns
             notification.error_code = status
             notification.error_description = description
             notification.save!(:validate => false)
-
           end
-        rescue Exception => e
+        rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end
       end

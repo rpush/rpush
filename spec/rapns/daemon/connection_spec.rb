@@ -210,7 +210,7 @@ describe Rapns::Daemon::Connection, "when receiving an error packet" do
   end
 
   it "should log that an error has been received" do
-    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Received APN error 4 (Missing payload) for notification #{@notification.id}")
+    Rapns::Daemon.logger.should_receive(:error).with(Rapns::DeliveryError.new("Received APN error 4 (Missing payload) for notification #{@notification.id}"))
     @queue.push("msg with an error")
   end
 
@@ -289,7 +289,7 @@ describe Rapns::Daemon::Connection, "when receiving an error packet" do
 
   it "should log if an error is raised when updating the notification" do
     Rapns::Notification.stub(:find_by_id).and_return(@notification)
-    e = Exception.new("bork!")
+    e = StandardError.new("bork!")
     @notification.stub(:save!).and_raise(e)
     Rapns::Daemon.logger.should_receive(:error).with(e)
     @queue.push("msg with an error")
