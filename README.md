@@ -7,7 +7,7 @@ Easy to use library for Apple's Push Notification Service with Rails 3.
 * Works with Rails 3 and Ruby 1.9.
 * Uses a daemon process to keep open a persistent connection to the Push Notification Service, as recommended by Apple.
 * Uses the [enhanced binary format](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4) (Figure 5-2) so that delivery errors can be reported.
-* Airbrake (Hoptoad) integration.
+* [Airbrake](http://airbrakeapp.com/) (Hoptoad) integration.
 * Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
 
 ## Getting Started
@@ -44,6 +44,8 @@ If you want to use rapns in environments other than development or production, y
 The `certificate` entry assumes .pem files exist under `config/rapns`. If your .pem files must exist in a different location, you can set `certificate` to an absolute path.
 
 If you set a password on your certificate, you'll need to set the `certificate_password` entry too.
+
+Notification of errors to Airbrake (Hoptoad) is enabled by default and handled for you if you have it installed. To disable this feature, set the `airbrake_notify` to `false`.
 
 ## Starting the rapns Daemon
 

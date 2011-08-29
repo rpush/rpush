@@ -19,6 +19,7 @@ module Rapns
         set_variable(:host, config)
         set_variable(:port, config)
         set_variable(:certificate, config)
+        set_variable(:airbrake_notify, config, :optional => true)
         set_variable(:certificate_password, config, :optional => true)
       end
 
@@ -32,6 +33,10 @@ module Rapns
 
       def certificate_password
         @certificate_password.blank? ? "" : @certificate_password
+      end
+
+      def airbrake_notify?
+        @airbrake_notify == true
       end
 
       protected

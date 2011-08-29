@@ -1,8 +1,8 @@
 module Rapns
   module Daemon
     class Logger
-      def initialize(foreground)
-        @foreground = foreground
+      def initialize(options)
+        @options = options
         log_path = File.join(Rails.root, "log", "rapns.log")
         @logger = ActiveSupport::BufferedLogger.new(log_path, Rails.logger.level)
         @logger.auto_flushing = Rails.logger.auto_flushing
@@ -13,6 +13,7 @@ module Rapns
       end
 
       def error(msg)
+        airbrake_notify(msg) if msg.is_a?(Exception)
         log(:error, msg, "ERROR")
       end
 
@@ -30,8 +31,18 @@ module Rapns
         formatted_msg = "[#{Time.now.to_s(:db)}] "
         formatted_msg << "[#{prefix}] " if prefix
         formatted_msg << msg
-        puts formatted_msg if @foreground
+        puts formatted_msg if @options[:foreground]
         @logger.send(where, formatted_msg)
+      end
+
+      def airbrake_notify(e)
+        return unless Rapns::Daemon.configuration.airbrake_notify?
+
+        if defined?(Airbrake)
+          Airbrake.notify(e)
+        elsif defined?(HoptoadNotify)
+          HoptoadNotify.notify(e)
+        end
       end
     end
   end

@@ -5,7 +5,7 @@ describe Rapns::Daemon::Configuration do
   end
 
   before do
-    @config = {"port" => 123, "host" => "localhost", "certificate" => "production.pem", "certificate_password" => "abc123"}
+    @config = {"port" => 123, "host" => "localhost", "certificate" => "production.pem", "certificate_password" => "abc123", "airbrake_notify" => true}
   end
 
   it "should raise an error if the configuration file does not exist" do
@@ -42,6 +42,12 @@ describe Rapns::Daemon::Configuration do
     expect { configuration.load }.should_not raise_error
   end
 
+  it "should not raise an error if the airbrake notify flag is not configured" do
+    configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
+    configuration.stub(:read_config).and_return({"production" => @config.except("airbrake_notify")})
+    expect { configuration.load }.should_not raise_error
+  end
+
   it "should set the host" do
     configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
     configuration.stub(:read_config).and_return({"production" => @config})
@@ -54,6 +60,20 @@ describe Rapns::Daemon::Configuration do
     configuration.stub(:read_config).and_return({"production" => @config})
     configuration.load
     configuration.port.should == 123
+  end
+
+  it "should set the airbrae notify flag" do
+    configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
+    configuration.stub(:read_config).and_return({"production" => @config})
+    configuration.load
+    configuration.airbrake_notify?.should == true
+  end
+
+  it "should default the airbrake notify flag to false if not set" do
+    configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
+    configuration.stub(:read_config).and_return({"production" => @config.except("airbrake_notify")})
+    configuration.load
+    configuration.airbrake_notify?.should == false
   end
 
   it "should set the certificate password" do

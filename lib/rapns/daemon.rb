@@ -14,10 +14,10 @@ module Rapns
     def self.start(environment, options)
       setup_signal_hooks
 
-      self.logger = Logger.new(options[:foreground])
-
       self.configuration = Configuration.new(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
       configuration.load
+
+      self.logger = Logger.new(options)
 
       self.certificate = Certificate.new(configuration.certificate)
       certificate.load

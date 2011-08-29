@@ -75,12 +75,12 @@ describe Rapns::Daemon, "when starting" do
   end
 
   it "should setup the logger" do
-    Rapns::Daemon::Logger.should_receive(:new).with(true).and_return(@logger)
+    Rapns::Daemon::Logger.should_receive(:new).with({:poll => 2, :foreground => true}).and_return(@logger)
     Rapns::Daemon.start("development", {:poll => 2, :foreground => true})
   end
 
   it "should make the logger accessible" do
-    Rapns::Daemon::Logger.stub(:new).with(true).and_return(@logger)
+    Rapns::Daemon::Logger.stub(:new).with({:poll => 2, :foreground => true}).and_return(@logger)
     Rapns::Daemon.start("development", {:poll => 2, :foreground => true})
     Rapns::Daemon.logger.should == @logger
   end
