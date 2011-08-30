@@ -51,18 +51,17 @@ describe Rapns::Daemon::DeliveryHandler do
     @notification.should_receive(:save!).with(:validate => false)
     @delivery_handler.send(:handle_next_notification)
   end
-  
-  # it "should log if an error is raised when updating the notification" do
-  #   Rapns::Notification.stub(:find_by_id).and_return(@notification)
-  #   e = StandardError.new("bork!")
-  #   @notification.stub(:save!).and_raise(e)
-  #   Rapns::Daemon.logger.should_receive(:error).with(e)
-  #   @queue.push("msg with an error")
-  # end
+
+  it "should log if an error is raised when updating the notification" do
+    e = StandardError.new("bork!")
+    @notification.stub(:save!).and_raise(e)
+    Rapns::Daemon.logger.should_receive(:error).with(e)
+    @delivery_handler.send(:handle_next_notification)
+  end
 
   describe "when delivery fails" do
     before do
-      @error = Rapns::DeliveryError.new(4, "Missing payload")
+      @error = Rapns::DeliveryError.new(4, "Missing payload", 1)
       @connection.stub(:write).and_raise(@error)
     end
 

@@ -65,7 +65,7 @@ module Rapns
 
             if cmd == 8 && status != 0
               description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
-              delivery_error = Rapns::DeliveryError.new(status, description)
+              delivery_error = Rapns::DeliveryError.new(status, description, notification_id)
             end
           end
 
