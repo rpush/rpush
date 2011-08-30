@@ -186,7 +186,7 @@ describe Rapns::Daemon::Connection, "when receiving an error packet" do
     @connection.stub(:setup_ssl_context)
     @connection.stub(:connect_socket).and_return([@tcp_socket, @ssl_socket])
     IO.stub(:select).and_return([@ssl_socket, [], []])
-    logger = mock("Logger", :error => nil)
+    logger = mock("Logger", :error => nil, :warn => nil)
     Rapns::Daemon.stub(:logger).and_return(logger)
     @connection.connect
   end
@@ -231,6 +231,14 @@ describe Rapns::Daemon::Connection, "when receiving an error packet" do
 
   it "should reconnect the socket" do
     @connection.should_receive(:connect_socket)
+    begin
+      @connection.write("msg with an error")
+    rescue Rapns::DeliveryError
+    end
+  end
+
+  it "should log that the connection is being reconnected" do
+    Rapns::Daemon.logger.should_receive(:warn).with("[Connection 1] Error received, reconnecting...")
     begin
       @connection.write("msg with an error")
     rescue Rapns::DeliveryError

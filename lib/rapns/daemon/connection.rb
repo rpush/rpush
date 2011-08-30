@@ -70,6 +70,7 @@ module Rapns
           end
 
           begin
+            Rapns::Daemon.logger.warn("[#{@name}] Error received, reconnecting...")
             close
             @tcp_socket, @ssl_socket = connect_socket
           ensure
