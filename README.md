@@ -41,20 +41,24 @@ Environment configuration lives in `config/rapns/rapns.yml`. For common setups y
 
 If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
 
-The `certificate` entry assumes .pem files exist under `config/rapns`. If your .pem files must exist in a different location, you can set `certificate` to an absolute path.
+### Options:
 
-If you set a password on your certificate, you'll need to set the `certificate_password` entry too.
-
-Notification of errors to Airbrake (Hoptoad) is enabled by default and handled for you if you have it installed. To disable this feature, set the `airbrake_notify` to `false`.
+* `host` the APNs host to connect to, either `gateway.sandbox.push.apple.com` or `gateway.sandbox.push.apple.com`.
+* `port` the APNs port. Currently 2195 for both hosts.
+* `certificate` The path to your .pem certificate, `config/rapns` is automatically checked if a relative path is given.
+* `certificate_password` (default: blank) the password you used when exporting your certificate, if any.
+* `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
+* `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
+* `connections` (default: 3) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications.
 
 ## Starting the rapns Daemon
 
-    bundle exec rapns <environment>
+    cd /path/to/rails/app
+    bundle exec rapns <Rails environment>
     
 ### Options
 
 * `--foreground` will prevent rapns from forking into a daemon. Activity information will be printed to the screen.
-* `--poll=SECONDS` defines how frequently to check the database for new notifications to deliver. Default is 2 seconds.
 
 ## Sending a Notification
 
@@ -83,7 +87,7 @@ The APN service provides two mechanism for delivery failure notification:
 
 ### Immediately, when processing a notification for delivery.
 
-Although rapns makes such errors highly unlikely due to validation, the APNs reports processing errors immediately after being sent a notification. These errors are all centred around the well-formedness of the notification payload. Should a notification be rejected due to such an error, rapns will update the following attributes on the notification and send a notification via Airbrake/Hoptoad (if configured):
+Although rapns makes such errors highly unlikely due to validation, the APNs reports processing errors immediately after being sent a notification. These errors are all centred around the well-formedness of the notification payload. Should a notification be rejected due to such an error, rapns will update the following attributes on the notification and send a notification via Airbrake/Hoptoad (if enabled):
 
 `failed` flag is set to true.
 `failed_at` is set to the time of failure.

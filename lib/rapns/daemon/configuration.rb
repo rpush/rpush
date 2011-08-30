@@ -5,7 +5,8 @@ module Rapns
 
   module Daemon
     class Configuration
-      attr_accessor :host, :port, :certificate, :certificate_password
+      attr_accessor :host, :port, :certificate, :certificate_password, :poll, :airbrake_notify, :connections
+      alias_method  :airbrake_notify?, :airbrake_notify
 
       def initialize(environment, config_path)
         @environment = environment
@@ -19,8 +20,10 @@ module Rapns
         set_variable(:host, config)
         set_variable(:port, config)
         set_variable(:certificate, config)
-        set_variable(:airbrake_notify, config, :optional => true)
-        set_variable(:certificate_password, config, :optional => true)
+        set_variable(:airbrake_notify, config, :optional => true, :default => true)
+        set_variable(:certificate_password, config, :optional => true, :default => "")
+        set_variable(:poll, config, :optional => true, :default => 2)
+        set_variable(:connections, config, :optional => true, :default => 3)
       end
 
       def certificate
@@ -31,14 +34,6 @@ module Rapns
         end
       end
 
-      def certificate_password
-        @certificate_password.blank? ? "" : @certificate_password
-      end
-
-      def airbrake_notify?
-        @airbrake_notify == true
-      end
-
       protected
 
       def read_config
@@ -47,8 +42,10 @@ module Rapns
       end
 
       def set_variable(key, config, options = {})
-        if config[key.to_s].blank?
-          if !options[:optional]
+        if !config.key?(key.to_s) || config[key.to_s].to_s.strip == ""
+          if options[:optional]
+            instance_variable_set("@#{key}", options[:default])
+          else
             raise Rapns::ConfigurationError, "'#{key}' not defined for environment '#{@environment}' in #{@config_path}"
           end
         else

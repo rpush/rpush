@@ -2,7 +2,8 @@ require "spec_helper"
 
 describe Rapns::Daemon::ConnectionPool do
   before do
-    Rapns::Daemon::Connection.stub(:new).and_return(mock("Connection", :connect => nil))
+    @connection = mock("Connection", :connect => nil)
+    Rapns::Daemon::Connection.stub(:new).and_return(@connection)
     @pool = Rapns::Daemon::ConnectionPool.new(3)
   end
 
@@ -12,16 +13,28 @@ describe Rapns::Daemon::ConnectionPool do
   end
 
   it "should tell each connection to close when drained" do
-    pool = 3.times.map { mock("Connection") }
-    @pool.instance_variable_set("@pool", pool)
-    pool.each { |conn| conn.should_receive(:close) }
+    @pool.populate
+    @connection.should_receive(:close).exactly(3).times
     @pool.drain
   end
+end
 
-  it "should push the msg into the queue" do
-    queue = @pool.instance_variable_get("@queue")
-    queue.should_receive(:push).with("blah")
-    @pool.write("blah")
+describe Rapns::Daemon::ConnectionPool, "when claiming a connection" do
+  before do
+    @connection = mock("Connection", :connect => nil)
+    Rapns::Daemon::Connection.stub(:new).and_return(@connection)
+    @pool = Rapns::Daemon::ConnectionPool.new(3)
+  end
+
+  it "should pop the connection from the pool" do
+    @pool.instance_variable_get("@queue").should_receive(:pop)
+    @pool.claim_connection {}
+  end
+
+  it "shuld push the connection into the pool after use" do
+    @pool.instance_variable_get("@queue").stub(:pop).and_return(@connection)
+    @pool.instance_variable_get("@queue").should_receive(:push).with(@connection)
+    @pool.claim_connection {}
   end
 end
 

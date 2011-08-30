@@ -15,11 +15,16 @@ describe Rapns::Daemon, "when starting" do
     @certificate.stub(:read_certificate).and_return("certificate contents")
     Rapns::Daemon::Certificate.stub(:new).and_return(@certificate)
 
-    @connection_pool = Rapns::Daemon::ConnectionPool.new
+    @connection_pool = Rapns::Daemon::ConnectionPool.new(3)
     @connection_pool.stub(:populate)
     Rapns::Daemon::ConnectionPool.stub(:new).and_return(@connection_pool)
 
-    Rapns::Daemon::Runner.stub(:start)
+    @handler_pool = Rapns::Daemon::DeliveryHandlerPool.new(3)
+    @handler_pool.stub(:populate)
+    Rapns::Daemon::DeliveryHandlerPool.stub(:new).and_return(@handler_pool)
+
+    Rapns::Daemon::Feeder.stub(:start)
+    Rapns::Daemon::Feeder.stub(:wait)
     Rapns::Daemon.stub(:daemonize)
     @logger = mock("Logger")
     Rapns::Daemon::Logger.stub(:new).and_return(@logger)
@@ -49,7 +54,7 @@ describe Rapns::Daemon, "when starting" do
   end
 
   it "should populate the connection pool" do
-    Rapns::Daemon::ConnectionPool.should_receive(:new).and_return(@connection_pool)
+    Rapns::Daemon::ConnectionPool.should_receive(:new).with(3).and_return(@connection_pool)
     @connection_pool.should_receive(:populate)
     Rapns::Daemon.start("development", {})
   end
@@ -59,54 +64,78 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.connection_pool.should == @connection_pool
   end
 
+  it "should populate the delivery handler pool" do
+    Rapns::Daemon::DeliveryHandlerPool.should_receive(:new).with(3).and_return(@handler_pool)
+    @handler_pool.should_receive(:populate)
+    Rapns::Daemon.start("development", {})
+  end
+
+  it "should make the delivery handler pool accessible" do
+    Rapns::Daemon.start("development", {})
+    Rapns::Daemon.delivery_handler_pool.should == @handler_pool
+  end
+
   it "should fork a child process if the foreground option is false" do
     Rapns::Daemon.should_receive(:daemonize)
-    Rapns::Daemon.start("development", {:foreground => false})
+    Rapns::Daemon.start("development", false)
   end
 
   it "should not fork a child process if the foreground option is true" do
     Rapns::Daemon.should_not_receive(:daemonize)
-    Rapns::Daemon.start("development", {:foreground => true})
+    Rapns::Daemon.start("development", true)
   end
 
-  it "should start the runner, passing the poll frequency as an argument" do
-    Rapns::Daemon::Runner.should_receive(:start).with({:poll => 2})
-    Rapns::Daemon.start("development", {:poll => 2})
+  it "should start the feeder" do
+    Rapns::Daemon::Feeder.should_receive(:start)
+    Rapns::Daemon.start("development", true)
   end
 
   it "should setup the logger" do
-    Rapns::Daemon::Logger.should_receive(:new).with({:poll => 2, :foreground => true}).and_return(@logger)
-    Rapns::Daemon.start("development", {:poll => 2, :foreground => true})
+    Rapns::Daemon::Logger.should_receive(:new).with(:foreground => true, :airbrake_notify => true).and_return(@logger)
+    Rapns::Daemon.start("development", true)
   end
 
   it "should make the logger accessible" do
-    Rapns::Daemon::Logger.stub(:new).with({:poll => 2, :foreground => true}).and_return(@logger)
-    Rapns::Daemon.start("development", {:poll => 2, :foreground => true})
+    Rapns::Daemon::Logger.stub(:new).and_return(@logger)
+    Rapns::Daemon.start("development", true)
     Rapns::Daemon.logger.should == @logger
   end
 end
 
 describe Rapns::Daemon, "when being shutdown" do
   before do
-    Rapns::Daemon::Runner.stub(:stop)
-    @pool = mock("ConnectionPool", :drain => nil)
-    Rapns::Daemon.stub(:connection_pool).and_return(@pool)
+    Rapns::Daemon::Feeder.stub(:stop)
+    @connection_pool = mock("ConnectionPool", :drain => nil)
+    Rapns::Daemon.stub(:connection_pool).and_return(@connection_pool)
+    @handler_pool = mock("DeliveryHandlerPool", :drain => nil)
+    Rapns::Daemon.stub(:delivery_handler_pool).and_return(@handler_pool)
     Rapns::Daemon.stub(:puts)
   end
 
-  it "should stop the runner" do
-    Rapns::Daemon::Runner.should_receive(:stop)
+  it "should stop the feeder" do
+    Rapns::Daemon::Feeder.should_receive(:stop)
     Rapns::Daemon.send(:shutdown)
   end
 
   it "should drain the connection pool" do
-    @pool.should_receive(:drain)
+    @connection_pool.should_receive(:drain)
     Rapns::Daemon.send(:shutdown)
   end
 
   it "should not attempt to drain the connection pool if it has not been initialized" do
     Rapns::Daemon.stub(:connection_pool).and_return(nil)
-    @pool.should_not_receive(:drain)
+    @connection_pool.should_not_receive(:drain)
+    Rapns::Daemon.send(:shutdown)
+  end
+
+  it "should drain the delivery handler pool" do
+    @handler_pool.should_receive(:drain)
+    Rapns::Daemon.send(:shutdown)
+  end
+
+  it "should not attempt to drain the delivery handler pool if it has not been initialized" do
+    Rapns::Daemon.stub(:delivery_handler_pool).and_return(nil)
+    @handler_pool.should_not_receive(:drain)
     Rapns::Daemon.send(:shutdown)
   end
 end

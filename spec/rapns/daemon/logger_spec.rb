@@ -76,15 +76,14 @@ describe Rapns::Daemon::Logger do
 
   it "should notify Airbrake of the exception" do
     e = RuntimeError.new("hi mom")
-    logger = Rapns::Daemon::Logger.new(:foreground => false)
+    logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
     Airbrake.should_receive(:notify).with(e)
     logger.error(e)
   end
 
-  it "should not notify Airbrake of the exception if the airbrake_notify? config option is false" do
-    Rapns::Daemon.configuration.stub(:airbrake_notify?).and_return(false)
+  it "should not notify Airbrake of the exception if the airbrake_notify option is false" do
     e = RuntimeError.new("hi mom")
-    logger = Rapns::Daemon::Logger.new(:foreground => false)
+    logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => false)
     Airbrake.should_not_receive(:notify).with(e)
     logger.error(e)
   end

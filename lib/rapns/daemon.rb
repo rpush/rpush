@@ -1,33 +1,45 @@
 require "rapns/daemon/configuration"
 require "rapns/daemon/certificate"
+require "rapns/daemon/delivery_error"
+require "rapns/daemon/pool"
 require "rapns/daemon/connection_pool"
 require "rapns/daemon/connection"
-require "rapns/daemon/runner"
+require "rapns/daemon/delivery_handler"
+require "rapns/daemon/delivery_handler_pool"
+require "rapns/daemon/feeder"
 require "rapns/daemon/logger"
 
 module Rapns
   module Daemon
     class << self
-      attr_accessor :logger, :configuration, :certificate, :connection_pool
+      attr_accessor :logger, :configuration, :certificate, :connection_pool, :delivery_queue,
+        :delivery_handler_pool, :foreground
+      alias_method  :foreground?, :foreground
     end
 
-    def self.start(environment, options)
+    def self.start(environment, foreground)
+      @foreground = foreground
       setup_signal_hooks
 
       self.configuration = Configuration.new(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
       configuration.load
 
-      self.logger = Logger.new(options)
+      self.logger = Logger.new(:foreground => foreground, :airbrake_notify => configuration.airbrake_notify)
 
       self.certificate = Certificate.new(configuration.certificate)
       certificate.load
 
-      self.connection_pool = ConnectionPool.new
+      self.delivery_queue = Queue.new
+
+      self.delivery_handler_pool = DeliveryHandlerPool.new(configuration.connections)
+      delivery_handler_pool.populate
+
+      self.connection_pool = ConnectionPool.new(configuration.connections)
       connection_pool.populate
 
-      daemonize unless options[:foreground]
+      daemonize unless foreground?
 
-      Runner.start(options)
+      Feeder.start
     end
 
     protected
@@ -38,7 +50,8 @@ module Rapns
 
     def self.shutdown
       puts "\nShutting down..."
-      Rapns::Daemon::Runner.stop
+      Rapns::Daemon::Feeder.stop
+      Rapns::Daemon.delivery_handler_pool.drain if Rapns::Daemon.delivery_handler_pool
       Rapns::Daemon.connection_pool.drain if Rapns::Daemon.connection_pool
     end
 

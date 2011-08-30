@@ -16,7 +16,7 @@ class CreateRapnsNotifications < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :rapns_notifications, :delivered
+    add_index :rapns_notifications, [:delivered, :failed]
   end
 
   def self.down

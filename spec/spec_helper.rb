@@ -11,9 +11,15 @@ CreateRapnsNotifications.up
 Bundler.require(:default)
 
 require "shoulda"
+require 'database_cleaner'
+DatabaseCleaner.strategy = :truncation
 
 require "rapns"
 require "rapns/daemon"
+
+RSpec.configure do |config|
+  config.before(:each) { DatabaseCleaner.clean }
+end
 
 
 

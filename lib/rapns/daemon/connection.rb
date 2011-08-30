@@ -1,11 +1,8 @@
 module Rapns
-  class DeliveryError < StandardError; end
-
   module Daemon
-    class Connection
-      class ConnectionError < StandardError; end
+    class ConnectionError < StandardError; end
 
-      CLOSE_CMD = 0x666
+    class Connection
       SELECT_TIMEOUT = 0.5
       ERROR_PACKET_BYTES = 6
       APN_ERRORS = {
@@ -20,32 +17,19 @@ module Rapns
         255 => "None (unknown error)"
       }
 
-      def initialize(name, queue)
+      def initialize(name)
         @name = name
-        @queue = queue
       end
 
       def connect
         @ssl_context = setup_ssl_context
         @tcp_socket, @ssl_socket = connect_socket
-
-        @thread = Thread.new do
-          loop do
-            data = @queue.pop
-            break if data == CLOSE_CMD
-            write(data)
-          end
-
-          close_socket
-        end
       end
 
       def close
-        @queue.push(CLOSE_CMD)
-        @thread.join if @thread
+        @ssl_socket.close if @ssl_socket
+        @tcp_socket.close if @tcp_socket
       end
-
-      protected
 
       def write(data)
         retry_count = 0
@@ -67,8 +51,6 @@ module Rapns
           else
             raise ConnectionError, "#{@name} tried #{retry_count} times to reconnect but failed: #{e.inspect}"
           end
-        rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
         end
       end
 
@@ -76,35 +58,23 @@ module Rapns
 
       def check_for_error
         if IO.select([@ssl_socket], nil, nil, SELECT_TIMEOUT)
+          delivery_error = nil
+
           if error = @ssl_socket.read(ERROR_PACKET_BYTES)
             cmd, status, notification_id = error.unpack("ccN")
-            handle_error(status, notification_id) if cmd == 8 && status != 0
+
+            if cmd == 8 && status != 0
+              description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
+              delivery_error = Rapns::DeliveryError.new(status, description)
+            end
           end
 
-          close_socket
-          @tcp_socket, @ssl_socket = connect_socket
-        end
-      end
-
-      # TODO: This is probably in the wrong place and should be handled by the Runner instead.
-      def handle_error(status, notification_id)
-        # Catch exceptions so they don't bubble up as we need to ensure the connection is closed after the error.
-        begin
-          description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
-          error = DeliveryError.new("Received APN error #{status} (#{description}) for notification #{notification_id}")
-          Rapns::Daemon.logger.error(error)
-
-          if notification = Rapns::Notification.find_by_id(notification_id)
-            notification.delivered = false
-            notification.delivered_at = nil
-            notification.failed = true
-            notification.failed_at = Time.now
-            notification.error_code = status
-            notification.error_description = description
-            notification.save!(:validate => false)
+          begin
+            close
+            @tcp_socket, @ssl_socket = connect_socket
+          ensure
+            raise delivery_error if delivery_error
           end
-        rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
         end
       end
 
@@ -122,11 +92,6 @@ module Rapns
         ssl_socket.connect
         Rapns::Daemon.logger.info("[#{@name}] Connected to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}")
         [tcp_socket, ssl_socket]
-      end
-
-      def close_socket
-        @ssl_socket.close if @ssl_socket
-        @tcp_socket.close if @tcp_socket
       end
     end
   end

@@ -4,6 +4,8 @@ development:
   certificate: development.pem
   certificate_password:
   airbrake_notify: true
+  poll: 2
+  connections: 3
 
 production:
   host: gateway.push.apple.com
@@ -11,3 +13,5 @@ production:
   certificate: production.pem
   certificate_password:
   airbrake_notify: true
+  poll: 2
+  connections: 3

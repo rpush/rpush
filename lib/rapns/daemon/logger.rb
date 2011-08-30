@@ -36,7 +36,7 @@ module Rapns
       end
 
       def airbrake_notify(e)
-        return unless Rapns::Daemon.configuration.airbrake_notify?
+        return unless @options[:airbrake_notify] == true
 
         if defined?(Airbrake)
           Airbrake.notify(e)
