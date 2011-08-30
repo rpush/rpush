@@ -69,11 +69,13 @@ If you want to use rapns in environments other than development or production, y
     n.sound = "1.aiff"
     n.expiry = 1.day.to_i
     n.attributes_for_device = {"question" => nil, "answer" => 42}
+    n.deliver_after = 1.hour.from_now
     n.save!
 
 * `sound` defaults to `1.aiff`. You can either set it to a custom .aiff file, or `nil` for no sound.
 * `expiry` is the time in seconds the APNs will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
+* `deliver_after` is not required, but may be set if you'd like to delay delivery of the notification to a specific time in the future.
 
 ### Assigning a Hash to alert
 

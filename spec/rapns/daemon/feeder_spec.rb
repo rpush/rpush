@@ -17,6 +17,24 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
+  it "should enqueue an undelivered notification without deliver_after set" do
+    @notification.update_attributes!(:delivered => false, :deliver_after => nil)
+    Rapns::Daemon.delivery_queue.should_receive(:push)
+    Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
+  it "should enqueue a notification with a deliver_after time in the past" do
+    @notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.ago)
+    Rapns::Daemon.delivery_queue.should_receive(:push)
+    Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
+  it "should not enqueue a notification with a deliver_after time in the future" do
+    @notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.from_now)
+    Rapns::Daemon.delivery_queue.should_not_receive(:push)
+    Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
   it "should not enqueue a previously delivered notification" do
     @notification.update_attributes!(:delivered => true, :delivered_at => Time.now)
     Rapns::Daemon.delivery_queue.should_not_receive(:push)

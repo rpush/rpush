@@ -13,10 +13,11 @@ class CreateRapnsNotifications < ActiveRecord::Migration
       t.timestamp :failed_at,             :null => true
       t.integer   :error_code,            :null => true
       t.string    :error_description,     :null => true
+      t.timestamp :deliver_after,         :null => true
       t.timestamps
     end
 
-    add_index :rapns_notifications, [:delivered, :failed]
+    add_index :rapns_notifications, [:delivered, :failed, :deliver_after], :name => "index_rapns_notifications_on_delivered_failed_deliver_after"
   end
 
   def self.down
