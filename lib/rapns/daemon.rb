@@ -45,6 +45,7 @@ module Rapns
     protected
 
     def self.setup_signal_hooks
+      @sigint_received = false
       Signal.trap("SIGINT") do
         exit 1 if @sigint_received
         @sigint_received = true

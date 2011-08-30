@@ -14,7 +14,6 @@ module Rapns
 
       def stop
         @stop = true
-        Rapns::Daemon.delivery_queue.push(STOP)
         @thread.join if @thread
       end
 

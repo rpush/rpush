@@ -15,6 +15,8 @@ module Rapns
       end
 
       def drain
+        drain_started
+
         while !@queue.empty?
           object = @queue.pop
           object_removed_from_pool(object)
@@ -24,15 +26,15 @@ module Rapns
       protected
 
       def new_object_for_pool(i)
-        raise NotImplementedError
       end
 
       def object_added_to_pool(object)
-        raise NotImplementedError
       end
 
       def object_removed_from_pool(object)
-        raise NotImplementedError
+      end
+
+      def drain_started
       end
     end
   end

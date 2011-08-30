@@ -15,6 +15,10 @@ module Rapns
       def object_removed_from_pool(object)
         object.stop
       end
+
+      def drain_started
+        @num_objects.times { Rapns::Daemon.delivery_queue.push(Rapns::Daemon::DeliveryHandler::STOP) }
+      end
     end
   end
 end
