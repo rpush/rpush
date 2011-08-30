@@ -25,7 +25,6 @@ module Rapns
 
       def self.stop
         @stop = true
-        @thread.join if @thread
       end
     end
   end

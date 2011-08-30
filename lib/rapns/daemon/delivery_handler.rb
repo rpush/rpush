@@ -14,7 +14,6 @@ module Rapns
 
       def stop
         @stop = true
-        @thread.join if @thread
       end
 
       protected
