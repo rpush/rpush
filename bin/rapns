@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require "optparse"
 require "rapns"
 require "rapns/daemon"
