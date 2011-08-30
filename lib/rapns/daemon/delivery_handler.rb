@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class DeliveryHandler
+      STOP = 0x666
+
       def start
         @thread = Thread.new do 
           loop do
@@ -12,6 +14,7 @@ module Rapns
 
       def stop
         @stop = true
+        Rapns::Daemon.delivery_queue.push(STOP)
         @thread.join if @thread
       end
 
@@ -20,6 +23,7 @@ module Rapns
       def handle_next_notification
         begin
           notification = Rapns::Daemon.delivery_queue.pop
+          return if notification == STOP
 
           Rapns::Daemon.connection_pool.claim_connection do |connection|
             begin

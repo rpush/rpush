@@ -45,7 +45,11 @@ module Rapns
     protected
 
     def self.setup_signal_hooks
-      Signal.trap("SIGINT") { shutdown }
+      Signal.trap("SIGINT") do
+        exit 1 if @sigint_received
+        @sigint_received = true
+        shutdown
+      end
     end
 
     def self.shutdown
