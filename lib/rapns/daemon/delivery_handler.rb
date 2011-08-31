@@ -19,8 +19,8 @@ module Rapns
       protected
 
       def handle_next_notification
+        notification = Rapns::Daemon.delivery_queue.pop
         begin
-          notification = Rapns::Daemon.delivery_queue.pop
           return if notification == STOP
 
           Rapns::Daemon.connection_pool.claim_connection do |connection|
@@ -46,6 +46,8 @@ module Rapns
           end
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
+        ensure
+          Rapns::Daemon.delivery_queue.signal
         end
       end
     end

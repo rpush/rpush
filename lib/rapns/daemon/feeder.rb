@@ -16,6 +16,8 @@ module Rapns
           Rapns::Notification.ready_for_delivery.each do |notification|
             Rapns::Daemon.delivery_queue.push(notification)
           end
+
+          Rapns::Daemon.delivery_queue.wait
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end

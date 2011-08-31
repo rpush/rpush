@@ -3,7 +3,7 @@ require "spec_helper"
 describe Rapns::Daemon::DeliveryHandler do
   before do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
-    Rapns::Daemon.stub(:delivery_queue).and_return(Queue.new)
+    Rapns::Daemon.stub(:delivery_queue).and_return(Rapns::Daemon::DeliveryQueue.new)
     Rapns::Daemon.delivery_queue.push(@notification)
     @connection = mock("Connection", :connect => nil, :write => nil)
     Rapns::Daemon::Connection.stub(:new).and_return(@connection)

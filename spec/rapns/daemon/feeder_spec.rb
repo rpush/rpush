@@ -6,7 +6,7 @@ describe Rapns::Daemon::Feeder do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     @logger = mock("Logger", :info => nil, :error => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
-    @queue = mock(:push => nil)
+    @queue = mock(:push => nil, :wait => nil)
     Rapns::Daemon.stub(:delivery_queue).and_return(@queue)
     Rapns::Daemon.stub(:configuration => mock("Configuration", :poll => 2))
   end
@@ -49,6 +49,11 @@ describe Rapns::Daemon::Feeder do
 
   it "should sleep for the given period" do
     Rapns::Daemon::Feeder.should_receive(:sleep).with(2)
+    Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
+  it "should wait for the delivery queue to be emptied" do
+    Rapns::Daemon.delivery_queue.should_receive(:wait)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
