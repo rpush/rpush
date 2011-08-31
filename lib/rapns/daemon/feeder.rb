@@ -2,13 +2,10 @@ module Rapns
   module Daemon
     class Feeder
       def self.start
-        @thread = Thread.new do
-          loop do
-            break if @stop
-            enqueue_notifications
-          end
+        loop do
+          break if @stop
+          enqueue_notifications
         end
-        @thread.join
       end
 
       def self.enqueue_notifications

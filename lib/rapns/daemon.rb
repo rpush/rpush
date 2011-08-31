@@ -32,13 +32,16 @@ module Rapns
 
       self.delivery_queue = DeliveryQueue.new
 
+      unless foreground?
+        daemonize
+        ActiveRecord::Base.establish_connection
+      end
+
       self.delivery_handler_pool = DeliveryHandlerPool.new(configuration.connections)
       delivery_handler_pool.populate
 
       self.connection_pool = ConnectionPool.new(configuration.connections)
       connection_pool.populate
-
-      daemonize unless foreground?
 
       Feeder.start
     end

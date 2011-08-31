@@ -76,7 +76,14 @@ describe Rapns::Daemon, "when starting" do
   end
 
   it "should fork a child process if the foreground option is false" do
+    ActiveRecord::Base.stub(:establish_connection)
     Rapns::Daemon.should_receive(:daemonize)
+    Rapns::Daemon.start("development", false)
+  end
+
+  it "should re-establish the connection to the database after being forked" do
+    ActiveRecord::Base.should_receive(:establish_connection)
+    Rapns::Daemon.stub(:daemonize)
     Rapns::Daemon.start("development", false)
   end
 
