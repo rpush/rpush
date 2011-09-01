@@ -88,6 +88,8 @@ module Rapns
 
       def connect_socket
         tcp_socket = TCPSocket.new(Rapns::Daemon.configuration.host, Rapns::Daemon.configuration.port)
+        tcp_socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
+        tcp_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
         ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
         ssl_socket.sync = true
         ssl_socket.connect

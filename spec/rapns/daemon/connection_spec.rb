@@ -36,7 +36,7 @@ describe Rapns::Daemon::Connection, "when connecting the socket" do
     @connection.stub(:setup_at_exit_hook)
     @ssl_context = mock("SSLContext")
     @connection.stub(:setup_ssl_context).and_return(@ssl_context)
-    @tcp_socket = mock("TCPSocket", :close => nil)
+    @tcp_socket = mock("TCPSocket", :close => nil, :setsockopt => nil)
     TCPSocket.stub(:new).and_return(@tcp_socket)
     Rapns::Daemon::Configuration.stub(:host).and_return("localhost")
     Rapns::Daemon::Configuration.stub(:port).and_return(123)
@@ -65,6 +65,16 @@ describe Rapns::Daemon::Connection, "when connecting the socket" do
 
   it "should connect the SSL socket" do
     @ssl_socket.should_receive(:connect)
+    @connection.connect
+  end
+
+  it "should set the socket option TCP_NODELAY" do
+    @tcp_socket.should_receive(:setsockopt).with(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+    @connection.connect
+  end
+
+  it "should set the socket option SO_KEEPALIVE" do
+    @tcp_socket.should_receive(:setsockopt).with(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
     @connection.connect
   end
 end
