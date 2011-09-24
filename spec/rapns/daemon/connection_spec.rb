@@ -122,15 +122,15 @@ describe Rapns::Daemon::Connection, "when the connection is lost" do
     @connection.instance_variable_set("@ssl_socket", @ssl_socket)
     @connection.stub(:connect_socket).and_return([mock("TCPSocket"), @ssl_socket])
     @ssl_socket.stub(:write).and_raise(Errno::EPIPE)
-    @logger = mock("Logger", :warn => nil)
+    @logger = mock("Logger", :error => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
     @connection.stub(:sleep)
     configuration = mock("Configuration", :host => "localhost", :port => 123)
     Rapns::Daemon.stub(:configuration).and_return(configuration)
   end
 
-  it "should log a warning" do
-    Rapns::Daemon.logger.should_receive(:warn).with("[Connection 1] Lost connection to localhost:123, reconnecting...")
+  it "should log a error" do
+    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Lost connection to localhost:123, reconnecting...")
     begin
       @connection.write(nil)
     rescue Rapns::Daemon::ConnectionError
@@ -248,7 +248,7 @@ describe Rapns::Daemon::Connection, "when receiving an error packet" do
   end
 
   it "should log that the connection is being reconnected" do
-    Rapns::Daemon.logger.should_receive(:warn).with("[Connection 1] Error received, reconnecting...")
+    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Error received, reconnecting...")
     begin
       @connection.write("msg with an error")
     rescue Rapns::DeliveryError
