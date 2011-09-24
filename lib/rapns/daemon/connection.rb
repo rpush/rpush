@@ -40,7 +40,7 @@ module Rapns
 
           check_for_error
         rescue Errno::EPIPE => e
-          Rapns::Daemon.logger.warn("[#{@name}] Lost connection to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}, reconnecting...")
+          Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}, reconnecting...")
           @tcp_socket, @ssl_socket = connect_socket
 
           retry_count += 1
@@ -70,7 +70,7 @@ module Rapns
           end
 
           begin
-            Rapns::Daemon.logger.warn("[#{@name}] Error received, reconnecting...")
+            Rapns::Daemon.logger.error("[#{@name}] Error received, reconnecting...")
             close
             @tcp_socket, @ssl_socket = connect_socket
           ensure
