@@ -5,7 +5,7 @@ describe Rapns::Daemon::Configuration do
   end
 
   before do
-    @config = {"port" => 123, "host" => "localhost", "certificate" => "production.pem", "certificate_password" => "abc123", "airbrake_notify" => false, "poll" => 4, "connections" => 6}
+    @config = {"port" => 123, "host" => "localhost", "certificate" => "production.pem", "certificate_password" => "abc123", "airbrake_notify" => false, "poll" => 4, "connections" => 6, "pid_file" => "rapns.pid"}
   end
 
   it "should raise an error if the configuration file does not exist" do
@@ -121,5 +121,12 @@ describe Rapns::Daemon::Configuration do
     configuration.stub(:read_config).and_return({"production" => @config})
     configuration.load
     configuration.certificate.should == "/different_path/to/production.pem"
+  end
+  
+  it "should set the PID file path" do
+    configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
+    configuration.stub(:read_config).and_return({"production" => @config})
+    configuration.load
+    configuration.pid_file.should == "rapns.pid"
   end
 end
