@@ -35,6 +35,16 @@ module Rapns
         end
       end
 
+      def pid_file
+        return if @pid_file.blank?
+
+        if Pathname.new(@pid_file).absolute?
+          @pid_file
+        else
+          File.join(Rails.root, @pid_file)
+        end
+      end
+
       protected
 
       def read_config

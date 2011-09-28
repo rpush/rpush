@@ -5,6 +5,7 @@ describe Rapns::Daemon::Configuration do
   end
 
   before do
+    Rails.stub(:root).and_return("/rails_root")
     @config = {"port" => 123, "host" => "localhost", "certificate" => "production.pem", "certificate_password" => "abc123", "airbrake_notify" => false, "poll" => 4, "connections" => 6, "pid_file" => "rapns.pid"}
   end
 
@@ -107,7 +108,6 @@ describe Rapns::Daemon::Configuration do
   end
 
   it "should set the certificate, with absolute path" do
-    Rails.stub(:root).and_return("/rails_root")
     configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
     configuration.stub(:read_config).and_return({"production" => @config})
     configuration.load
@@ -115,18 +115,33 @@ describe Rapns::Daemon::Configuration do
   end
 
   it "should keep the absolute path of the certificate if it has one" do
-    Rails.stub(:root).and_return("/rails_root")
     @config["certificate"] = "/different_path/to/production.pem"
     configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
     configuration.stub(:read_config).and_return({"production" => @config})
     configuration.load
     configuration.certificate.should == "/different_path/to/production.pem"
   end
-  
+
   it "should set the PID file path" do
     configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
     configuration.stub(:read_config).and_return({"production" => @config})
     configuration.load
-    configuration.pid_file.should == "rapns.pid"
+    configuration.pid_file.should == "/rails_root/rapns.pid"
+  end
+
+  it "should keep the absolute path of the PID file if it has one" do
+    @config["pid_file"] = "/some/absolue/path/rapns.pid"
+    configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
+    configuration.stub(:read_config).and_return({"production" => @config})
+    configuration.load
+    configuration.pid_file.should == "/some/absolue/path/rapns.pid"
+  end
+
+  it "should return nil if no PID file was set" do
+    @config["pid_file"] = ""
+    configuration = Rapns::Daemon::Configuration.new("production", "/some/config.yml")
+    configuration.stub(:read_config).and_return({"production" => @config})
+    configuration.load
+    configuration.pid_file.should be_nil
   end
 end

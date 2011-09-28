@@ -92,7 +92,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.should_not_receive(:daemonize)
     Rapns::Daemon.start("development", true)
   end
-  
+
   it "should write the process ID to the PID file" do
     Rapns::Daemon.should_receive(:write_pid_file)
     Rapns::Daemon.start("development", {})
@@ -117,11 +117,14 @@ end
 
 describe Rapns::Daemon, "when being shutdown" do
   before do
+    Rails.stub(:root).and_return("/rails_root")
     Rapns::Daemon::Feeder.stub(:stop)
     @connection_pool = mock("ConnectionPool", :drain => nil)
     Rapns::Daemon.stub(:connection_pool).and_return(@connection_pool)
     @handler_pool = mock("DeliveryHandlerPool", :drain => nil)
     Rapns::Daemon.stub(:delivery_handler_pool).and_return(@handler_pool)
+    @configuration = mock("Configuration", :pid_file => File.join(Rails.root, "rapns.pid"))
+    Rapns::Daemon.stub(:configuration).and_return(@configuration)
     Rapns::Daemon.stub(:puts)
   end
 
@@ -154,20 +157,18 @@ describe Rapns::Daemon, "when being shutdown" do
 
   it "should remove the PID file if one was written" do
     File.stub(:exists?).and_return(true)
-    Rapns::Daemon.stub(:pid_file).and_return("rapns.pid")
-    File.should_receive(:delete).with("rapns.pid")
+    File.should_receive(:delete).with("/rails_root/rapns.pid")
     Rapns::Daemon.send(:shutdown)
   end
 
   it "should not attempt to remove the PID file if it does not exist" do
     File.stub(:exists?).and_return(false)
-    Rapns::Daemon.stub(:pid_file).and_return("rapns.pid")
-    File.should_not_receive(:delete).with("rapns.pid")
+    File.should_not_receive(:delete)
     Rapns::Daemon.send(:shutdown)
   end
 
   it "should not remove the PID file if one was not written" do
-    Rapns::Daemon.stub(:pid_file).and_return(nil)
+    @configuration.stub(:pid_file).and_return(nil)
     File.should_not_receive(:delete)
     Rapns::Daemon.send(:shutdown)
   end

@@ -14,7 +14,7 @@ module Rapns
   module Daemon
     class << self
       attr_accessor :logger, :configuration, :certificate, :connection_pool, :delivery_queue,
-        :delivery_handler_pool, :foreground, :pid_file
+        :delivery_handler_pool, :foreground
       alias_method  :foreground?, :foreground
     end
 
@@ -37,7 +37,7 @@ module Rapns
         ActiveRecord::Base.establish_connection
       end
 
-      write_pid_file unless configuration.pid_file.blank?
+      write_pid_file
 
       self.delivery_handler_pool = DeliveryHandlerPool.new(configuration.connections)
       delivery_handler_pool.populate
@@ -71,7 +71,7 @@ module Rapns
       Rapns::Daemon::Feeder.stop
       Rapns::Daemon.delivery_handler_pool.drain if Rapns::Daemon.delivery_handler_pool
       Rapns::Daemon.connection_pool.drain if Rapns::Daemon.connection_pool
-      File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
+      delete_pid_file
     end
 
     def self.daemonize
@@ -86,19 +86,18 @@ module Rapns
       STDOUT.reopen '/dev/null', 'a'
       STDERR.reopen STDOUT
     end
-    
+
     def self.write_pid_file
-      pid_file = if Pathname.new(configuration.pid_file).absolute?
-        configuration.pid_file
-      else
-        File.join(Rails.root, configuration.pid_file)
+      if !configuration.pid_file.blank?
+        File.open(configuration.pid_file, "w") do |f|
+          f.puts $$
+        end
       end
-      
-      File.open(pid_file, "w") do |f|
-        f.puts $$
-      end
-      
-      self.pid_file = pid_file
+    end
+
+    def self.delete_pid_file
+      pid_file = configuration.pid_file
+      File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
     end
   end
 end
