@@ -6,5 +6,6 @@ gem "shoulda"
 gem "activerecord", :require => "active_record"
 gem "pg"
 gem "database_cleaner"
+gem "simplecov"
 
 gemspec
