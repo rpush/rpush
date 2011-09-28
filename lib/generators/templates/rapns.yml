@@ -15,3 +15,4 @@ production:
   airbrake_notify: true
   poll: 2
   connections: 3
+  pid_file: tmp/pids/rapns.pid

@@ -8,7 +8,7 @@ describe Rapns::Daemon, "when starting" do
     Rails.stub(:root).and_return("/rails_root")
 
     @configuration = Rapns::Daemon::Configuration.new("development", "/rails_root/config/rapns/rapns.yml")
-    @configuration.stub(:read_config).and_return({"development" => {"port" => 123, "host" => "localhost", "certificate" => "development.pem", "certificate_password" => "abc123"}})
+    @configuration.stub(:read_config).and_return({"development" => {"port" => 123, "host" => "localhost", "certificate" => "development.pem", "certificate_password" => "abc123", "pid_file" => "rapns.pid"}})
     Rapns::Daemon::Configuration.stub(:new).and_return(@configuration)
 
     @certificate = Rapns::Daemon::Certificate.new("/rails_root/config/rapns/development.pem")
@@ -26,6 +26,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon::Feeder.stub(:wait)
     Rapns::Daemon.stub(:daemonize)
+    Rapns::Daemon.stub(:write_pid_file)
     @logger = mock("Logger")
     Rapns::Daemon::Logger.stub(:new).and_return(@logger)
   end
@@ -91,6 +92,11 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.should_not_receive(:daemonize)
     Rapns::Daemon.start("development", true)
   end
+  
+  it "should write the process ID to the PID file" do
+    Rapns::Daemon.should_receive(:write_pid_file)
+    Rapns::Daemon.start("development", {})
+  end
 
   it "should start the feeder" do
     Rapns::Daemon::Feeder.should_receive(:start)
@@ -143,6 +149,18 @@ describe Rapns::Daemon, "when being shutdown" do
   it "should not attempt to drain the delivery handler pool if it has not been initialized" do
     Rapns::Daemon.stub(:delivery_handler_pool).and_return(nil)
     @handler_pool.should_not_receive(:drain)
+    Rapns::Daemon.send(:shutdown)
+  end
+  
+  it "should remove the PID file if one was written" do
+    Rapns::Daemon.stub(:pid_file).and_return("rapns.pid")
+    File.should_receive(:delete).with("rapns.pid")
+    Rapns::Daemon.send(:shutdown)
+  end
+  
+  it "should not remove the PID file if one was not written" do
+    Rapns::Daemon.stub(:pid_file).and_return(nil)
+    File.should_not_receive(:delete)
     Rapns::Daemon.send(:shutdown)
   end
 end
