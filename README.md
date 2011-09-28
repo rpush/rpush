@@ -50,7 +50,7 @@ If you want to use rapns in environments other than development or production, y
 * `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
 * `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
 * `connections` (default: 3) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications.
-* `pid_file` (default: blank) the file that rapns will write its process ID to when run as a daemon. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
+* `pid_file` (default: blank) the file that rapns will write its process ID to. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
 
 ## Starting the rapns Daemon
 
