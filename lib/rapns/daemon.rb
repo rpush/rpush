@@ -52,16 +52,18 @@ module Rapns
 
     def self.setup_signal_hooks
       @shutting_down = false
-      Signal.trap("SIGINT") do
-        exit 1 if @shutting_down
-        @shutting_down = true
-        shutdown
+
+      ["SIGINT", "SIGTERM"].each do |signal|
+        Signal.trap(signal) do
+          handle_shutdown_signal
+        end
       end
-      Signal.trap("SIGTERM") do
-        exit 1 if @shutting_down
-        @shutting_down = true
-        shutdown
-      end
+    end
+
+    def self.handle_shutdown_signal
+      exit 1 if @shutting_down
+      @shutting_down = true
+      shutdown
     end
 
     def self.shutdown
