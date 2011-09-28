@@ -151,13 +151,21 @@ describe Rapns::Daemon, "when being shutdown" do
     @handler_pool.should_not_receive(:drain)
     Rapns::Daemon.send(:shutdown)
   end
-  
+
   it "should remove the PID file if one was written" do
+    File.stub(:exists?).and_return(true)
     Rapns::Daemon.stub(:pid_file).and_return("rapns.pid")
     File.should_receive(:delete).with("rapns.pid")
     Rapns::Daemon.send(:shutdown)
   end
-  
+
+  it "should not attempt to remove the PID file if it does not exist" do
+    File.stub(:exists?).and_return(false)
+    Rapns::Daemon.stub(:pid_file).and_return("rapns.pid")
+    File.should_not_receive(:delete).with("rapns.pid")
+    Rapns::Daemon.send(:shutdown)
+  end
+
   it "should not remove the PID file if one was not written" do
     Rapns::Daemon.stub(:pid_file).and_return(nil)
     File.should_not_receive(:delete)

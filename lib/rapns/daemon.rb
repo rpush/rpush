@@ -71,7 +71,7 @@ module Rapns
       Rapns::Daemon::Feeder.stop
       Rapns::Daemon.delivery_handler_pool.drain if Rapns::Daemon.delivery_handler_pool
       Rapns::Daemon.connection_pool.drain if Rapns::Daemon.connection_pool
-      File.delete(pid_file) unless pid_file.blank?
+      File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
     end
 
     def self.daemonize
