@@ -3,6 +3,5 @@ rvm:
   - 1.9.3
   - 1.8.7
   - ree
-  - rbx
 before_script:
   - "psql -c 'create database rapns_test;' -U postgres >/dev/null"
