@@ -6,7 +6,7 @@ describe Rapns::Daemon::Feeder do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     @logger = mock("Logger", :info => nil, :error => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
-    @queue = mock(:push => nil, :wait => nil)
+    @queue = mock(:push => nil, :wait_until_empty => nil)
     Rapns::Daemon.stub(:delivery_queue).and_return(@queue)
     Rapns::Daemon.stub(:configuration => mock("Configuration", :poll => 2))
   end
@@ -53,7 +53,7 @@ describe Rapns::Daemon::Feeder do
   end
 
   it "should wait for the delivery queue to be emptied" do
-    Rapns::Daemon.delivery_queue.should_receive(:wait)
+    Rapns::Daemon.delivery_queue.should_receive(:wait_until_empty)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 

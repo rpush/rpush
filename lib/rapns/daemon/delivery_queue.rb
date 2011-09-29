@@ -5,11 +5,9 @@ module Rapns
         @queue = Queue.new
         @waiting_threads = []
         @mutex = Mutex.new
-        @counter = 0
       end
 
       def push(obj)
-        @mutex.synchronize { @counter += 1 }
         @queue.push(obj)
       end
 
@@ -17,11 +15,10 @@ module Rapns
         @queue.pop
       end
 
-      def signal
+      def signal_waiters_if_empty
         @mutex.synchronize do
           begin
-            @counter -= 1
-            if @counter <= 0
+            if @queue.size == 0
               t = @waiting_threads.shift
               t.wakeup if t
             end
@@ -31,9 +28,9 @@ module Rapns
         end
       end
 
-      def wait
+      def wait_until_empty
         Thread.exclusive do
-          if @counter > 0
+          if @queue.size > 0
             @waiting_threads << Thread.current
             Thread.stop
           end

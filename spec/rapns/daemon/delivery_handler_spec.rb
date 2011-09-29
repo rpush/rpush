@@ -59,6 +59,11 @@ describe Rapns::Daemon::DeliveryHandler do
     @delivery_handler.send(:handle_next_notification)
   end
 
+  it "should signal the feeder if the delivery queue is empty" do
+    Rapns::Daemon.delivery_queue.should_receive(:signal_waiters_if_empty)
+    @delivery_handler.send(:handle_next_notification)
+  end
+
   describe "when delivery fails" do
     before do
       @error = Rapns::DeliveryError.new(4, "Missing payload", 1)

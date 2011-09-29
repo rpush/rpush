@@ -14,7 +14,7 @@ module Rapns
             Rapns::Daemon.delivery_queue.push(notification)
           end
 
-          Rapns::Daemon.delivery_queue.wait
+          Rapns::Daemon.delivery_queue.wait_until_empty
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end
