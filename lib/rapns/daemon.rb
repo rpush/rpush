@@ -1,3 +1,7 @@
+require 'thread'
+require 'socket'
+require 'pathname'
+
 require "rapns/daemon/configuration"
 require "rapns/daemon/certificate"
 require "rapns/daemon/delivery_error"
