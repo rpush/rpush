@@ -7,7 +7,7 @@ Gem::Specification.new do |s|
   s.version     = Rapns::VERSION
   s.authors     = ["Ian Leitch"]
   s.email       = ["port001@gmail.com"]
-  s.homepage    = ""
+  s.homepage    = "https://github.com/ileitch/rapns"
   s.summary     = %q{Easy to use library for Apple's Push Notification Service with Rails 3}
   s.description = %q{Easy to use library for Apple's Push Notification Service with Rails 3}
 
