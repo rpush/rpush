@@ -25,14 +25,21 @@ Bundler.require(:default)
 
 require 'shoulda'
 require 'database_cleaner'
+
 DatabaseCleaner.strategy = :truncation
 
 require 'rapns'
 require 'rapns/daemon'
 
+require 'perftools'
+
 RSpec.configure do |config|
+  # config.before :suite do
+  #   PerfTools::CpuProfiler.start('/tmp/rapns_profile')
+  # end
+  # config.after :suite do
+  #   PerfTools::CpuProfiler.stop
+  # end
+
   config.before(:each) { DatabaseCleaner.clean }
 end
-
-
-
