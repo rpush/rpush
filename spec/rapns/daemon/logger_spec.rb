@@ -88,6 +88,13 @@ describe Rapns::Daemon::Logger do
     logger.error(e)
   end
 
+  it "should not notify Airbrake if explicitly disabled in the call to error" do
+    e = RuntimeError.new("hi mom")
+    logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
+    Airbrake.should_not_receive(:notify).with(e)
+    logger.error(e, :airbrake_notify => false)
+  end
+
   it "should not attempt to notify Airbrake of the error is not an Exception" do
     logger = Rapns::Daemon::Logger.new(:foreground => false)
     Airbrake.should_not_receive(:notify)

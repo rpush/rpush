@@ -3,7 +3,7 @@ module Rapns
     class Logger
       def initialize(options)
         @options = options
-        log_path = File.join(Rails.root, "log", "rapns.log")
+        log_path = File.join(Rails.root, 'log', 'rapns.log')
         @logger = ActiveSupport::BufferedLogger.new(log_path, Rails.logger.level)
         @logger.auto_flushing = Rails.logger.auto_flushing
       end
@@ -12,13 +12,13 @@ module Rapns
         log(:info, msg)
       end
 
-      def error(msg)
-        airbrake_notify(msg) if msg.is_a?(Exception)
-        log(:error, msg, "ERROR")
+      def error(msg, options = {})
+        airbrake_notify(msg) if msg.is_a?(Exception) && options[:airbrake_notify] != false
+        log(:error, msg, 'ERROR')
       end
 
       def warn(msg)
-        log(:warn, msg, "WARNING")
+        log(:warn, msg, 'WARNING')
       end
 
       private
