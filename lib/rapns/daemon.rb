@@ -14,8 +14,6 @@ require 'rapns/daemon/delivery_handler_pool'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
 
-require 'rapns/daemon/patches'
-
 module Rapns
   module Daemon
     class << self
