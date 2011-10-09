@@ -2,17 +2,19 @@ require 'thread'
 require 'socket'
 require 'pathname'
 
-require "rapns/daemon/configuration"
-require "rapns/daemon/certificate"
-require "rapns/daemon/delivery_error"
-require "rapns/daemon/pool"
-require "rapns/daemon/connection_pool"
-require "rapns/daemon/connection"
-require "rapns/daemon/delivery_queue"
-require "rapns/daemon/delivery_handler"
-require "rapns/daemon/delivery_handler_pool"
-require "rapns/daemon/feeder"
-require "rapns/daemon/logger"
+require 'rapns/daemon/configuration'
+require 'rapns/daemon/certificate'
+require 'rapns/daemon/delivery_error'
+require 'rapns/daemon/pool'
+require 'rapns/daemon/connection_pool'
+require 'rapns/daemon/connection'
+require 'rapns/daemon/delivery_queue'
+require 'rapns/daemon/delivery_handler'
+require 'rapns/daemon/delivery_handler_pool'
+require 'rapns/daemon/feeder'
+require 'rapns/daemon/logger'
+
+require 'rapns/daemon/patches'
 
 module Rapns
   module Daemon
@@ -26,7 +28,7 @@ module Rapns
       @foreground = foreground
       setup_signal_hooks
 
-      self.configuration = Configuration.new(environment, File.join(Rails.root, "config", "rapns", "rapns.yml"))
+      self.configuration = Configuration.new(environment, File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
       configuration.load
 
       self.logger = Logger.new(:foreground => foreground, :airbrake_notify => configuration.airbrake_notify)
@@ -57,7 +59,7 @@ module Rapns
     def self.setup_signal_hooks
       @shutting_down = false
 
-      ["SIGINT", "SIGTERM"].each do |signal|
+      ['SIGINT', 'SIGTERM'].each do |signal|
         Signal.trap(signal) do
           handle_shutdown_signal
         end
@@ -93,7 +95,7 @@ module Rapns
 
     def self.write_pid_file
       if !configuration.pid_file.blank?
-        File.open(configuration.pid_file, "w") do |f|
+        File.open(configuration.pid_file, 'w') do |f|
           f.puts $$
         end
       end

@@ -23,9 +23,7 @@ module Rapns
           Rapns::Daemon.delivery_queue.wait_until_empty
         rescue ActiveRecord::StatementInvalid, *ADAPTER_ERRORS => e
           Rapns::Daemon.logger.error(e)
-          Rapns::Daemon.logger.warn('Lost connection to database, reconnecting...')
           reconnect
-          Rapns::Daemon.logger.warn('Database reconnected.')
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end
@@ -38,6 +36,7 @@ module Rapns
       end
 
       def self.reconnect
+        Rapns::Daemon.logger.warn('Lost connection to database, reconnecting...')
         attempts = 0
         loop do
           begin
@@ -51,6 +50,7 @@ module Rapns
             sleep 2 # Avoid thrashing.
           end
         end
+        Rapns::Daemon.logger.warn('Database reconnected.')
       end
     end
   end
