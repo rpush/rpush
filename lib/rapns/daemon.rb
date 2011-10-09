@@ -49,6 +49,7 @@ module Rapns
       self.connection_pool = ConnectionPool.new(configuration.connections)
       connection_pool.populate
 
+      logger.info("Ready")
       Feeder.start
     end
 

@@ -27,7 +27,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon::Feeder.stub(:wait)
     Rapns::Daemon.stub(:daemonize)
     Rapns::Daemon.stub(:write_pid_file)
-    @logger = mock("Logger")
+    @logger = mock("Logger", :info => nil)
     Rapns::Daemon::Logger.stub(:new).and_return(@logger)
   end
 

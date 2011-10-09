@@ -50,7 +50,7 @@ module Rapns
             sleep 2 # Avoid thrashing.
           end
         end
-        Rapns::Daemon.logger.warn('Database reconnected.')
+        Rapns::Daemon.logger.warn('Database reconnected')
       end
     end
   end
