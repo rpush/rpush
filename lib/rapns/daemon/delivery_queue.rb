@@ -1,9 +1,10 @@
 module Rapns
   module Daemon
     class DeliveryQueue
-      def initialize
+      def initialize(num_handlers)
+        @num_handlers = num_handlers
         @queue = Queue.new
-        @waiting_threads = []
+        @feeder_threads = []
         @mutex = Mutex.new
       end
 
@@ -15,23 +16,29 @@ module Rapns
         @queue.pop
       end
 
-      def signal_waiters_if_empty
+      def handler_available
         @mutex.synchronize do
-          begin
-            if @queue.size == 0
-              t = @waiting_threads.shift
-              t.wakeup if t
-            end
-          rescue ThreadError
-            retry
-          end
+          signal_feeder if handler_available?
         end
       end
 
-      def wait_until_empty
+      def handler_available?
+        @queue.size < @num_handlers
+      end
+
+      def signal_feeder
+        begin
+          t = @feeder_threads.shift
+          t.wakeup if t
+        rescue ThreadError
+          retry
+        end
+      end
+
+      def wait_for_available_handler
         Thread.exclusive do
-          if @queue.size > 0
-            @waiting_threads << Thread.current
+          if @queue.size >= @num_handlers
+            @feeder_threads << Thread.current
             Thread.stop
           end
         end

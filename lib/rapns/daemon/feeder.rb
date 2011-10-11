@@ -20,7 +20,7 @@ module Rapns
             Rapns::Daemon.delivery_queue.push(notification)
           end
 
-          Rapns::Daemon.delivery_queue.wait_until_empty
+          Rapns::Daemon.delivery_queue.wait_for_available_handler
         rescue ActiveRecord::StatementInvalid, *ADAPTER_ERRORS => e
           Rapns::Daemon.logger.error(e)
           reconnect

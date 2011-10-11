@@ -60,6 +60,11 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", {})
   end
 
+  it "should initialize the delivery queue with the number of connection as its signal point" do
+    Rapns::Daemon::DeliveryQueue.should_receive(:new).with(3)
+    Rapns::Daemon.start("development", {})
+  end
+
   it "should make the connection pool accessible" do
     Rapns::Daemon.start("development", {})
     Rapns::Daemon.connection_pool.should == @connection_pool

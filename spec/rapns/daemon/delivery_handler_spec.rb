@@ -3,7 +3,7 @@ require "spec_helper"
 describe Rapns::Daemon::DeliveryHandler do
   before do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
-    Rapns::Daemon.stub(:delivery_queue).and_return(Rapns::Daemon::DeliveryQueue.new)
+    Rapns::Daemon.stub(:delivery_queue).and_return(Rapns::Daemon::DeliveryQueue.new(1))
     Rapns::Daemon.delivery_queue.push(@notification)
     @connection = mock("Connection", :connect => nil, :write => nil)
     Rapns::Daemon::Connection.stub(:new).and_return(@connection)
@@ -59,8 +59,8 @@ describe Rapns::Daemon::DeliveryHandler do
     @delivery_handler.send(:handle_next_notification)
   end
 
-  it "should signal the feeder if the delivery queue is empty" do
-    Rapns::Daemon.delivery_queue.should_receive(:signal_waiters_if_empty)
+  it "should notify the delivery queue a handler is now available" do
+    Rapns::Daemon.delivery_queue.should_receive(:handler_available)
     @delivery_handler.send(:handle_next_notification)
   end
 

@@ -47,7 +47,7 @@ module Rapns
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         ensure
-          Rapns::Daemon.delivery_queue.signal_waiters_if_empty
+          Rapns::Daemon.delivery_queue.handler_available
         end
       end
     end
