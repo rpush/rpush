@@ -31,7 +31,7 @@ DatabaseCleaner.strategy = :truncation
 require 'rapns'
 require 'rapns/daemon'
 
-require 'perftools'
+#require 'perftools'
 
 RSpec.configure do |config|
   # config.before :suite do
