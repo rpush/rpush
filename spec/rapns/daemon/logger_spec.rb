@@ -100,4 +100,11 @@ describe Rapns::Daemon::Logger do
     Airbrake.should_not_receive(:notify)
     logger.error("string error message")
   end
+
+  it 'defaults auto_flushing to true of the Rails logger does not respond to auto_flushing' do
+    rails_logger = mock(:info => nil, :error => nil, :level => 0)
+    Rails.logger = rails_logger
+    logger = Rapns::Daemon::Logger.new({})
+    @buffered_logger.auto_flushing.should be_true
+  end
 end
