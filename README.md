@@ -103,4 +103,10 @@ rapns will not attempt to deliver the notification again.
 
 Not implemented yet!
 
+## Contributing to rapns
 
+Fork as usual and go crazy!
+
+When running specs, please note that the ActiveRecord adapter can be changed by setting the `ADAPTER` environment variable. For example: `ADAPTER=postgresql rake`.
+
+Available adapters for testing are 'mysql', 'mysql2' and 'postgresql'.
