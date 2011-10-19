@@ -5,7 +5,7 @@ module Rapns
         @options = options
         log_path = File.join(Rails.root, 'log', 'rapns.log')
         @logger = ActiveSupport::BufferedLogger.new(log_path, Rails.logger.level)
-        @logger.auto_flushing = Rails.logger.auto_flushing
+        @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
       end
 
       def info(msg)
