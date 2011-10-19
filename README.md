@@ -44,7 +44,7 @@ If you want to use rapns in environments other than development or production, y
 ### Options:
 
 * `host` the APNs host to connect to, either `gateway.sandbox.push.apple.com` or `gateway.sandbox.push.apple.com`.
-* `port` the APNs port. Currently 2195 for both hosts.
+* `port` the APNs port. Currently `2195` for both hosts.
 * `certificate` The path to your .pem certificate, `config/rapns` is automatically checked if a relative path is given.
 * `certificate_password` (default: blank) the password you used when exporting your certificate, if any.
 * `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
@@ -74,7 +74,7 @@ If you want to use rapns in environments other than development or production, y
     n.save!
 
 * `sound` defaults to `1.aiff`. You can either set it to a custom .aiff file, or `nil` for no sound.
-* `expiry` is the time in seconds the APNs will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
+* `expiry` is the time in seconds the APNs (not rapns) will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
 * `deliver_after` is not required, but may be set if you'd like to delay delivery of the notification to a specific time in the future.
 
@@ -109,4 +109,4 @@ Fork as usual and go crazy!
 
 When running specs, please note that the ActiveRecord adapter can be changed by setting the `ADAPTER` environment variable. For example: `ADAPTER=postgresql rake`.
 
-Available adapters for testing are 'mysql', 'mysql2' and 'postgresql'.
+Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
