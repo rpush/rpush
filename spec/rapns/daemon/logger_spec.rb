@@ -101,7 +101,7 @@ describe Rapns::Daemon::Logger do
     logger.error("string error message")
   end
 
-  it 'defaults auto_flushing to true of the Rails logger does not respond to auto_flushing' do
+  it 'defaults auto_flushing to true if the Rails logger does not respond to auto_flushing' do
     rails_logger = mock(:info => nil, :error => nil, :level => 0)
     Rails.logger = rails_logger
     logger = Rapns::Daemon::Logger.new({})
