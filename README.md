@@ -59,7 +59,11 @@ If you want to use rapns in environments other than development or production, y
     
 ### Options
 
-* `--foreground` will prevent rapns from forking into a daemon. Activity information will be printed to the screen.
+* `--foreground` will prevent rapns from forking into a daemon.
+
+## Logging
+
+rapns logs activity to `rapns.log` in your Rails log directory. This is also printed to STDOUT when running in the foreground. When running as a daemon rapns does not print to STDOUT or STDERR.
 
 ## Sending a Notification
 
