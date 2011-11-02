@@ -36,10 +36,7 @@ module Rapns
 
       self.delivery_queue = DeliveryQueue.new(configuration.connections)
 
-      unless foreground?
-        daemonize
-        ActiveRecord::Base.establish_connection
-      end
+      daemonize unless foreground?
 
       write_pid_file
 
@@ -49,8 +46,8 @@ module Rapns
       self.connection_pool = ConnectionPool.new(configuration.connections)
       connection_pool.populate
 
-      logger.info("Ready")
-      Feeder.start
+      logger.info('Ready')
+      Feeder.start(foreground?)
     end
 
     protected

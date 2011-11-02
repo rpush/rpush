@@ -11,6 +11,18 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon.stub(:configuration => mock("Configuration", :poll => 2))
   end
 
+  it "should reconnect to the database when daemonized" do
+    Rapns::Daemon::Feeder.stub(:loop)
+    ActiveRecord::Base.should_receive(:establish_connection)
+    Rapns::Daemon::Feeder.start(false)
+  end
+
+  it "should not reconnect to the database when running in the foreground" do
+    Rapns::Daemon::Feeder.stub(:loop)
+    ActiveRecord::Base.should_not_receive(:establish_connection)
+    Rapns::Daemon::Feeder.start(true)
+  end
+
   it "should enqueue an undelivered notification" do
     @notification.update_attributes!(:delivered => false)
     Rapns::Daemon.delivery_queue.should_receive(:push)
