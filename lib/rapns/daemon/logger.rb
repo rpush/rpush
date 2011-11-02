@@ -13,7 +13,7 @@ module Rapns
       end
 
       def error(msg, options = {})
-        airbrake_notify(msg) if msg.is_a?(Exception) && options[:airbrake_notify] != false
+        airbrake_notify(msg) if notify_via_airbrake?(msg, options)
         log(:error, msg, 'ERROR')
       end
 
@@ -43,6 +43,10 @@ module Rapns
         elsif defined?(HoptoadNotifier)
           HoptoadNotifier.notify(e)
         end
+      end
+
+      def notify_via_airbrake?(msg, options)
+        msg.is_a?(Exception) && options[:airbrake_notify] != false
       end
     end
   end
