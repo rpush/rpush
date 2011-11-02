@@ -21,6 +21,7 @@ require 'generators/templates/create_rapns_notifications'
 CreateRapnsNotifications.down rescue ActiveRecord::StatementInvalid
 CreateRapnsNotifications.up
 
+require 'bundler'
 Bundler.require(:default)
 
 require 'shoulda'

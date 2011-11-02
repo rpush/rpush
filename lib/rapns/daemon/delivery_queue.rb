@@ -4,8 +4,8 @@ module Rapns
       def initialize(num_handlers)
         @num_handlers = num_handlers
         @queue = Queue.new
-        @feeder_threads = []
-        @mutex = Mutex.new
+        @feeder = nil
+        @handler_mutex = Mutex.new
       end
 
       def push(obj)
@@ -17,7 +17,7 @@ module Rapns
       end
 
       def handler_available
-        @mutex.synchronize do
+        @handler_mutex.synchronize do
           signal_feeder if handler_available?
         end
       end
@@ -28,19 +28,16 @@ module Rapns
 
       def signal_feeder
         begin
-          t = @feeder_threads.shift
-          t.wakeup if t
+          @feeder.wakeup if @feeder
         rescue ThreadError
           retry
         end
       end
 
       def wait_for_available_handler
-        Thread.exclusive do
-          if @queue.size >= @num_handlers
-            @feeder_threads << Thread.current
-            Thread.stop
-          end
+        if !handler_available?
+          @feeder = Thread.current
+          @feeder.stop
         end
       end
     end
