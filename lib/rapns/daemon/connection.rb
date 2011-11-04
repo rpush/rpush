@@ -39,7 +39,7 @@ module Rapns
           @ssl_socket.flush
 
           check_for_error
-        rescue Errno::EPIPE => e
+        rescue Errno::EPIPE, OpenSSL::SSL::SSLError => e
           Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}, reconnecting...")
           @tcp_socket, @ssl_socket = connect_socket
 

@@ -160,6 +160,51 @@ describe Rapns::Daemon::Connection, "when the connection is lost" do
   end
 end
 
+describe Rapns::Daemon::Connection, "when an SSL error occurs during write" do
+  before do
+    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @ssl_socket = mock("SSLSocket")
+    @connection.instance_variable_set("@ssl_socket", @ssl_socket)
+    @connection.stub(:connect_socket).and_return([mock("TCPSocket"), @ssl_socket])
+    @ssl_socket.stub(:write).and_raise(OpenSSL::SSL::SSLError)
+    @logger = mock("Logger", :error => nil)
+    Rapns::Daemon.stub(:logger).and_return(@logger)
+    @connection.stub(:sleep)
+    configuration = mock("Configuration", :host => "localhost", :port => 123)
+    Rapns::Daemon.stub(:configuration).and_return(configuration)
+  end
+
+  it "should log a error" do
+    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Lost connection to localhost:123, reconnecting...")
+    begin
+      @connection.write(nil)
+    rescue Rapns::Daemon::ConnectionError
+    end
+  end
+
+  it "should retry to make a connection 3 times" do
+    @connection.should_receive(:connect_socket).exactly(3).times
+    begin
+      @connection.write(nil)
+    rescue Rapns::Daemon::ConnectionError
+    end
+  end
+
+  it "should raise a ConnectionError after 3 attempts at reconnecting" do
+    expect do
+      @connection.write(nil)
+    end.to raise_error(Rapns::Daemon::ConnectionError, "Connection 1 tried 3 times to reconnect but failed: #<OpenSSL::SSL::SSLError: OpenSSL::SSL::SSLError>")
+  end
+
+  it "should sleep 1 second before retrying the connection" do
+    @connection.should_receive(:sleep).with(1)
+    begin
+      @connection.write(nil)
+    rescue Rapns::Daemon::ConnectionError
+    end
+  end
+end
+
 describe Rapns::Daemon::Connection, "when sending a notification" do
   before do
     @connection = Rapns::Daemon::Connection.new("Connection 1")
