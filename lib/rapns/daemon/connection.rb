@@ -27,47 +27,50 @@ module Rapns
       end
 
       def close
-        @ssl_socket.close if @ssl_socket
-        @tcp_socket.close if @tcp_socket
+        begin
+          @ssl_socket.close if @ssl_socket
+          @tcp_socket.close if @tcp_socket
+        rescue IOError
+        end
       end
 
       def write(data)
         retry_count = 0
 
         begin
-          @ssl_socket.write(data)
-          @ssl_socket.flush
+          write_data(data)
+        rescue Errno::EPIPE, Errno::ETIMEDOUT, OpenSSL::SSL::SSLError => e
+          retry_count += 1;
 
+          if retry_count == 1
+            host = Rapns::Daemon.configuration.host
+            port = Rapns::Daemon.configuration.port
+            Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{host}:#{port} (#{e.class.name}), reconnecting...")
+          end
+
+          if retry_count <= 3
+            reconnect
+            sleep 1
+            retry
+          else
+            raise ConnectionError, "#{@name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
+          end
+        else
           check_for_error
-        rescue Errno::EPIPE, OpenSSL::SSL::SSLError => e
-          Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}, reconnecting...")
-          @tcp_socket, @ssl_socket = connect_socket
-
-          retry_count += 1
-
-          if retry_count < 3
-            sleep 1
-            retry
-          else
-            raise ConnectionError, "#{@name} tried #{retry_count} times to reconnect but failed: #{e.inspect}"
-          end
-        rescue Errno::ETIMEDOUT => e
-          Rapns::Daemon.logger.error("[#{@name}] Resetting connection...")
-          close
-          @tcp_socket, @ssl_socket = connect_socket
-
-          retry_count += 1
-
-          if retry_count < 3
-            sleep 1
-            retry
-          else
-            raise
-          end
         end
       end
 
       protected
+
+      def write_data(data)
+        @ssl_socket.write(data)
+        @ssl_socket.flush
+      end
+
+      def reconnect
+        close
+        @tcp_socket, @ssl_socket = connect_socket
+      end
 
       def check_for_error
         if IO.select([@ssl_socket], nil, nil, SELECT_TIMEOUT)
@@ -84,8 +87,7 @@ module Rapns
 
           begin
             Rapns::Daemon.logger.error("[#{@name}] Error received, reconnecting...")
-            close
-            @tcp_socket, @ssl_socket = connect_socket
+            reconnect
           ensure
             raise delivery_error if delivery_error
           end

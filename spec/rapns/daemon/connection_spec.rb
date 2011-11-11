@@ -113,24 +113,29 @@ describe Rapns::Daemon::Connection, "when shuting down the connection" do
     @connection.instance_variable_set("@ssl_socket", nil)
     @connection.close
   end
+
+  it "should ignore IOError when the socket is already closed" do
+    @tcp_socket.stub(:close).and_raise(IOError)
+    @connection.connect
+    expect {@connection.close }.should_not raise_error(IOError)
+  end
 end
 
-describe Rapns::Daemon::Connection, "when the connection is lost" do
+shared_examples_for "when the write fails" do
   before do
     @connection = Rapns::Daemon::Connection.new("Connection 1")
-    @ssl_socket = mock("SSLSocket")
-    @connection.instance_variable_set("@ssl_socket", @ssl_socket)
-    @connection.stub(:connect_socket).and_return([mock("TCPSocket"), @ssl_socket])
-    @ssl_socket.stub(:write).and_raise(Errno::EPIPE)
     @logger = mock("Logger", :error => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
-    @connection.stub(:sleep)
     configuration = mock("Configuration", :host => "localhost", :port => 123)
     Rapns::Daemon.stub(:configuration).and_return(configuration)
+    @connection.stub(:reconnect)
+    @connection.stub(:write_data).and_raise(error_type)
+    @connection.stub(:check_for_error)
+    @connection.stub(:sleep)
   end
 
-  it "should log a error" do
-    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Lost connection to localhost:123, reconnecting...")
+  it "should log that the connection has been lost once only" do
+    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Lost connection to localhost:123 (#{error_type.name}), reconnecting...").once
     begin
       @connection.write(nil)
     rescue Rapns::Daemon::ConnectionError
@@ -138,7 +143,7 @@ describe Rapns::Daemon::Connection, "when the connection is lost" do
   end
 
   it "should retry to make a connection 3 times" do
-    @connection.should_receive(:connect_socket).exactly(3).times
+    @connection.should_receive(:reconnect).exactly(3).times
     begin
       @connection.write(nil)
     rescue Rapns::Daemon::ConnectionError
@@ -148,7 +153,7 @@ describe Rapns::Daemon::Connection, "when the connection is lost" do
   it "should raise a ConnectionError after 3 attempts at reconnecting" do
     expect do
       @connection.write(nil)
-    end.to raise_error(Rapns::Daemon::ConnectionError, "Connection 1 tried 3 times to reconnect but failed: #<Errno::EPIPE: Broken pipe>")
+    end.to raise_error(Rapns::Daemon::ConnectionError, "Connection 1 tried 3 times to reconnect but failed (#{error_type.name}).")
   end
 
   it "should sleep 1 second before retrying the connection" do
@@ -160,48 +165,45 @@ describe Rapns::Daemon::Connection, "when the connection is lost" do
   end
 end
 
-describe Rapns::Daemon::Connection, "when an SSL error occurs during write" do
+describe Rapns::Daemon::Connection, "when write raises an Errno::EPIPE" do
+  it_should_behave_like "when the write fails"
+
+  def error_type
+    Errno::EPIPE
+  end
+end
+
+describe Rapns::Daemon::Connection, "when write raises an Errno::ETIMEDOUT" do
+  it_should_behave_like "when the write fails"
+
+  def error_type
+    Errno::ETIMEDOUT
+  end
+end
+
+describe Rapns::Daemon::Connection, "when write raises an OpenSSL::SSL::SSLError" do
+  it_should_behave_like "when the write fails"
+
+  def error_type
+    OpenSSL::SSL::SSLError
+  end
+end
+
+describe Rapns::Daemon::Connection, "when reconnecting" do
   before do
     @connection = Rapns::Daemon::Connection.new("Connection 1")
-    @ssl_socket = mock("SSLSocket")
-    @connection.instance_variable_set("@ssl_socket", @ssl_socket)
-    @connection.stub(:connect_socket).and_return([mock("TCPSocket"), @ssl_socket])
-    @ssl_socket.stub(:write).and_raise(OpenSSL::SSL::SSLError)
-    @logger = mock("Logger", :error => nil)
-    Rapns::Daemon.stub(:logger).and_return(@logger)
-    @connection.stub(:sleep)
-    configuration = mock("Configuration", :host => "localhost", :port => 123)
-    Rapns::Daemon.stub(:configuration).and_return(configuration)
+    @connection.stub(:close)
+    @connection.stub(:connect_socket)
   end
 
-  it "should log a error" do
-    Rapns::Daemon.logger.should_receive(:error).with("[Connection 1] Lost connection to localhost:123, reconnecting...")
-    begin
-      @connection.write(nil)
-    rescue Rapns::Daemon::ConnectionError
-    end
+  it 'closes the socket' do
+    @connection.should_receive(:close)
+    @connection.send(:reconnect)
   end
 
-  it "should retry to make a connection 3 times" do
-    @connection.should_receive(:connect_socket).exactly(3).times
-    begin
-      @connection.write(nil)
-    rescue Rapns::Daemon::ConnectionError
-    end
-  end
-
-  it "should raise a ConnectionError after 3 attempts at reconnecting" do
-    expect do
-      @connection.write(nil)
-    end.to raise_error(Rapns::Daemon::ConnectionError, "Connection 1 tried 3 times to reconnect but failed: #<OpenSSL::SSL::SSLError: OpenSSL::SSL::SSLError>")
-  end
-
-  it "should sleep 1 second before retrying the connection" do
-    @connection.should_receive(:sleep).with(1)
-    begin
-      @connection.write(nil)
-    rescue Rapns::Daemon::ConnectionError
-    end
+  it 'connects the socket' do
+    @connection.should_receive(:connect_socket)
+    @connection.send(:reconnect)
   end
 end
 
