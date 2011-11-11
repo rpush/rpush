@@ -122,3 +122,4 @@ Thank you to the following wonderful people for contributing to rapns:
 * [@blakewatters](https://github.com/blakewatters)
 * [@forresty](https://github.com/forresty)
 * [@sjmadsen](https://github.com/sjmadsen)
+* [@ivanyv](https://github.com/ivanyv)
