@@ -51,6 +51,19 @@ module Rapns
           else
             raise ConnectionError, "#{@name} tried #{retry_count} times to reconnect but failed: #{e.inspect}"
           end
+        rescue Errno::ETIMEDOUT => e
+          Rapns::Daemon.logger.error("[#{@name}] Resetting connection...")
+          close
+          @tcp_socket, @ssl_socket = connect_socket
+
+          retry_count += 1
+
+          if retry_count < 3
+            sleep 1
+            retry
+          else
+            raise
+          end
         end
       end
 
