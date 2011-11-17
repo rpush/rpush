@@ -68,6 +68,11 @@ describe Rapns::Notification, "as_json" do
     notification.as_json["aps"].key?("alert").should be_false
   end
 
+  it "should encode the alert as JSON if it is a Hash" do
+    notification = Rapns::Notification.new(:alert => { 'body' => "hi mom", 'alert-loc-key' => "View" })
+    notification.as_json["aps"]["alert"].should == { 'body' => "hi mom", 'alert-loc-key' => "View" }
+  end
+
   it "should include the badge if present" do
     notification = Rapns::Notification.new(:badge => 6)
     notification.as_json["aps"]["badge"].should == 6
