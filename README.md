@@ -86,8 +86,6 @@ rapns logs activity to `rapns.log` in your Rails log directory. This is also pri
 
 Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Tables 3-1 and 3-2).
 
-Not yet implemented!
-
 ## Delivery Failures
 
 The APN service provides two mechanism for delivery failure notification:
