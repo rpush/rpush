@@ -13,6 +13,19 @@ module Rapns
     def device_token=(token)
       write_attribute(:device_token, token.delete(" <>")) if !token.nil?
     end
+    
+    def alert=(alert)
+      if alert.is_a?(Hash)
+        write_attribute(:alert, ActiveSupport::JSON.encode(alert))
+      else
+        write_attribute(:alert, alert)
+      end
+    end
+    
+    def alert
+      string_or_json = read_attribute(:alert)
+      ActiveSupport::JSON.decode(string_or_json) rescue string_or_json
+    end
 
     def attributes_for_device=(attrs)
       raise ArgumentError, "attributes_for_device must be a Hash" if !attrs.is_a?(Hash)
