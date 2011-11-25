@@ -37,7 +37,7 @@ module Rapns
       def wait_for_available_handler
         if !handler_available?
           @feeder = Thread.current
-          @feeder.stop
+          Thread.stop
         end
       end
     end
