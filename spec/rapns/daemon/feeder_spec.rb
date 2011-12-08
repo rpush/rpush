@@ -6,8 +6,7 @@ describe Rapns::Daemon::Feeder do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     @logger = mock("Logger", :info => nil, :error => nil, :warn => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
-    @queue = mock(:push => nil, :wait_for_available_handler => nil)
-    Rapns::Daemon.stub(:delivery_queue).and_return(@queue)
+    Rapns::Daemon.stub(:delivery_queue).and_return(Queue.new)
     Rapns::Daemon.stub(:configuration => mock("Configuration", :poll => 2))
   end
 
@@ -64,8 +63,10 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
-  it "should wait for a delivery handler to become available" do
-    Rapns::Daemon.delivery_queue.should_receive(:wait_for_available_handler)
+  it "should wait for the delivery queue to empty before loading more notifications" do
+    Rapns::Daemon.delivery_queue.stub(:empty?).and_return(false)
+    Rapns::Notification.should_not_receive(:ready_for_delivery)
+    Rapns::Daemon.delivery_queue.should_not_receive(:push)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 

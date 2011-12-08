@@ -53,8 +53,6 @@ module Rapns
           deliver(notification)
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
-        ensure
-          Rapns::Daemon.delivery_queue.handler_available
         end
       end
     end

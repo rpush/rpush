@@ -8,7 +8,6 @@ require 'rapns/daemon/delivery_error'
 require 'rapns/daemon/pool'
 require 'rapns/daemon/connection_pool'
 require 'rapns/daemon/connection'
-require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/delivery_handler'
 require 'rapns/daemon/delivery_handler_pool'
 require 'rapns/daemon/feeder'
@@ -34,7 +33,7 @@ module Rapns
       self.certificate = Certificate.new(configuration.certificate)
       certificate.load
 
-      self.delivery_queue = DeliveryQueue.new(configuration.connections)
+      self.delivery_queue = Queue.new
 
       daemonize unless foreground?
 

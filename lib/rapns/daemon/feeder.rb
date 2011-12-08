@@ -24,11 +24,12 @@ module Rapns
 
       def self.enqueue_notifications
         begin
-          Rapns::Notification.ready_for_delivery.each do |notification|
-            Rapns::Daemon.delivery_queue.push(notification)
+          if Rapns::Daemon.delivery_queue.empty?
+            Rapns::Notification.ready_for_delivery.each do |notification|
+              Rapns::Daemon.delivery_queue.push(notification)
+            end
           end
 
-          Rapns::Daemon.delivery_queue.wait_for_available_handler
         rescue ActiveRecord::StatementInvalid, *ADAPTER_ERRORS => e
           Rapns::Daemon.logger.error(e)
           reconnect
