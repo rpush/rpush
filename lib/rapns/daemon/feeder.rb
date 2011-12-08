@@ -62,7 +62,7 @@ module Rapns
       end
 
       def self.check_is_connected
-        # Simple asking the adapter for the connection state is not sufficient.
+        # Simply asking the adapter for the connection state is not sufficient.
         Rapns::Notification.count
       end
 
