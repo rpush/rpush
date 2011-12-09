@@ -9,6 +9,24 @@ describe Rapns::Daemon::Configuration do
     @config = {"port" => 123, "host" => "localhost", "certificate" => "production.pem", "certificate_password" => "abc123", "airbrake_notify" => false, "poll" => 4, "connections" => 6, "pid_file" => "rapns.pid"}
   end
 
+  it 'opens the config from the given path' do
+    YAML.stub(:load => {"production" => @config})
+    fd = stub(:read => nil)
+    File.should_receive(:open).with("/tmp/rapns-non-existant-file").and_yield(fd)
+    config = Rapns::Daemon::Configuration.new("production", "/tmp/rapns-non-existant-file")
+    config.stub(:ensure_config_exists)
+    config.load
+  end
+
+  it 'reads the config as YAML' do
+    YAML.should_receive(:load).and_return({"production" => @config})
+    fd = stub(:read => nil)
+    File.stub(:open).and_yield(fd)
+    config = Rapns::Daemon::Configuration.new("production", "/tmp/rapns-non-existant-file")
+    config.stub(:ensure_config_exists)
+    config.load
+  end
+
   it "should raise an error if the configuration file does not exist" do
     expect { Rapns::Daemon::Configuration.new("production", "/tmp/rapns-non-existant-file").load }.to raise_error(Rapns::ConfigurationError, "/tmp/rapns-non-existant-file does not exist. Have you run 'rails g rapns'?")
   end
@@ -16,7 +34,7 @@ describe Rapns::Daemon::Configuration do
   it "should raise an error if the environment is not configured" do
     configuration = Rapns::Daemon::Configuration.new("development", "/some/config.yml")
     configuration.stub(:read_config).and_return({"production" => {}})
-    expect { configuration.load  }.to raise_error(Rapns::ConfigurationError, "Configuration for environment 'development' not defined in /some/config.yml")
+    expect { configuration.load }.to raise_error(Rapns::ConfigurationError, "Configuration for environment 'development' not defined in /some/config.yml")
   end
 
   it "should raise an error if the host is not configured" do

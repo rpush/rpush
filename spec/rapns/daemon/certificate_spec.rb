@@ -1,6 +1,12 @@
 require "spec_helper"
 
 describe Rapns::Daemon::Certificate do
+  it 'reads the certificate from the given path' do
+    File.stub(:exists? => true)
+    File.should_receive(:read).with("/dir/development.pem")
+    cert = Rapns::Daemon::Certificate.new("/dir/development.pem")
+    cert.load
+  end
 
   it "should raise an error if the .pem file does not exist" do
     cert = Rapns::Daemon::Certificate.new("/tmp/rapns-missing.pem")

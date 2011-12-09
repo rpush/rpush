@@ -1,26 +1,26 @@
 require "spec_helper"
 
+module Rails
+  def self.logger
+    @logger
+  end
+
+  def self.logger=(logger)
+    @logger = logger
+  end
+end
+
+module HoptoadNotifier
+  def self.notify(e)
+  end
+end
+
+module Airbrake
+  def self.notify(e)
+  end
+end
+
 describe Rapns::Daemon::Logger do
-  module Rails
-    def self.logger
-      @logger
-    end
-
-    def self.logger=(logger)
-      @logger = logger
-    end
-  end
-
-  module HoptoadNotifier
-    def self.notify(e)
-    end
-  end
-
-  module Airbrake
-    def self.notify(e)
-    end
-  end
-
   before do
     Rails.stub(:root).and_return("/rails_root")
     @buffered_logger = mock("BufferedLogger", :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
@@ -79,6 +79,26 @@ describe Rapns::Daemon::Logger do
     logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
     Airbrake.should_receive(:notify).with(e)
     logger.error(e)
+  end
+
+  context "without Airbrake defined" do
+    before do
+      Object.send(:remove_const, :Airbrake)
+    end
+
+    after do
+      module Airbrake
+        def self.notify(e)
+        end
+      end
+    end
+
+    it "should notify using HoptoadNotifier" do
+      e = RuntimeError.new("hi mom")
+      logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
+      HoptoadNotifier.should_receive(:notify).with(e)
+      logger.error(e)
+    end
   end
 
   it "should not notify Airbrake of the exception if the airbrake_notify option is false" do
