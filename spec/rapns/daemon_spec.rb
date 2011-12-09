@@ -15,10 +15,6 @@ describe Rapns::Daemon, "when starting" do
     @certificate.stub(:read_certificate).and_return("certificate contents")
     Rapns::Daemon::Certificate.stub(:new).and_return(@certificate)
 
-    @connection_pool = Rapns::Daemon::ConnectionPool.new(3)
-    @connection_pool.stub(:populate)
-    Rapns::Daemon::ConnectionPool.stub(:new).and_return(@connection_pool)
-
     @handler_pool = Rapns::Daemon::DeliveryHandlerPool.new(3)
     @handler_pool.stub(:populate)
     Rapns::Daemon::DeliveryHandlerPool.stub(:new).and_return(@handler_pool)
@@ -54,20 +50,9 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.certificate.should == @certificate
   end
 
-  it "should populate the connection pool" do
-    Rapns::Daemon::ConnectionPool.should_receive(:new).with(3).and_return(@connection_pool)
-    @connection_pool.should_receive(:populate)
-    Rapns::Daemon.start("development", {})
-  end
-
   it "should initialize the delivery queue" do
     Rapns::Daemon::DeliveryQueue.should_receive(:new)
     Rapns::Daemon.start("development", {})
-  end
-
-  it "should make the connection pool accessible" do
-    Rapns::Daemon.start("development", {})
-    Rapns::Daemon.connection_pool.should == @connection_pool
   end
 
   it "should populate the delivery handler pool" do
@@ -118,8 +103,6 @@ describe Rapns::Daemon, "when being shutdown" do
   before do
     Rails.stub(:root).and_return("/rails_root")
     Rapns::Daemon::Feeder.stub(:stop)
-    @connection_pool = mock("ConnectionPool", :drain => nil)
-    Rapns::Daemon.stub(:connection_pool).and_return(@connection_pool)
     @handler_pool = mock("DeliveryHandlerPool", :drain => nil)
     Rapns::Daemon.stub(:delivery_handler_pool).and_return(@handler_pool)
     @configuration = mock("Configuration", :pid_file => File.join(Rails.root, "rapns.pid"))
@@ -129,17 +112,6 @@ describe Rapns::Daemon, "when being shutdown" do
 
   it "should stop the feeder" do
     Rapns::Daemon::Feeder.should_receive(:stop)
-    Rapns::Daemon.send(:shutdown)
-  end
-
-  it "should drain the connection pool" do
-    @connection_pool.should_receive(:drain)
-    Rapns::Daemon.send(:shutdown)
-  end
-
-  it "should not attempt to drain the connection pool if it has not been initialized" do
-    Rapns::Daemon.stub(:connection_pool).and_return(nil)
-    @connection_pool.should_not_receive(:drain)
     Rapns::Daemon.send(:shutdown)
   end
 

@@ -10,7 +10,7 @@ describe Rapns::Daemon::Connection, "when setting up the SSL context" do
     Rapns::Daemon.stub(:certificate).and_return(@certificate)
     @x509_certificate = mock("X509 Certificate")
     OpenSSL::X509::Certificate.stub(:new).and_return(@x509_certificate)
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @connection.stub(:connect_socket)
     @connection.stub(:setup_at_exit_hook)
     configuration = mock("Configuration", :host => "localhost", :port => 123, :certificate_password => "abc123")
@@ -32,7 +32,7 @@ end
 
 describe Rapns::Daemon::Connection, "when connecting the socket" do
   before do
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @connection.stub(:setup_at_exit_hook)
     @ssl_context = mock("SSLContext")
     @connection.stub(:setup_ssl_context).and_return(@ssl_context)
@@ -81,7 +81,7 @@ end
 
 describe Rapns::Daemon::Connection, "when shuting down the connection" do
   before do
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @connection.stub(:setup_ssl_context)
     @ssl_socket = mock("SSLSocket", :close => nil)
     @tcp_socket = mock("TCPSocket", :close => nil)
@@ -123,7 +123,7 @@ end
 
 shared_examples_for "when the write fails" do
   before do
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @logger = mock("Logger", :error => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
     configuration = mock("Configuration", :host => "localhost", :port => 123)
@@ -191,7 +191,7 @@ end
 
 describe Rapns::Daemon::Connection, "when reconnecting" do
   before do
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @connection.stub(:close)
     @connection.stub(:connect_socket)
   end
@@ -209,7 +209,7 @@ end
 
 describe Rapns::Daemon::Connection, "when sending a notification" do
   before do
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @ssl_socket = mock("SSLSocket", :write => nil, :flush => nil, :close => nil)
     @tcp_socket = mock("TCPSocket", :close => nil)
     @connection.stub(:setup_ssl_context)
@@ -238,7 +238,7 @@ describe Rapns::Daemon::Connection, "when receiving an error packet" do
   before do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     @notification.stub(:save!)
-    @connection = Rapns::Daemon::Connection.new("Connection 1")
+    @connection = Rapns::Daemon::Connection.new(1)
     @ssl_socket = mock("SSLSocket", :write => nil, :flush => nil, :close => nil, :read => [8, 4, @notification.id].pack("ccN"))
     @connection.stub(:setup_ssl_context)
     @connection.stub(:connect_socket).and_return([@tcp_socket, @ssl_socket])

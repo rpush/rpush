@@ -5,7 +5,7 @@ module Rapns
       protected
 
       def new_object_for_pool(i)
-        DeliveryHandler.new
+        DeliveryHandler.new(i)
       end
 
       def object_added_to_pool(object)

@@ -5,23 +5,26 @@ describe Rapns::Daemon::DeliveryHandler do
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     Rapns::Daemon.stub(:delivery_queue).and_return(Rapns::Daemon::DeliveryQueue.new)
     Rapns::Daemon.delivery_queue.push(@notification)
-    @connection = mock("Connection", :connect => nil, :write => nil)
+    @connection = mock("Connection", :connect => nil, :write => nil, :close => nil)
     Rapns::Daemon::Connection.stub(:new).and_return(@connection)
-    @connection_pool = Rapns::Daemon::ConnectionPool.new(1)
-    @connection_pool.populate
-    Rapns::Daemon.stub(:connection_pool).and_return(@connection_pool)
-    @delivery_handler = Rapns::Daemon::DeliveryHandler.new
+    @delivery_handler = Rapns::Daemon::DeliveryHandler.new(0)
     @logger = mock("Logger", :error => nil, :info => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
   end
 
-  it "should pop a new notification from the delivery queue" do
-    Rapns::Daemon.delivery_queue.should_receive(:pop)
-    @delivery_handler.send(:handle_next_notification)
+  it "connects the socket when started" do
+    @connection.should_receive(:connect)
+    @delivery_handler.start
+    @delivery_handler.stop
   end
 
-  it "should claim a connection for the delivery" do
-    Rapns::Daemon.connection_pool.should_receive(:claim_connection)
+  it "closes the connection when stopped" do
+    @connection.should_receive(:close)
+    @delivery_handler.stop
+  end
+
+  it "should pop a new notification from the delivery queue" do
+    Rapns::Daemon.delivery_queue.should_receive(:pop)
     @delivery_handler.send(:handle_next_notification)
   end
 

@@ -6,7 +6,6 @@ require 'rapns/daemon/configuration'
 require 'rapns/daemon/certificate'
 require 'rapns/daemon/delivery_error'
 require 'rapns/daemon/pool'
-require 'rapns/daemon/connection_pool'
 require 'rapns/daemon/connection'
 require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/delivery_handler'
@@ -17,8 +16,8 @@ require 'rapns/daemon/logger'
 module Rapns
   module Daemon
     class << self
-      attr_accessor :logger, :configuration, :certificate, :connection_pool, :delivery_queue,
-        :delivery_handler_pool, :foreground
+      attr_accessor :logger, :configuration, :certificate,
+        :delivery_queue, :delivery_handler_pool, :foreground
       alias_method  :foreground?, :foreground
     end
 
@@ -42,9 +41,6 @@ module Rapns
 
       self.delivery_handler_pool = DeliveryHandlerPool.new(configuration.connections)
       delivery_handler_pool.populate
-
-      self.connection_pool = ConnectionPool.new(configuration.connections)
-      connection_pool.populate
 
       logger.info('Ready')
       Feeder.start(foreground?)
@@ -72,7 +68,6 @@ module Rapns
       puts "\nShutting down..."
       Rapns::Daemon::Feeder.stop
       Rapns::Daemon.delivery_handler_pool.drain if Rapns::Daemon.delivery_handler_pool
-      Rapns::Daemon.connection_pool.drain if Rapns::Daemon.connection_pool
       delete_pid_file
     end
 

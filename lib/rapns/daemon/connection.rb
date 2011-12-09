@@ -17,8 +17,8 @@ module Rapns
         255 => "None (unknown error)"
       }
 
-      def initialize(name)
-        @name = name
+      def initialize(i)
+        @name = "Connection #{i}"
       end
 
       def connect
