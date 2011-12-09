@@ -15,8 +15,6 @@ module Rapns
       end
 
       def drain
-        drain_started
-
         while !@queue.empty?
           object = @queue.pop
           object_removed_from_pool(object)
@@ -32,9 +30,6 @@ module Rapns
       end
 
       def object_removed_from_pool(object)
-      end
-
-      def drain_started
       end
     end
   end

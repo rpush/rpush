@@ -10,7 +10,7 @@ module Rapns
       def start
         @connection.connect
 
-        @thread = Thread.new do 
+        Thread.new do
           loop do
             break if @stop
             handle_next_notification
@@ -20,8 +20,7 @@ module Rapns
 
       def stop
         @stop = true
-        @thread.join if @thread
-        @connection.close
+        Rapns::Daemon.delivery_queue.push(STOP)
       end
 
       protected
@@ -54,8 +53,13 @@ module Rapns
 
       def handle_next_notification
         notification = Rapns::Daemon.delivery_queue.pop
+
+        if notification == STOP
+          @connection.close
+          return
+        end
+
         begin
-          return if notification == STOP
           deliver(notification)
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)

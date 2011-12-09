@@ -13,14 +13,9 @@ describe Rapns::Daemon::DeliveryHandlerPool do
     @pool.populate
   end
 
-  it "should tell each connection to close when drained" do
+  it "waits for each handle to stop" do
     @pool.populate
     @handler.should_receive(:stop).exactly(3).times
-    @pool.drain
-  end
-
-  it "should initiate the topping process for each DeliveryHandler before the pool is drained" do
-    Rapns::Daemon.delivery_queue.should_receive(:push).with(0x666).exactly(3).times
     @pool.drain
   end
 end

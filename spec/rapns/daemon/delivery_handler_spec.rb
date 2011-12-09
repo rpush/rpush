@@ -18,13 +18,25 @@ describe Rapns::Daemon::DeliveryHandler do
     @delivery_handler.stop
   end
 
-  it "closes the connection when stopped" do
-    @connection.should_receive(:close)
+  it "pushes a STOP instruction into the queue when told to stop" do
+    Rapns::Daemon.delivery_queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::STOP)
     @delivery_handler.stop
+  end
+
+  it "closes the connection when a STOP instruction is received" do
+    Rapns::Daemon.delivery_queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+    @delivery_handler.send(:handle_next_notification)
   end
 
   it "should pop a new notification from the delivery queue" do
     Rapns::Daemon.delivery_queue.should_receive(:pop)
+    @delivery_handler.send(:handle_next_notification)
+  end
+
+  it "does not attempt to deliver a notification when a STOP instruction is received" do
+    Rapns::Daemon.delivery_queue.pop # empty the queue
+    @delivery_handler.should_not_receive(:deliver)
+    Rapns::Daemon.delivery_queue.push(Rapns::Daemon::DeliveryHandler::STOP)
     @delivery_handler.send(:handle_next_notification)
   end
 
