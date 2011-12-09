@@ -60,8 +60,8 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", {})
   end
 
-  it "should initialize the delivery queue with the number of connection as its signal point" do
-    Rapns::Daemon::DeliveryQueue.should_receive(:new).with(3)
+  it "should initialize the delivery queue" do
+    Rapns::Daemon::DeliveryQueue.should_receive(:new)
     Rapns::Daemon.start("development", {})
   end
 

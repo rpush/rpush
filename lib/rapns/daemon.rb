@@ -34,7 +34,7 @@ module Rapns
       self.certificate = Certificate.new(configuration.certificate)
       certificate.load
 
-      self.delivery_queue = DeliveryQueue.new(configuration.connections)
+      self.delivery_queue = DeliveryQueue.new
 
       daemonize unless foreground?
 

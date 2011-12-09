@@ -1,44 +1,27 @@
 module Rapns
   module Daemon
     class DeliveryQueue
-      def initialize(num_handlers)
-        @num_handlers = num_handlers
+      def initialize
+        @mutex = Mutex.new
+        @num_notifications = 0
         @queue = Queue.new
-        @feeder = nil
-        @handler_mutex = Mutex.new
       end
 
-      def push(obj)
-        @queue.push(obj)
+      def push(notification)
+        @mutex.synchronize { @num_notifications += 1 }
+        @queue.push(notification)
       end
 
       def pop
         @queue.pop
       end
 
-      def handler_available
-        @handler_mutex.synchronize do
-          signal_feeder if handler_available?
-        end
+      def notification_processed
+        @mutex.synchronize { @num_notifications -= 1 }
       end
 
-      def handler_available?
-        @queue.size < @num_handlers
-      end
-
-      def signal_feeder
-        begin
-          @feeder.wakeup if @feeder
-        rescue ThreadError
-          retry
-        end
-      end
-
-      def wait_for_available_handler
-        if !handler_available?
-          @feeder = Thread.current
-          Thread.stop
-        end
+      def notifications_processed?
+        @mutex.synchronize { @num_notifications == 0 }
       end
     end
   end
