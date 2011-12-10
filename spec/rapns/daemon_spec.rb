@@ -4,11 +4,31 @@ describe Rapns::Daemon, "when starting" do
   module Rails
   end
 
+  let(:config) do
+    {
+      "airbrake_notify" => true,
+      "certificate" => "development.pem",
+      "certificate_password" => "abc123",
+      "pid_file" => "rapns.pid",
+      "push" => {
+        "port" => 123,
+        "host" => "localhost",
+        "poll" => 4,
+        "connections" => 3
+      },
+      "feedback" => {
+        "port" => 123,
+        "host" => "localhost",
+        "poll" => 30,
+      }
+    }
+  end
+
   before do
     Rails.stub(:root).and_return("/rails_root")
 
     @configuration = Rapns::Daemon::Configuration.new("development", "/rails_root/config/rapns/rapns.yml")
-    @configuration.stub(:read_config).and_return({"development" => {"port" => 123, "host" => "localhost", "certificate" => "development.pem", "certificate_password" => "abc123", "pid_file" => "rapns.pid"}})
+    @configuration.stub(:read_config).and_return({"development" => config})
     Rapns::Daemon::Configuration.stub(:new).and_return(@configuration)
 
     @certificate = Rapns::Daemon::Certificate.new("/rails_root/config/rapns/development.pem")
@@ -19,8 +39,8 @@ describe Rapns::Daemon, "when starting" do
     @handler_pool.stub(:populate)
     Rapns::Daemon::DeliveryHandlerPool.stub(:new).and_return(@handler_pool)
 
+    Rapns::Daemon::FeedbackReceiver.stub(:start)
     Rapns::Daemon::Feeder.stub(:start)
-    Rapns::Daemon::Feeder.stub(:wait)
     Rapns::Daemon.stub(:daemonize)
     Rapns::Daemon.stub(:write_pid_file)
     @logger = mock("Logger", :info => nil)
@@ -82,6 +102,11 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", {})
   end
 
+  it "should start the feedback receiver" do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:start)
+    Rapns::Daemon.start("development", true)
+  end
+
   it "should start the feeder" do
     Rapns::Daemon::Feeder.should_receive(:start)
     Rapns::Daemon.start("development", true)
@@ -103,11 +128,17 @@ describe Rapns::Daemon, "when being shutdown" do
   before do
     Rails.stub(:root).and_return("/rails_root")
     Rapns::Daemon::Feeder.stub(:stop)
+    Rapns::Daemon::FeedbackReceiver.stub(:stop)
     @handler_pool = mock("DeliveryHandlerPool", :drain => nil)
     Rapns::Daemon.stub(:delivery_handler_pool).and_return(@handler_pool)
     @configuration = mock("Configuration", :pid_file => File.join(Rails.root, "rapns.pid"))
     Rapns::Daemon.stub(:configuration).and_return(@configuration)
     Rapns::Daemon.stub(:puts)
+  end
+
+  it "should stop the feedback receiver" do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:stop)
+    Rapns::Daemon.send(:shutdown)
   end
 
   it "should stop the feeder" do

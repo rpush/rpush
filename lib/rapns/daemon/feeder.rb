@@ -36,7 +36,7 @@ module Rapns
           Rapns::Daemon.logger.error(e)
         end
 
-        sleep Rapns::Daemon.configuration.poll
+        sleep Rapns::Daemon.configuration.push.poll
       end
 
       def self.reconnect
