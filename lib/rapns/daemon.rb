@@ -10,6 +10,7 @@ require 'rapns/daemon/connection'
 require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/delivery_handler'
 require 'rapns/daemon/delivery_handler_pool'
+require 'rapns/daemon/feedback_receiver'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
 
@@ -43,6 +44,8 @@ module Rapns
       delivery_handler_pool.populate
 
       logger.info('Ready')
+
+      FeedbackReceiver.start
       Feeder.start(foreground?)
     end
 
@@ -66,6 +69,7 @@ module Rapns
 
     def self.shutdown
       puts "\nShutting down..."
+      Rapns::Daemon::FeedbackReceiver.stop
       Rapns::Daemon::Feeder.stop
       Rapns::Daemon.delivery_handler_pool.drain if Rapns::Daemon.delivery_handler_pool
       delete_pid_file

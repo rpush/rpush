@@ -2,10 +2,11 @@ module Rapns
   class Notification < ActiveRecord::Base
     set_table_name "rapns_notifications"
 
-    validates :device_token, :presence => true, :format => { :with => /^[a-z0-9]{64}$/ }
+    validates :device_token, :presence => true
     validates :badge, :numericality => true, :allow_nil => true
     validates :expiry, :numericality => true, :presence => true
 
+    validates_with Rapns::DeviceTokenFormatValidator
     validates_with Rapns::BinaryNotificationValidator
 
     scope :ready_for_delivery, lambda { where(:delivered => false, :failed => false).merge(where("deliver_after IS NULL") | where("deliver_after < ?", Time.now)) }

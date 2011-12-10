@@ -7,7 +7,8 @@ class RapnsGenerator < Rails::Generators::Base
   end
 
   def copy_migration
-     migration_template "create_rapns_notifications.rb", "db/migrate/create_rapns_notifications.rb"
+    migration_template "create_rapns_notifications.rb", "db/migrate/create_rapns_notifications.rb"
+    migration_template "create_rapns_feedback.rb", "db/migrate/create_rapns_feedback.rb"
   end
 
   def copy_config

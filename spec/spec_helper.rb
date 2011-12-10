@@ -17,9 +17,12 @@ end
 puts "Using #{$adapter} adapter."
 ActiveRecord::Base.establish_connection('adapter' => $adapter, 'database' => 'rapns_test')
 require 'generators/templates/create_rapns_notifications'
+require 'generators/templates/create_rapns_feedback'
 
-CreateRapnsNotifications.down rescue ActiveRecord::StatementInvalid
-CreateRapnsNotifications.up
+[CreateRapnsNotifications, CreateRapnsFeedback].each do |migration|
+  migration.down rescue ActiveRecord::StatementInvalid
+  migration.up
+end
 
 require 'bundler'
 Bundler.require(:default)
