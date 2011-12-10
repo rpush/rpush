@@ -40,7 +40,7 @@ module Rapns
 
       write_pid_file
 
-      self.delivery_handler_pool = DeliveryHandlerPool.new(configuration.connections)
+      self.delivery_handler_pool = DeliveryHandlerPool.new(configuration.push.connections)
       delivery_handler_pool.populate
 
       logger.info('Ready')

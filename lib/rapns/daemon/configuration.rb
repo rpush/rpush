@@ -5,26 +5,35 @@ module Rapns
 
   module Daemon
     class Configuration
-      attr_accessor :host, :port, :certificate, :certificate_password, :poll, :airbrake_notify, :connections, :pid_file
+      attr_accessor :push, :feedback
+      attr_accessor :certificate, :certificate_password, :airbrake_notify, :pid_file
       alias_method  :airbrake_notify?, :airbrake_notify
 
       def initialize(environment, config_path)
         @environment = environment
         @config_path = config_path
+
+        self.push = Struct.new(:host, :port, :connections, :poll).new
+        self.feedback = Struct.new(:host, :port, :poll).new
       end
 
       def load
         config = read_config
         ensure_environment_configured(config)
         config = config[@environment]
-        set_variable(:host, config)
-        set_variable(:port, config)
-        set_variable(:certificate, config)
-        set_variable(:airbrake_notify, config, :optional => true, :default => true)
-        set_variable(:certificate_password, config, :optional => true, :default => "")
-        set_variable(:poll, config, :optional => true, :default => 2)
-        set_variable(:connections, config, :optional => true, :default => 3)
-        set_variable(:pid_file, config, :optional => true, :default => "")
+        set_variable(:push, :host, config)
+        set_variable(:push, :port, config)
+        set_variable(:push, :poll, config, :optional => true, :default => 2)
+        set_variable(:push, :connections, config, :optional => true, :default => 3)
+
+        set_variable(:feedback, :host, config)
+        set_variable(:feedback, :port, config)
+        set_variable(:feedback, :poll, config, :optional => true, :default => 60)
+
+        set_variable(nil, :certificate, config)
+        set_variable(nil, :airbrake_notify, config, :optional => true, :default => true)
+        set_variable(nil, :certificate_password, config, :optional => true, :default => "")
+        set_variable(nil, :pid_file, config, :optional => true, :default => "")
       end
 
       def certificate
@@ -52,15 +61,24 @@ module Rapns
         File.open(@config_path) { |fd| YAML.load(fd) }
       end
 
-      def set_variable(key, config, options = {})
-        if !config.key?(key.to_s) || config[key.to_s].to_s.strip == ""
+      def set_variable(base_key, key, config, options = {})
+        if base_key
+          base = send(base_key)
+          value = config.key?(base_key.to_s) ? config[base_key.to_s][key.to_s] : nil
+        else
+          base = self
+          value = config[key.to_s]
+        end
+
+        if value.to_s.strip == ""
           if options[:optional]
-            instance_variable_set("@#{key}", options[:default])
+            base.send("#{key}=", options[:default])
           else
-            raise Rapns::ConfigurationError, "'#{key}' not defined for environment '#{@environment}' in #{@config_path}"
+            key_path = base_key ? "#{base_key}.#{key}" : key
+            raise Rapns::ConfigurationError, "'#{key_path}' not defined for environment '#{@environment}' in #{@config_path}. You may need to run 'rails g rapns' after updating."
           end
         else
-          instance_variable_set("@#{key}", config[key.to_s])
+          base.send("#{key}=", value)
         end
       end
 

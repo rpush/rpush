@@ -21,7 +21,9 @@ module Rapns
       def self.check_for_feedback
         connection = nil
         begin
-          connection = Connection.new("FeedbackReceiver", nil, nil)
+          host = Rapns::Daemon.configuration.feedback.host
+          port = Rapns::Daemon.configuration.feedback.port
+          connection = Connection.new("FeedbackReceiver", host, port)
           connection.connect
 
           while tuple = connection.read(FEEDBACK_TUPLE_BYTES)

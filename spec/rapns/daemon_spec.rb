@@ -4,11 +4,31 @@ describe Rapns::Daemon, "when starting" do
   module Rails
   end
 
+  let(:config) do
+    {
+      "airbrake_notify" => true,
+      "certificate" => "development.pem",
+      "certificate_password" => "abc123",
+      "pid_file" => "rapns.pid",
+      "push" => {
+        "port" => 123,
+        "host" => "localhost",
+        "poll" => 4,
+        "connections" => 3
+      },
+      "feedback" => {
+        "port" => 123,
+        "host" => "localhost",
+        "poll" => 30,
+      }
+    }
+  end
+
   before do
     Rails.stub(:root).and_return("/rails_root")
 
     @configuration = Rapns::Daemon::Configuration.new("development", "/rails_root/config/rapns/rapns.yml")
-    @configuration.stub(:read_config).and_return({"development" => {"port" => 123, "host" => "localhost", "certificate" => "development.pem", "certificate_password" => "abc123", "pid_file" => "rapns.pid"}})
+    @configuration.stub(:read_config).and_return({"development" => config})
     Rapns::Daemon::Configuration.stub(:new).and_return(@configuration)
 
     @certificate = Rapns::Daemon::Certificate.new("/rails_root/config/rapns/development.pem")
