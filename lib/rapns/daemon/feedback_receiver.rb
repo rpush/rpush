@@ -21,7 +21,7 @@ module Rapns
       def self.check_for_feedback
         connection = nil
         begin
-          connection = Connection.new("implement me")
+          connection = Connection.new("FeedbackReceiver", nil, nil)
           connection.connect
 
           while tuple = connection.read(FEEDBACK_TUPLE_BYTES)

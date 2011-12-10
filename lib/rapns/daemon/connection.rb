@@ -3,22 +3,10 @@ module Rapns
     class ConnectionError < StandardError; end
 
     class Connection
-      SELECT_TIMEOUT = 0.5
-      ERROR_PACKET_BYTES = 6
-      APN_ERRORS = {
-        1 => "Processing error",
-        2 => "Missing device token",
-        3 => "Missing topic",
-        4 => "Missing payload",
-        5 => "Missing token size",
-        6 => "Missing topic size",
-        7 => "Missing payload size",
-        8 => "Invalid token",
-        255 => "None (unknown error)"
-      }
-
-      def initialize(i)
-        @name = "Connection #{i}"
+      def initialize(name, host, port)
+        @name = name
+        @host = host
+        @port = port
       end
 
       def connect
@@ -34,6 +22,14 @@ module Rapns
         end
       end
 
+      def read(num_bytes)
+        @ssl_socket.read(num_bytes)
+      end
+
+      def select(timeout)
+        IO.select([@ssl_socket], nil, nil, timeout)
+      end
+
       def write(data)
         retry_count = 0
 
@@ -43,9 +39,7 @@ module Rapns
           retry_count += 1;
 
           if retry_count == 1
-            host = Rapns::Daemon.configuration.host
-            port = Rapns::Daemon.configuration.port
-            Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{host}:#{port} (#{e.class.name}), reconnecting...")
+            Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
           end
 
           if retry_count <= 3
@@ -55,16 +49,7 @@ module Rapns
           else
             raise ConnectionError, "#{@name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
           end
-        else
-          check_for_error
         end
-      end
-
-      protected
-
-      def write_data(data)
-        @ssl_socket.write(data)
-        @ssl_socket.flush
       end
 
       def reconnect
@@ -72,26 +57,11 @@ module Rapns
         @tcp_socket, @ssl_socket = connect_socket
       end
 
-      def check_for_error
-        if IO.select([@ssl_socket], nil, nil, SELECT_TIMEOUT)
-          delivery_error = nil
+      protected
 
-          if error = @ssl_socket.read(ERROR_PACKET_BYTES)
-            cmd, status, notification_id = error.unpack("ccN")
-
-            if cmd == 8 && status != 0
-              description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
-              delivery_error = Rapns::DeliveryError.new(status, description, notification_id)
-            end
-          end
-
-          begin
-            Rapns::Daemon.logger.error("[#{@name}] Error received, reconnecting...")
-            reconnect
-          ensure
-            raise delivery_error if delivery_error
-          end
-        end
+      def write_data(data)
+        @ssl_socket.write(data)
+        @ssl_socket.flush
       end
 
       def setup_ssl_context
@@ -102,13 +72,13 @@ module Rapns
       end
 
       def connect_socket
-        tcp_socket = TCPSocket.new(Rapns::Daemon.configuration.host, Rapns::Daemon.configuration.port)
+        tcp_socket = TCPSocket.new(@host, @port)
         tcp_socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
         tcp_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
         ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
         ssl_socket.sync = true
         ssl_socket.connect
-        Rapns::Daemon.logger.info("[#{@name}] Connected to #{Rapns::Daemon.configuration.host}:#{Rapns::Daemon.configuration.port}")
+        Rapns::Daemon.logger.info("[#{@name}] Connected to #{@host}:#{@port}")
         [tcp_socket, ssl_socket]
       end
     end

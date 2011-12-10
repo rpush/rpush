@@ -22,7 +22,7 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do  
-    Rapns::Daemon::Connection.should_receive(:new).with("implement me")
+    Rapns::Daemon::Connection.should_receive(:new).with("FeedbackReceiver", nil, nil)
     Rapns::Daemon::FeedbackReceiver.check_for_feedback
   end
 
