@@ -8,7 +8,7 @@ module Rapns
           loop do
             break if @stop
             check_for_feedback
-            sleep 60
+            sleep Rapns::Daemon.configuration.feedback.poll
           end
         end
       end
