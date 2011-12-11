@@ -87,9 +87,8 @@ describe Rapns::Daemon::Feeder do
 
   it "enqueues notifications when started" do
     Rapns::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
-    Thread.new { Rapns::Daemon::Feeder.start(true) }.run
-    sleep 0.1
-    Rapns::Daemon::Feeder.stop
+    Thread.new { sleep 0.1; Rapns::Daemon::Feeder.stop }.run
+    Rapns::Daemon::Feeder.start(true)
   end
 
   context "when the database connection is lost" do
