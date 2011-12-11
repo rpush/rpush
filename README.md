@@ -4,11 +4,14 @@ Easy to use library for Apple's Push Notification Service with Rails 3.
 
 ## Features
 
-* Works with Rails 3 and Ruby 1.9.
+* Works with Rails 3 and Ruby 1.9 & 1.8.
 * Uses a daemon process to keep open a persistent connection to the Push Notification Service, as recommended by Apple.
 * Uses the [enhanced binary format](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4) (Figure 5-2) so that delivery errors can be reported.
+* Records feedback from [The Feedback Service](http://developer.apple.com/library/mac/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3)
 * [Airbrake](http://airbrakeapp.com/) (Hoptoad) integration.
 * Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
+* Reconnects to the APNs if connections are lost.
+* Reconnects to your database if the connect is lost.
 
 ## Getting Started
 
@@ -43,13 +46,20 @@ If you want to use rapns in environments other than development or production, y
 
 ### Options:
 
-* `host` the APNs host to connect to, either `gateway.sandbox.push.apple.com` or `gateway.sandbox.push.apple.com`.
-* `port` the APNs port. Currently `2195` for both hosts.
+* `push` this section contains options to configure the delivery of notifications.
+    * `host` the APNs host to connect to, either `gateway.push.apple.com` or `gateway.sandbox.push.apple.com`.
+    * `port` the APNs port. Currently `2195` for both hosts.
+    * `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
+    * `connections` (default: 3) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications.
+    
+* `feedback` this section contains options to configure feedback checking.
+    * `host` the APNs host to connect to, either `feedback.push.apple.com` or `feedback.sandbox.push.apple.com`.
+    * `port` the APNs port. Currently `2196` for both hosts.
+    * `poll` (default: 60) Frequency in seconds to check for new feedback.
+
 * `certificate` The path to your .pem certificate, `config/rapns` is automatically checked if a relative path is given.
 * `certificate_password` (default: blank) the password you used when exporting your certificate, if any.
 * `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
-* `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
-* `connections` (default: 3) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications.
 * `pid_file` (default: blank) the file that rapns will write its process ID to. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
 
 ## Starting the rapns Daemon
@@ -88,7 +98,7 @@ Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#
 
 ## Delivery Failures
 
-The APN service provides two mechanism for delivery failure notification:
+The APNs provides two mechanism for delivery failure notification:
 
 ### Immediately, when processing a notification for delivery.
 
@@ -103,7 +113,15 @@ rapns will not attempt to deliver the notification again.
 
 ### Via the Feedback Service.
 
-Not implemented yet!
+rapns checks for feedback periodically and stores results in the Rapns::Feedback model. Each record contains the device token and a timestamp of when the APNs determined that the app no longer exists on the device.
+
+It is your responsibility to avoid creating new notifications for devices that no longer have your app installed. rapns does not and will not check Rapns::Feedback before sending notifications.
+
+Note: In my testing and from other reports on the Internet, it appears you may not receive feedback when using the APNs sandbox environment.
+
+## Updating rapns
+
+After updating you should run `rails g rapns` to check for any new migrations or configuration changes.
 
 ## Contributing to rapns
 
