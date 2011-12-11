@@ -15,6 +15,7 @@ module Rapns
         loop do
           break if @stop
           enqueue_notifications
+          interruptible_sleep Rapns::Daemon.configuration.push.poll
         end
       end
 
@@ -38,8 +39,6 @@ module Rapns
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         end
-
-        interruptible_sleep Rapns::Daemon.configuration.push.poll
       end
 
       def self.reconnect

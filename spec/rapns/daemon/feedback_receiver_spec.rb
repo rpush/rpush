@@ -66,16 +66,16 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
   it 'sleeps for the feedback poll period' do
     Rapns::Daemon::FeedbackReceiver.stub(:check_for_feedback)
     Rapns::Daemon::FeedbackReceiver.should_receive(:interruptible_sleep).with(60).at_least(:once)
+    Thread.stub(:new).and_yield
+    Rapns::Daemon::FeedbackReceiver.stub(:loop).and_yield
     Rapns::Daemon::FeedbackReceiver.start
-    sleep 0.1
-    Rapns::Daemon::FeedbackReceiver.stop
   end
 
   it 'checks for feedback when started' do
     Rapns::Daemon::FeedbackReceiver.should_receive(:check_for_feedback).at_least(:once)
+    Thread.stub(:new).and_yield
+    Rapns::Daemon::FeedbackReceiver.stub(:loop).and_yield
     Rapns::Daemon::FeedbackReceiver.start
-    sleep 0.1
-    Rapns::Daemon::FeedbackReceiver.stop
   end
 
   it 'interrupts sleep when stopped' do

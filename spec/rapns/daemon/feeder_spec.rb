@@ -61,11 +61,6 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
-  it "should sleep for the given period" do
-    Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(2)
-    Rapns::Daemon::Feeder.enqueue_notifications
-  end
-
   it "should not enqueue more notifications if other are still being processed" do
     Rapns::Daemon.delivery_queue.stub(:notifications_processed? => false)
     Rapns::Notification.should_not_receive(:ready_for_delivery)
@@ -87,7 +82,13 @@ describe Rapns::Daemon::Feeder do
 
   it "enqueues notifications when started" do
     Rapns::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
-    Thread.new { sleep 0.1; Rapns::Daemon::Feeder.stop }.run
+    Rapns::Daemon::Feeder.stub(:loop).and_yield
+    Rapns::Daemon::Feeder.start(true)
+  end
+
+  it "should sleep for the given period" do
+    Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(2)
+    Rapns::Daemon::Feeder.stub(:loop).and_yield
     Rapns::Daemon::Feeder.start(true)
   end
 
