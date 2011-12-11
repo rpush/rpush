@@ -90,8 +90,6 @@ describe Rapns::Daemon::DeliveryHandler do
   describe "when delivery fails" do
     before do
       @connection.stub(:select => true, :read => [8, 4, 69].pack("ccN"), :reconnect => nil)
-      @error = Rapns::DeliveryError.new(4, "Missing payload", 69)
-      Rapns::DeliveryError.stub(:new => @error)
     end
 
     it "should set the notification as not delivered" do
@@ -122,7 +120,9 @@ describe Rapns::Daemon::DeliveryHandler do
     end
 
     it "should log the delivery error" do
-      Rapns::Daemon.logger.should_receive(:error).with(@error)
+      error = Rapns::DeliveryError.new(4, "Missing payload", 69)
+      Rapns::DeliveryError.stub(:new => error)
+      Rapns::Daemon.logger.should_receive(:error).with(error)
       delivery_handler.send(:handle_next_notification)
     end
 
@@ -136,16 +136,6 @@ describe Rapns::Daemon::DeliveryHandler do
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should not raise a DeliveryError if the packet cmd value is not 8" do
-      @connection.stub(:read).and_return([6, 4, 12].pack("ccN"))
-      expect { delivery_handler.send(:handle_next_notification) }.should_not raise_error(Rapns::DeliveryError)
-    end
-
-    it "should not raise a DeliveryError if the status code is 0 (no error)" do
-      @connection.stub(:read).and_return([8, 0, 12].pack("ccN"))
-      expect { delivery_handler.send(:handle_next_notification) }.should_not raise_error(Rapns::DeliveryError)
-    end
-
     it "should read 6 bytes from the socket" do
       @connection.should_receive(:read).with(6).and_return(nil)
       delivery_handler.send(:handle_next_notification)
@@ -157,46 +147,23 @@ describe Rapns::Daemon::DeliveryHandler do
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should not raise a DeliveryError if the socket read returns nothing" do
-      @connection.stub(:read).with(6).and_return(nil)
-      expect { delivery_handler.send(:handle_next_notification) }.should_not raise_error(Rapns::DeliveryError)
+    it 'should raise an error if the connection is closed without an error being returned' do
+      @connection.stub(:read => nil)
+      description = "The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host."
+      error = Rapns::DeliveryError.new(nil, description, nil)
+      Rapns::DeliveryError.should_receive(:new).with(nil, description, nil).and_return(error)
+      Rapns::Daemon.logger.should_receive(:error).with(error)
+      delivery_handler.send(:handle_next_notification)
     end
 
     it "should reconnect the socket" do
       @connection.should_receive(:reconnect)
-      begin
-        delivery_handler.send(:handle_next_notification)
-      rescue Rapns::DeliveryError
-      end
+      delivery_handler.send(:handle_next_notification)
     end
 
     it "should log that the connection is being reconnected" do
       Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler 0] Error received, reconnecting...")
-      begin
-        delivery_handler.send(:handle_next_notification)
-      rescue Rapns::DeliveryError
-      end
+      delivery_handler.send(:handle_next_notification)
     end
   end
 end
-
-# describe Rapns::Daemon::Connection, "when receiving an error packet" do
-#   before do
-#     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
-#     @notification.stub(:save!)
-#     @connection = Rapns::Daemon::Connection.new('Connection 0', 'gateway.push.apple.com', 2195)
-#     @ssl_socket = mock("SSLSocket", :write => nil, :flush => nil, :close => nil, :read => [8, 4, @notification.id].pack("ccN"))
-#     @connection.stub(:setup_ssl_context)
-#     @connection.stub(:connect_socket).and_return([@tcp_socket, @ssl_socket])
-#     IO.stub(:select).and_return([@ssl_socket, [], []])
-#     logger = mock("Logger", :error => nil, :warn => nil)
-#     Rapns::Daemon.stub(:logger).and_return(logger)
-#     @connection.connect
-#   end
-# 
-#   it "should raise a DeliveryError when an error is received" do
-#     expect { @connection.write("msg with an error") }.should raise_error(Rapns::DeliveryError)
-#   end
-# 
-
-# end

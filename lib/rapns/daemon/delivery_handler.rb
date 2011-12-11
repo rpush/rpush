@@ -2,8 +2,6 @@ module Rapns
   module Daemon
     class DeliveryHandler
       STOP = 0x666
-      ERROR_CMD = 8
-      OK_STATUS = 0
       SELECT_TIMEOUT = 0.5
       ERROR_TUPLE_BYTES = 6
       APN_ERRORS = {
@@ -71,22 +69,23 @@ module Rapns
 
       def check_for_error
         if @connection.select(SELECT_TIMEOUT)
-          delivery_error = nil
+          error = nil
 
-          if error = @connection.read(ERROR_TUPLE_BYTES)
-            cmd, status, notification_id = error.unpack("ccN")
+          if tuple = @connection.read(ERROR_TUPLE_BYTES)
+            cmd, status, notification_id = tuple.unpack("ccN")
 
-            if cmd == ERROR_CMD && status != OK_STATUS
-              description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
-              delivery_error = Rapns::DeliveryError.new(status, description, notification_id)
-            end
+            description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
+            error = Rapns::DeliveryError.new(status, description, notification_id)
+          else
+            description = "The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host."
+            error = Rapns::DeliveryError.new(nil, description, nil)
           end
 
           begin
             Rapns::Daemon.logger.error("[#{@name}] Error received, reconnecting...")
             @connection.reconnect
           ensure
-            raise delivery_error if delivery_error
+            raise error if error
           end
         end
       end
