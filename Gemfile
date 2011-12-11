@@ -9,6 +9,6 @@ gem 'mysql2'
 gem 'mysql'
 gem 'database_cleaner'
 gem 'simplecov'
-gem 'perftools.rb'
+#gem 'perftools.rb'
 
 gemspec
