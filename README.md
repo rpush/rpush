@@ -7,7 +7,7 @@ Easy to use library for Apple's Push Notification Service with Rails 3.
 * Works with Rails 3 and Ruby 1.9 & 1.8.
 * Uses a daemon process to keep open a persistent connection to the Push Notification Service, as recommended by Apple.
 * Uses the [enhanced binary format](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4) (Figure 5-2) so that delivery errors can be reported.
-* Records feedback from [The Feedback Service](http://developer.apple.com/library/mac/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3)
+* Records feedback from [The Feedback Service](http://developer.apple.com/library/mac/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3).
 * [Airbrake](http://airbrakeapp.com/) (Hoptoad) integration.
 * Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
 * Reconnects to the APNs if connections are lost.
@@ -113,11 +113,11 @@ rapns will not attempt to deliver the notification again.
 
 ### Via the Feedback Service.
 
-rapns checks for feedback periodically and stores results in the Rapns::Feedback model. Each record contains the device token and a timestamp of when the APNs determined that the app no longer exists on the device.
+rapns checks for feedback periodically and stores results in the `Rapns::Feedback` model. Each record contains the device token and a timestamp of when the APNs determined that the app no longer exists on the device.
 
-It is your responsibility to avoid creating new notifications for devices that no longer have your app installed. rapns does not and will not check Rapns::Feedback before sending notifications.
+It is your responsibility to avoid creating new notifications for devices that no longer have your app installed. rapns does not and will not check `Rapns::Feedback` before sending notifications.
 
-Note: In my testing and from other reports on the Internet, it appears you may not receive feedback when using the APNs sandbox environment.
+*Note: In my testing and from other reports on the Internet, it appears you may not receive feedback when using the APNs sandbox environment.*
 
 ## Updating rapns
 
