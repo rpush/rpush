@@ -10,6 +10,7 @@ describe Rapns::Daemon::Feeder do
     @queue = mock(:push => nil, :notifications_processed? => true)
     Rapns::Daemon.stub(:delivery_queue).and_return(@queue)
     Rapns::Daemon.stub(:configuration => mock("Configuration", :push => stub(:poll => 2)))
+    Rapns::Daemon::Feeder.instance_variable_set("@stop", false)
   end
 
   it "should reconnect to the database when daemonized" do
@@ -81,6 +82,13 @@ describe Rapns::Daemon::Feeder do
 
   it "interrupts sleep when stopped" do
     Rapns::Daemon::Feeder.should_receive(:interrupt_sleep)
+    Rapns::Daemon::Feeder.stop
+  end
+
+  it "enqueues notifications when started" do
+    Rapns::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
+    Thread.new { Rapns::Daemon::Feeder.start(true) }.run
+    sleep 0.1
     Rapns::Daemon::Feeder.stop
   end
 
