@@ -5,10 +5,11 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
   let(:logger) { stub(:error => nil, :info => nil) }
 
   before do
+    Rapns::Daemon::FeedbackReceiver.stub(:interrupt_sleep)
     Rapns::Daemon.logger = logger
     Rapns::Daemon::Connection.stub(:new => connection)
     Rapns::Feedback.stub(:create!)
-    Rapns::Daemon.configuration = stub(:feedback => stub(:host => 'feedback.push.apple.com', :port => 2196))
+    Rapns::Daemon.configuration = stub(:feedback => stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60))
   end
 
   def stub_connection_read_with_tuple
@@ -59,5 +60,24 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
     connection.stub(:read).and_raise(error)
     Rapns::Daemon.logger.should_receive(:error).with(error)
     Rapns::Daemon::FeedbackReceiver.check_for_feedback
+  end
+
+  it 'sleeps for the feedback poll period' do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:interruptible_sleep).with(60).any_number_of_times
+    Rapns::Daemon::FeedbackReceiver.start
+    sleep 0.1
+    Rapns::Daemon::FeedbackReceiver.stop
+  end
+
+  it 'checks for feedback when started' do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:check_for_feedback).with(60).any_number_of_times
+    Rapns::Daemon::FeedbackReceiver.start
+    sleep 0.1
+    Rapns::Daemon::FeedbackReceiver.stop
+  end
+
+  it 'interrupts sleep when stopped' do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:interrupt_sleep)
+    Rapns::Daemon::FeedbackReceiver.stop
   end
 end

@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class FeedbackReceiver
+      extend InterruptibleSleep
+
       FEEDBACK_TUPLE_BYTES = 38
 
       def self.start
@@ -8,13 +10,14 @@ module Rapns
           loop do
             break if @stop
             check_for_feedback
-            sleep Rapns::Daemon.configuration.feedback.poll
+            interruptible_sleep Rapns::Daemon.configuration.feedback.poll
           end
         end
       end
 
       def self.stop
         @stop = true
+        interrupt_sleep
         @thread.join if @thread
       end
 

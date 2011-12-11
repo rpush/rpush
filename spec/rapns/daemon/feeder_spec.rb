@@ -3,6 +3,7 @@ require "spec_helper"
 describe Rapns::Daemon::Feeder do
   before do
     Rapns::Daemon::Feeder.stub(:sleep)
+    Rapns::Daemon::Feeder.stub(:interruptible_sleep)
     @notification = Rapns::Notification.create!(:device_token => "a" * 64)
     @logger = mock("Logger", :info => nil, :error => nil, :warn => nil)
     Rapns::Daemon.stub(:logger).and_return(@logger)
@@ -60,7 +61,7 @@ describe Rapns::Daemon::Feeder do
   end
 
   it "should sleep for the given period" do
-    Rapns::Daemon::Feeder.should_receive(:sleep).with(2)
+    Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(2)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
@@ -76,6 +77,11 @@ describe Rapns::Daemon::Feeder do
     Rapns::Notification.stub(:ready_for_delivery).and_raise(e)
     Rapns::Daemon.logger.should_receive(:error).with(e)
     Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
+  it "interrupts sleep when stopped" do
+    Rapns::Daemon::Feeder.should_receive(:interrupt_sleep)
+    Rapns::Daemon::Feeder.stop
   end
 
   context "when the database connection is lost" do

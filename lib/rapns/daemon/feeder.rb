@@ -7,6 +7,8 @@ ADAPTER_ERRORS = [PGError, Mysql::Error, Mysql2::Error]
 module Rapns
   module Daemon
     class Feeder
+      extend InterruptibleSleep
+
       def self.start(foreground)
         connect unless foreground
 
@@ -18,6 +20,7 @@ module Rapns
 
       def self.stop
         @stop = true
+        interrupt_sleep
       end
 
       protected
@@ -36,7 +39,7 @@ module Rapns
           Rapns::Daemon.logger.error(e)
         end
 
-        sleep Rapns::Daemon.configuration.push.poll
+        interruptible_sleep Rapns::Daemon.configuration.push.poll
       end
 
       def self.reconnect
