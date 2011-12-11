@@ -1,3 +1,4 @@
+require "spec_helper"
 
 describe Rapns::Daemon::InterruptibleSleep do
   class SleepTest
