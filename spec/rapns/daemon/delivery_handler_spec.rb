@@ -120,7 +120,7 @@ describe Rapns::Daemon::DeliveryHandler do
     end
 
     it "should log the delivery error" do
-      error = Rapns::DeliveryError.new(4, "Missing payload", 69)
+      error = Rapns::DeliveryError.new(4, 12, "Missing payload")
       Rapns::DeliveryError.stub(:new => error)
       Rapns::Daemon.logger.should_receive(:error).with(error)
       delivery_handler.send(:handle_next_notification)
@@ -147,15 +147,6 @@ describe Rapns::Daemon::DeliveryHandler do
       delivery_handler.send(:handle_next_notification)
     end
 
-    it 'should raise an error if the connection is closed without an error being returned' do
-      @connection.stub(:read => nil)
-      description = "The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host."
-      error = Rapns::DeliveryError.new(nil, description, nil)
-      Rapns::DeliveryError.should_receive(:new).with(nil, description, nil).and_return(error)
-      Rapns::Daemon.logger.should_receive(:error).with(error)
-      delivery_handler.send(:handle_next_notification)
-    end
-
     it "should reconnect the socket" do
       @connection.should_receive(:reconnect)
       delivery_handler.send(:handle_next_notification)
@@ -164,6 +155,29 @@ describe Rapns::Daemon::DeliveryHandler do
     it "should log that the connection is being reconnected" do
       Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler 0] Error received, reconnecting...")
       delivery_handler.send(:handle_next_notification)
+    end
+
+    context "when the APNs disconnects without returning an error" do
+      before do
+        @connection.stub(:read => nil)
+      end
+
+      it 'should raise a DisconnectError error if the connection is closed without an error being returned' do
+        error = Rapns::DisconnectionError.new
+        Rapns::DisconnectionError.should_receive(:new).and_return(error)
+        Rapns::Daemon.logger.should_receive(:error).with(error)
+        delivery_handler.send(:handle_next_notification)
+      end
+
+      it 'does not set the error code on the notification' do
+        @notification.should_receive(:error_code=).with(nil)
+        delivery_handler.send(:handle_next_notification)
+      end
+
+      it 'sets the error descriptipon on the notification' do
+        @notification.should_receive(:error_description=).with("APNs disconnected without returning an error.")
+        delivery_handler.send(:handle_next_notification)
+      end
     end
   end
 end

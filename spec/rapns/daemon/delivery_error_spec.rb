@@ -1,11 +1,13 @@
 require "spec_helper"
 
 describe Rapns::DeliveryError do
-  before do
-    @error = Rapns::DeliveryError.new(4, "Missing payload", 12)
+  let(:error) { Rapns::DeliveryError.new(4, 12, "Missing payload") }
+
+  it "returns an informative message" do
+    error.message.should == "Unable to deliver notification 12, received APN error 4 (Missing payload)"
   end
 
-  it "should give an informative message" do
-    @error.message.should == "Unable to deliver notification 12, received APN error 4 (Missing payload)"
+  it "returns the error code" do
+    error.code.should == 4
   end
 end

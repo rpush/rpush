@@ -51,7 +51,7 @@ module Rapns
           notification.save!(:validate => false)
 
           Rapns::Daemon.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
-        rescue Rapns::DeliveryError => error
+        rescue Rapns::DeliveryError, Rapns::DisconnectionError => error
           handle_delivery_error(notification, error)
           raise
         end
@@ -72,13 +72,12 @@ module Rapns
           error = nil
 
           if tuple = @connection.read(ERROR_TUPLE_BYTES)
-            cmd, status, notification_id = tuple.unpack("ccN")
+            cmd, code, notification_id = tuple.unpack("ccN")
 
-            description = APN_ERRORS[status] || "Unknown error. Possible rapns bug?"
-            error = Rapns::DeliveryError.new(status, description, notification_id)
+            description = APN_ERRORS[code.to_i] || "Unknown error. Possible rapns bug?"
+            error = Rapns::DeliveryError.new(code, notification_id, description)
           else
-            description = "The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host."
-            error = Rapns::DeliveryError.new(nil, description, nil)
+            error = Rapns::DisconnectionError.new
           end
 
           begin
