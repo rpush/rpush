@@ -77,7 +77,7 @@ describe Rapns::Daemon::Logger do
   it "should notify Airbrake of the exception" do
     e = RuntimeError.new("hi mom")
     logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
-    Airbrake.should_receive(:notify).with(e)
+    Airbrake.should_receive(:notify_or_ignore).with(e)
     logger.error(e)
   end
 
@@ -104,20 +104,20 @@ describe Rapns::Daemon::Logger do
   it "should not notify Airbrake of the exception if the airbrake_notify option is false" do
     e = RuntimeError.new("hi mom")
     logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => false)
-    Airbrake.should_not_receive(:notify).with(e)
+    Airbrake.should_not_receive(:notify_or_ignore).with(e)
     logger.error(e)
   end
 
   it "should not notify Airbrake if explicitly disabled in the call to error" do
     e = RuntimeError.new("hi mom")
     logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
-    Airbrake.should_not_receive(:notify).with(e)
+    Airbrake.should_not_receive(:notify_or_ignore).with(e)
     logger.error(e, :airbrake_notify => false)
   end
 
   it "should not attempt to notify Airbrake of the error is not an Exception" do
     logger = Rapns::Daemon::Logger.new(:foreground => false)
-    Airbrake.should_not_receive(:notify)
+    Airbrake.should_not_receive(:notify_or_ignore)
     logger.error("string error message")
   end
 

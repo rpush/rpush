@@ -39,7 +39,7 @@ module Rapns
         return unless @options[:airbrake_notify] == true
 
         if defined?(Airbrake)
-          Airbrake.notify(e)
+          Airbrake.notify_or_ignore(e)
         elsif defined?(HoptoadNotifier)
           HoptoadNotifier.notify(e)
         end
