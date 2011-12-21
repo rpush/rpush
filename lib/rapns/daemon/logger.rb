@@ -41,7 +41,7 @@ module Rapns
         if defined?(Airbrake)
           Airbrake.notify_or_ignore(e)
         elsif defined?(HoptoadNotifier)
-          HoptoadNotifier.notify(e)
+          HoptoadNotifier.notify_or_ignore(e)
         end
       end
 

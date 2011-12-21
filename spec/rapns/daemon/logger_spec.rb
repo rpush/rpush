@@ -96,7 +96,7 @@ describe Rapns::Daemon::Logger do
     it "should notify using HoptoadNotifier" do
       e = RuntimeError.new("hi mom")
       logger = Rapns::Daemon::Logger.new(:foreground => false, :airbrake_notify => true)
-      HoptoadNotifier.should_receive(:notify).with(e)
+      HoptoadNotifier.should_receive(:notify_or_ignore).with(e)
       logger.error(e)
     end
   end
