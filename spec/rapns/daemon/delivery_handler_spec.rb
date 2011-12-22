@@ -75,6 +75,11 @@ describe Rapns::Daemon::DeliveryHandler do
     delivery_handler.send(:handle_next_notification)
   end
 
+  it "should update notification with the ability to reconnect the database" do
+    delivery_handler.should_receive(:with_database_reconnect_and_retry)
+    delivery_handler.send(:handle_next_notification)
+  end
+
   it "should log if an error is raised when updating the notification" do
     e = StandardError.new("bork!")
     @notification.stub(:save!).and_raise(e)
@@ -90,6 +95,11 @@ describe Rapns::Daemon::DeliveryHandler do
   describe "when delivery fails" do
     before do
       @connection.stub(:select => true, :read => [8, 4, 69].pack("ccN"), :reconnect => nil)
+    end
+
+    it "should update notification with the ability to reconnect the database" do
+      delivery_handler.should_receive(:with_database_reconnect_and_retry)
+      delivery_handler.send(:handle_next_notification)
     end
 
     it "should set the notification as not delivered" do

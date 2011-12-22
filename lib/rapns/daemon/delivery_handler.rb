@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class DeliveryHandler
+      include DatabaseReconnectable
+
       STOP = 0x666
       SELECT_TIMEOUT = 0.5
       ERROR_TUPLE_BYTES = 6
@@ -15,6 +17,8 @@ module Rapns
         8 => "Invalid token",
         255 => "None (unknown error)"
       }
+
+      attr_reader :name
 
       def initialize(i)
         @name = "DeliveryHandler #{i}"
@@ -46,9 +50,11 @@ module Rapns
           @connection.write(notification.to_binary)
           check_for_error
 
-          notification.delivered = true
-          notification.delivered_at = Time.now
-          notification.save!(:validate => false)
+          with_database_reconnect_and_retry do
+            notification.delivered = true
+            notification.delivered_at = Time.now
+            notification.save!(:validate => false)
+          end
 
           Rapns::Daemon.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
         rescue Rapns::DeliveryError, Rapns::DisconnectionError => error
@@ -58,13 +64,15 @@ module Rapns
       end
 
       def handle_delivery_error(notification, error)
-        notification.delivered = false
-        notification.delivered_at = nil
-        notification.failed = true
-        notification.failed_at = Time.now
-        notification.error_code = error.code
-        notification.error_description = error.description
-        notification.save!(:validate => false)
+        with_database_reconnect_and_retry do
+          notification.delivered = false
+          notification.delivered_at = nil
+          notification.failed = true
+          notification.failed_at = Time.now
+          notification.error_code = error.code
+          notification.error_description = error.description
+          notification.save!(:validate => false)
+        end
       end
 
       def check_for_error
