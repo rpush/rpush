@@ -42,8 +42,8 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon::FeedbackReceiver.stub(:start)
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon.stub(:daemonize)
-    Rapns::Daemon.stub(:write_pid_file)
-    @logger = mock("Logger", :info => nil)
+    File.stub(:open)
+    @logger = mock("Logger", :info => nil, :error => nil)
     Rapns::Daemon::Logger.stub(:new).and_return(@logger)
   end
 
@@ -99,6 +99,12 @@ describe Rapns::Daemon, "when starting" do
 
   it "should write the process ID to the PID file" do
     Rapns::Daemon.should_receive(:write_pid_file)
+    Rapns::Daemon.start("development", {})
+  end
+
+  it "should log an error if the PID file could not be written" do
+    File.stub(:open).and_raise(Errno::ENOENT)
+    @logger.should_receive(:error).with("Failed to write PID to '/rails_root/rapns.pid': #<Errno::ENOENT: No such file or directory>")
     Rapns::Daemon.start("development", {})
   end
 

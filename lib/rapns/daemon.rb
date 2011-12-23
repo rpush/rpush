@@ -93,8 +93,12 @@ module Rapns
 
     def self.write_pid_file
       if !configuration.pid_file.blank?
-        File.open(configuration.pid_file, 'w') do |f|
-          f.puts $$
+        begin
+          File.open(configuration.pid_file, 'w') do |f|
+            f.puts $$
+          end
+        rescue SystemCallError => e
+          logger.error("Failed to write PID to '#{configuration.pid_file}': #{e.inspect}")
         end
       end
     end
