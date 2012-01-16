@@ -18,14 +18,25 @@ module Rapns
     def alert=(alert)
       if alert.is_a?(Hash)
         write_attribute(:alert, ActiveSupport::JSON.encode(alert))
+        self.alert_is_json = true if has_attribute?(:alert_is_json)
       else
         write_attribute(:alert, alert)
+        self.alert_is_json = false if has_attribute?(:alert_is_json)
       end
     end
 
     def alert
       string_or_json = read_attribute(:alert)
-      ActiveSupport::JSON.decode(string_or_json) rescue string_or_json
+
+      if has_attribute?(:alert_is_json)
+        if alert_is_json?
+          ActiveSupport::JSON.decode(string_or_json)
+        else
+          string_or_json
+        end
+      else
+        ActiveSupport::JSON.decode(string_or_json) rescue string_or_json
+      end
     end
 
     def attributes_for_device=(attrs)

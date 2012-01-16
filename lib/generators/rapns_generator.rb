@@ -7,18 +7,22 @@ class RapnsGenerator < Rails::Generators::Base
   end
 
   def copy_migration
-    migration_dir = File.expand_path("db/migrate")
-
-    if !self.class.migration_exists?(migration_dir, 'create_rapns_notifications')
-      migration_template "create_rapns_notifications.rb", "db/migrate/create_rapns_notifications.rb"
-    end
-
-    if !self.class.migration_exists?(migration_dir, 'create_rapns_feedback')
-      migration_template "create_rapns_feedback.rb", "db/migrate/create_rapns_feedback.rb"
-    end
+    add_rapns_migration('create_rapns_notifications')
+    add_rapns_migration('create_rapns_feedback')
+    add_rapns_migration('add_alert_is_json_to_rapns_notifications')
   end
 
   def copy_config
-    copy_file "rapns.yml", "config/rapns/rapns.yml"
+    copy_file 'rapns.yml', 'config/rapns/rapns.yml'
+  end
+
+  protected
+
+  def add_rapns_migration(template)
+    File.expand_path('db/migrate')
+
+    if !self.class.migration_exists?(migration_dir, template)
+      migration_template "#{template}.rb", "db/migrate/#{template}.rb"
+    end
   end
 end

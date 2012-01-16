@@ -115,3 +115,18 @@ describe Rapns::Notification, "to_binary" do
     notification.to_binary.should == "\x01\x00\x00\x04\xD2\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}"
   end
 end
+
+describe Rapns::Notification, "bug #31" do
+  it 'does not confuse a JSON looking string as JSON' do
+    notification = Rapns::Notification.new
+    notification.alert = "{\"one\":2}"
+    notification.alert.should == "{\"one\":2}"
+  end
+
+  it 'does confuse a JSON looking string as JSON if the alert_is_json attribute is not present' do
+    notification = Rapns::Notification.new
+    notification.stub(:has_attribute? => false)
+    notification.alert = "{\"one\":2}"
+    notification.alert.should == {"one" => 2}
+  end
+end
