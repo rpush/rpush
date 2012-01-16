@@ -19,7 +19,7 @@ class RapnsGenerator < Rails::Generators::Base
   protected
 
   def add_rapns_migration(template)
-    File.expand_path('db/migrate')
+    migration_dir = File.expand_path('db/migrate')
 
     if !self.class.migration_exists?(migration_dir, template)
       migration_template "#{template}.rb", "db/migrate/#{template}.rb"
