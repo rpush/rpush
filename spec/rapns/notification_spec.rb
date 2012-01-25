@@ -130,3 +130,16 @@ describe Rapns::Notification, "bug #31" do
     notification.alert.should == {"one" => 2}
   end
 end
+
+describe Rapns::Notification, "payload size limitation" do
+  it "should limit payload size to 256 bytes but not the entire packet" do
+    notification = Rapns::Notification.new do |n|
+      n.device_token = "a" * 64
+      n.alert = "a" * 210
+    end
+
+    notification.to_binary(:for_validation => true).size.should > 256
+    notification.payload_size.should < 256
+    notification.should be_valid
+  end
+end

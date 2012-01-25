@@ -58,12 +58,19 @@ module Rapns
       json
     end
 
+    def payload
+      as_json.to_json
+    end
+
+    def payload_size
+      payload.bytesize
+    end
+
     # This method conforms to the enhanced binary format.
     # http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4
     def to_binary(options = {})
       id_for_pack = options[:for_validation] ? 0 : id
-      json = as_json.to_json
-      [1, id_for_pack, expiry, 0, 32, device_token, 0, json.size, json].pack("cNNccH*cca*")
+      [1, id_for_pack, expiry, 0, 32, device_token, 0, payload_size, payload].pack("cNNccH*cca*")
     end
   end
 end
