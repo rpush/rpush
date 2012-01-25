@@ -44,7 +44,7 @@ module Rapns
 
       def self.parse_tuple(tuple)
         failed_at, _, device_token = tuple.unpack("N1n1H*")
-        [Time.at(failed_at), device_token]
+        [Time.at(failed_at).utc, device_token]
       end
 
       def self.create_feedback(failed_at, device_token)
