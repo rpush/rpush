@@ -1,6 +1,6 @@
 module Rapns
   class Notification < ActiveRecord::Base
-    set_table_name "rapns_notifications"
+    self.table_name = 'rapns_notifications'
 
     validates :device_token, :presence => true
     validates :badge, :numericality => true, :allow_nil => true
