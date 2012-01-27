@@ -131,7 +131,7 @@ describe Rapns::Notification, "bug #31" do
   end
 end
 
-describe Rapns::Notification, "payload size limitation" do
+describe Rapns::Notification, "bug #35" do
   it "should limit payload size to 256 bytes but not the entire packet" do
     notification = Rapns::Notification.new do |n|
       n.device_token = "a" * 64
