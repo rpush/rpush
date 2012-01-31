@@ -5,6 +5,9 @@ describe Rapns::Daemon::InterruptibleSleep do
     extend Rapns::Daemon::InterruptibleSleep
   end
 
+  let(:rd) { stub(:close => nil) }
+  let(:wr) { stub(:close => nil) }
+
   before do
     IO.stub(:pipe)
     IO.stub(:select)
@@ -16,15 +19,20 @@ describe Rapns::Daemon::InterruptibleSleep do
   end
 
   it 'selects on the reader' do
-    rd = stub
-    IO.stub(:pipe => [rd, stub])
+    IO.stub(:pipe => [rd, wr])
     IO.should_receive(:select).with([rd], nil, nil, 1)
     SleepTest.interruptible_sleep 1
   end
 
+  it 'closes both ends of the pipe after the timeout' do
+    IO.stub(:pipe => [rd, wr])
+    rd.should_receive(:close)
+    wr.should_receive(:close)
+    SleepTest.interruptible_sleep 1
+  end
+
   it 'closes the writer' do
-    wr = stub
-    IO.stub(:pipe => [stub, wr])
+    IO.stub(:pipe => [rd, wr])
     SleepTest.interruptible_sleep 1
     wr.should_receive(:close)
     SleepTest.interrupt_sleep

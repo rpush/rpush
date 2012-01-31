@@ -4,10 +4,14 @@ module Rapns
       def interruptible_sleep(seconds)
         @_sleep_check, @_sleep_interrupt = IO.pipe
         IO.select([@_sleep_check], nil, nil, seconds)
+        @_sleep_check.close rescue IOError
+        @_sleep_interrupt.close rescue IOError
       end
 
       def interrupt_sleep
-        @_sleep_interrupt.close if @_sleep_interrupt
+        if @_sleep_interrupt
+          @_sleep_interrupt.close rescue IOError
+        end
       end
     end
   end
