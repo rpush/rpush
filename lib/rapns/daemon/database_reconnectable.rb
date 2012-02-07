@@ -1,5 +1,5 @@
 class PGError < StandardError; end if !defined?(PGError)
-module Mysql; class Error < StandardError; end; end if !defined?(Mysql)
+class Mysql; class Error < StandardError; end; end if !defined?(Mysql)
 module Mysql2; class Error < StandardError; end; end if !defined?(Mysql2)
 
 module Rapns
