@@ -1,6 +1,6 @@
 module Rapns
   class Feedback < ActiveRecord::Base
-    set_table_name 'rapns_feedback'
+    self.table_name = 'rapns_feedback'
 
     validates :device_token, :presence => true
     validates :failed_at, :presence => true
