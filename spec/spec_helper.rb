@@ -1,8 +1,12 @@
 ENV['RAILS_ENV'] = 'test'
 
-require 'simplecov'
-SimpleCov.start do
-  add_filter '/spec/'
+begin
+  require 'simplecov'
+  SimpleCov.start do
+    add_filter '/spec/'
+  end
+rescue LoadError
+  puts "Coverage disabled."
 end
 
 require 'active_record'
@@ -15,7 +19,8 @@ if !adapters.include?($adapter)
 end
 
 puts "Using #{$adapter} adapter."
-ActiveRecord::Base.establish_connection('adapter' => $adapter, 'database' => 'rapns_test')
+
+ActiveRecord::Base.establish_connection('adapter' => $adapter, 'database' => 'rapns_test', 'host' => '/var/pgsql_socket')
 require 'generators/templates/create_rapns_notifications'
 require 'generators/templates/create_rapns_feedback'
 require 'generators/templates/add_alert_is_json_to_rapns_notifications'

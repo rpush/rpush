@@ -3,10 +3,17 @@ module Rapns
     class ConnectionError < StandardError; end
 
     class Connection
+      attr_accessor :last_write
+
+      def self.idle_period
+        30.minutes
+      end
+
       def initialize(name, host, port)
         @name = name
         @host = host
         @port = port
+        written
       end
 
       def connect
@@ -31,6 +38,8 @@ module Rapns
       end
 
       def write(data)
+        reconnect_idle if idle_period_exceeded?
+
         retry_count = 0
 
         begin
@@ -59,9 +68,23 @@ module Rapns
 
       protected
 
+      def reconnect_idle
+        Rapns::Daemon.logger.info("[#{@name}] Idle period exceeded, reconnecting...")
+        reconnect
+      end
+
+      def idle_period_exceeded?
+        Time.now - last_write > self.class.idle_period
+      end
+
       def write_data(data)
         @ssl_socket.write(data)
         @ssl_socket.flush
+        written
+      end
+
+      def written
+        self.last_write = Time.now
       end
 
       def setup_ssl_context

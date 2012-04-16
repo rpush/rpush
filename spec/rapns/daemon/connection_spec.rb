@@ -252,3 +252,42 @@ describe Rapns::Daemon::Connection, "when sending a notification" do
     @connection.write("blah")
   end
 end
+
+describe Rapns::Daemon::Connection, 'idle period' do
+  before do
+    @connection = Rapns::Daemon::Connection.new('Connection 0', 'gateway.push.apple.com', 2195)
+    @ssl_socket = mock("SSLSocket", :write => nil, :flush => nil, :close => nil)
+    @tcp_socket = mock("TCPSocket", :close => nil)
+    @connection.stub(:setup_ssl_context)
+    @connection.stub(:connect_socket => [@tcp_socket, @ssl_socket])
+    @logger = mock("Logger", :info => nil)
+    Rapns::Daemon.stub(:logger).and_return(@logger)
+    @connection.connect
+  end
+
+  it 'reconnects if the connection has been idle for more than the defined period' do
+    Rapns::Daemon::Connection.stub(:idle_period => 0.1)
+    sleep 0.2
+    @connection.should_receive(:reconnect)
+    @connection.write('blah')
+  end
+
+  it 'resets the last write time' do
+    now = Time.now
+    Time.stub(:now => now)
+    @connection.write('blah')
+    @connection.last_write.should == now
+  end
+
+  it 'does not reconnect if the connection has not been idle for more than the defined period' do
+    @connection.should_not_receive(:reconnect)
+    @connection.write('blah')
+  end
+
+  it 'logs the the connection is idle' do
+    Rapns::Daemon::Connection.stub(:idle_period => 0.1)
+    sleep 0.2
+    Rapns::Daemon.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
+    @connection.write('blah')
+  end
+end
