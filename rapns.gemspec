@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.summary     = %q{Easy to use library for Apple's Push Notification Service with Rails 3}
   s.description = %q{Easy to use library for Apple's Push Notification Service with Rails 3}
 
-  s.files         = `git ls-files lib`.split("\n") + ["README.md"]
+  s.files         = `git ls-files lib`.split("\n") + ["README.md", "History.md"]
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
