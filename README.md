@@ -5,14 +5,13 @@ Easy to use library for Apple's Push Notification Service with Rails 3.
 ## Features
 
 * Works with Rails 3 and Ruby 1.9 & 1.8.
-* Uses a daemon process to keep open a persistent connection to the Push Notification Service, as recommended by Apple.
+* Uses a daemon process to keep open a persistent connection to the APNs, as recommended by Apple.
 * Uses the [enhanced binary format](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4) (Figure 5-2) so that delivery errors can be reported.
 * Records feedback from [The Feedback Service](http://developer.apple.com/library/mac/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3).
 * [Airbrake](http://airbrakeapp.com/) (Hoptoad) integration.
 * Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
-* Reconnects to the APNs if connections are lost.
-* Reconnects to your database if the connect is lost.
 * Mobile Device Management (MDM)
+* Stable. Reconnects to the APNs and your database if connections are lost.
 
 ## Getting Started
 
