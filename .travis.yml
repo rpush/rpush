@@ -5,11 +5,9 @@ rvm:
   - ree
   - jruby-19mode
   - rbx-19mode
-
 matrix:
   allow_failures:
 	- rvm: jruby-19mode
 	- rvm: rbx-19mode
-
 before_script:
   - "psql -c 'create database rapns_test;' -U postgres >/dev/null"
