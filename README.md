@@ -12,6 +12,7 @@ Easy to use library for Apple's Push Notification Service with Rails 3.
 * Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
 * Reconnects to the APNs if connections are lost.
 * Reconnects to your database if the connect is lost.
+* Mobile Device Management (MDM)
 
 ## Getting Started
 
@@ -91,6 +92,12 @@ rapns logs activity to `rapns.log` in your Rails log directory. This is also pri
 * `expiry` is the time in seconds the APNs (not rapns) will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
 * `deliver_after` is not required, but may be set if you'd like to delay delivery of the notification to a specific time in the future.
+
+## Mobile Device Management
+
+    n = Rapns::Notification.new
+    n.mdm = "magic"
+    n.save!
 
 ### Assigning a Hash to alert
 

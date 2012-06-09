@@ -48,13 +48,24 @@ module Rapns
       ActiveSupport::JSON.decode(read_attribute(:attributes_for_device)) if read_attribute(:attributes_for_device)
     end
 
+    MDM_OVERIDE_KEY = '__rapns_mdm__'
+    def mdm=(magic)
+      self.attributes_for_device = {MDM_OVERIDE_KEY => magic}
+    end
+
     def as_json
       json = ActiveSupport::OrderedHash.new
-      json['aps'] = ActiveSupport::OrderedHash.new
-      json['aps']['alert'] = alert if alert
-      json['aps']['badge'] = badge if badge
-      json['aps']['sound'] = sound if sound
-      attributes_for_device.each { |k, v| json[k.to_s] = v.to_s } if attributes_for_device
+
+      if attributes_for_device && attributes_for_device.key?(MDM_OVERIDE_KEY)
+        json['mdm'] = attributes_for_device[MDM_OVERIDE_KEY]
+      else
+        json['aps'] = ActiveSupport::OrderedHash.new
+        json['aps']['alert'] = alert if alert
+        json['aps']['badge'] = badge if badge
+        json['aps']['sound'] = sound if sound
+        attributes_for_device.each { |k, v| json[k.to_s] = v.to_s } if attributes_for_device
+      end
+
       json
     end
 

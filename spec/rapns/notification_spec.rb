@@ -101,6 +101,22 @@ describe Rapns::Notification, "as_json" do
   end
 end
 
+describe Rapns::Notification, 'MDM' do
+  let(:magic) { 'abc123' }
+  let(:notification) { Rapns::Notification.new }
+
+  it 'includes the mdm magic in the payload' do
+    notification.mdm = magic
+    notification.as_json.should == {'mdm' => magic}
+  end
+
+  it 'does not include aps attribute' do
+    notification.alert = "i'm doomed"
+    notification.mdm = magic
+    notification.as_json.key?('aps').should be_false
+  end
+end
+
 describe Rapns::Notification, "to_binary" do
   it "should correctly convert the notification to binary" do
     notification = Rapns::Notification.new
