@@ -24,8 +24,10 @@ ActiveRecord::Base.establish_connection('adapter' => $adapter, 'database' => 'ra
 require 'generators/templates/create_rapns_notifications'
 require 'generators/templates/create_rapns_feedback'
 require 'generators/templates/add_alert_is_json_to_rapns_notifications'
+require 'generators/templates/add_app_to_rapns_notifications'
 
-[CreateRapnsNotifications, CreateRapnsFeedback, AddAlertIsJsonToRapnsNotifications].each do |migration|
+[CreateRapnsNotifications, CreateRapnsFeedback, AddAlertIsJsonToRapnsNotifications,
+ AddAppToRapnsNotifications].each do |migration|
   migration.down rescue ActiveRecord::StatementInvalid
   migration.up
 end

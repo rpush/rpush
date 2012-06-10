@@ -1,12 +1,13 @@
 development:
-  certificate: development.pem
-  certificate_password:
+  app:
+    certificate: development.pem
+    certificate_password:
+    connections: 3
 
   push:
     host: gateway.sandbox.push.apple.com
     port: 2195
     poll: 2
-    connections: 3
 
   feedback:
     host: feedback.sandbox.push.apple.com
@@ -14,16 +15,18 @@ development:
     poll: 60
 
 production:
-  certificate: production.pem
-  certificate_password:
   airbrake_notify: true
   pid_file: tmp/pids/rapns.pid
+
+  app:
+    certificate: production.pem
+    certificate_password:
+    connections: 3
 
   push:
     host: gateway.push.apple.com
     port: 2195
     poll: 2
-    connections: 3
 
   feedback:
     host: feedback.push.apple.com

@@ -13,6 +13,7 @@ class RapnsGenerator < Rails::Generators::Base
     add_rapns_migration('create_rapns_notifications')
     add_rapns_migration('create_rapns_feedback')
     add_rapns_migration('add_alert_is_json_to_rapns_notifications')
+    add_rapns_migration('add_app_to_rapns_notifications')
   end
 
   def copy_config
