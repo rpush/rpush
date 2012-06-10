@@ -158,35 +158,35 @@ describe Rapns::Daemon::Configuration do
   describe "App specific configuration" do
     it "sets the certificate password" do
       configuration.load
-      configuration.apps.myapp.certificate_password.should == "myapppass"
+      configuration.apps['myapp'].certificate_password.should == "myapppass"
     end
 
     it "sets the certificate password to a blank string if it is not configured" do
       config['myapp'].delete('certificate_password')
       configuration.load
-      configuration.apps.myapp.certificate_password.should == ""
+      configuration.apps['myapp'].certificate_password.should == ""
     end
 
     it "sets the certificate, with absolute path" do
       configuration.load
-      configuration.apps.myapp.certificate.should == "/rails_root/config/rapns/myapp.pem"
+      configuration.apps['myapp'].certificate.should == "/rails_root/config/rapns/myapp.pem"
     end
 
     it "keeps the absolute path of the certificate if it has one" do
       config['myapp']["certificate"] = "/different_path/to/myapp.pem"
       configuration.load
-      configuration.apps.myapp.certificate.should == "/different_path/to/myapp.pem"
+      configuration.apps['myapp'].certificate.should == "/different_path/to/myapp.pem"
     end
 
     it 'sets the number of connections for the app' do
       configuration.load
-      configuration.apps.myapp.connections.should == 8
+      configuration.apps['myapp'].connections.should == 8
     end
 
     it "defaults the number of push connections to 3 if not set" do
       config["myapp"]["connections"] = nil
       configuration.load
-      configuration.apps.myapp.connections.should == 3
+      configuration.apps['myapp'].connections.should == 3
     end
 
     it "raises an error if the certificate is not configured" do

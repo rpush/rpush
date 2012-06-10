@@ -1,5 +1,4 @@
 require 'yaml'
-require 'ostruct'
 
 module Rapns
   class ConfigurationError < StandardError; end
@@ -17,7 +16,7 @@ module Rapns
 
         self.push = Struct.new(:host, :port, :poll).new
         self.feedback = Struct.new(:host, :port, :poll).new
-        self.apps = OpenStruct.new
+        self.apps = {}
       end
 
       def load
@@ -55,7 +54,7 @@ module Rapns
 
       def load_app(name, config)
         app = @app_template.new
-        apps.send("#{name}=", app)
+        apps[name] = app
         set_variable(app, name, :certificate, config, :path => rapns_root)
         set_variable(app, name, :certificate_password, config, :optional => true, :default => "")
         set_variable(app, name, :connections, config, :optional => true, :default => 3)
