@@ -5,7 +5,7 @@ module Rapns
 
   module Daemon
     class Configuration
-      attr_accessor :push, :feedback, :apps
+      attr_accessor :push, :feedback
       attr_accessor :airbrake_notify, :pid_file
       alias_method  :airbrake_notify?, :airbrake_notify
 
@@ -18,11 +18,9 @@ module Rapns
       def initialize(environment, config_path)
         @environment = environment
         @config_path = config_path
-        @app_template = Struct.new(:certificate, :certificate_password, :connections)
 
         self.push = Struct.new(:host, :port, :poll).new
         self.feedback = Struct.new(:host, :port, :poll).new
-        self.apps = {}
       end
 
       def load
@@ -33,16 +31,6 @@ module Rapns
         load_push(config)
         load_feedback(config)
         load_defaults(config)
-
-        (config.keys - ['push', 'feedback']).each do |app|
-          if config[app].kind_of? Hash
-            load_app(app, config)
-          end
-        end
-
-        if apps.empty?
-          raise ConfigurationError, "No applications configured. See https://github.com/ileitch/rapns for instructions."
-        end
       end
 
       def load_push(config)
@@ -60,13 +48,6 @@ module Rapns
       def load_defaults(config)
         set_variable(self, nil, :airbrake_notify, config, :optional => true, :default => true)
         set_variable(self, nil, :pid_file, config, :optional => true, :default => nil, :path => Rails.root)
-      end
-
-      def load_app(name, config)
-        app = apps[name] = @app_template.new
-        set_variable(app, name, :certificate, config, :path => rapns_root, :certificate => true)
-        set_variable(app, name, :certificate_password, config, :optional => true, :default => "")
-        set_variable(app, name, :connections, config, :optional => true, :default => 3)
       end
 
       protected
@@ -96,7 +77,6 @@ module Rapns
           end
         else
           value = File.join(options[:path], value) if options[:path] && !Pathname.new(value).absolute?
-          value = Rapns::Daemon::Certificate.read(value) if options[:certificate]
           base.send("#{key}=", value)
         end
       end

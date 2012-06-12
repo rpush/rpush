@@ -5,11 +5,11 @@ describe Rapns::Daemon, "when starting" do
 
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:my_app_config) { stub(:connections => 3, :certificate => certificate, :certificate_password => password) }
+  let(:app) { stub(:key => 'my_app', :certificate => certificate, :password => password, :connections => 3) }
   let(:feedback_config) { stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60) }
   let(:push_config) { stub(:poll => 2, :host => 'gateway.push.apple.com', :port => 2195) }
   let(:configuration) { stub(:pid_file => nil, :push => push_config, :airbrake_notify => false,
-    :feedback => feedback_config, :apps => { 'my_app' => my_app_config }) }
+    :feedback => feedback_config) }
   let(:handler_pool) { stub(:<< => nil) }
   let(:queue) { stub }
   let(:delivery_handler) { stub }
@@ -27,6 +27,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon::Logger.stub(:new).and_return(logger)
     Rapns::Daemon.stub(:daemonize, :reconnect_database)
+    Rapns::App.stub(:where => [app])
     File.stub(:open)
     Rails.stub(:root).and_return("/rails_root")
   end
@@ -90,9 +91,14 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.logger.should == logger
   end
 
-  it 'instantiates delivery handlers' do
+  it 'starts all apps for the environment' do
+    Rapns::App.should_receive(:where).with(:environment => 'development')
+    Rapns::Daemon.start("development", true)
+  end
+
+  it 'instantiates app delivery handlers' do
     Rapns::Daemon::DeliveryHandler.should_receive(:new).with(queue, "my_app:0", configuration.push.host,
-      configuration.push.port, my_app_config.certificate, my_app_config.certificate_password)
+      configuration.push.port, app.certificate, app.password)
     Rapns::Daemon.start("development", true)
   end
 
@@ -108,13 +114,20 @@ describe Rapns::Daemon, "when starting" do
 
   it 'starts a feedback receiver for each app' do
     Rapns::Daemon::FeedbackReceiver.should_receive(:new).with('my_app', configuration.feedback.host, configuration.feedback.port,
-      configuration.feedback.poll, my_app_config.certificate, my_app_config.certificate_password)
+      configuration.feedback.poll, app.certificate, app.password)
     Rapns::Daemon.start("development", true)
   end
 
   it 'adds the feedback receiver to the pool' do
     receiver_pool.should_receive(:<<).with(receiver)
     Rapns::Daemon.start("development", true)
+  end
+
+  it 'raises an error if there are no apps for the environment' do
+    Rapns::App.stub(:where => [])
+    expect do
+      Rapns::Daemon.start("development", true)
+    end.should raise_error("You must create an app for environment 'development'.\nSee https://github.com/ileitch/rapns for details.")
   end
 end
 

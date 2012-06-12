@@ -17,11 +17,6 @@ describe Rapns::Daemon::Configuration do
         "port" => 123,
         "host" => "localhost",
         "poll" => 30,
-      },
-      "myapp" => {
-        "certificate" => "myapp.pem",
-        "certificate_password" => "myapppass",
-        "connections" => 8
       }
     }
   end
@@ -32,7 +27,6 @@ describe Rapns::Daemon::Configuration do
     File.stub(:exists? => true)
     File.stub(:open => {"production" => config})
     Rails.stub(:root).and_return("/rails_root")
-    Rapns::Daemon::Certificate.stub(:read)
   end
 
   it 'opens the config from the given path' do
@@ -139,51 +133,5 @@ describe Rapns::Daemon::Configuration do
   it "returns nil if no PID file was set" do
     config["pid_file"] = ""
     configuration.pid_file.should be_nil
-  end
-
-  describe "App specific configuration" do
-    it 'raises an error if no applications are configured' do
-      config.delete('myapp')
-      expect { configuration }.should raise_error(Rapns::ConfigurationError)
-    end
-
-    it "sets the certificate password" do
-      configuration.apps['myapp'].certificate_password.should == "myapppass"
-    end
-
-    it "sets the certificate password to a blank string if it is not configured" do
-      config['myapp'].delete('certificate_password')
-      configuration.apps['myapp'].certificate_password.should == ""
-    end
-
-    it "reads the certificate, with absolute path" do
-      Rapns::Daemon::Certificate.should_receive(:read).with('/rails_root/config/rapns/myapp.pem')
-      configuration
-    end
-
-    it 'sets the certificate contents' do
-      Rapns::Daemon::Certificate.stub(:read => 'ima cert')
-      configuration.apps['myapp'].certificate.should == 'ima cert'
-    end
-
-    it "reads the absolute path of the certificate" do
-      config['myapp']["certificate"] = '/different_path/to/myapp.pem'
-      Rapns::Daemon::Certificate.should_receive(:read).with('/different_path/to/myapp.pem')
-      configuration
-    end
-
-    it 'sets the number of connections for the app' do
-      configuration.apps['myapp'].connections.should == 8
-    end
-
-    it "defaults the number of push connections to 3 if not set" do
-      config["myapp"]["connections"] = nil
-      configuration.apps['myapp'].connections.should == 3
-    end
-
-    it "raises an error if the certificate is not configured" do
-      config['myapp']['certificate'] = nil
-      expect { configuration }.to raise_error(Rapns::ConfigurationError, "'myapp.certificate' not defined for environment 'production' in /some/config.yml. You may need to run 'rails g rapns' after updating.")
-    end
   end
 end

@@ -4,7 +4,6 @@ require 'pathname'
 
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/configuration'
-require 'rapns/daemon/certificate'
 require 'rapns/daemon/delivery_error'
 require 'rapns/daemon/disconnection_error'
 require 'rapns/daemon/connection'
@@ -27,6 +26,7 @@ module Rapns
 
     def self.start(environment, foreground)
       setup_signal_hooks
+
       self.configuration = Configuration.load(environment, File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
       self.logger = Logger.new(:foreground => foreground, :airbrake_notify => configuration.airbrake_notify)
 
@@ -41,27 +41,28 @@ module Rapns
       self.receiver_pool = FeedbackReceiverPool.new
       self.queues = {}
 
-      configuration.apps.each do |name, app_config|
-        host = configuration.push.host
-        port = configuration.push.port
-        certificate = app_config.certificate
-        password = app_config.certificate_password
-        queue = queues[name] ||= DeliveryQueue.new
-
-        app_config.connections.times do |i|
-          handler = DeliveryHandler.new(queue, "#{name}:#{i}", host, port, certificate, password)
-          handler_pool << handler
-        end
-
-        feedback = configuration.feedback
-        receiver = FeedbackReceiver.new(name, feedback.host, feedback.port, feedback.poll, certificate, password)
-        receiver_pool << receiver
-      end
-
+      apps = Rapns::App.where(:environment => environment)
+      raise "You must create an app for environment '#{environment}'.\nSee https://github.com/ileitch/rapns for details." if apps.empty?
+      apps.each { |app| start_app(app) }
       Feeder.start(configuration.push.poll)
     end
 
     protected
+
+    def self.start_app(app)
+      queue = queues[app.key] ||= DeliveryQueue.new
+
+      app.connections.times do |i|
+        host = configuration.push.host
+        port = configuration.push.port
+        handler = DeliveryHandler.new(queue, "#{app.key}:#{i}", host, port, app.certificate, app.password)
+        handler_pool << handler
+      end
+
+      feedback = configuration.feedback
+      receiver = FeedbackReceiver.new(app.key, feedback.host, feedback.port, feedback.poll, app.certificate, app.password)
+      receiver_pool << receiver
+    end
 
     def self.setup_signal_hooks
       @shutting_down = false
