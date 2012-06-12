@@ -5,7 +5,7 @@ class CreateRapnsApps < ActiveRecord::Migration
       t.string    :environment, :null => false
       t.text      :certificate, :null => false
       t.string    :password,    :null => true
-      t.integer   :connections, :null => false, :default => 1
+      t.integer   :connections, :null => false, :default => 2
       t.timestamps
     end
 
