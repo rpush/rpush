@@ -2,7 +2,6 @@
 
 require 'optparse'
 require 'rapns'
-require 'rapns/daemon'
 
 foreground = false
 environment = ARGV[0]
@@ -23,6 +22,7 @@ end
 ENV['RAILS_ENV'] = environment
 load 'config/environment.rb'
 
+require 'rapns/daemon'
 require 'rapns/patches'
 
 Rapns::Daemon.start(environment, foreground)

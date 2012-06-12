@@ -1,178 +1,182 @@
 require "spec_helper"
 
 describe Rapns::Daemon::DeliveryHandler do
-  let(:delivery_handler) { Rapns::Daemon::DeliveryHandler.new(0) }
+  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
+  let(:name) { 'my_app:0' }
+  let(:host) { 'localhost' }
+  let(:port) { 2195 }
+  let(:certificate) { stub }
+  let(:password) { stub }
+  let(:delivery_handler) { Rapns::Daemon::DeliveryHandler.new(queue, name, host, port, certificate, password) }
+  let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil) }
+  let(:logger) { stub(:error => nil, :info => nil) }
+  let(:notification) { stub.as_null_object }
+  let(:delivery_queues) { [] }
 
   before do
-    @notification = Rapns::Notification.create!(:device_token => "a" * 64)
-    Rapns::Daemon.stub(:delivery_queue).and_return(Rapns::Daemon::DeliveryQueue.new)
-    Rapns::Daemon.delivery_queue.push(@notification)
-    @connection = mock("Connection", :connect => nil, :write => nil, :close => nil, :select => nil, :read => nil)
-    Rapns::Daemon::Connection.stub(:new).and_return(@connection)
-    configuration = mock("Configuration", :push => stub(:host => "gateway.push.apple.com", :port => 2195))
-    Rapns::Daemon.stub(:configuration).and_return(configuration)
-    @logger = mock("Logger", :error => nil, :info => nil)
-    Rapns::Daemon.stub(:logger).and_return(@logger)
+    Rapns::Daemon::Connection.stub(:new => connection)
+    Rapns::Daemon.stub(:logger => logger)
+    Rapns::Daemon.stub(:delivery_queues => delivery_queues)   
+    queue.push(notification) 
   end
 
   it "instantiates a new connection" do
-    Rapns::Daemon::Connection.should_receive(:new).with('DeliveryHandler 0', 'gateway.push.apple.com', 2195)
+    Rapns::Daemon::Connection.should_receive(:new).with("DeliveryHandler:#{name}", host, port, certificate, password)
     delivery_handler
   end
 
   it "connects the socket when started" do
-    @connection.should_receive(:connect)
+    connection.should_receive(:connect)
     delivery_handler.start
     delivery_handler.stop
   end
 
   it "pushes a STOP instruction into the queue when told to stop" do
-    Rapns::Daemon.delivery_queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::STOP)
+    queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::STOP)
     delivery_handler.stop
   end
 
-  it "closes the connection when a STOP instruction is received" do
-    Rapns::Daemon.delivery_queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+  it "sends the binary version of the notification" do
+    notification.stub(:to_binary => "hi mom")
+    connection.should_receive(:write).with("hi mom")
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "should pop a new notification from the delivery queue" do
-    Rapns::Daemon.delivery_queue.should_receive(:pop)
+  it "logs the notification delivery" do
+    notification.stub(:id => 666, :device_token => 'abc123')
+    logger.should_receive(:info).with("[DeliveryHandler:my_app:0] 666 sent to abc123")
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "does not attempt to deliver a notification when a STOP instruction is received" do
-    Rapns::Daemon.delivery_queue.pop # empty the queue
-    delivery_handler.should_not_receive(:deliver)
-    Rapns::Daemon.delivery_queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+  it "marks the notification as delivered" do
+    notification.should_receive(:delivered=).with(true)
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "should send the binary version of the notification" do
-    @notification.stub((:to_binary)).and_return("hi mom")
-    @connection.should_receive(:write).with("hi mom")
+  it "sets the time the notification was delivered" do
+    now = Time.now
+    Time.stub(:now).and_return(now)
+    notification.should_receive(:delivered_at=).with(now)
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "should log the notification delivery" do
-    Rapns::Daemon.logger.should_receive(:info).with("Notification #{@notification.id} delivered to #{@notification.device_token}")
+  it "does not trigger validations when saving the notification" do
+    notification.should_receive(:save!).with(:validate => false)
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "should mark the notification as delivered" do
-    expect { delivery_handler.send(:handle_next_notification); @notification.reload }.to change(@notification, :delivered).to(true)
-  end
-
-  it "should set the time the notification was delivered" do
-    @notification.delivered_at.should be_nil
-    delivery_handler.send(:handle_next_notification)
-    @notification.reload
-    @notification.delivered_at.should be_kind_of(Time)
-  end
-
-  it "should not trigger validations when saving the notification" do
-    @notification.should_receive(:save!).with(:validate => false)
-    delivery_handler.send(:handle_next_notification)
-  end
-
-  it "should update notification with the ability to reconnect the database" do
+  it "updates notification with the ability to reconnect the database" do
     delivery_handler.should_receive(:with_database_reconnect_and_retry)
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "should log if an error is raised when updating the notification" do
+  it "logs if an error is raised when updating the notification" do
     e = StandardError.new("bork!")
-    @notification.stub(:save!).and_raise(e)
+    notification.stub(:save!).and_raise(e)
     Rapns::Daemon.logger.should_receive(:error).with(e)
     delivery_handler.send(:handle_next_notification)
   end
 
-  it "should notify the delivery queue the notification has been processed" do
-    Rapns::Daemon.delivery_queue.should_receive(:notification_processed)
+  it "notifies the delivery queue the notification has been processed" do
+    queue.should_receive(:notification_processed)
     delivery_handler.send(:handle_next_notification)
   end
 
-  describe "when delivery fails" do
-    before do
-      @connection.stub(:select => true, :read => [8, 4, 69].pack("ccN"), :reconnect => nil)
+  describe "when being stopped" do
+    before { queue.pop }
+
+    it "closes the connection when a STOP instruction is received" do
+      connection.should_receive(:close)
+      queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+      delivery_handler.send(:handle_next_notification)
     end
 
-    it "should update notification with the ability to reconnect the database" do
+    it "does not attempt to deliver a notification when a STOP instruction is received" do
+      queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+      delivery_handler.should_not_receive(:deliver)
+      delivery_handler.send(:handle_next_notification)
+    end
+  end
+
+  describe "when delivery fails" do
+    before { connection.stub(:select => true, :read => [8, 4, 69].pack("ccN")) }
+
+    it "updates notification with the ability to reconnect the database" do
       delivery_handler.should_receive(:with_database_reconnect_and_retry)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should set the notification as not delivered" do
-      @notification.should_receive(:delivered=).with(false)
+    it "sets the notification as not delivered" do
+      notification.should_receive(:delivered=).with(false)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should set the notification delivered_at timestamp to nil" do
-      @notification.should_receive(:delivered_at=).with(nil)
+    it "sets the notification delivered_at timestamp to nil" do
+      notification.should_receive(:delivered_at=).with(nil)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should set the notification as failed" do
-      @notification.should_receive(:failed=).with(true)
+    it "sets the notification as failed" do
+      notification.should_receive(:failed=).with(true)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should set the notification failed_at timestamp" do
+    it "sets the notification failed_at timestamp" do
       now = Time.now
       Time.stub(:now).and_return(now)
-      @notification.should_receive(:failed_at=).with(now)
+      notification.should_receive(:failed_at=).with(now)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should set the notification error code" do
-      @notification.should_receive(:error_code=).with(4)
+    it "sets the notification error code" do
+      notification.should_receive(:error_code=).with(4)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should log the delivery error" do
+    it "logs the delivery error" do
       error = Rapns::DeliveryError.new(4, 12, "Missing payload")
       Rapns::DeliveryError.stub(:new => error)
-      Rapns::Daemon.logger.should_receive(:error).with(error)
+      logger.should_receive(:error).with(error)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should set the notification error description" do
-      @notification.should_receive(:error_description=).with("Missing payload")
+    it "sets the notification error description" do
+      notification.should_receive(:error_description=).with("Missing payload")
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should skip validation when saving the notification" do
-      @notification.should_receive(:save!).with(:validate => false)
+    it "skips validation when saving the notification" do
+      notification.should_receive(:save!).with(:validate => false)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should read 6 bytes from the socket" do
-      @connection.should_receive(:read).with(6).and_return(nil)
+    it "reads 6 bytes from the socket" do
+      connection.should_receive(:read).with(6).and_return(nil)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should not attempt to read from the socket if the socket was not selected for reading after the timeout" do
-      @connection.stub(:select => nil)
-      @connection.should_not_receive(:read)
+    it "does not attempt to read from the socket if the socket was not selected for reading after the timeout" do
+      connection.stub(:select => nil)
+      connection.should_not_receive(:read)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should reconnect the socket" do
-      @connection.should_receive(:reconnect)
+    it "reconnects the socket" do
+      connection.should_receive(:reconnect)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "should log that the connection is being reconnected" do
-      Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler 0] Error received, reconnecting...")
+    it "logs that the connection is being reconnected" do
+      Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler:my_app:0] Error received, reconnecting...")
       delivery_handler.send(:handle_next_notification)
     end
 
     context "when the APNs disconnects without returning an error" do
       before do
-        @connection.stub(:read => nil)
+        connection.stub(:read => nil)
       end
 
-      it 'should raise a DisconnectError error if the connection is closed without an error being returned' do
+      it 'raises a DisconnectError error if the connection is closed without an error being returned' do
         error = Rapns::DisconnectionError.new
         Rapns::DisconnectionError.should_receive(:new).and_return(error)
         Rapns::Daemon.logger.should_receive(:error).with(error)
@@ -180,12 +184,12 @@ describe Rapns::Daemon::DeliveryHandler do
       end
 
       it 'does not set the error code on the notification' do
-        @notification.should_receive(:error_code=).with(nil)
+        notification.should_receive(:error_code=).with(nil)
         delivery_handler.send(:handle_next_notification)
       end
 
       it 'sets the error descriptipon on the notification' do
-        @notification.should_receive(:error_description=).with("APNs disconnected without returning an error.")
+        notification.should_receive(:error_description=).with("APNs disconnected without returning an error.")
         delivery_handler.send(:handle_next_notification)
       end
     end

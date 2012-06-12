@@ -1,72 +1,89 @@
-require "yaml"
+require 'yaml'
 
 module Rapns
   class ConfigurationError < StandardError; end
 
   module Daemon
     class Configuration
-      attr_accessor :push, :feedback
-      attr_accessor :certificate, :certificate_password, :airbrake_notify, :pid_file
+      attr_accessor :push, :feedback, :apps
+      attr_accessor :airbrake_notify, :pid_file
       alias_method  :airbrake_notify?, :airbrake_notify
+
+      def self.load(environment, config_path)
+        configuration = new(environment, config_path)
+        configuration.load
+        configuration
+      end
 
       def initialize(environment, config_path)
         @environment = environment
         @config_path = config_path
+        @app_template = Struct.new(:certificate, :certificate_password, :connections)
 
-        self.push = Struct.new(:host, :port, :connections, :poll).new
+        self.push = Struct.new(:host, :port, :poll).new
         self.feedback = Struct.new(:host, :port, :poll).new
+        self.apps = {}
       end
 
       def load
         config = read_config
         ensure_environment_configured(config)
         config = config[@environment]
-        set_variable(:push, :host, config)
-        set_variable(:push, :port, config)
-        set_variable(:push, :poll, config, :optional => true, :default => 2)
-        set_variable(:push, :connections, config, :optional => true, :default => 3)
 
-        set_variable(:feedback, :host, config)
-        set_variable(:feedback, :port, config)
-        set_variable(:feedback, :poll, config, :optional => true, :default => 60)
+        load_push(config)
+        load_feedback(config)
+        load_defaults(config)
 
-        set_variable(nil, :certificate, config)
-        set_variable(nil, :airbrake_notify, config, :optional => true, :default => true)
-        set_variable(nil, :certificate_password, config, :optional => true, :default => "")
-        set_variable(nil, :pid_file, config, :optional => true, :default => "")
-      end
+        (config.keys - ['push', 'feedback']).each do |app|
+          if config[app].kind_of? Hash
+            load_app(app, config)
+          end
+        end
 
-      def certificate
-        if Pathname.new(@certificate).absolute?
-          @certificate
-        else
-          File.join(Rails.root, "config", "rapns", @certificate)
+        if apps.empty?
+          raise ConfigurationError, "No applications configured. See https://github.com/ileitch/rapns for instructions."
         end
       end
 
-      def pid_file
-        return if @pid_file.blank?
+      def load_push(config)
+        set_variable(push, :push, :host, config)
+        set_variable(push, :push, :port, config)
+        set_variable(push, :push, :poll, config, :optional => true, :default => 2)
+      end
 
-        if Pathname.new(@pid_file).absolute?
-          @pid_file
-        else
-          File.join(Rails.root, @pid_file)
-        end
+      def load_feedback(config)
+        set_variable(feedback, :feedback, :host, config)
+        set_variable(feedback ,:feedback, :port, config)
+        set_variable(feedback, :feedback, :poll, config, :optional => true, :default => 60)
+      end
+
+      def load_defaults(config)
+        set_variable(self, nil, :airbrake_notify, config, :optional => true, :default => true)
+        set_variable(self, nil, :pid_file, config, :optional => true, :default => nil, :path => Rails.root)
+      end
+
+      def load_app(name, config)
+        app = apps[name] = @app_template.new
+        set_variable(app, name, :certificate, config, :path => rapns_root, :certificate => true)
+        set_variable(app, name, :certificate_password, config, :optional => true, :default => "")
+        set_variable(app, name, :connections, config, :optional => true, :default => 3)
       end
 
       protected
+
+      def rapns_root
+        File.join(Rails.root, 'config', 'rapns')
+      end
 
       def read_config
         ensure_config_exists
         File.open(@config_path) { |fd| YAML.load(fd) }
       end
 
-      def set_variable(base_key, key, config, options = {})
+      def set_variable(base, base_key, key, config, options = {})
         if base_key
-          base = send(base_key)
           value = config.key?(base_key.to_s) ? config[base_key.to_s][key.to_s] : nil
         else
-          base = self
           value = config[key.to_s]
         end
 
@@ -78,6 +95,8 @@ module Rapns
             raise Rapns::ConfigurationError, "'#{key_path}' not defined for environment '#{@environment}' in #{@config_path}. You may need to run 'rails g rapns' after updating."
           end
         else
+          value = File.join(options[:path], value) if options[:path] && !Pathname.new(value).absolute?
+          value = Rapns::Daemon::Certificate.read(value) if options[:certificate]
           base.send("#{key}=", value)
         end
       end
