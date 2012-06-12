@@ -41,7 +41,7 @@ Environment configuration lives in `config/rapns/rapns.yml`. For common setups y
 
 If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
 
-### Options:
+### Options
 
 * `push` this section contains options to configure the delivery of notifications.
     * `host` the APNs host to connect to, either `gateway.push.apple.com` or `gateway.sandbox.push.apple.com`.
@@ -55,6 +55,10 @@ If you want to use rapns in environments other than development or production, y
 
 * `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
 * `pid_file` (default: blank) the file that rapns will write its process ID to. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
+
+#### Advanced Options
+
+* `check_for_errors` (default: true) Enables/disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.   
 
 ### Adding Apps
 

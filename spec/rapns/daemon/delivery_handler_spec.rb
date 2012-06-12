@@ -11,12 +11,12 @@ describe Rapns::Daemon::DeliveryHandler do
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:notification) { stub.as_null_object }
+  let(:configuration) { stub(:check_for_errors => true) }
   let(:delivery_queues) { [] }
 
   before do
     Rapns::Daemon::Connection.stub(:new => connection)
-    Rapns::Daemon.stub(:logger => logger)
-    Rapns::Daemon.stub(:delivery_queues => delivery_queues)   
+    Rapns::Daemon.stub(:delivery_queues => delivery_queues, :logger => logger, :configuration => configuration)
     queue.push(notification) 
   end
 
@@ -79,6 +79,12 @@ describe Rapns::Daemon::DeliveryHandler do
 
   it "notifies the delivery queue the notification has been processed" do
     queue.should_receive(:notification_processed)
+    delivery_handler.send(:handle_next_notification)
+  end
+
+  it 'does not check for errors if check_for_errors config option is false' do
+    configuration.stub(:check_for_errors => false)
+    delivery_handler.should_not_receive(:check_for_error)
     delivery_handler.send(:handle_next_notification)
   end
 

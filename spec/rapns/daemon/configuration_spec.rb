@@ -134,4 +134,14 @@ describe Rapns::Daemon::Configuration do
     config["pid_file"] = ""
     configuration.pid_file.should be_nil
   end
+
+  it 'sets check_for_errors' do
+    config['check_for_errors'] = false
+    configuration.check_for_errors.should be_false
+  end
+
+  it 'sets check_for_errors to true by default' do
+    config.delete('check_for_errors')
+    configuration.check_for_errors.should be_true
+  end
 end

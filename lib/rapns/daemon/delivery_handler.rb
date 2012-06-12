@@ -47,7 +47,7 @@ module Rapns
       def deliver(notification)
         begin
           @connection.write(notification.to_binary)
-          check_for_error
+          check_for_error if Rapns::Daemon.configuration.check_for_errors
 
           with_database_reconnect_and_retry do
             notification.delivered = true
