@@ -13,13 +13,16 @@ describe Rapns::Daemon, "when starting" do
   let(:handler_pool) { stub(:<< => nil) }
   let(:queue) { stub }
   let(:delivery_handler) { stub }
+  let(:receiver) { stub }
+  let(:receiver_pool) { stub(:<< => nil) }
   let(:logger) { stub(:info => nil, :error => nil) }
 
   before do
     Rapns::Daemon::Configuration.stub(:load).and_return(configuration)
     Rapns::Daemon::DeliveryHandlerPool.stub(:new).and_return(handler_pool)
+    Rapns::Daemon::FeedbackReceiverPool.stub(:new).and_return(receiver_pool)
     Rapns::Daemon::DeliveryQueue.stub(:new).and_return(queue)
-    Rapns::Daemon::FeedbackReceiver.stub(:start)
+    Rapns::Daemon::FeedbackReceiver.stub(:new => receiver)
     Rapns::Daemon::DeliveryHandler.stub(:new => delivery_handler)
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon::Logger.stub(:new).and_return(logger)
@@ -41,6 +44,11 @@ describe Rapns::Daemon, "when starting" do
   it "makes the delivery handler pool accessible" do
     Rapns::Daemon.start("development", {})
     Rapns::Daemon.handler_pool.should == handler_pool
+  end
+
+  it "makes the feedback receiver pool accessible" do
+    Rapns::Daemon.start("development", {})
+    Rapns::Daemon.receiver_pool.should == receiver_pool
   end
 
   it "forks into a daemon if the foreground option is false" do
@@ -98,8 +106,14 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", true)
   end
 
-  it 'starts the feedback receiver' do
-    Rapns::Daemon::FeedbackReceiver.should_receive(:start).with('my_app', 'feedback.push.apple.com', 2196, 60, my_app_config.certificate, my_app_config.certificate_password)
+  it 'starts a feedback receiver for each app' do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:new).with('my_app', configuration.feedback.host, configuration.feedback.port,
+      configuration.feedback.poll, my_app_config.certificate, my_app_config.certificate_password)
+    Rapns::Daemon.start("development", true)
+  end
+
+  it 'adds the feedback receiver to the pool' do
+    receiver_pool.should_receive(:<<).with(receiver)
     Rapns::Daemon.start("development", true)
   end
 end
@@ -107,19 +121,16 @@ end
 describe Rapns::Daemon, "when being shutdown" do
   let(:configuration) { stub(:pid_file => '/rails_root/rapns.pid') }
   let(:handler_pool) { stub(:drain => nil) }
+  let(:receiver_pool) { stub(:drain => nil) }
 
   before do
     Rails.stub(:root).and_return("/rails_root")
     Rapns::Daemon::Feeder.stub(:stop)
     Rapns::Daemon::FeedbackReceiver.stub(:stop)
     Rapns::Daemon.stub(:handler_pool).and_return(handler_pool)
+    Rapns::Daemon.stub(:receiver_pool).and_return(receiver_pool)
     Rapns::Daemon.stub(:configuration).and_return(configuration)
     Rapns::Daemon.stub(:puts)
-  end
-
-  it "stops the feedback receiver" do
-    Rapns::Daemon::FeedbackReceiver.should_receive(:stop)
-    Rapns::Daemon.send(:shutdown)
   end
 
   it "stops the feeder" do
@@ -135,6 +146,17 @@ describe Rapns::Daemon, "when being shutdown" do
   it "does not attempt to drain the delivery handler pool if it has not been initialized" do
     Rapns::Daemon.stub(:handler_pool).and_return(nil)
     handler_pool.should_not_receive(:drain)
+    Rapns::Daemon.send(:shutdown)
+  end
+
+  it "drains the feedback receiver pool" do
+    receiver_pool.should_receive(:drain)
+    Rapns::Daemon.send(:shutdown)
+  end
+
+  it "does not attempt to drain the delivery handler pool if it has not been initialized" do
+    Rapns::Daemon.stub(:receiver_pool).and_return(nil)
+    receiver_pool.should_not_receive(:drain)
     Rapns::Daemon.send(:shutdown)
   end
 

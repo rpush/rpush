@@ -12,6 +12,7 @@ require 'rapns/daemon/database_reconnectable'
 require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/delivery_handler'
 require 'rapns/daemon/delivery_handler_pool'
+require 'rapns/daemon/feedback_receiver_pool'
 require 'rapns/daemon/feedback_receiver'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
@@ -21,7 +22,7 @@ module Rapns
     extend DatabaseReconnectable
 
     class << self
-      attr_accessor :logger, :queues, :handler_pool, :configuration
+      attr_accessor :logger, :queues, :handler_pool, :receiver_pool, :configuration
     end
 
     def self.start(environment, foreground)
@@ -37,6 +38,7 @@ module Rapns
       write_pid_file
 
       self.handler_pool = DeliveryHandlerPool.new
+      self.receiver_pool = FeedbackReceiverPool.new
       self.queues = {}
 
       configuration.apps.each do |name, app_config|
@@ -52,7 +54,8 @@ module Rapns
         end
 
         feedback = configuration.feedback
-        FeedbackReceiver.start(name, feedback.host, feedback.port, feedback.poll, certificate, password)
+        receiver = FeedbackReceiver.new(name, feedback.host, feedback.port, feedback.poll, certificate, password)
+        receiver_pool << receiver
       end
 
       logger.info('Ready')
@@ -64,7 +67,9 @@ module Rapns
     def self.setup_signal_hooks
       @shutting_down = false
 
-      ['SIGINT', 'SIGTERM'].each { |signal| Signal.trap(signal) { handle_shutdown_signal } }
+      ['SIGINT', 'SIGTERM'].each do |signal|
+        Signal.trap(signal) { handle_shutdown_signal }
+      end
     end
 
     def self.handle_shutdown_signal
@@ -78,6 +83,7 @@ module Rapns
       Rapns::Daemon::FeedbackReceiver.stop
       Rapns::Daemon::Feeder.stop
       Rapns::Daemon.handler_pool.drain if Rapns::Daemon.handler_pool
+      Rapns::Daemon.receiver_pool.drain if Rapns::Daemon.receiver_pool
       delete_pid_file
     end
 
