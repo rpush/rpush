@@ -1,17 +1,15 @@
-# rapns [![Build Status](https://secure.travis-ci.org/ileitch/rapns.png)](http://travis-ci.org/ileitch/rapns)
+[![Build Status](https://secure.travis-ci.org/ileitch/rapns.png)](http://travis-ci.org/ileitch/rapns)
 
-Easy to use library for Apple's Push Notification Service with Rails 3.
-
-## Features
+# Features
 
 * Works with Rails 3 and Ruby 1.9 & 1.8.
-* Supports multiple apps.
+* Supports multiple iOS apps.
 * Uses a daemon process to keep open a persistent connection to the APNs, as recommended by Apple.
-* Uses the [enhanced binary format](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4) (Figure 5-2) so that delivery errors can be reported.
-* Records feedback from [The Feedback Service](http://developer.apple.com/library/mac/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW3).
+* Uses the enhanced binary format so that [delivery errors can be reported](#delivery-failures).
+* Records feedback from [The Feedback Service](#delivery-failures).
 * [Airbrake](http://airbrakeapp.com/) (Hoptoad) integration.
-* Support for [dictionary `alert` properties](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Table 3-2).
-* Mobile Device Management (MDM)
+* Support for [dictionary `alert` properties](#assigning-a-hash-to-alert).
+* [Mobile Device Management (MDM)](#mobile-device-management)
 * Stable. Reconnects to the APNs and your database if connections are lost.
 
 ## Getting Started
@@ -106,7 +104,7 @@ rapns logs activity to `rapns.log` in your Rails log directory. This is also pri
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
 * `deliver_after` is not required, but may be set if you'd like to delay delivery of the notification to a specific time in the future.
 
-## Mobile Device Management
+### Mobile Device Management
 
     n = Rapns::Notification.new
     n.mdm = "magic"
