@@ -30,7 +30,7 @@ module Rapns
               if queue = Rapns::Daemon.queues[notification.app]
                 queue.push(notification) if queue.notifications_processed?
               else
-                Rapns::Daemon.logger.error("rapns not configured for app '#{notification.app}'.")
+                Rapns::Daemon.logger.error("No such app '#{notification.app}' for notification #{notification.id}.")
               end
             end
           end

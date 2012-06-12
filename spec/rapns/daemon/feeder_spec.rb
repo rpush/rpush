@@ -87,7 +87,8 @@ describe Rapns::Daemon::Feeder do
 
   it 'logs and error if the notifcation app is not configured' do
     notification.update_attributes!(:app => 'unknown')
-    logger.should_receive(:error).with("rapns not configured for app 'unknown'.")
+    notification.stub(:id => 1)
+    logger.should_receive(:error).with("No such app 'unknown' for notification 1.")
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 end
