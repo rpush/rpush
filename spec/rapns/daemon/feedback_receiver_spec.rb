@@ -4,6 +4,9 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
   let(:poll) { 60 }
+  let(:certificate) { stub }
+  let(:password) { stub }
+  let(:app) { 'my_app' }
   let(:connection) { stub(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
 
@@ -28,42 +31,42 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do  
-    Rapns::Daemon::Connection.should_receive(:new).with("FeedbackReceiver", 'feedback.push.apple.com', 2196)
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Daemon::Connection.should_receive(:new).with("FeedbackReceiver:#{app}", host, port, certificate, password)
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'connects to the feeback service' do
     connection.should_receive(:connect)
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'closes the connection' do
     connection.should_receive(:close)
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'reads from the connection' do
     connection.should_receive(:read).with(38)
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'logs the feedback' do
     stub_connection_read_with_tuple
-    Rapns::Daemon.logger.should_receive(:info).with("[FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17")
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Daemon.logger.should_receive(:info).with("[FeedbackReceiver:my_app] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17")
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'creates the feedback' do
     stub_connection_read_with_tuple
-    Rapns::Feedback.should_receive(:create!).with(:failed_at => Time.at(1323533325), :device_token => '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17')
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Feedback.should_receive(:create!).with(:failed_at => Time.at(1323533325), :device_token => '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', :app => 'my_app')
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'logs errors' do
     error = StandardError.new('bork!')
     connection.stub(:read).and_raise(error)
     Rapns::Daemon.logger.should_receive(:error).with(error)
-    Rapns::Daemon::FeedbackReceiver.check_for_feedback(host, port)
+    Rapns::Daemon::FeedbackReceiver.check_for_feedback(app, host, port, certificate, password)
   end
 
   it 'sleeps for the feedback poll period' do
@@ -71,14 +74,14 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
     Rapns::Daemon::FeedbackReceiver.should_receive(:interruptible_sleep).with(60).at_least(:once)
     Thread.stub(:new).and_yield
     Rapns::Daemon::FeedbackReceiver.stub(:loop).and_yield
-    Rapns::Daemon::FeedbackReceiver.start(host, port, poll)
+    Rapns::Daemon::FeedbackReceiver.start(app, host, port, poll, certificate, password)
   end
 
   it 'checks for feedback when started' do
     Rapns::Daemon::FeedbackReceiver.should_receive(:check_for_feedback).at_least(:once)
     Thread.stub(:new).and_yield
     Rapns::Daemon::FeedbackReceiver.stub(:loop).and_yield
-    Rapns::Daemon::FeedbackReceiver.start(host, port, poll)
+    Rapns::Daemon::FeedbackReceiver.start(app, host, port, poll, certificate, password)
   end
 
   it 'interrupts sleep when stopped' do

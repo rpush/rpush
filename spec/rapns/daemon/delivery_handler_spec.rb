@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Rapns::Daemon::DeliveryHandler do
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
-  let(:name) { 'my_app, 0' }
+  let(:name) { 'my_app:0' }
   let(:host) { 'localhost' }
   let(:port) { 2195 }
   let(:certificate) { stub }
@@ -21,7 +21,7 @@ describe Rapns::Daemon::DeliveryHandler do
   end
 
   it "instantiates a new connection" do
-    Rapns::Daemon::Connection.should_receive(:new).with("DeliveryHandler #{name}", host, port, certificate, password)
+    Rapns::Daemon::Connection.should_receive(:new).with("DeliveryHandler:#{name}", host, port, certificate, password)
     delivery_handler
   end
 
@@ -167,7 +167,7 @@ describe Rapns::Daemon::DeliveryHandler do
     end
 
     it "logs that the connection is being reconnected" do
-      Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler my_app, 0] Error received, reconnecting...")
+      Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler:my_app:0] Error received, reconnecting...")
       delivery_handler.send(:handle_next_notification)
     end
 

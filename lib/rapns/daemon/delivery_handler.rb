@@ -22,7 +22,7 @@ module Rapns
 
       def initialize(queue, name, host, port, certificate, password)
         @queue = queue
-        @name = "DeliveryHandler #{name}"
+        @name = "DeliveryHandler:#{name}"
         @connection = Connection.new(@name, host, port, certificate, password)
       end
 

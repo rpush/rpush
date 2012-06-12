@@ -66,11 +66,6 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", {})
   end
 
-  it "starts the feedback receiver" do
-    Rapns::Daemon::FeedbackReceiver.should_receive(:start).with('feedback.push.apple.com', 2196, 60)
-    Rapns::Daemon.start("development", true)
-  end
-
   it "starts the feeder" do
     Rapns::Daemon::Feeder.should_receive(:start).with(2)
     Rapns::Daemon.start("development", true)
@@ -88,7 +83,7 @@ describe Rapns::Daemon, "when starting" do
   end
 
   it 'instantiates delivery handlers' do
-    Rapns::Daemon::DeliveryHandler.should_receive(:new).with(queue, "my_app, 0", configuration.push.host,
+    Rapns::Daemon::DeliveryHandler.should_receive(:new).with(queue, "my_app:0", configuration.push.host,
       configuration.push.port, my_app_config.certificate, my_app_config.certificate_password)
     Rapns::Daemon.start("development", true)
   end
@@ -100,6 +95,11 @@ describe Rapns::Daemon, "when starting" do
 
   it 'adds the delivery handler to the pool' do
     handler_pool.should_receive(:<<).with(delivery_handler)
+    Rapns::Daemon.start("development", true)
+  end
+
+  it 'starts the feedback receiver' do
+    Rapns::Daemon::FeedbackReceiver.should_receive(:start).with('my_app', 'feedback.push.apple.com', 2196, 60, my_app_config.certificate, my_app_config.certificate_password)
     Rapns::Daemon.start("development", true)
   end
 end

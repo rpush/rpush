@@ -34,32 +34,30 @@ module Rapns
         reconnect_database
       end
 
+      write_pid_file
+
       self.handler_pool = DeliveryHandlerPool.new
       self.queues = {}
 
-      write_pid_file
-      start_delivery_handlers
+      configuration.apps.each do |name, app_config|
+        host = configuration.push.host
+        port = configuration.push.port
+        certificate = app_config.certificate
+        password = app_config.certificate_password
+        feedback = configuration.feedback
+        FeedbackReceiver.start(name, feedback.host, feedback.port, feedback.poll, certificate, password)
+        queue = queues[name] ||= DeliveryQueue.new
+        app_config.connections.times do |i|
+          handler = DeliveryHandler.new(queue, "#{name}:#{i}", host, port, certificate, password)
+          handler_pool << handler
+        end
+      end
+
       logger.info('Ready')
-      feedback = configuration.feedback
-      FeedbackReceiver.start(feedback.host, feedback.port, feedback.poll)
       Feeder.start(configuration.push.poll)
     end
 
     protected
-
-    def self.start_delivery_handlers
-      configuration.apps.each do |name, app_config|
-        queue = queues[name] ||= DeliveryQueue.new
-        app_config.connections.times do |i|
-          host = configuration.push.host
-          port = configuration.push.port
-          certificate = app_config.certificate
-          password = app_config.certificate_password
-          handler = DeliveryHandler.new(queue, "#{name}, #{i}", host, port, certificate, password)
-          handler_pool << handler
-        end
-      end
-    end
 
     def self.setup_signal_hooks
       @shutting_down = false
