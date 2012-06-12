@@ -6,6 +6,6 @@ module Rapns
     validates :environment, :presence => true
     validates_uniqueness_of :environment, :scope => :key
     validates :certificate, :presence => true
-    validates :connections, :numericality => true
+    validates_numericality_of :connections, :greater_than => 0, :only_integer => true
   end
 end
