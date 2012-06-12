@@ -58,7 +58,6 @@ module Rapns
         receiver_pool << receiver
       end
 
-      logger.info('Ready')
       Feeder.start(configuration.push.poll)
     end
 
