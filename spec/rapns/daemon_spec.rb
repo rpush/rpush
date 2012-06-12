@@ -124,7 +124,6 @@ describe Rapns::Daemon, "when being shutdown" do
   let(:receiver_pool) { stub(:drain => nil) }
 
   before do
-    Rails.stub(:root).and_return("/rails_root")
     Rapns::Daemon::Feeder.stub(:stop)
     Rapns::Daemon.stub(:handler_pool).and_return(handler_pool)
     Rapns::Daemon.stub(:receiver_pool).and_return(receiver_pool)
