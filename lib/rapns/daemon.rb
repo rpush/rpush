@@ -79,7 +79,6 @@ module Rapns
 
     def self.shutdown
       puts "\nShutting down..."
-      Rapns::Daemon::FeedbackReceiver.stop
       Rapns::Daemon::Feeder.stop
       Rapns::Daemon.handler_pool.drain if Rapns::Daemon.handler_pool
       Rapns::Daemon.receiver_pool.drain if Rapns::Daemon.receiver_pool
