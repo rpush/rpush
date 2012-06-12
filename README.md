@@ -100,7 +100,7 @@ rapns logs activity to `rapns.log` in your Rails log directory. This is also pri
     n.deliver_after = 1.hour.from_now
     n.save!
 
-* `app` must match a `key` on a Rapns::App.
+* `app` must match a `key` on a `Rapns::App`.
 * `sound` defaults to `1.aiff`. You can either set it to a custom .aiff file, or `nil` for no sound.
 * `expiry` is the time in seconds the APNs (not rapns) will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
