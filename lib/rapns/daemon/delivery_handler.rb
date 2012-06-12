@@ -55,7 +55,7 @@ module Rapns
             notification.save!(:validate => false)
           end
 
-          Rapns::Daemon.logger.info("Notification #{notification.id} delivered to #{notification.device_token}")
+          Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
         rescue Rapns::DeliveryError, Rapns::DisconnectionError => error
           handle_delivery_error(notification, error)
           raise

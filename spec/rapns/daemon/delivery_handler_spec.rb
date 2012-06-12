@@ -44,7 +44,7 @@ describe Rapns::Daemon::DeliveryHandler do
 
   it "logs the notification delivery" do
     notification.stub(:id => 666, :device_token => 'abc123')
-    logger.should_receive(:info).with("Notification 666 delivered to abc123")
+    logger.should_receive(:info).with("[DeliveryHandler:my_app:0] 666 sent to abc123")
     delivery_handler.send(:handle_next_notification)
   end
 

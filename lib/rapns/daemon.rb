@@ -44,13 +44,15 @@ module Rapns
         port = configuration.push.port
         certificate = app_config.certificate
         password = app_config.certificate_password
-        feedback = configuration.feedback
-        FeedbackReceiver.start(name, feedback.host, feedback.port, feedback.poll, certificate, password)
         queue = queues[name] ||= DeliveryQueue.new
+
         app_config.connections.times do |i|
           handler = DeliveryHandler.new(queue, "#{name}:#{i}", host, port, certificate, password)
           handler_pool << handler
         end
+
+        feedback = configuration.feedback
+        FeedbackReceiver.start(name, feedback.host, feedback.port, feedback.poll, certificate, password)
       end
 
       logger.info('Ready')
