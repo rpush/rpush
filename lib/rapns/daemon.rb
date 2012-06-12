@@ -41,8 +41,15 @@ module Rapns
       self.receiver_pool = FeedbackReceiverPool.new
       self.queues = {}
 
+      ensure_upgraded
+
       apps = Rapns::App.where(:environment => environment)
-      raise "You must create an app for environment '#{environment}'.\nSee https://github.com/ileitch/rapns for details." if apps.empty?
+      if apps.empty?
+        puts "!!!!!!!!!!"
+        puts "You must create an app for environment '#{environment}'."
+        puts "See https://github.com/ileitch/rapns for instructions."
+        exit 1
+      end
       apps.each { |app| start_app(app) }
       Feeder.start(configuration.push.poll)
     end
@@ -62,6 +69,16 @@ module Rapns
       feedback = configuration.feedback
       receiver = FeedbackReceiver.new(app.key, feedback.host, feedback.port, feedback.poll, app.certificate, app.password)
       receiver_pool << receiver
+    end
+
+    def self.ensure_upgraded
+      Rapns::App.count
+    rescue ActiveRecord::StatementInvalid
+      puts "!!!!!!!!!!"
+      puts "As of version v2.0.0 apps are configured in the database instead of rapns.yml."
+      puts "Please run 'rails g rapns' to generate the new migrations and create your apps with Rapns::App."
+      puts "See https://github.com/ileitch/rapns for further instructions."
+      exit 1
     end
 
     def self.setup_signal_hooks

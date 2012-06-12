@@ -123,11 +123,18 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", true)
   end
 
-  it 'raises an error if there are no apps for the environment' do
+  it 'prints a warning exists if there are no apps for the environment' do
     Rapns::App.stub(:where => [])
-    expect do
-      Rapns::Daemon.start("development", true)
-    end.should raise_error("You must create an app for environment 'development'.\nSee https://github.com/ileitch/rapns for details.")
+    Rapns::Daemon.should_receive(:puts).any_number_of_times
+    Rapns::Daemon.should_receive(:exit).with(1)
+    Rapns::Daemon.start("development", true)
+  end
+
+  it 'prints a warning exists if rapns has not been upgraded' do
+    Rapns::App.stub(:count).and_raise(ActiveRecord::StatementInvalid)
+    Rapns::Daemon.should_receive(:puts).any_number_of_times
+    Rapns::Daemon.should_receive(:exit).with(1)
+    Rapns::Daemon.start("development", true)
   end
 end
 
