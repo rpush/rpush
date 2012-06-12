@@ -5,12 +5,12 @@ module Rapns
 
       FEEDBACK_TUPLE_BYTES = 38
 
-      def self.start
+      def self.start(host, port, poll)
         @thread = Thread.new do
           loop do
             break if @stop
-            check_for_feedback
-            interruptible_sleep Rapns::Daemon.configuration.feedback.poll
+            check_for_feedback(host, port)
+            interruptible_sleep poll
           end
         end
       end
@@ -21,12 +21,10 @@ module Rapns
         @thread.join if @thread
       end
 
-      def self.check_for_feedback
+      def self.check_for_feedback(host, port)
         connection = nil
         begin
-          host = Rapns::Daemon.configuration.feedback.host
-          port = Rapns::Daemon.configuration.feedback.port
-          connection = Connection.new("FeedbackReceiver", host, port)
+          connection = Connection.new('FeedbackReceiver', host, port)
           connection.connect
 
           while tuple = connection.read(FEEDBACK_TUPLE_BYTES)

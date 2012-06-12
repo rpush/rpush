@@ -9,6 +9,12 @@ module Rapns
       attr_accessor :airbrake_notify, :pid_file
       alias_method  :airbrake_notify?, :airbrake_notify
 
+      def self.load(environment, config_path)
+        configuration = new(environment, config_path)
+        configuration.load
+        configuration
+      end
+
       def initialize(environment, config_path)
         @environment = environment
         @config_path = config_path
@@ -33,6 +39,10 @@ module Rapns
             load_app(app, config)
           end
         end
+
+        if apps.empty?
+          raise ConfigurationError, "No applications configured. See https://github.com/ileitch/rapns for instructions."
+        end
       end
 
       def load_push(config)
@@ -53,9 +63,8 @@ module Rapns
       end
 
       def load_app(name, config)
-        app = @app_template.new
-        apps[name] = app
-        set_variable(app, name, :certificate, config, :path => rapns_root)
+        app = apps[name] = @app_template.new
+        set_variable(app, name, :certificate, config, :path => rapns_root, :certificate => true)
         set_variable(app, name, :certificate_password, config, :optional => true, :default => "")
         set_variable(app, name, :connections, config, :optional => true, :default => 3)
       end
@@ -87,6 +96,7 @@ module Rapns
           end
         else
           value = File.join(options[:path], value) if options[:path] && !Pathname.new(value).absolute?
+          value = Rapns::Daemon::Certificate.read(value) if options[:certificate]
           base.send("#{key}=", value)
         end
       end

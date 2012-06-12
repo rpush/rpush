@@ -20,11 +20,10 @@ module Rapns
 
       attr_reader :name
 
-      def initialize(i)
-        @name = "DeliveryHandler #{i}"
-        host = Rapns::Daemon.configuration.push.host
-        port = Rapns::Daemon.configuration.push.port
-        @connection = Connection.new(@name, host, port)
+      def initialize(queue, name, host, port, certificate, password)
+        @queue = queue
+        @name = "DeliveryHandler #{name}"
+        @connection = Connection.new(@name, host, port, certificate, password)
       end
 
       def start
@@ -40,7 +39,7 @@ module Rapns
 
       def stop
         @stop = true
-        Rapns::Daemon.delivery_queue.push(STOP)
+        @queue.push(STOP)
       end
 
       protected
@@ -98,7 +97,7 @@ module Rapns
       end
 
       def handle_next_notification
-        notification = Rapns::Daemon.delivery_queue.pop
+        notification = @queue.pop
 
         if notification == STOP
           @connection.close
@@ -110,7 +109,7 @@ module Rapns
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
         ensure
-          Rapns::Daemon.delivery_queue.notification_processed
+          @queue.notification_processed
         end
       end
     end
