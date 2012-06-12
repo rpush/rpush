@@ -45,9 +45,11 @@ module Rapns
 
       apps = Rapns::App.where(:environment => environment)
       if apps.empty?
-        puts "!!!!!!!!!!"
+        puts "!!!! RAPNS NOT STARTED !!!!"
+        puts
         puts "You must create an app for environment '#{environment}'."
         puts "See https://github.com/ileitch/rapns for instructions."
+        puts
         exit 1
       end
       apps.each { |app| start_app(app) }
@@ -74,10 +76,12 @@ module Rapns
     def self.ensure_upgraded
       Rapns::App.count
     rescue ActiveRecord::StatementInvalid
-      puts "!!!!!!!!!!"
+      puts "!!!! RAPNS NOT STARTED !!!!"
+      puts
       puts "As of version v2.0.0 apps are configured in the database instead of rapns.yml."
       puts "Please run 'rails g rapns' to generate the new migrations and create your apps with Rapns::App."
       puts "See https://github.com/ileitch/rapns for further instructions."
+      puts
       exit 1
     end
 
