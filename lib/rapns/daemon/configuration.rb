@@ -7,7 +7,6 @@ module Rapns
     class Configuration
       attr_accessor :push, :feedback
       attr_accessor :airbrake_notify, :pid_file, :check_for_errors
-      alias_method  :airbrake_notify?, :airbrake_notify
 
       def self.load(environment, config_path)
         configuration = new(environment, config_path)

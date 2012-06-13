@@ -95,12 +95,12 @@ describe Rapns::Daemon::Configuration do
   end
 
   it "sets the airbrake notify flag" do
-    configuration.airbrake_notify?.should == false
+    configuration.airbrake_notify.should == false
   end
 
   it "defaults the airbrake notify flag to true if not set" do
     config.delete('airbrake_notify')
-    configuration.airbrake_notify?.should == true
+    configuration.airbrake_notify.should == true
   end
 
   it "sets the push poll frequency" do
