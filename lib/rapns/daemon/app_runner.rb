@@ -92,7 +92,7 @@ module Rapns
       end
 
       def debug
-        Rapns::Daemon.logger.info("#{@app.key}:\n\thandlers: #{@handlers.size}\n\tbacklog: #{@queue.size}")
+        Rapns::Daemon.logger.info("\nAppRunner State:\n#{@app.key}:\n  handlers: #{@handlers.size}\n  backlog: #{@queue.size}\n  ready: #{ready?}")
       end
 
       protected
