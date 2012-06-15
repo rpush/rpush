@@ -10,6 +10,7 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.stub(:interruptible_sleep)
     Rapns::Daemon.stub(:logger).and_return(logger)
     Rapns::Daemon::Feeder.instance_variable_set("@stop", false)
+    Rapns::Daemon::AppRunner.stub(:ready => ['my_app'])
   end
 
   it "checks for new notifications with the ability to reconnect the database" do
@@ -20,6 +21,12 @@ describe Rapns::Daemon::Feeder do
   it "delivers the notification" do
     notification.update_attributes!(:delivered => false)
     Rapns::Daemon::AppRunner.should_receive(:deliver).with(notification)
+    Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
+  it 'does not enqueue the notification if the app runner is still processing the previous batch' do
+    Rapns::Daemon::AppRunner.stub(:ready => [])
+    Rapns::Daemon::AppRunner.should_not_receive(:deliver)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 

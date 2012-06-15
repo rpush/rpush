@@ -26,8 +26,9 @@ module Rapns
       def self.enqueue_notifications
         begin
           with_database_reconnect_and_retry do
+            ready_apps = Rapns::Daemon::AppRunner.ready
             Rapns::Notification.ready_for_delivery.each do |notification|
-              Rapns::Daemon::AppRunner.deliver(notification)
+              Rapns::Daemon::AppRunner.deliver(notification) if ready_apps.include?(notification.app)
             end
           end
         rescue StandardError => e

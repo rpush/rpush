@@ -7,6 +7,12 @@ module Rapns
 
       @all = {}
 
+      def self.ready
+        ready = []
+        @all.each { |app, runner| ready << app if runner.ready? }
+        ready
+      end
+
       def self.deliver(notification)
         if app = @all[notification.app]
           app.deliver(notification)
@@ -59,7 +65,6 @@ module Rapns
       end
 
       def deliver(notification)
-        return unless @queue.notifications_processed?
         @queue.push(notification)
       end
 
@@ -76,6 +81,10 @@ module Rapns
         else
           diff.abs.times { @handlers << start_handler }
         end
+      end
+
+      def ready?
+        @queue.notifications_processed?
       end
 
       protected

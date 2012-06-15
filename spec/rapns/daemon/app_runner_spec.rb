@@ -16,6 +16,8 @@ describe Rapns::Daemon::AppRunner do
     Rapns::Daemon::DeliveryHandler.stub(:new => handler)
   end
 
+  after { Rapns::Daemon::AppRunner.all.clear }
+
   describe 'start' do
     it 'starts a feedback receiver' do
       Rapns::Daemon::FeedbackReceiver.should_receive(:new).with(app.key, feedback_config.host, feedback_config.port, feedback_config.poll, app.certificate, app.password)
@@ -38,12 +40,6 @@ describe Rapns::Daemon::AppRunner do
       queue.should_receive(:push).with(notification)
       runner.deliver(notification)
     end
-
-    it 'does not enqueue the notification if queue still contains unprocessed notifications' do
-      queue.stub(:notifications_processed? => false)
-      queue.should_not_receive(:push)
-      runner.deliver(notification)
-    end
   end
 
   describe 'stop' do
@@ -60,6 +56,18 @@ describe Rapns::Daemon::AppRunner do
     end
   end
 
+  describe 'ready?' do
+    it 'is ready if all notifications have been processed' do
+      queue.stub(:notifications_processed? => true)
+      runner.ready?.should be_true
+    end
+
+    it 'is not ready if not all notifications have been processed' do
+      queue.stub(:notifications_processed? => false)
+      runner.ready?.should be_false
+    end
+  end
+
   describe 'sync' do
     let(:new_app) { stub(:key => 'app', :certificate => 'cert', :password => '', :connections => 1) }
     before { runner.start }
@@ -70,7 +78,7 @@ describe Rapns::Daemon::AppRunner do
       runner.sync(new_app)
     end
 
-    it 'increases the number of hadlers if needed' do
+    it 'increases the number of handlers if needed' do
       new_handler = stub
       Rapns::Daemon::DeliveryHandler.should_receive(:new).and_return(new_handler)
       new_handler.should_receive(:start)
@@ -83,6 +91,7 @@ end
 describe Rapns::Daemon::AppRunner, 'stop' do
   let(:runner) { stub }
   before { Rapns::Daemon::AppRunner.all['app'] = runner }
+  after { Rapns::Daemon::AppRunner.all.clear }
 
   it 'stops all runners' do
     runner.should_receive(:stop)
@@ -100,6 +109,8 @@ describe Rapns::Daemon::AppRunner, 'deliver' do
     Rapns::Daemon::AppRunner.all['app'] = runner
   end
 
+  after { Rapns::Daemon::AppRunner.all.clear }
+
   it 'delivers the notification' do
     runner.should_receive(:deliver).with(notification)
     Rapns::Daemon::AppRunner.deliver(notification)
@@ -109,6 +120,22 @@ describe Rapns::Daemon::AppRunner, 'deliver' do
     notification.stub(:app => 'unknonw', :id => 123)
     logger.should_receive(:error).with("No such app '#{notification.app}' for notification #{notification.id}.")
     Rapns::Daemon::AppRunner.deliver(notification)
+  end
+end
+
+describe Rapns::Daemon::AppRunner, 'ready' do
+  let(:runner1) { stub(:ready? => true) }
+  let(:runner2) { stub(:ready? => false) }
+
+  before do
+    Rapns::Daemon::AppRunner.all['app1'] = runner1
+    Rapns::Daemon::AppRunner.all['app2'] = runner2
+  end
+
+  after { Rapns::Daemon::AppRunner.all.clear }
+
+  it 'returns apps that are ready for more notifications' do
+    Rapns::Daemon::AppRunner.ready.should == ['app1']
   end
 end
 
@@ -123,10 +150,11 @@ describe Rapns::Daemon::AppRunner, 'sync' do
 
   before do
     Rapns::Daemon.stub(:configuration => configuration)
-    Rapns::Daemon::AppRunner.all.clear
     Rapns::Daemon::AppRunner.all['app'] = runner
     Rapns::App.stub(:where => [app])
   end
+
+  after { Rapns::Daemon::AppRunner.all.clear }
 
   it 'loads apps for the given environment' do
     Rapns::App.should_receive(:where).with(:environment => 'development')
