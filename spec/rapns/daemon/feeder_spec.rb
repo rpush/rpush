@@ -22,8 +22,9 @@ describe Rapns::Daemon::Feeder do
 
   it 'loads notifications in batches' do
     relation = stub
-    relation.should_not_receive(:find_each).with(:batch_size => 5000)
+    relation.should_receive(:find_each).with(:batch_size => 5000)
     Rapns::Notification.stub(:ready_for_delivery => relation)
+    Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it "delivers the notification" do
