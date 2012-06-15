@@ -36,33 +36,7 @@ Generate the migration, rapns.yml and migrate:
 
     `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
 
-## Configuration
-
-Environment configuration lives in `config/rapns/rapns.yml`. For common setups you probably wont need to change this file.
-
-If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
-
-### Options
-
-* `push` this section contains options to configure the delivery of notifications.
-    * `host` the APNs host to connect to, either `gateway.push.apple.com` or `gateway.sandbox.push.apple.com`.
-    * `port` the APNs port. Currently `2195` for both hosts.
-    * `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
-    
-* `feedback` this section contains options to configure feedback checking.
-    * `host` the APNs host to connect to, either `feedback.push.apple.com` or `feedback.sandbox.push.apple.com`.
-    * `port` the APNs port. Currently `2196` for both hosts.
-    * `poll` (default: 60) Frequency in seconds to check for new feedback.
-
-* `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
-* `pid_file` (default: blank) the file that rapns will write its process ID to. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
-
-#### Advanced Options
-
-* `check_for_errors` (default: true) Enables/disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.   
-* `feeder_batch_size` (default: 5000) Sets the ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint.
-
-### Adding Apps
+## Create an App
 
     app = Rapns::App.new
     app.key = "my_app"
@@ -100,7 +74,7 @@ You will need to create an app for each environment.
     n.deliver_after = 1.hour.from_now
     n.save!
 
-* `app` must match a `key` on a `Rapns::App`.
+* `app` must match `key` on an `Rapns::App`.
 * `sound` defaults to `1.aiff`. You can either set it to a custom .aiff file, or `nil` for no sound.
 * `expiry` is the time in seconds the APNs (not rapns) will spend trying to deliver the notification to the device. The notification is discarded if it has not been delivered in this time. Default is 1 day.
 * `attributes_for_device` is the `NSDictionary` argument passed to your iOS app in either `didFinishLaunchingWithOptions` or `didReceiveRemoteNotification`.
@@ -115,6 +89,32 @@ You will need to create an app for each environment.
 ### Assigning a Hash to alert
 
 Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Tables 3-1 and 3-2).
+
+## Configuration
+
+Environment configuration lives in `config/rapns/rapns.yml`. For common setups you probably wont need to change this file.
+
+If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
+
+### Options
+
+* `push` this section contains options to configure the delivery of notifications.
+    * `host` the APNs host to connect to, either `gateway.push.apple.com` or `gateway.sandbox.push.apple.com`.
+    * `port` the APNs port. Currently `2195` for both hosts.
+    * `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
+
+* `feedback` this section contains options to configure feedback checking.
+    * `host` the APNs host to connect to, either `feedback.push.apple.com` or `feedback.sandbox.push.apple.com`.
+    * `port` the APNs port. Currently `2196` for both hosts.
+    * `poll` (default: 60) Frequency in seconds to check for new feedback.
+
+* `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
+* `pid_file` (default: blank) the file that rapns will write its process ID to. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
+
+#### Advanced Options
+
+* `check_for_errors` (default: true) Enables/disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.   
+* `feeder_batch_size` (default: 5000) Sets the ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint.
 
 ## Hot App Updates
 
