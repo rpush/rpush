@@ -6,7 +6,7 @@ module Rapns
   module Daemon
     class Configuration
       attr_accessor :push, :feedback
-      attr_accessor :airbrake_notify, :pid_file, :check_for_errors
+      attr_accessor :airbrake_notify, :pid_file, :check_for_errors, :feeder_batch_size
 
       def self.load(environment, config_path)
         configuration = new(environment, config_path)
@@ -48,6 +48,7 @@ module Rapns
         set_variable(self, nil, :airbrake_notify, config, :optional => true, :default => true)
         set_variable(self, nil, :pid_file, config, :optional => true, :default => nil, :path => Rails.root)
         set_variable(self, nil, :check_for_errors, config, :optional => true, :default => true)
+        set_variable(self, nil, :feeder_batch_size, config, :optional => true, :default => 5000)
       end
 
       protected

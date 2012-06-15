@@ -60,6 +60,7 @@ If you want to use rapns in environments other than development or production, y
 #### Advanced Options
 
 * `check_for_errors` (default: true) Enables/disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.   
+* `feeder_batch_size` (default: 5000) Sets the ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint.
 
 ### Adding Apps
 

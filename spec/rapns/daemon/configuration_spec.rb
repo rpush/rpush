@@ -144,4 +144,14 @@ describe Rapns::Daemon::Configuration do
     config.delete('check_for_errors')
     configuration.check_for_errors.should be_true
   end
+
+  it 'sets feeder_batch_size' do
+    config['feeder_batch_size'] = 1000
+    configuration.feeder_batch_size.should == 1000
+  end
+
+  it 'sets feeder_batch_size to 5000 by default' do
+    config.delete('feeder_batch_size')
+    configuration.feeder_batch_size.should == 5000
+  end
 end

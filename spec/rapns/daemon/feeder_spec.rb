@@ -2,20 +2,28 @@ require "spec_helper"
 
 describe Rapns::Daemon::Feeder do
   let(:poll) { 2 }
+  let(:configuration) { stub(:feeder_batch_size => 5000) }
   let(:notification) { Rapns::Notification.create!(:device_token => "a" * 64, :app => 'my_app') }
   let(:logger) { stub }
 
   before do
     Rapns::Daemon::Feeder.stub(:sleep)
     Rapns::Daemon::Feeder.stub(:interruptible_sleep)
-    Rapns::Daemon.stub(:logger).and_return(logger)
+    Rapns::Daemon.stub(:logger => logger, :configuration => configuration)
     Rapns::Daemon::Feeder.instance_variable_set("@stop", false)
+    Rapns::Daemon::AppRunner.stub(:ready => ['my_app'])
     Rapns::Daemon::AppRunner.stub(:ready => ['my_app'])
   end
 
   it "checks for new notifications with the ability to reconnect the database" do
     Rapns::Daemon::Feeder.should_receive(:with_database_reconnect_and_retry)
     Rapns::Daemon::Feeder.enqueue_notifications
+  end
+
+  it 'loads notifications in batches' do
+    relation = stub
+    relation.should_not_receive(:find_each).with(:batch_size => 5000)
+    Rapns::Notification.stub(:ready_for_delivery => relation)
   end
 
   it "delivers the notification" do
