@@ -21,6 +21,8 @@ module Airbrake
 end
 
 describe Rapns::Daemon::Logger do
+  let(:log) { stub(:sync= => true) }
+
   before do
     Rails.stub(:root).and_return("/rails_root")
     @buffered_logger = mock("BufferedLogger", :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
@@ -28,10 +30,21 @@ describe Rapns::Daemon::Logger do
     ActiveSupport::BufferedLogger.stub(:new).and_return(@buffered_logger)
     configuration = mock("Configuration", :airbrake_notify? => true)
     Rapns::Daemon.stub(:configuration).and_return(configuration)
+    File.stub(:open => log)
   end
 
   it "should open the a log file in the Rails log directory" do
-    ActiveSupport::BufferedLogger.should_receive(:new).with("/rails_root/log/rapns.log", Rails.logger.level)
+    File.should_receive(:open).with("/rails_root/log/rapns.log")
+    Rapns::Daemon::Logger.new(:foreground => true)
+  end
+
+  it 'sets sync mode on the log descriptor' do
+    log.should_receive(:sync=).with(true)
+    Rapns::Daemon::Logger.new(:foreground => true)
+  end
+
+  it 'instantiates the BufferedLogger' do
+    ActiveSupport::BufferedLogger.should_receive(:new).with(log, Rails.logger.level)
     Rapns::Daemon::Logger.new(:foreground => true)
   end
 
