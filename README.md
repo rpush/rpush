@@ -13,6 +13,12 @@
 * [Mobile Device Management (MDM)](#mobile-device-management)
 * Stable. Reconnects to the APNs and your database if connections are lost.
 
+### Who uses rapns?
+
+[GateGuru](http://http://gateguruapp.com/), among others!
+
+*I'd love to hear if you use rapns - @ileitch on twitter.*
+
 ## Getting Started
 
 Add rapns to your Gemfile:
