@@ -5,7 +5,7 @@
 * Works with Rails 3 and Ruby 1.9 & 1.8.
 * Supports multiple iOS apps.
 * [Add & remove apps](#hot-app-updates) without restarting or affecting the delivery of notifications to other apps.
-* Uses a daemon process to keep open a persistent connection to the APNs, as recommended by Apple.
+* Uses a daemon process to keep open persistent connections to the APNs, as recommended by Apple.
 * Uses the enhanced binary format so that [delivery errors can be reported](#delivery-failures).
 * Records feedback from [The Feedback Service](#delivery-failures).
 * [Airbrake](http://airbrakeapp.com/) (Hoptoad) integration.
@@ -86,16 +86,6 @@ You will need to create an app for each environment.
 
 * `--foreground` will prevent rapns from forking into a daemon.
 
-## Hot App Updates
-
-If you signal the rapns process with `HUP` it will synchronize with the current Rapns::App configurations. This includes adding an app, removing and increasing/decreasing the number of connections an app uses.
-
-This synchronization process does not pause the delivery of notifications to other apps.
-
-## Logging
-
-rapns logs activity to `rapns.log` in your Rails log directory. This is also printed to STDOUT when running in the foreground. When running as a daemon rapns does not print to STDOUT or STDERR.
-
 ## Sending a Notification
 
     n = Rapns::Notification.new
@@ -124,6 +114,16 @@ rapns logs activity to `rapns.log` in your Rails log directory. This is also pri
 ### Assigning a Hash to alert
 
 Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Tables 3-1 and 3-2).
+
+## Hot App Updates
+
+If you signal the rapns process with `HUP` it will synchronize with the current `Rapns::App` configurations. This includes adding an app, removing and increasing/decreasing the number of connections an app uses.
+
+This synchronization process does not pause the delivery of notifications to other apps.
+
+## Logging
+
+rapns logs activity to `rapns.log` in your Rails log directory. This is also printed to STDOUT when running in the foreground. When running as a daemon rapns does not print to STDOUT or STDERR.
 
 ## Delivery Failures
 
