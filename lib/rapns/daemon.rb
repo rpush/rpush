@@ -11,8 +11,8 @@ require 'rapns/daemon/database_reconnectable'
 require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/delivery_handler'
 require 'rapns/daemon/delivery_handler_pool'
-require 'rapns/daemon/feedback_receiver_pool'
 require 'rapns/daemon/feedback_receiver'
+require 'rapns/daemon/app_runner'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
 
@@ -21,11 +21,11 @@ module Rapns
     extend DatabaseReconnectable
 
     class << self
-      attr_accessor :logger, :queues, :handler_pool, :receiver_pool, :configuration
+      attr_accessor :logger, :configuration
     end
 
     def self.start(environment, foreground)
-      setup_signal_hooks
+      setup_signal_hooks(environment)
 
       self.configuration = Configuration.load(environment, File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
       self.logger = Logger.new(:foreground => foreground, :airbrake_notify => configuration.airbrake_notify)
@@ -36,15 +36,29 @@ module Rapns
       end
 
       write_pid_file
+      ensure_upgraded(environment)
+      AppRunner.sync(environment)
+      Feeder.start(configuration.push.poll)
+    end
 
-      self.handler_pool = DeliveryHandlerPool.new
-      self.receiver_pool = FeedbackReceiverPool.new
-      self.queues = {}
+    protected
 
-      ensure_upgraded
+    def self.ensure_upgraded(environment)
+      count = 0
 
-      apps = Rapns::App.where(:environment => environment)
-      if apps.empty?
+      begin
+        count = Rapns::App.count(:conditions => { :environment => environment })
+      rescue ActiveRecord::StatementInvalid
+        puts "!!!! RAPNS NOT STARTED !!!!"
+        puts
+        puts "As of version v2.0.0 apps are configured in the database instead of rapns.yml."
+        puts "Please run 'rails g rapns' to generate the new migrations and create your apps with Rapns::App."
+        puts "See https://github.com/ileitch/rapns for further instructions."
+        puts
+        exit 1
+      end
+
+      if count == 0
         puts "!!!! RAPNS NOT STARTED !!!!"
         puts
         puts "You must create an app for environment '#{environment}'."
@@ -52,40 +66,9 @@ module Rapns
         puts
         exit 1
       end
-      apps.each { |app| start_app(app) }
-      Feeder.start(configuration.push.poll)
     end
 
-    protected
-
-    def self.start_app(app)
-      queue = queues[app.key] ||= DeliveryQueue.new
-
-      app.connections.times do |i|
-        host = configuration.push.host
-        port = configuration.push.port
-        handler = DeliveryHandler.new(queue, "#{app.key}:#{i}", host, port, app.certificate, app.password)
-        handler_pool << handler
-      end
-
-      feedback = configuration.feedback
-      receiver = FeedbackReceiver.new(app.key, feedback.host, feedback.port, feedback.poll, app.certificate, app.password)
-      receiver_pool << receiver
-    end
-
-    def self.ensure_upgraded
-      Rapns::App.count
-    rescue ActiveRecord::StatementInvalid
-      puts "!!!! RAPNS NOT STARTED !!!!"
-      puts
-      puts "As of version v2.0.0 apps are configured in the database instead of rapns.yml."
-      puts "Please run 'rails g rapns' to generate the new migrations and create your apps with Rapns::App."
-      puts "See https://github.com/ileitch/rapns for further instructions."
-      puts
-      exit 1
-    end
-
-    def self.setup_signal_hooks
+    def self.setup_signal_hooks(environment)
       @shutting_down = false
 
       ['SIGINT', 'SIGTERM'].each do |signal|
@@ -101,9 +84,8 @@ module Rapns
 
     def self.shutdown
       puts "\nShutting down..."
-      Rapns::Daemon::Feeder.stop
-      Rapns::Daemon.handler_pool.drain if Rapns::Daemon.handler_pool
-      Rapns::Daemon.receiver_pool.drain if Rapns::Daemon.receiver_pool
+      Feeder.stop
+      AppRunner.stop
       delete_pid_file
     end
 

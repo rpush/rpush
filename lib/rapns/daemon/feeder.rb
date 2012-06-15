@@ -27,11 +27,7 @@ module Rapns
         begin
           with_database_reconnect_and_retry do
             Rapns::Notification.ready_for_delivery.each do |notification|
-              if queue = Rapns::Daemon.queues[notification.app]
-                queue.push(notification) if queue.notifications_processed?
-              else
-                Rapns::Daemon.logger.error("No such app '#{notification.app}' for notification #{notification.id}.")
-              end
+              Rapns::Daemon::AppRunner.deliver(notification)
             end
           end
         rescue StandardError => e

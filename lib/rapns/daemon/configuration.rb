@@ -52,10 +52,6 @@ module Rapns
 
       protected
 
-      def rapns_root
-        File.join(Rails.root, 'config', 'rapns')
-      end
-
       def read_config
         ensure_config_exists
         File.open(@config_path) { |fd| YAML.load(fd) }

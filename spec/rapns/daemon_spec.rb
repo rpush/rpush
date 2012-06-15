@@ -5,29 +5,18 @@ describe Rapns::Daemon, "when starting" do
 
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:app) { stub(:key => 'my_app', :certificate => certificate, :password => password, :connections => 3) }
   let(:feedback_config) { stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60) }
   let(:push_config) { stub(:poll => 2, :host => 'gateway.push.apple.com', :port => 2195) }
   let(:configuration) { stub(:pid_file => nil, :push => push_config, :airbrake_notify => false,
     :feedback => feedback_config) }
-  let(:handler_pool) { stub(:<< => nil) }
-  let(:queue) { stub }
-  let(:delivery_handler) { stub }
-  let(:receiver) { stub }
-  let(:receiver_pool) { stub(:<< => nil) }
   let(:logger) { stub(:info => nil, :error => nil) }
 
   before do
     Rapns::Daemon::Configuration.stub(:load).and_return(configuration)
-    Rapns::Daemon::DeliveryHandlerPool.stub(:new).and_return(handler_pool)
-    Rapns::Daemon::FeedbackReceiverPool.stub(:new).and_return(receiver_pool)
-    Rapns::Daemon::DeliveryQueue.stub(:new).and_return(queue)
-    Rapns::Daemon::FeedbackReceiver.stub(:new => receiver)
-    Rapns::Daemon::DeliveryHandler.stub(:new => delivery_handler)
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon::Logger.stub(:new).and_return(logger)
-    Rapns::Daemon.stub(:daemonize, :reconnect_database)
-    Rapns::App.stub(:where => [app])
+    Rapns::Daemon::AppRunner.stub(:sync => nil, :stop => nil)
+    Rapns::Daemon.stub(:daemonize => nil, :reconnect_database => nil, :exit => nil, :puts => nil)
     File.stub(:open)
     Rails.stub(:root).and_return("/rails_root")
   end
@@ -36,22 +25,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon::Configuration.should_receive(:load).with("development", "/rails_root/config/rapns/rapns.yml")
     Rapns::Daemon.start("development", {})
   end
-
-  it "makes the configuration accessible" do
-    Rapns::Daemon.start("development", true)
-    Rapns::Daemon.configuration.should == configuration
-  end
-
-  it "makes the delivery handler pool accessible" do
-    Rapns::Daemon.start("development", {})
-    Rapns::Daemon.handler_pool.should == handler_pool
-  end
-
-  it "makes the feedback receiver pool accessible" do
-    Rapns::Daemon.start("development", {})
-    Rapns::Daemon.receiver_pool.should == receiver_pool
-  end
-
+  
   it "forks into a daemon if the foreground option is false" do
     ActiveRecord::Base.stub(:establish_connection)
     Rapns::Daemon.should_receive(:daemonize)
@@ -80,6 +54,11 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start("development", true)
   end
 
+  it "syncs apps" do
+    Rapns::Daemon::AppRunner.should_receive(:sync).with('development')
+    Rapns::Daemon.start("development", true)
+  end
+
   it "sets up the logger" do
     configuration.stub(:airbrake_notify => true)
     Rapns::Daemon::Logger.should_receive(:new).with(:foreground => true, :airbrake_notify => true)
@@ -91,40 +70,8 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.logger.should == logger
   end
 
-  it 'starts all apps for the environment' do
-    Rapns::App.should_receive(:where).with(:environment => 'development')
-    Rapns::Daemon.start("development", true)
-  end
-
-  it 'instantiates app delivery handlers' do
-    Rapns::Daemon::DeliveryHandler.should_receive(:new).with(queue, "my_app:0", configuration.push.host,
-      configuration.push.port, app.certificate, app.password)
-    Rapns::Daemon.start("development", true)
-  end
-
-  it 'starts a delivery handler for each connection' do
-    Rapns::Daemon::DeliveryHandler.should_receive(:new).exactly(3).times
-    Rapns::Daemon.start("development", true)
-  end
-
-  it 'adds the delivery handler to the pool' do
-    handler_pool.should_receive(:<<).with(delivery_handler)
-    Rapns::Daemon.start("development", true)
-  end
-
-  it 'starts a feedback receiver for each app' do
-    Rapns::Daemon::FeedbackReceiver.should_receive(:new).with('my_app', configuration.feedback.host, configuration.feedback.port,
-      configuration.feedback.poll, app.certificate, app.password)
-    Rapns::Daemon.start("development", true)
-  end
-
-  it 'adds the feedback receiver to the pool' do
-    receiver_pool.should_receive(:<<).with(receiver)
-    Rapns::Daemon.start("development", true)
-  end
-
   it 'prints a warning exists if there are no apps for the environment' do
-    Rapns::App.stub(:where => [])
+    Rapns::App.stub(:count => 0)
     Rapns::Daemon.should_receive(:puts).any_number_of_times
     Rapns::Daemon.should_receive(:exit).with(1)
     Rapns::Daemon.start("development", true)
@@ -140,15 +87,11 @@ end
 
 describe Rapns::Daemon, "when being shutdown" do
   let(:configuration) { stub(:pid_file => '/rails_root/rapns.pid') }
-  let(:handler_pool) { stub(:drain => nil) }
-  let(:receiver_pool) { stub(:drain => nil) }
 
   before do
+    Rapns::Daemon.stub(:configuration => configuration, :puts => nil)
     Rapns::Daemon::Feeder.stub(:stop)
-    Rapns::Daemon.stub(:handler_pool).and_return(handler_pool)
-    Rapns::Daemon.stub(:receiver_pool).and_return(receiver_pool)
-    Rapns::Daemon.stub(:configuration).and_return(configuration)
-    Rapns::Daemon.stub(:puts)
+    Rapns::Daemon::AppRunner.stub(:stop)
   end
 
   it "stops the feeder" do
@@ -156,25 +99,8 @@ describe Rapns::Daemon, "when being shutdown" do
     Rapns::Daemon.send(:shutdown)
   end
 
-  it "drains the delivery handler pool" do
-    handler_pool.should_receive(:drain)
-    Rapns::Daemon.send(:shutdown)
-  end
-
-  it "does not attempt to drain the delivery handler pool if it has not been initialized" do
-    Rapns::Daemon.stub(:handler_pool).and_return(nil)
-    handler_pool.should_not_receive(:drain)
-    Rapns::Daemon.send(:shutdown)
-  end
-
-  it "drains the feedback receiver pool" do
-    receiver_pool.should_receive(:drain)
-    Rapns::Daemon.send(:shutdown)
-  end
-
-  it "does not attempt to drain the delivery handler pool if it has not been initialized" do
-    Rapns::Daemon.stub(:receiver_pool).and_return(nil)
-    receiver_pool.should_not_receive(:drain)
+  it "stops the app runners" do
+    Rapns::Daemon::AppRunner.should_receive(:stop)
     Rapns::Daemon.send(:shutdown)
   end
 
