@@ -71,6 +71,8 @@ module Rapns
     def self.setup_signal_hooks(environment)
       @shutting_down = false
 
+      Signal.trap('SIGHUP') { AppRunner.sync(environment) }
+
       ['SIGINT', 'SIGTERM'].each do |signal|
         Signal.trap(signal) { handle_shutdown_signal }
       end

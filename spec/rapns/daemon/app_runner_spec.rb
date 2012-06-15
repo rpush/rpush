@@ -59,6 +59,25 @@ describe Rapns::Daemon::AppRunner do
       runner.stop
     end
   end
+
+  describe 'sync' do
+    let(:new_app) { stub(:key => 'app', :certificate => 'cert', :password => '', :connections => 1) }
+    before { runner.start }
+
+    it 'reduces the number of handlers if needed' do
+      handler.should_receive(:stop)
+      new_app.stub(:connections => app.connections - 1)
+      runner.sync(new_app)
+    end
+
+    it 'increases the number of hadlers if needed' do
+      new_handler = stub
+      Rapns::Daemon::DeliveryHandler.should_receive(:new).and_return(new_handler)
+      new_handler.should_receive(:start)
+      new_app.stub(:connections => app.connections + 1)
+      runner.sync(new_app)
+    end
+  end
 end
 
 describe Rapns::Daemon::AppRunner, 'stop' do

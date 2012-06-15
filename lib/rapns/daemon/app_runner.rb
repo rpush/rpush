@@ -55,11 +55,7 @@ module Rapns
         @feedback_receiver = FeedbackReceiver.new(@app.key, @feedback_host, @feedback_port, @feedback_poll, @app.certificate, @app.password)
         @feedback_receiver.start
 
-        @app.connections.times do
-          handler = DeliveryHandler.new(@queue, @app.key, @push_host, @push_port, @app.certificate, @app.password)
-          handler.start
-          @handlers << handler
-        end
+        @app.connections.times { @handlers << start_handler }
       end
 
       def deliver(notification)
@@ -70,6 +66,24 @@ module Rapns
       def stop
         @handlers.map(&:stop)
         @feedback_receiver.stop if @feedback_receiver
+      end
+
+      def sync(app)
+        @app = app
+        diff = @handlers.size - app.connections
+        if diff > 0
+          diff.times { @handlers.pop.stop }
+        else
+          diff.abs.times { @handlers << start_handler }
+        end
+      end
+
+      protected
+
+      def start_handler
+        handler = DeliveryHandler.new(@queue, @app.key, @push_host, @push_port, @app.certificate, @app.password)
+        handler.start
+        handler
       end
     end
 	end
