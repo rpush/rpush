@@ -2,8 +2,6 @@ require 'thread'
 require 'socket'
 require 'pathname'
 
-require 'rapns/daemon/core_ext/queue'
-
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/configuration'
 require 'rapns/daemon/delivery_error'

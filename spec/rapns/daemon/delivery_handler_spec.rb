@@ -94,14 +94,14 @@ describe Rapns::Daemon::DeliveryHandler do
   describe "when being stopped" do
     before { queue.pop }
 
-    it "closes the connection when a Queue::WakeupError if raised" do
+    it "closes the connection when a DeliveryQueue::WakeupError is raised" do
       connection.should_receive(:close)
-      queue.stub(:pop).and_raise(Queue::WakeupError)
+      queue.stub(:pop).and_raise(Rapns::Daemon::DeliveryQueue::WakeupError)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "does not attempt to deliver a notification when a Queue::WakeupError is raised" do
-      queue.stub(:pop).and_raise(Queue::WakeupError)
+    it "does not attempt to deliver a notification when a DeliveryQueue::::WakeupError is raised" do
+      queue.stub(:pop).and_raise(Rapns::Daemon::DeliveryQueue::WakeupError)
       delivery_handler.should_not_receive(:deliver)
       delivery_handler.send(:handle_next_notification)
     end
