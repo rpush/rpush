@@ -34,7 +34,7 @@ describe Rapns::Daemon::Logger do
   end
 
   it "should open the a log file in the Rails log directory" do
-    File.should_receive(:open).with("/rails_root/log/rapns.log")
+    File.should_receive(:open).with('/rails_root/log/rapns.log', 'w')
     Rapns::Daemon::Logger.new(:foreground => true)
   end
 
