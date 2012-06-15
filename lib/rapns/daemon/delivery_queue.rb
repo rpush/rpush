@@ -23,6 +23,10 @@ module Rapns
       def notifications_processed?
         @mutex.synchronize { @num_notifications == 0 }
       end
+
+      def size
+        @queue.size
+      end
     end
   end
 end

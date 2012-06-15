@@ -44,6 +44,10 @@ module Rapns
         @all.values.map(&:stop)
       end
 
+      def self.debug
+        @all.values.map(&:debug)
+      end
+
       def initialize(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
         @app = app
         @push_host = push_host
@@ -85,6 +89,10 @@ module Rapns
 
       def ready?
         @queue.notifications_processed?
+      end
+
+      def debug
+        Rapns::Daemon.logger.info("#{@app.key}:\n\thandlers: #{@handlers.size}\n\tbacklog: #{@queue.size}")
       end
 
       protected
