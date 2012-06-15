@@ -4,6 +4,7 @@
 
 * Works with Rails 3 and Ruby 1.9 & 1.8.
 * Supports multiple iOS apps.
+* [Add & remove apps](#hot-app-updates) without restarting or affecting the delivery of notifications to other apps.
 * Uses a daemon process to keep open a persistent connection to the APNs, as recommended by Apple.
 * Uses the enhanced binary format so that [delivery errors can be reported](#delivery-failures).
 * Records feedback from [The Feedback Service](#delivery-failures).
@@ -84,6 +85,12 @@ You will need to create an app for each environment.
 ### Options
 
 * `--foreground` will prevent rapns from forking into a daemon.
+
+## Hot App Updates
+
+If you signal the rapns process with `HUP` it will synchronize with the current Rapns::App configurations. This includes adding an app, removing and increasing/decreasing the number of connections an app uses.
+
+This synchronization process does not pause the delivery of notifications to other apps.
 
 ## Logging
 
