@@ -8,7 +8,7 @@ describe Rapns::Daemon::DeliveryHandler do
   let(:certificate) { stub }
   let(:password) { stub }
   let(:delivery_handler) { Rapns::Daemon::DeliveryHandler.new(queue, name, host, port, certificate, password) }
-  let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil) }
+  let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:notification) { stub.as_null_object }
   let(:configuration) { stub(:check_for_errors => true) }
@@ -31,8 +31,11 @@ describe Rapns::Daemon::DeliveryHandler do
     delivery_handler.stop
   end
 
-  it "pushes a STOP instruction into the queue when told to stop" do
-    queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::STOP)
+  it "instructs the queue to wakeup the thread when told to stop" do
+    thread = stub
+    Thread.stub(:new => thread)
+    queue.should_receive(:wakeup).with(thread)
+    delivery_handler.start
     delivery_handler.stop
   end
 
@@ -91,14 +94,14 @@ describe Rapns::Daemon::DeliveryHandler do
   describe "when being stopped" do
     before { queue.pop }
 
-    it "closes the connection when a STOP instruction is received" do
+    it "closes the connection when a Queue::WakeupError if raised" do
       connection.should_receive(:close)
-      queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+      queue.stub(:pop).and_raise(Queue::WakeupError)
       delivery_handler.send(:handle_next_notification)
     end
 
-    it "does not attempt to deliver a notification when a STOP instruction is received" do
-      queue.push(Rapns::Daemon::DeliveryHandler::STOP)
+    it "does not attempt to deliver a notification when a Queue::WakeupError is raised" do
+      queue.stub(:pop).and_raise(Queue::WakeupError)
       delivery_handler.should_not_receive(:deliver)
       delivery_handler.send(:handle_next_notification)
     end

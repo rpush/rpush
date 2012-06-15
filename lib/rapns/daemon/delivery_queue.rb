@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class DeliveryQueue
+      delegate :wakeup, :size, :to => :@queue
+
       def initialize
         @mutex = Mutex.new
         @num_notifications = 0
@@ -22,10 +24,6 @@ module Rapns
 
       def notifications_processed?
         @mutex.synchronize { @num_notifications == 0 }
-      end
-
-      def size
-        @queue.size
       end
     end
   end

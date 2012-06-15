@@ -3,7 +3,6 @@ module Rapns
     class DeliveryHandler
       include DatabaseReconnectable
 
-      STOP = 0x666
       SELECT_TIMEOUT = 0.2
       ERROR_TUPLE_BYTES = 6
       APN_ERRORS = {
@@ -29,7 +28,7 @@ module Rapns
       def start
         @connection.connect
 
-        Thread.new do
+        @thread = Thread.new do
           loop do
             break if @stop
             handle_next_notification
@@ -39,7 +38,7 @@ module Rapns
 
       def stop
         @stop = true
-        @queue.push(STOP)
+        @queue.wakeup(@thread)
       end
 
       protected
@@ -97,9 +96,9 @@ module Rapns
       end
 
       def handle_next_notification
-        notification = @queue.pop
-
-        if notification == STOP
+        begin
+          notification = @queue.pop
+        rescue Queue::WakeupError
           @connection.close
           return
         end
