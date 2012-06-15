@@ -49,12 +49,12 @@ Generate the migration, rapns.yml and migrate:
     app.environment = "development"
     app.certificate = File.read("/path/to/development.pem")
     app.password = "certificate password"
-    app.connections = 2
+    app.connections = 1
     app.save!
 
 * `certificate` is the contents of your PEM certificate, NOT its path on disk.
 * `password` should be left blank if you did not password protect your certificate.
-* `connections` (default: 2) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications to this app.
+* `connections` (default: 1) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications to this app.
 
 You will need to create an app for each environment.
 
