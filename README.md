@@ -46,17 +46,17 @@ Generate the migration, rapns.yml and migrate:
 
     app = Rapns::App.new
     app.key = "my_app"
-    app.environment = "development"
     app.certificate = File.read("/path/to/development.pem")
     app.password = "certificate password"
     app.connections = 1
     app.save!
 
+* `key` is a symbolic name to tie this app to notifications.
 * `certificate` is the contents of your PEM certificate, NOT its path on disk.
 * `password` should be left blank if you did not password protect your certificate.
-* `connections` (default: 1) the number of connections to keep open to the APNs. Consider increasing this if you are sending a very large number of notifications to this app.
+* `connections` (default: 1) the number of connections to keep open to the APNs. Consider increasing this if you are sending a large number of notifications to this app.
 
-You will need to create an app for each environment.
+The APNs environment is automatically detected from the app certificate, you do not need to configure push and feedback hosts.
 
 ## Starting the rapns Daemon
 
@@ -105,13 +105,9 @@ If you want to use rapns in environments other than development or production, y
 ### Options
 
 * `push` this section contains options to configure the delivery of notifications.
-    * `host` the APNs host to connect to, either `gateway.push.apple.com` or `gateway.sandbox.push.apple.com`.
-    * `port` the APNs port. Currently `2195` for both hosts.
     * `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
 
 * `feedback` this section contains options to configure feedback checking.
-    * `host` the APNs host to connect to, either `feedback.push.apple.com` or `feedback.sandbox.push.apple.com`.
-    * `port` the APNs port. Currently `2196` for both hosts.
     * `poll` (default: 60) Frequency in seconds to check for new feedback.
 
 * `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.

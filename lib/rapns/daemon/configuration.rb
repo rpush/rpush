@@ -18,8 +18,8 @@ module Rapns
         @environment = environment
         @config_path = config_path
 
-        self.push = Struct.new(:host, :port, :poll).new
-        self.feedback = Struct.new(:host, :port, :poll).new
+        self.push = Struct.new(:poll).new
+        self.feedback = Struct.new(:poll).new
       end
 
       def load
@@ -33,14 +33,10 @@ module Rapns
       end
 
       def load_push(config)
-        set_variable(push, :push, :host, config)
-        set_variable(push, :push, :port, config)
         set_variable(push, :push, :poll, config, :optional => true, :default => 2)
       end
 
       def load_feedback(config)
-        set_variable(feedback, :feedback, :host, config)
-        set_variable(feedback ,:feedback, :port, config)
         set_variable(feedback, :feedback, :poll, config, :optional => true, :default => 60)
       end
 

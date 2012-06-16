@@ -25,7 +25,7 @@ module Rapns
     end
 
     def self.start(environment, foreground)
-      setup_signal_hooks(environment)
+      setup_signal_hooks
 
       self.configuration = Configuration.load(environment, File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
       self.logger = Logger.new(:foreground => foreground, :airbrake_notify => configuration.airbrake_notify)
@@ -36,18 +36,18 @@ module Rapns
       end
 
       write_pid_file
-      ensure_upgraded(environment)
-      AppRunner.sync(environment)
+      ensure_upgraded
+      AppRunner.sync
       Feeder.start(configuration.push.poll)
     end
 
     protected
 
-    def self.ensure_upgraded(environment)
+    def self.ensure_upgraded
       count = 0
 
       begin
-        count = Rapns::App.count(:conditions => { :environment => environment })
+        count = Rapns::App.count
       rescue ActiveRecord::StatementInvalid
         puts "!!!! RAPNS NOT STARTED !!!!"
         puts
@@ -61,17 +61,17 @@ module Rapns
       if count == 0
         puts "!!!! RAPNS NOT STARTED !!!!"
         puts
-        puts "You must create an app for environment '#{environment}'."
+        puts "You must create an Rapns::App."
         puts "See https://github.com/ileitch/rapns for instructions."
         puts
         exit 1
       end
     end
 
-    def self.setup_signal_hooks(environment)
+    def self.setup_signal_hooks
       @shutting_down = false
 
-      Signal.trap('SIGHUP') { AppRunner.sync(environment) }
+      Signal.trap('SIGHUP') { AppRunner.sync }
       Signal.trap('SIGUSR1') { AppRunner.debug }
 
       ['SIGINT', 'SIGTERM'].each do |signal|

@@ -5,8 +5,8 @@ describe Rapns::Daemon, "when starting" do
 
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:feedback_config) { stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60) }
-  let(:push_config) { stub(:poll => 2, :host => 'gateway.push.apple.com', :port => 2195) }
+  let(:feedback_config) { stub(:poll => 60) }
+  let(:push_config) { stub(:poll => 2) }
   let(:configuration) { stub(:pid_file => nil, :push => push_config, :airbrake_notify => false,
     :feedback => feedback_config) }
   let(:logger) { stub(:info => nil, :error => nil) }
@@ -55,7 +55,7 @@ describe Rapns::Daemon, "when starting" do
   end
 
   it "syncs apps" do
-    Rapns::Daemon::AppRunner.should_receive(:sync).with('development')
+    Rapns::Daemon::AppRunner.should_receive(:sync)
     Rapns::Daemon.start("development", true)
   end
 
@@ -70,7 +70,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.logger.should == logger
   end
 
-  it 'prints a warning exists if there are no apps for the environment' do
+  it 'prints a warning exists if there are no apps' do
     Rapns::App.stub(:count => 0)
     Rapns::Daemon.should_receive(:puts).any_number_of_times
     Rapns::Daemon.should_receive(:exit).with(1)

@@ -1,6 +1,17 @@
 module Rapns
 	module Daemon
     class AppRunner
+      HOSTS = {
+        :production => {
+          :push => ['gateway.push.apple.com', 2195],
+          :feedback => ['feedback.push.apple.com', 2196]
+        },
+        :development => {
+          :push => ['gateway.sandbox.push.apple.com', 2195],
+          :feedback => ['feedback.sandbox.push.apple.com', 2196]
+        }
+      }
+
       class << self
         attr_reader :all
       end
@@ -21,16 +32,18 @@ module Rapns
         end
       end
 
-      def self.sync(environment)
-        apps = Rapns::App.where(:environment => environment)
-
+      def self.sync
+        apps = Rapns::App.all
         apps.each do |app|
           if @all[app.key]
             @all[app.key].sync(app)
           else
-            push = Rapns::Daemon.configuration.push
+            environment = detect_environment(app)
+            next unless environment
+            push_host, push_port = HOSTS[environment][:push]
+            feedback_host, feedback_port = HOSTS[environment][:feedback]
             feedback = Rapns::Daemon.configuration.feedback
-            runner = AppRunner.new(app, push.host, push.port, feedback.host, feedback.port, feedback.poll)
+            runner = AppRunner.new(app, push_host, push_port, feedback_host, feedback_port, feedback.poll)
             runner.start
             @all[app.key] = runner
           end
@@ -46,6 +59,17 @@ module Rapns
 
       def self.debug
         @all.values.map(&:debug)
+      end
+
+      def self.detect_environment(app)
+        if app.certificate =~ /Apple Development IOS Push Services/i
+          :development
+        elsif app.certificate =~ /Apple Production IOS Push Services/i
+          :production
+        else
+          Rapns::Daemon.logger.error("Could not detect environment for app '#{app.key}'.")
+          nil
+        end
       end
 
       def initialize(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)

@@ -9,14 +9,10 @@ describe Rapns::Daemon::Configuration do
       "airbrake_notify" => false,
       "pid_file" => "rapns.pid",
       "push" => {
-        "port" => 123,
-        "host" => "localhost",
-        "poll" => 4,
+        "poll" => 4
       },
       "feedback" => {
-        "port" => 123,
-        "host" => "localhost",
-        "poll" => 30,
+        "poll" => 30
       }
     }
   end
@@ -56,42 +52,6 @@ describe Rapns::Daemon::Configuration do
     configuration = Rapns::Daemon::Configuration.new("development", "/some/config.yml")
     configuration.stub(:read_config).and_return({"production" => {}})
     expect { configuration.load }.to raise_error(Rapns::ConfigurationError, "Configuration for environment 'development' not defined in /some/config.yml")
-  end
-
-  it "raises an error if the push host is not configured" do
-    config["push"]["host"] = nil
-    expect { configuration }.to raise_error(Rapns::ConfigurationError, "'push.host' not defined for environment 'production' in /some/config.yml. You may need to run 'rails g rapns' after updating.")
-  end
-
-  it "raises an error if the push port is not configured" do
-    config["push"]["port"] = nil
-    expect { configuration }.to raise_error(Rapns::ConfigurationError, "'push.port' not defined for environment 'production' in /some/config.yml. You may need to run 'rails g rapns' after updating.")
-  end
-
-  it "raises an error if the feedback host is not configured" do
-    config["feedback"]["host"] = nil
-    expect { configuration }.to raise_error(Rapns::ConfigurationError, "'feedback.host' not defined for environment 'production' in /some/config.yml. You may need to run 'rails g rapns' after updating.")
-  end
-
-  it "raises an error if the feedback port is not configured" do
-    config["feedback"]["port"] = nil
-    expect { configuration }.to raise_error(Rapns::ConfigurationError, "'feedback.port' not defined for environment 'production' in /some/config.yml. You may need to run 'rails g rapns' after updating.")
-  end
-
-  it "sets the push host" do
-    configuration.push.host.should == "localhost"
-  end
-
-  it "sets the push port" do
-    configuration.push.port.should == 123
-  end
-
-  it "sets the feedback port" do
-    configuration.feedback.port.should == 123
-  end
-
-  it "sets the feedback host" do
-    configuration.feedback.host.should == "localhost"
   end
 
   it "sets the airbrake notify flag" do

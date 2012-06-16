@@ -144,40 +144,65 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   let(:new_app) { stub(:key => 'new_app') }
   let(:runner) { stub(:sync => nil, :stop => nil) }
   let(:new_runner) { stub }
-  let(:push_config) { stub(:host => 'gateway.push.apple.com', :port => 2195) }
-  let(:feedback_config) { stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60) }
-  let(:configuration) { stub(:push => push_config, :feedback => feedback_config) }
+  let(:logger) { stub(:error => nil) }
+  let(:feedback_config) { stub(:poll => 60) }
+  let(:configuration) { stub(:feedback => feedback_config) }
 
   before do
-    Rapns::Daemon.stub(:configuration => configuration)
+    Rapns::Daemon.stub(:configuration => configuration, :logger => logger)
     Rapns::Daemon::AppRunner.all['app'] = runner
-    Rapns::App.stub(:where => [app])
+    Rapns::App.stub(:all => [app])
   end
 
   after { Rapns::Daemon::AppRunner.all.clear }
 
-  it 'loads apps for the given environment' do
-    Rapns::App.should_receive(:where).with(:environment => 'development')
-    Rapns::Daemon::AppRunner.sync('development')
+  it 'loads all apps' do
+    Rapns::App.should_receive(:all)
+    Rapns::Daemon::AppRunner.sync
   end
 
   it 'instructs existing runners to sync' do
     runner.should_receive(:sync).with(app)
-    Rapns::Daemon::AppRunner.sync('development')
+    Rapns::Daemon::AppRunner.sync
   end
 
-  it 'starts a runner for a new app' do
-    Rapns::App.stub(:where => [new_app])
+it 'starts a runner for a new app with a production certificate' do
+    new_app.stub(:certificate => 'Apple Production IOS Push Services')
+    Rapns::App.stub(:all => [new_app])
     new_runner = stub 
-    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, push_config.host, push_config.port,
-      feedback_config.host, feedback_config.port, feedback_config.poll).and_return(new_runner)
+    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.push.apple.com', 2195,
+      'feedback.push.apple.com', 2196, feedback_config.poll).and_return(new_runner)
     new_runner.should_receive(:start)
-    Rapns::Daemon::AppRunner.sync('development')
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  it 'starts a runner for a new app with a development certificate' do
+    new_app.stub(:certificate => 'Apple Development IOS Push Services')
+    Rapns::App.stub(:all => [new_app])
+    new_runner = stub 
+    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.sandbox.push.apple.com', 2195,
+      'feedback.sandbox.push.apple.com', 2196, feedback_config.poll).and_return(new_runner)
+    new_runner.should_receive(:start)
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  it 'logs an error if the environment cannot be determined from the certificate' do
+    new_app.stub(:certificate => 'wat')
+    Rapns::App.stub(:all => [new_app])
+    Rapns::Daemon.logger.should_receive(:error).with("Could not detect environment for app 'new_app'.")
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  it 'does not attempt to start an AppRunner if the environment could not be detected' do
+    new_app.stub(:certificate => 'wat')
+    Rapns::App.stub(:all => [new_app])
+    Rapns::Daemon::AppRunner.should_not_receive(:new) 
+    Rapns::Daemon::AppRunner.sync
   end
 
   it 'deletes old apps' do
-    Rapns::App.stub(:where => [])
+    Rapns::App.stub(:all => [])
     runner.should_receive(:stop)
-    Rapns::Daemon::AppRunner.sync('development')
+    Rapns::Daemon::AppRunner.sync
   end
 end
