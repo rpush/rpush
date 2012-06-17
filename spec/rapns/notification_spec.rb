@@ -159,3 +159,25 @@ describe Rapns::Notification, "bug #35" do
     notification.should be_valid
   end
 end
+
+describe Rapns::Notification, "after save" do
+  let(:notification) do
+    notification = Rapns::Notification.new
+    notification.device_token = "a" * 64
+    notification
+  end
+
+  before { notification.connection.stub(:execute => nil) }
+
+  it 'notifies the channel if using PostgreSQL' do
+    notification.connection.stub(:adapter_name => 'PostgreSQL')
+    notification.connection.should_receive(:execute).with('NOTIFY rapns')
+    notification.save!
+  end
+
+  it 'does not attempt to notify the channel if not using PostgreSQL' do
+    notification.connection.stub(:adapter_name => 'MySQL')
+    notification.connection.should_not_receive(:execute).with('NOTIFY rapns')
+    notification.save!
+  end
+end

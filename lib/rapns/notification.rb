@@ -1,5 +1,7 @@
 module Rapns
   class Notification < ActiveRecord::Base
+    NOTIFY_CHANNEL = 'rapns'
+
     self.table_name = 'rapns_notifications'
 
     validates :device_token, :presence => true
@@ -10,6 +12,8 @@ module Rapns
     validates_with Rapns::BinaryNotificationValidator
 
     scope :ready_for_delivery, lambda { where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, Time.now) }
+
+    after_save :notify
 
     def device_token=(token)
       write_attribute(:device_token, token.delete(" <>")) if !token.nil?
@@ -82,6 +86,12 @@ module Rapns
     def to_binary(options = {})
       id_for_pack = options[:for_validation] ? 0 : id
       [1, id_for_pack, expiry, 0, 32, device_token, 0, payload_size, payload].pack("cNNccH*cca*")
+    end
+
+    protected
+
+    def notify
+      connection.execute("NOTIFY #{NOTIFY_CHANNEL}") if connection.adapter_name == 'PostgreSQL'
     end
   end
 end

@@ -31,6 +31,7 @@ module Rapns
             sleep_to_avoid_thrashing
           end
         end
+        reconnected if respond_to?(:reconnected)
         Rapns::Daemon.logger.warn("[#{name}] Database reconnected")
       end
 
