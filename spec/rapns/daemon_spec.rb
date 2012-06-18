@@ -76,6 +76,12 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.should_receive(:exit).with(1)
     Rapns::Daemon.start("development", config)
   end
+
+  it 'warns if rapns.yml still exists' do
+    File.should_receive(:exists?).with('/rails_root/config/rapns/rapns.yml').and_return(true)
+    logger.should_receive(:warn).with("Since 2.0.0 rapns uses command-line options instead of a configuration file. Please remove config/rapns/rapns.yml.")
+    Rapns::Daemon.start("development", config)
+  end
 end
 
 describe Rapns::Daemon, "when being shutdown" do

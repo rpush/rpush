@@ -64,6 +64,10 @@ module Rapns
         puts
         exit 1
       end
+
+      if File.exists?(File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
+        logger.warn("Since 2.0.0 rapns uses command-line options instead of a configuration file. Please remove config/rapns/rapns.yml.")
+      end
     end
 
     def self.setup_signal_hooks
