@@ -28,7 +28,7 @@ ARGV.options do |opts|
   opts.parse!
 end
 
-if environment.nil?
+if environment.nil? || environment =~ /^-/
   puts banner
   exit 1
 end
