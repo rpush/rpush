@@ -66,12 +66,12 @@ The APNs environment is automatically detected from the app certificate, you do 
 ### Options
 
 * `-f` `--foreground` Prevent rapns from forking into a daemon.
-* '-P N' '--db-poll N' Frequency in seconds to check for new notifications. Default: 2.
-* '-F N' '--feedback-poll N' Frequency in seconds to check for feedback. Default: 60.
-* '-e' '--no-error-checks' Disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.
-* '-n' '--no-airbrake-notify' Disables error notifications via Airbrake.
-* '-p PATH' '--pid-file PATH' Path to write PID file. Relative to Rails root unless absolute.
-* '-b N' '--batch-size N' ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint. Default: 5000.
+* `-P N` `--db-poll N` Frequency in seconds to check for new notifications. Default: 2.
+* `-F N` `--feedback-poll N` Frequency in seconds to check for feedback. Default: 60.
+* `-e` `--no-error-checks` Disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.
+* `-n` `--no-airbrake-notify` Disables error notifications via Airbrake.
+* `-p PATH` `--pid-file PATH` Path to write PID file. Relative to Rails root unless absolute.
+* `-b N` `--batch-size N` ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint. Default: 5000.
 
 ## Sending a Notification
 
