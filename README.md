@@ -61,11 +61,17 @@ The APNs environment is automatically detected from the app certificate, you do 
 ## Starting the rapns Daemon
 
     cd /path/to/rails/app
-    bundle exec rapns <Rails environment>
+    bundle exec rapns <Rails environment> [options]
     
 ### Options
 
-* `--foreground` will prevent rapns from forking into a daemon.
+* `-f` `--foreground` Prevent rapns from forking into a daemon.
+* '-P N' '--db-poll N' Frequency in seconds to check for new notifications. Default: 2.
+* '-F N' '--feedback-poll N' Frequency in seconds to check for feedback. Default: 60.
+* '-e' '--no-error-checks' Disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.
+* '-n' '--no-airbrake-notify' Disables error notifications via Airbrake.
+* '-p PATH' '--pid-file PATH' Path to write PID file. Relative to Rails root unless absolute.
+* '-b N' '--batch-size N' ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint. Default: 5000.
 
 ## Sending a Notification
 
@@ -95,28 +101,6 @@ The APNs environment is automatically detected from the app certificate, you do 
 ### Assigning a Hash to alert
 
 Please refer to Apple's [documentation](http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html#//apple_ref/doc/uid/TP40008194-CH100-SW1) (Tables 3-1 and 3-2).
-
-## Configuration
-
-Environment configuration lives in `config/rapns/rapns.yml`. For common setups you probably wont need to change this file.
-
-If you want to use rapns in environments other than development or production, you will need to create an entry for it. Simply duplicate the configuration for development or production, depending on which iOS Push Certificate you wish to use.
-
-### Options
-
-* `push` this section contains options to configure the delivery of notifications.
-    * `poll` (default: 2) Frequency in seconds to check for new notifications to deliver.
-
-* `feedback` this section contains options to configure feedback checking.
-    * `poll` (default: 60) Frequency in seconds to check for new feedback.
-
-* `airbrake_notify` (default: true) Enables/disables error notifications via Airbrake.
-* `pid_file` (default: blank) the file that rapns will write its process ID to. Paths are relative to your project's RAILS_ROOT unless an absolute path is given.
-
-#### Advanced Options
-
-* `check_for_errors` (default: true) Enables/disables [error checking](#immediately-when-processing-a-notification-for-delivery) after notification delivery. You may want to disable this if you are sending a very high number of notifications.   
-* `feeder_batch_size` (default: 5000) Sets the ActiveRecord batch size of notifications. Increase for possible higher throughput but higher memory footprint.
 
 ## Hot App Updates
 
@@ -153,7 +137,7 @@ It is your responsibility to avoid creating new notifications for devices that n
 
 ## Updating rapns
 
-After updating you should run `rails g rapns` to check for any new migrations or configuration changes.
+After updating you should run `rails g rapns` to check for any new migrations.
 
 ## Wiki
 

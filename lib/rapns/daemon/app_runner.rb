@@ -42,8 +42,8 @@ module Rapns
             next unless environment
             push_host, push_port = HOSTS[environment][:push]
             feedback_host, feedback_port = HOSTS[environment][:feedback]
-            feedback = Rapns::Daemon.configuration.feedback
-            runner = AppRunner.new(app, push_host, push_port, feedback_host, feedback_port, feedback.poll)
+            feedback_poll = Rapns::Daemon.config.feedback_poll
+            runner = AppRunner.new(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
             runner.start
             @all[app.key] = runner
           end

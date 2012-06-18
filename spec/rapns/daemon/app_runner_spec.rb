@@ -145,11 +145,10 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   let(:runner) { stub(:sync => nil, :stop => nil) }
   let(:new_runner) { stub }
   let(:logger) { stub(:error => nil) }
-  let(:feedback_config) { stub(:poll => 60) }
-  let(:configuration) { stub(:feedback => feedback_config) }
+  let(:config) { stub(:feedback_poll => 60) }
 
   before do
-    Rapns::Daemon.stub(:configuration => configuration, :logger => logger)
+    Rapns::Daemon.stub(:config => config, :logger => logger)
     Rapns::Daemon::AppRunner.all['app'] = runner
     Rapns::App.stub(:all => [app])
   end
@@ -171,7 +170,7 @@ it 'starts a runner for a new app with a production certificate' do
     Rapns::App.stub(:all => [new_app])
     new_runner = stub 
     Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.push.apple.com', 2195,
-      'feedback.push.apple.com', 2196, feedback_config.poll).and_return(new_runner)
+      'feedback.push.apple.com', 2196, config.feedback_poll).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
   end
@@ -181,7 +180,7 @@ it 'starts a runner for a new app with a production certificate' do
     Rapns::App.stub(:all => [new_app])
     new_runner = stub 
     Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.sandbox.push.apple.com', 2195,
-      'feedback.sandbox.push.apple.com', 2196, feedback_config.poll).and_return(new_runner)
+      'feedback.sandbox.push.apple.com', 2196, config.feedback_poll).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
   end

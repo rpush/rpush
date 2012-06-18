@@ -2,14 +2,14 @@ require "spec_helper"
 
 describe Rapns::Daemon::Feeder do
   let(:poll) { 2 }
-  let(:configuration) { stub(:feeder_batch_size => 5000) }
+  let(:config) { stub(:batch_size => 5000) }
   let(:notification) { Rapns::Notification.create!(:device_token => "a" * 64, :app => 'my_app') }
   let(:logger) { stub }
 
   before do
     Rapns::Daemon::Feeder.stub(:sleep)
     Rapns::Daemon::Feeder.stub(:interruptible_sleep)
-    Rapns::Daemon.stub(:logger => logger, :configuration => configuration)
+    Rapns::Daemon.stub(:logger => logger, :config => config)
     Rapns::Daemon::Feeder.instance_variable_set("@stop", false)
     Rapns::Daemon::AppRunner.stub(:ready => ['my_app'])
     Rapns::Daemon::AppRunner.stub(:ready => ['my_app'])

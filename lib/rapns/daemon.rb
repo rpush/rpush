@@ -3,7 +3,6 @@ require 'socket'
 require 'pathname'
 
 require 'rapns/daemon/interruptible_sleep'
-require 'rapns/daemon/configuration'
 require 'rapns/daemon/delivery_error'
 require 'rapns/daemon/disconnection_error'
 require 'rapns/daemon/connection'
@@ -21,16 +20,15 @@ module Rapns
     extend DatabaseReconnectable
 
     class << self
-      attr_accessor :logger, :configuration
+      attr_accessor :logger, :config
     end
 
-    def self.start(environment, foreground)
+    def self.start(environment, config)
+      self.config = config
+      self.logger = Logger.new(:foreground => config.foreground, :airbrake_notify => config.airbrake_notify)
       setup_signal_hooks
 
-      self.configuration = Configuration.load(environment, File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
-      self.logger = Logger.new(:foreground => foreground, :airbrake_notify => configuration.airbrake_notify)
-
-      unless foreground
+      unless config.foreground
         daemonize
         reconnect_database
       end
@@ -38,7 +36,7 @@ module Rapns
       write_pid_file
       ensure_upgraded
       AppRunner.sync
-      Feeder.start(configuration.push.poll)
+      Feeder.start(config.push_poll)
     end
 
     protected
@@ -106,17 +104,17 @@ module Rapns
     end
 
     def self.write_pid_file
-      if !configuration.pid_file.blank?
+      if !config.pid_file.blank?
         begin
-          File.open(configuration.pid_file, 'w') { |f| f.puts Process.pid }
+          File.open(config.pid_file, 'w') { |f| f.puts Process.pid }
         rescue SystemCallError => e
-          logger.error("Failed to write PID to '#{configuration.pid_file}': #{e.inspect}")
+          logger.error("Failed to write PID to '#{config.pid_file}': #{e.inspect}")
         end
       end
     end
 
     def self.delete_pid_file
-      pid_file = configuration.pid_file
+      pid_file = config.pid_file
       File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
     end
   end

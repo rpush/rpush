@@ -17,10 +17,6 @@ class RapnsGenerator < Rails::Generators::Base
     add_rapns_migration('create_rapns_apps')
   end
 
-  def copy_config
-    copy_file 'rapns.yml', 'config/rapns/rapns.yml'
-  end
-
   protected
 
   def add_rapns_migration(template)
