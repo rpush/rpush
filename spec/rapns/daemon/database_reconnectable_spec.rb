@@ -19,9 +19,6 @@ describe Rapns::Daemon::DatabaseReconnectable do
         raise @error if @calls <= @max_calls
       end
     end
-
-    def reconnected
-    end
   end
 
   let(:adapter_error_class) do
@@ -75,11 +72,6 @@ describe Rapns::Daemon::DatabaseReconnectable do
 
   it "should test out the new connection by performing a count" do
     Rapns::Notification.should_receive(:count)
-    test_double.perform
-  end
-
-  it 'notifies the parent class of a successful reconnection' do
-    test_double.should_receive(:reconnected)
     test_double.perform
   end
 

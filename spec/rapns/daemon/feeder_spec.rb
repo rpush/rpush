@@ -81,43 +81,15 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.stop
   end
 
-  describe 'start - postgresql' do
-    before do
-      Rapns::Notification.connection.stub(:adapter_name => 'PostgreSQL')
-      Rapns::Notification.connection.raw_connection.stub(:wait_for_notify)
-      Rapns::Daemon::Feeder.stub(:loop).and_yield
-    end
-
-    it 'registers the current session as a listener' do
-      Rapns::Notification.connection.should_receive(:execute).with('LISTEN rapns')
-      Rapns::Daemon::Feeder.start(poll)
-    end
-
-    it "enqueues notifications" do
-      Rapns::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
-      Rapns::Daemon::Feeder.start(poll)
-    end
-
-    it "waits for a notify" do
-      Rapns::Notification.connection.raw_connection.should_receive(:wait_for_notify)
-      Rapns::Daemon::Feeder.start(poll)
-    end
+  it "enqueues notifications when started" do
+    Rapns::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
+    Rapns::Daemon::Feeder.stub(:loop).and_yield
+    Rapns::Daemon::Feeder.start(poll)
   end
 
-  describe 'start - mysql' do
-    before do
-      Rapns::Notification.connection.stub(:adapter_name => 'MySQL')
-      Rapns::Daemon::Feeder.stub(:loop).and_yield
-    end
-
-    it "enqueues notifications" do
-      Rapns::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
-      Rapns::Daemon::Feeder.start(poll)
-    end
-
-    it "sleeps for the given period" do
-      Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(poll)
-      Rapns::Daemon::Feeder.start(poll)
-    end
+  it "sleeps for the given period" do
+    Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(poll)
+    Rapns::Daemon::Feeder.stub(:loop).and_yield
+    Rapns::Daemon::Feeder.start(poll)
   end
 end
