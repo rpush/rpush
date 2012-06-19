@@ -140,8 +140,8 @@ describe Rapns::Daemon::AppRunner, 'ready' do
 end
 
 describe Rapns::Daemon::AppRunner, 'sync' do
-  let(:app) { stub(:key => 'app') }
-  let(:new_app) { stub(:key => 'new_app') }
+  let(:app) { stub(:key => 'app', :environment => 'development') }
+  let(:new_app) { stub(:key => 'new_app', :environment => 'development') }
   let(:runner) { stub(:sync => nil, :stop => nil) }
   let(:new_runner) { stub }
   let(:logger) { stub(:error => nil) }
@@ -166,7 +166,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   end
 
 it 'starts a runner for a new app with a production certificate' do
-    new_app.stub(:certificate => 'Apple Production IOS Push Services')
+    new_app.stub(:environment => 'production')
     Rapns::App.stub(:all => [new_app])
     new_runner = stub 
     Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.push.apple.com', 2195,
@@ -176,26 +176,12 @@ it 'starts a runner for a new app with a production certificate' do
   end
 
   it 'starts a runner for a new app with a development certificate' do
-    new_app.stub(:certificate => 'Apple Development IOS Push Services')
+    new_app.stub(:environment => 'development')
     Rapns::App.stub(:all => [new_app])
     new_runner = stub 
     Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.sandbox.push.apple.com', 2195,
       'feedback.sandbox.push.apple.com', 2196, config.feedback_poll).and_return(new_runner)
     new_runner.should_receive(:start)
-    Rapns::Daemon::AppRunner.sync
-  end
-
-  it 'logs an error if the environment cannot be determined from the certificate' do
-    new_app.stub(:certificate => 'wat')
-    Rapns::App.stub(:all => [new_app])
-    Rapns::Daemon.logger.should_receive(:error).with("Could not detect environment for app 'new_app'.")
-    Rapns::Daemon::AppRunner.sync
-  end
-
-  it 'does not attempt to start an AppRunner if the environment could not be detected' do
-    new_app.stub(:certificate => 'wat')
-    Rapns::App.stub(:all => [new_app])
-    Rapns::Daemon::AppRunner.should_not_receive(:new) 
     Rapns::Daemon::AppRunner.sync
   end
 

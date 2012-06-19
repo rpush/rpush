@@ -47,16 +47,16 @@ Generate the migration, rapns.yml and migrate:
     app = Rapns::App.new
     app.key = "my_app"
     app.certificate = File.read("/path/to/development.pem")
+    app.environment = "development"
     app.password = "certificate password"
     app.connections = 1
     app.save!
 
 * `key` is a symbolic name to tie this app to notifications.
 * `certificate` is the contents of your PEM certificate, NOT its path on disk.
+* `environment` the certificate type, either `development` or `production`.
 * `password` should be left blank if you did not password protect your certificate.
 * `connections` (default: 1) the number of connections to keep open to the APNs. Consider increasing this if you are sending a large number of notifications to this app.
-
-The APNs environment is automatically detected from the app certificate, you do not need to configure push and feedback hosts.
 
 ## Starting the rapns Daemon
 

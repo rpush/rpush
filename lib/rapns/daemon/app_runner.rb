@@ -38,10 +38,8 @@ module Rapns
           if @all[app.key]
             @all[app.key].sync(app)
           else
-            environment = detect_environment(app)
-            next unless environment
-            push_host, push_port = HOSTS[environment][:push]
-            feedback_host, feedback_port = HOSTS[environment][:feedback]
+            push_host, push_port = HOSTS[app.environment.to_sym][:push]
+            feedback_host, feedback_port = HOSTS[app.environment.to_sym][:feedback]
             feedback_poll = Rapns::Daemon.config.feedback_poll
             runner = AppRunner.new(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
             runner.start
@@ -59,17 +57,6 @@ module Rapns
 
       def self.debug
         @all.values.map(&:debug)
-      end
-
-      def self.detect_environment(app)
-        if app.certificate =~ /Apple Development IOS Push Services/i
-          :development
-        elsif app.certificate =~ /Apple Production IOS Push Services/i
-          :production
-        else
-          Rapns::Daemon.logger.error("Could not detect environment for app '#{app.key}'.")
-          nil
-        end
       end
 
       def initialize(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
