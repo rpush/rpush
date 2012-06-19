@@ -81,7 +81,7 @@ module Rapns
     # http://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingWIthAPS/CommunicatingWIthAPS.html#//apple_ref/doc/uid/TP40008194-CH101-SW4
     def to_binary(options = {})
       id_for_pack = options[:for_validation] ? 0 : id
-      [1, id_for_pack, expiry, 0, 32, device_token, 0, payload_size, payload].pack("cNNccH*cca*")
+      [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
     end
   end
 end
