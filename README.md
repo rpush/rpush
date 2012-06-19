@@ -160,3 +160,6 @@ Thank you to the following wonderful people for contributing to rapns:
 * [@sjmadsen](https://github.com/sjmadsen)
 * [@ivanyv](https://github.com/ivanyv)
 * [@taybenlor](https://github.com/taybenlor)
+* [@tompesman](https://github.com/tompesman)
+* [@EpicDraws](https://github.com/EpicDraws)
+* [@dei79](https://github.com/dei79)
