@@ -18,7 +18,7 @@ module Rapns
 
     def alert=(alert)
       if alert.is_a?(Hash)
-        write_attribute(:alert, ActiveSupport::JSON.encode(alert))
+        write_attribute(:alert, MultiJson.dump(alert))
         self.alert_is_json = true if has_attribute?(:alert_is_json)
       else
         write_attribute(:alert, alert)
@@ -31,22 +31,22 @@ module Rapns
 
       if has_attribute?(:alert_is_json)
         if alert_is_json?
-          ActiveSupport::JSON.decode(string_or_json)
+          MultiJson.load(string_or_json)
         else
           string_or_json
         end
       else
-        ActiveSupport::JSON.decode(string_or_json) rescue string_or_json
+        MultiJson.load(string_or_json) rescue string_or_json
       end
     end
 
     def attributes_for_device=(attrs)
       raise ArgumentError, "attributes_for_device must be a Hash" if !attrs.is_a?(Hash)
-      write_attribute(:attributes_for_device, ActiveSupport::JSON.encode(attrs))
+      write_attribute(:attributes_for_device, MultiJson.dump(attrs))
     end
 
     def attributes_for_device
-      ActiveSupport::JSON.decode(read_attribute(:attributes_for_device)) if read_attribute(:attributes_for_device)
+      MultiJson.load(read_attribute(:attributes_for_device)) if read_attribute(:attributes_for_device)
     end
 
     MDM_OVERIDE_KEY = '__rapns_mdm__'
@@ -71,7 +71,7 @@ module Rapns
     end
 
     def payload
-      as_json.to_json
+      MultiJson.dump(as_json)
     end
 
     def payload_size
