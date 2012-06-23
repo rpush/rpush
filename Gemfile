@@ -10,6 +10,7 @@ gem 'mysql'
 gem 'database_cleaner'
 gem 'simplecov'
 gem 'multi_json'
+gem 'yajl-ruby'
 #gem 'perftools.rb'
 
 gemspec
