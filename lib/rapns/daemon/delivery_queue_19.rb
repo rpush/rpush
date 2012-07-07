@@ -37,10 +37,6 @@ module Rapns
       def synchronize(&blk)
       	@mutex.synchronize(&blk)
       end
-
-      def mutext
-        @mutex
-      end
   	end
   end
 end
