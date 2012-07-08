@@ -1,4 +1,4 @@
-## 2.0.1 (unreleased) ##
+## 2.0.1 (July 7, 2012) ##
   * Fix delivery when using Ruby 1.8.
   * MultiJson support.
 
