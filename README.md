@@ -24,7 +24,7 @@
 Add rapns to your Gemfile:
 
     gem 'rapns'
-  
+
 Generate the migration, rapns.yml and migrate:
 
     rails g rapns
@@ -62,7 +62,7 @@ Generate the migration, rapns.yml and migrate:
 
     cd /path/to/rails/app
     bundle exec rapns <Rails environment> [options]
-    
+
 ### Options
 
 * `-f` `--foreground` Prevent rapns from forking into a daemon.
@@ -125,7 +125,7 @@ Although rapns makes such errors highly unlikely due to validation, the APNs rep
 `error` is set to Apple's code for the error.
 `error_description` is set to a (somewhat brief) description of the error.
 
-rapns will not attempt to deliver the notification again. 
+rapns will not attempt to deliver the notification again.
 
 ### Via the Feedback Service.
 
@@ -163,3 +163,4 @@ Thank you to the following wonderful people for contributing to rapns:
 * [@tompesman](https://github.com/tompesman)
 * [@EpicDraws](https://github.com/EpicDraws)
 * [@dei79](https://github.com/dei79)
+* [@adorr](https://github.com/adorr)
