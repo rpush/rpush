@@ -162,3 +162,37 @@ describe Rapns::Notification, "bug #35" do
     notification.should be_valid
   end
 end
+
+describe Rapns::Notification, "multi_json usage" do
+  describe Rapns::Notification, "alert" do
+    it "should call MultiJson.load when multi_json version is 1.3.0" do
+      notification = Rapns::Notification.new(:alert => { a: 1 }, :alert_is_json => true)
+      Gem.stub(:loaded_specs).and_return( { 'multi_json' => Gem::Specification.new('multi_json', '1.3.0') } )
+      MultiJson.should_receive(:load).with(any_args())
+      notification.alert
+    end
+
+    it "should call MultiJson.decode when multi_json version is 1.2.9" do
+      notification = Rapns::Notification.new(:alert => { a: 1 }, :alert_is_json => true)
+      Gem.stub(:loaded_specs).and_return( { 'multi_json' => Gem::Specification.new('multi_json', '1.2.9') } )
+      MultiJson.should_receive(:decode).with(any_args())
+      notification.alert
+    end
+  end
+
+  describe Rapns::Notification, "attributes_for_device=" do
+    it "should call MultiJson.dump when multi_json responds to :dump" do
+      notification = Rapns::Notification.new
+      MultiJson.stub(:respond_to?).with(:dump).and_return(true)
+      MultiJson.should_receive(:dump).with(any_args())
+      notification.attributes_for_device = { pirates: 1 }
+    end
+
+    it "should call MultiJson.encode when multi_json does not respond to :dump" do
+      notification = Rapns::Notification.new
+      MultiJson.stub(:respond_to?).with(:dump).and_return(false)
+      MultiJson.should_receive(:encode).with(any_args())
+      notification.attributes_for_device = { ninjas: 1 }
+    end
+  end
+end
