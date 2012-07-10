@@ -18,7 +18,7 @@ module Rapns
 
     def alert=(alert)
       if alert.is_a?(Hash)
-        write_attribute(:alert, MultiJson.dump(alert))
+        write_attribute(:alert, multi_json_dump(alert))
         self.alert_is_json = true if has_attribute?(:alert_is_json)
       else
         write_attribute(:alert, alert)
@@ -31,22 +31,22 @@ module Rapns
 
       if has_attribute?(:alert_is_json)
         if alert_is_json?
-          MultiJson.load(string_or_json)
+          multi_json_load(string_or_json)
         else
           string_or_json
         end
       else
-        MultiJson.load(string_or_json) rescue string_or_json
+        multi_json_load(string_or_json) rescue string_or_json
       end
     end
 
     def attributes_for_device=(attrs)
       raise ArgumentError, "attributes_for_device must be a Hash" if !attrs.is_a?(Hash)
-      write_attribute(:attributes_for_device, MultiJson.dump(attrs))
+      write_attribute(:attributes_for_device, multi_json_dump(attrs))
     end
 
     def attributes_for_device
-      MultiJson.load(read_attribute(:attributes_for_device)) if read_attribute(:attributes_for_device)
+      multi_json_load(read_attribute(:attributes_for_device)) if read_attribute(:attributes_for_device)
     end
 
     MDM_OVERIDE_KEY = '__rapns_mdm__'
@@ -71,7 +71,7 @@ module Rapns
     end
 
     def payload
-      MultiJson.dump(as_json)
+      multi_json_dump(as_json)
     end
 
     def payload_size
@@ -83,6 +83,22 @@ module Rapns
     def to_binary(options = {})
       id_for_pack = options[:for_validation] ? 0 : id
       [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
+    end
+
+
+    private
+
+    def multi_json_load(string, options = {})
+      # Calling load on multi_json less than v1.3.0 attempts to load a file from disk. Check the version explicitly.
+      if Gem.loaded_specs['multi_json'].version >= Gem::Version.create('1.3.0')
+        MultiJson.load(string, options)
+      else
+        MultiJson.decode(string, options)
+      end
+    end
+
+    def multi_json_dump(string, options = {})
+      MultiJson.respond_to?(:dump) ? MultiJson.dump(string, options) : MultiJson.encode(string, options)
     end
   end
 end
