@@ -141,6 +141,7 @@ After updating you should run `rails g rapns` to check for any new migrations.
 
 ## Wiki
 
+* [Deploying to Heroku](https://github.com/ileitch/rapns/wiki/Heroku)
 * [Why open multiple connections to the APNs?](https://github.com/ileitch/rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
 
 ## Contributing to rapns
