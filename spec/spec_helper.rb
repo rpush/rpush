@@ -24,7 +24,7 @@ end
 
 if jruby
   if ENV['TRAVIS']
-    username = 'root'
+    username = 'postgres'
   else
     require 'etc'
     username = Etc.getlogin
