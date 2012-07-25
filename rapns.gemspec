@@ -17,4 +17,9 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "multi_json", "~> 1.0"
+
+  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+    s.add_dependency "jruby-openssl"
+    s.add_dependency "activerecord-jdbc-adapter"
+  end
 end
