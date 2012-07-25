@@ -1,3 +1,7 @@
+## 2.0.2 (July 25, 2012) ##
+  * Support MultiJson < 1.3.0.
+  * Make all model attributes accessible.
+
 ## 2.0.1 (July 7, 2012) ##
   * Fix delivery when using Ruby 1.8.
   * MultiJson support.
