@@ -1,11 +1,14 @@
 class PGError < StandardError; end if !defined?(PGError)
 class Mysql; class Error < StandardError; end; end if !defined?(Mysql)
 module Mysql2; class Error < StandardError; end; end if !defined?(Mysql2)
+module ActiveRecord; end
+class ActiveRecord::JDBCError < StandardError; end if !defined?(ActiveRecord::JDBCError)
 
 module Rapns
   module Daemon
     module DatabaseReconnectable
-      ADAPTER_ERRORS = [ActiveRecord::StatementInvalid, PGError, Mysql::Error, Mysql2::Error]
+      ADAPTER_ERRORS = [ActiveRecord::StatementInvalid, PGError, Mysql::Error,
+                        Mysql2::Error, ActiveRecord::JDBCError]
 
       def with_database_reconnect_and_retry
         begin

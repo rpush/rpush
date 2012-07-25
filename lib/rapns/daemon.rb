@@ -1,6 +1,7 @@
 require 'thread'
 require 'socket'
 require 'pathname'
+require 'openssl'
 
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/delivery_error'
