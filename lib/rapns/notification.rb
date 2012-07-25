@@ -4,14 +4,6 @@ module Rapns
 
     attr_accessible *column_names.map(&:to_sym)
 
-    validates :app, :presence => true
-    validates :device_token, :presence => true
-    validates :badge, :numericality => true, :allow_nil => true
-    validates :expiry, :numericality => true, :presence => true
-
-    validates_with Rapns::DeviceTokenFormatValidator
-    validates_with Rapns::BinaryNotificationValidator
-
     scope :ready_for_delivery, lambda { where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, Time.now) }
 
     def device_token=(token)
