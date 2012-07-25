@@ -21,45 +21,45 @@ describe Rapns::Daemon, "when starting" do
     config.stub(:foreground => false)
     ActiveRecord::Base.stub(:establish_connection)
     Rapns::Daemon.should_receive(:daemonize)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "does not fork into a daemon if the foreground option is true" do
     config.stub(:foreground => true)
     Rapns::Daemon.should_not_receive(:daemonize)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "writes the process ID to the PID file" do
     Rapns::Daemon.should_receive(:write_pid_file)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "logs an error if the PID file could not be written" do
     config.stub(:pid_file => '/rails_root/rapns.pid')
     File.stub(:open).and_raise(Errno::ENOENT)
     logger.should_receive(:error).with("Failed to write PID to '/rails_root/rapns.pid': #<Errno::ENOENT: No such file or directory>")
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "starts the feeder" do
     Rapns::Daemon::Feeder.should_receive(:start).with(2)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "syncs apps" do
     Rapns::Daemon::AppRunner.should_receive(:sync)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "sets up the logger" do
     config.stub(:airbrake_notify => true)
     Rapns::Daemon::Logger.should_receive(:new).with(:foreground => true, :airbrake_notify => true)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it "makes the logger accessible" do
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
     Rapns::Daemon.logger.should == logger
   end
 
@@ -67,20 +67,20 @@ describe Rapns::Daemon, "when starting" do
     Rapns::App.stub(:count => 0)
     Rapns::Daemon.should_receive(:puts).any_number_of_times
     Rapns::Daemon.should_receive(:exit).with(1)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it 'prints a warning exists if rapns has not been upgraded' do
     Rapns::App.stub(:count).and_raise(ActiveRecord::StatementInvalid)
     Rapns::Daemon.should_receive(:puts).any_number_of_times
     Rapns::Daemon.should_receive(:exit).with(1)
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 
   it 'warns if rapns.yml still exists' do
     File.should_receive(:exists?).with('/rails_root/config/rapns/rapns.yml').and_return(true)
     logger.should_receive(:warn).with("Since 2.0.0 rapns uses command-line options instead of a configuration file. Please remove config/rapns/rapns.yml.")
-    Rapns::Daemon.start("development", config)
+    Rapns::Daemon.start(config)
   end
 end
 
