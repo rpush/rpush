@@ -5,7 +5,7 @@ module Rapns
         attr_reader :all
       end
 
-      attr_reader :app
+      attr_accessor :app
 
       @all = {}
 
@@ -92,7 +92,7 @@ module Rapns
       end
 
       def queue
-        @queue ||= []
+        @queue ||= Rapns::Daemon::DeliveryQueue.new
       end
 
       def handlers

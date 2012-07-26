@@ -8,19 +8,24 @@ module Rapns
           @push_port = push_port
           @feedback_host = feedback_host
           @feedback_port = feedback_port
+          @feedback_poll = feedback_poll
         end
 
-        protected
+        def start
+          super
 
-        def started
           @feedback_receiver = FeedbackReceiver.new(app.key, @feedback_host, @feedback_port,
                                                     @feedback_poll, app.certificate, app.password)
           @feedback_receiver.start
         end
 
-        def stopped
+        def stop
+          super
+
           @feedback_receiver.stop if @feedback_receiver
         end
+
+        protected
 
         def start_handler
           handler = DeliveryHandler.new(queue, app.key, @push_host, @push_port, app.certificate, app.password)
