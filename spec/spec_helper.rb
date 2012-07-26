@@ -10,8 +10,28 @@ rescue LoadError
 end
 
 require 'active_record'
-adapters = ['mysql', 'mysql2', 'postgresql']
-$adapter = ENV['ADAPTER'] || 'postgresql'
+adapters = ['mysql', 'mysql2', 'postgresql', 'jdbcpostgresql']
+
+jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+
+$adapter = if ENV['ADAPTER']
+  ENV['ADAPTER']
+elsif jruby
+  'jdbcpostgresql'
+else
+  'postgresql'
+end
+
+if jruby
+  if ENV['TRAVIS']
+    username = 'postgres'
+  else
+    require 'etc'
+    username = Etc.getlogin
+  end
+else
+  username = nil
+end
 
 if !adapters.include?($adapter)
   puts "No such adapter '#{$adapter}'. Valid adapters are #{adapters.join(', ')}."
@@ -20,7 +40,7 @@ end
 
 puts "Using #{$adapter} adapter."
 
-ActiveRecord::Base.establish_connection('adapter' => $adapter, 'database' => 'rapns_test')
+ActiveRecord::Base.establish_connection('username' => username, 'adapter' => $adapter, 'database' => 'rapns_test')
 require 'generators/templates/create_rapns_notifications'
 require 'generators/templates/create_rapns_feedback'
 require 'generators/templates/add_alert_is_json_to_rapns_notifications'

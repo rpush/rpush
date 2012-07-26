@@ -43,4 +43,4 @@ if config.pid_file && !Pathname.new(config.pid_file).absolute?
   config.pid_file = File.join(Rails.root, config.pid_file)
 end
 
-Rapns::Daemon.start(environment, config)
+Rapns::Daemon.start(config)
