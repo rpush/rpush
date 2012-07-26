@@ -11,9 +11,11 @@ require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/delivery_handler'
 require 'rapns/daemon/delivery_handler_pool'
 require 'rapns/daemon/feedback_receiver'
-require 'rapns/daemon/app_runner'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
+
+require 'rapns/daemon/app_runner'
+require 'rapns/daemon/apns/app_runner'
 
 module Rapns
   module Daemon

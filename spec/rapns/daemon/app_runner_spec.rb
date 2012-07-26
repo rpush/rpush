@@ -5,10 +5,8 @@ describe Rapns::Daemon::AppRunner do
   let(:queue) { stub(:notifications_processed? => true, :push => nil) }
   let(:receiver) { stub(:start => nil, :stop => nil) }
   let(:handler) { stub(:start => nil, :stop => nil) }
-  let(:push_config) { stub(:host => 'gateway.push.apple.com', :port => 2195) }
-  let(:feedback_config) { stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60) }
-  let(:runner) { Rapns::Daemon::AppRunner.new(app, push_config.host, push_config.port,
-    feedback_config.host, feedback_config.port, feedback_config.poll) }
+
+  let(:runner) { Rapns::Daemon::AppRunner.new }
 
   before do
     Rapns::Daemon::DeliveryQueue.stub(:new => queue)
@@ -19,16 +17,13 @@ describe Rapns::Daemon::AppRunner do
   after { Rapns::Daemon::AppRunner.all.clear }
 
   describe 'start' do
-    it 'starts a feedback receiver' do
-      Rapns::Daemon::FeedbackReceiver.should_receive(:new).with(app.key, feedback_config.host, feedback_config.port, feedback_config.poll, app.certificate, app.password)
-      receiver.should_receive(:start)
+    it 'starts a delivery handler for each connection' do
+      runner.should_receive(:start_handler).once
       runner.start
     end
 
-    it 'starts a delivery handler for each connection' do
-      Rapns::Daemon::DeliveryHandler.should_receive(:new).with(queue, app.key, push_config.host,
-        push_config.port, app.certificate, app.password)
-      handler.should_receive(:start)
+    it 'calls the started subclass callback' do
+      runner.should_receive(:started)
       runner.start
     end
   end
@@ -50,8 +45,8 @@ describe Rapns::Daemon::AppRunner do
       runner.stop
     end
 
-    it 'stops the feedback receiver' do
-      receiver.should_receive(:stop)
+    it 'calls the stopped subclass callback' do
+      runner.should_receive(:stopped)
       runner.stop
     end
   end
@@ -69,7 +64,7 @@ describe Rapns::Daemon::AppRunner do
   end
 
   describe 'sync' do
-    let(:new_app) { stub(:key => 'app', :certificate => 'cert', :password => '', :connections => 1) }
+    let(:new_app) { stub(:key => 'app', :connections => 1) }
     before { runner.start }
 
     it 'reduces the number of handlers if needed' do
@@ -143,12 +138,9 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   let(:app) { stub(:key => 'app', :environment => 'development') }
   let(:new_app) { stub(:key => 'new_app', :environment => 'development') }
   let(:runner) { stub(:sync => nil, :stop => nil) }
-  let(:new_runner) { stub }
   let(:logger) { stub(:error => nil) }
-  let(:config) { stub(:feedback_poll => 60) }
 
   before do
-    Rapns::Daemon.stub(:config => config, :logger => logger)
     Rapns::Daemon::AppRunner.all['app'] = runner
     Rapns::App.stub(:all => [app])
   end
@@ -165,22 +157,9 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     Rapns::Daemon::AppRunner.sync
   end
 
-it 'starts a runner for a new app with a production certificate' do
-    new_app.stub(:environment => 'production')
-    Rapns::App.stub(:all => [new_app])
-    new_runner = stub 
-    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.push.apple.com', 2195,
-      'feedback.push.apple.com', 2196, config.feedback_poll).and_return(new_runner)
-    new_runner.should_receive(:start)
-    Rapns::Daemon::AppRunner.sync
-  end
-
-  it 'starts a runner for a new app with a development certificate' do
-    new_app.stub(:environment => 'development')
-    Rapns::App.stub(:all => [new_app])
-    new_runner = stub 
-    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app, 'gateway.sandbox.push.apple.com', 2195,
-      'feedback.sandbox.push.apple.com', 2196, config.feedback_poll).and_return(new_runner)
+  it 'starts a runner for a new app' do
+    new_runner = stub
+    new_app.should_receive(:new_runner).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
   end
