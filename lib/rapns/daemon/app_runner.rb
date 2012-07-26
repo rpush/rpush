@@ -49,7 +49,6 @@ module Rapns
 
       def start
         app.connections.times { handlers << start_handler }
-        started
       end
 
       def deliver(notification)
@@ -58,7 +57,6 @@ module Rapns
 
       def stop
         handlers.map(&:stop)
-        stopped
       end
 
       def sync(app)
@@ -80,12 +78,6 @@ module Rapns
       end
 
       protected
-
-      def started
-      end
-
-      def stopped
-      end
 
       def start_handler
         raise NotImplementedError

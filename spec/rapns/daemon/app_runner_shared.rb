@@ -1,11 +1,7 @@
 shared_examples_for "an AppRunner subclass" do
   let(:queue) { stub(:notifications_processed? => true, :push => nil) }
 
-
-  before do
-    Rapns::Daemon::DeliveryQueue.stub(:new => queue)
-  end
-
+  before { Rapns::Daemon::DeliveryQueue.stub(:new => queue) }
   after { Rapns::Daemon::AppRunner.all.clear }
 
   describe 'start' do
