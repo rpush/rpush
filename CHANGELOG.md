@@ -1,3 +1,6 @@
+## 2.0.3 (unreleased) ##
+  * JRuby support.
+
 ## 2.0.2 (July 25, 2012) ##
   * Support MultiJson < 1.3.0.
   * Make all model attributes accessible.
