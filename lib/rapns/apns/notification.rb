@@ -1,7 +1,6 @@
 module Rapns
   module Apns
     class Notification < Rapns::Notification
-      validates :app, :presence => true
       validates :device_token, :presence => true
       validates :badge, :numericality => true, :allow_nil => true
       validates :expiry, :numericality => true, :presence => true

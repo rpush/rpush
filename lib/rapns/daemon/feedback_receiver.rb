@@ -57,7 +57,7 @@ module Rapns
       def create_feedback(failed_at, device_token)
         formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
         Rapns::Daemon.logger.info("[FeedbackReceiver:#{@app}] Delivery failed at #{formatted_failed_at} for #{device_token}")
-        Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @app)
+        Rapns::Apns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @app)
       end
     end
   end
