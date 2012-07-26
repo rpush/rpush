@@ -1,5 +1,6 @@
-## 2.0.3 (unreleased) ##
+## 2.0.3 (July 26, 2012) ##
   * JRuby support.
+  * Explicitly list all attributes instead of calling column_names (#53).
 
 ## 2.0.2 (July 25, 2012) ##
   * Support MultiJson < 1.3.0.
