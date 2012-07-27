@@ -1,4 +1,4 @@
-require "spec_helper"
+require "unit_spec_helper"
 
 describe Rapns::Apns::Feedback do
   it { should validate_presence_of(:device_token) }

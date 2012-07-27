@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 require File.dirname(__FILE__) + '/../app_runner_shared.rb'
 
 describe Rapns::Daemon::Apns::AppRunner do

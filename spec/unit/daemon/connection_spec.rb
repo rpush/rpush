@@ -1,4 +1,4 @@
-require "spec_helper"
+require "unit_spec_helper"
 
 describe Rapns::Daemon::Connection do
   let(:ssl_context) { stub(:key= => nil, :cert= => nil) }

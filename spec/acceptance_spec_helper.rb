@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper' # Shouldn't need to do this...
 require 'fileutils'
 
 TMP_DIR = '/tmp'

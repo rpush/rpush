@@ -1,4 +1,4 @@
-require "spec_helper"
+require "unit_spec_helper"
 
 describe Rapns::Daemon::DeliveryHandler do
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
@@ -17,7 +17,7 @@ describe Rapns::Daemon::DeliveryHandler do
   before do
     Rapns::Daemon::Connection.stub(:new => connection)
     Rapns::Daemon.stub(:delivery_queues => delivery_queues, :logger => logger, :config => config)
-    queue.push(notification) 
+    queue.push(notification)
   end
 
   it "instantiates a new connection" do

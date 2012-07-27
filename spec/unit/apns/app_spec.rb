@@ -1,4 +1,4 @@
-require "spec_helper"
+require "unit_spec_helper"
 
 describe Rapns::Apns::App, 'new_runner' do
   let(:app) { Rapns::Apns::App.new }
