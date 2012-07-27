@@ -2,24 +2,29 @@ require 'unit_spec_helper'
 require File.dirname(__FILE__) + '/../app_runner_shared.rb'
 
 describe Rapns::Daemon::Apns::AppRunner do
-  it_behaves_like "an AppRunner subclass"
+  it_behaves_like 'an AppRunner subclass'
 
-  let(:push_config) { stub(:host => 'gateway.push.apple.com', :port => 2195) }
-  let(:feedback_config) { stub(:host => 'feedback.push.apple.com', :port => 2196, :poll => 60) }
-  let(:app) { stub(:app, :key => 'app', :certificate => 'cert', :password => '', :connections => 1) }
-  let(:new_app) { stub(:new_app, :key => 'app', :certificate => 'cert', :password => '', :connections => 1) }
-  let(:runner) { Rapns::Daemon::Apns::AppRunner.new(app, push_config.host, push_config.port,
-    feedback_config.host, feedback_config.port, feedback_config.poll) }
+  let(:app_class) { Rapns::Apns::App }
+  let(:app) { app_class.new(:environment => 'development', :key => 'my_app',
+                            :certificate => 'cert', :password => 'pass') }
+  let(:runner) { Rapns::Daemon::Apns::AppRunner.new(app) }
+  let(:handler) { stub(:start => nil, :stop => nil) }
   let(:receiver) { stub(:start => nil, :stop => nil) }
-  let(:handler) { stub(:handler, :start => nil, :stop => nil) }
+  let(:config) { {:feedback_poll => 60 } }
 
   before do
-    Rapns::Daemon::FeedbackReceiver.stub(:new => receiver)
-    Rapns::Daemon::DeliveryHandler.stub(:new => handler)
+    Rapns::Daemon::Apns::DeliveryHandler.stub(:new => handler)
+    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => receiver)
+    Rapns::Daemon.stub(:config => config)
   end
 
-  it 'starts a feedback receiver' do
-    Rapns::Daemon::FeedbackReceiver.should_receive(:new).with(app.key, feedback_config.host, feedback_config.port, feedback_config.poll, app.certificate, app.password)
+  it 'instantiates a new feedback receiver when started' do
+    Rapns::Daemon::Apns::FeedbackReceiver.should_receive(:new).with('my_app', 'feedback.sandbox.push.apple.com',
+                                                                    2196, 60, 'cert', 'pass')
+    runner.start
+  end
+
+  it 'starts the feedback receiver' do
     receiver.should_receive(:start)
     runner.start
   end

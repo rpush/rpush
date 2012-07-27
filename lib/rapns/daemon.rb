@@ -9,14 +9,14 @@ require 'rapns/daemon/disconnection_error'
 require 'rapns/daemon/connection'
 require 'rapns/daemon/database_reconnectable'
 require 'rapns/daemon/delivery_queue'
-require 'rapns/daemon/delivery_handler'
 require 'rapns/daemon/delivery_handler_pool'
-require 'rapns/daemon/feedback_receiver'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
-
 require 'rapns/daemon/app_runner'
+
 require 'rapns/daemon/apns/app_runner'
+require 'rapns/daemon/apns/delivery_handler'
+require 'rapns/daemon/apns/feedback_receiver'
 
 module Rapns
   module Daemon

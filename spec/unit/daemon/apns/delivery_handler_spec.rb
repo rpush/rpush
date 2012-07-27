@@ -1,13 +1,13 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::DeliveryHandler do
+describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
   let(:name) { 'my_app:0' }
   let(:host) { 'localhost' }
   let(:port) { 2195 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:delivery_handler) { Rapns::Daemon::DeliveryHandler.new(queue, name, host, port, certificate, password) }
+  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(queue, name, host, port, certificate, password) }
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:notification) { stub.as_null_object }

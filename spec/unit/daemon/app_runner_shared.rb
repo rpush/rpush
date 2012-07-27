@@ -6,7 +6,7 @@ shared_examples_for "an AppRunner subclass" do
 
   describe 'start' do
     it 'starts a delivery handler for each connection' do
-      runner.should_receive(:start_handler).once
+      handler.should_receive(:start)
       runner.start
     end
   end
@@ -46,14 +46,14 @@ shared_examples_for "an AppRunner subclass" do
 
     it 'reduces the number of handlers if needed' do
       handler.should_receive(:stop)
+      new_app = app_class.new
       new_app.stub(:connections => app.connections - 1)
       runner.sync(new_app)
     end
 
     it 'increases the number of handlers if needed' do
-      new_handler = stub
-      Rapns::Daemon::DeliveryHandler.should_receive(:new).and_return(new_handler)
-      new_handler.should_receive(:start)
+      runner.should_receive(:start_handler).and_return(handler)
+      new_app = app_class.new
       new_app.stub(:connections => app.connections + 1)
       runner.sync(new_app)
     end

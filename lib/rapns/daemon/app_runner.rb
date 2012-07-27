@@ -5,15 +5,7 @@ module Rapns
         attr_reader :all
       end
 
-      attr_accessor :app
-
       @all = {}
-
-      def self.ready
-        ready = []
-        @all.each { |app, runner| ready << app if runner.ready? }
-        ready
-      end
 
       def self.deliver(notification)
         if app = @all[notification.app]
@@ -29,7 +21,7 @@ module Rapns
           if @all[app.key]
             @all[app.key].sync(app)
           else
-            runner = app.new_runner
+            runner = new_runner_for_app(app)
             runner.start
             @all[app.key] = runner
           end
@@ -37,6 +29,16 @@ module Rapns
 
         removed = @all.keys - apps.map(&:key)
         removed.each { |key| @all.delete(key).stop }
+      end
+
+      def self.runner_class_for_app(app)
+        # Violates tell don't ask, but we can't reference Daemon scope in the client code.
+        case app.class
+        when Rapns::Apns::App
+          Rapns::Daemon::Apns::AppRunner.new(app)
+        else
+          raise NotImplementedError
+        end
       end
 
       def self.stop
@@ -47,20 +49,38 @@ module Rapns
         @all.values.map(&:debug)
       end
 
-      def start
-        app.connections.times { handlers << start_handler }
+      attr_reader :app
+
+      def initialize(app)
+        @app = app
       end
 
-      def deliver(notification)
-        queue.push(notification)
+      def new_delivery_handler
+        raise NotImplementedError
+      end
+
+      def started
+      end
+
+      def stopped
+      end
+
+      def start
+        app.connections.times { handlers << start_handler }
+        started
       end
 
       def stop
         handlers.map(&:stop)
+        stopped
+      end
+
+      def deliver(notification)
+        queue.push(notification) if ready?
       end
 
       def sync(app)
-        self.app = app
+        @app = app
         diff = handlers.size - app.connections
         if diff > 0
           diff.times { handlers.pop.stop }
@@ -69,18 +89,20 @@ module Rapns
         end
       end
 
-      def ready?
-        queue.notifications_processed?
+      def debug
+        Rapns::Daemon.logger.info("\nApp State:\n#{key}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  ready: #{ready?}")
       end
 
-      def debug
-        Rapns::Daemon.logger.info("\nAppRunner State:\n#{app.key}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  ready: #{ready?}")
+      def ready?
+        queue.notifications_processed?
       end
 
       protected
 
       def start_handler
-        raise NotImplementedError
+        handler = new_delivery_handler
+        handler.start
+        handler
       end
 
       def queue

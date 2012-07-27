@@ -35,29 +35,14 @@ describe Rapns::Daemon::AppRunner, 'deliver' do
   end
 end
 
-describe Rapns::Daemon::AppRunner, 'ready' do
-  let(:runner1) { stub(:ready? => true) }
-  let(:runner2) { stub(:ready? => false) }
-
-  before do
-    Rapns::Daemon::AppRunner.all['app1'] = runner1
-    Rapns::Daemon::AppRunner.all['app2'] = runner2
-  end
-
-  after { Rapns::Daemon::AppRunner.all.clear }
-
-  it 'returns apps that are ready for more notifications' do
-    Rapns::Daemon::AppRunner.ready.should == ['app1']
-  end
-end
-
 describe Rapns::Daemon::AppRunner, 'sync' do
   let(:app) { stub(:key => 'app') }
   let(:new_app) { stub(:key => 'new_app') }
-  let(:runner) { stub(:sync => nil, :stop => nil) }
+  let(:runner) { stub(:sync => nil, :stop => nil, :start => nil) }
   let(:logger) { stub(:error => nil) }
 
   before do
+    Rapns::Daemon::AppRunner.stub(:new_runner_for_app => runner)
     Rapns::Daemon::AppRunner.all['app'] = runner
     Rapns::App.stub(:all => [app])
   end
@@ -77,7 +62,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   it 'starts a runner for a new app' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = stub
-    new_app.should_receive(:new_runner).and_return(new_runner)
+    Rapns::Daemon::AppRunner.should_receive(:new_runner_for_app).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
   end

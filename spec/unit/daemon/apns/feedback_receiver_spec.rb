@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
+describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
   let(:poll) { 60 }
@@ -9,7 +9,7 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
   let(:app) { 'my_app' }
   let(:connection) { stub(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
-  let(:receiever) { Rapns::Daemon::FeedbackReceiver.new(app, host, port, poll, certificate, password) }
+  let(:receiever) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, host, port, poll, certificate, password) }
 
   before do
     receiever.stub(:interruptible_sleep)
