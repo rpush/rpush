@@ -16,11 +16,15 @@ def setup_rails
   `rm -rf #{RAILS_DIR}`
   FileUtils.mkdir_p(RAILS_DIR)
   cmd("bundle exec rails new #{RAILS_DIR} --skip-bundle")
-  p `git branch`
   branch = `git branch | grep '\*'`.split(' ').last
   in_test_rails do
     cmd('echo "gem \'rake\'" >> Gemfile')
-    cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}', :branch => '#{branch}'\" >> Gemfile")
+    if ENV['TRAVIS']
+      cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}'\" >> Gemfile")
+    else
+      cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}', :branch => '#{branch}'\" >> Gemfile")
+    end
+
     Bundler.with_clean_env { cmd("bundle") }
   end
 end
