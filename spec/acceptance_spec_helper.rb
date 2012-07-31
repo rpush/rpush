@@ -16,6 +16,7 @@ def setup_rails
   `rm -rf #{RAILS_DIR}`
   FileUtils.mkdir_p(RAILS_DIR)
   cmd("bundle exec rails new #{RAILS_DIR} --skip-bundle")
+  p `git branch`
   branch = `git branch | grep '\*'`.split(' ').last
   in_test_rails do
     cmd('echo "gem \'rake\'" >> Gemfile')
