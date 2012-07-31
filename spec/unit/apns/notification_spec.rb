@@ -1,10 +1,16 @@
 require "unit_spec_helper"
 
 describe Rapns::Apns::Notification do
-  it { should validate_presence_of(:app) }
   it { should validate_presence_of(:device_token) }
   it { should validate_numericality_of(:badge) }
-  it { should validate_numericality_of(:expiry) }
+
+  let(:notification) { Rapns::Apns::Notification.new }
+
+  it 'does not allow multiple apps to be assigned' do
+    notification.app = ['app1', 'app2']
+    notification.valid?
+    notification.errors[:app].should == ['APNs does not support sending a notification to multiple apps.']
+  end
 
   it "should validate the format of the device_token" do
     notification = Rapns::Apns::Notification.new(:device_token => "{$%^&*()}")
@@ -13,7 +19,6 @@ describe Rapns::Apns::Notification do
   end
 
   it "should validate the length of the binary conversion of the notification" do
-    notification = Rapns::Apns::Notification.new
     notification.device_token = "a" * 64
     notification.alert = "way too long!" * 100
     notification.valid?.should be_false
@@ -21,11 +26,11 @@ describe Rapns::Apns::Notification do
   end
 
   it "should default the sound to 1.aiff" do
-    Rapns::Apns::Notification.new.sound.should == "1.aiff"
+    notification.sound.should == "1.aiff"
   end
 
   it "should default the expiry to 1 day" do
-    Rapns::Apns::Notification.new.expiry.should == 1.day.to_i
+    notification.expiry.should == 1.day.to_i
   end
 end
 
@@ -42,19 +47,27 @@ describe Rapns::Apns::Notification, "when assigning the device token" do
 end
 
 describe Rapns::Apns::Notification, "when assigning the attributes for the device" do
+  let(:notification) { Rapns::Apns::Notification.new }
+
   it "should raise an ArgumentError if something other than a Hash is assigned" do
-    expect { Rapns::Apns::Notification.new(:attributes_for_device => Array.new) }.should
-      raise_error(ArgumentError, "attributes_for_device must be a Hash")
+    expect do
+      notification.attributes_for_device = Array.new
+    end.to raise_error(ArgumentError, "attributes_for_device must be a Hash")
   end
 
   it "should encode the given Hash as JSON" do
-    notification = Rapns::Apns::Notification.new(:attributes_for_device => {:hi => "mom"})
-    notification.read_attribute(:attributes_for_device).should == "{\"hi\":\"mom\"}"
+    notification.attributes_for_device = {:hi => "mom"}
+    notification.read_attribute(:data).should == "{\"hi\":\"mom\"}"
   end
 
   it "should decode the JSON when using the reader method" do
-    notification = Rapns::Apns::Notification.new(:attributes_for_device => {:hi => "mom"})
+    notification.attributes_for_device = {:hi => "mom"}
     notification.attributes_for_device.should == {"hi" => "mom"}
+  end
+
+  it 'warns if attributes_for_device is assigned via mass-assignment' do
+    ActiveSupport::Deprecation.should_receive(:warn)
+    Rapns::Apns::Notification.new(:attributes_for_device => {:hi => 'mom'})
   end
 end
 
