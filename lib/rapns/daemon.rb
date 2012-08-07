@@ -58,12 +58,7 @@ module Rapns
       end
 
       if count == 0
-        puts "!!!! RAPNS NOT STARTED !!!!"
-        puts
-        puts "You must create an Rapns::App."
-        puts "See https://github.com/ileitch/rapns for instructions."
-        puts
-        exit 1
+        logger.warn("You have not created an Rapns::App yet. See https://github.com/ileitch/rapns for instructions.")
       end
 
       if File.exists?(File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
