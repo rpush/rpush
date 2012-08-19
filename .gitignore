@@ -5,3 +5,4 @@ pkg/*
 coverage/
 .rbx/
 spec/acceptance/fixtures
+.rbenv-version

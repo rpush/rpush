@@ -1,3 +1,6 @@
+## 2.0.4 (Aug 6, 2012) ##
+  * Don't exit when there aren't any Rapns::App instances, just warn (#55).
+
 ## 2.0.3 (July 26, 2012) ##
   * JRuby support.
   * Explicitly list all attributes instead of calling column_names (#53).

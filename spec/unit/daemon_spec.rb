@@ -6,7 +6,7 @@ describe Rapns::Daemon, "when starting" do
   let(:certificate) { stub }
   let(:password) { stub }
   let(:config) { stub(:pid_file => nil, :push_poll => 2, :airbrake_notify => false, :foreground => true) }
-  let(:logger) { stub(:info => nil, :error => nil) }
+  let(:logger) { stub(:info => nil, :error => nil, :warn => nil) }
 
   before do
     Rapns::Daemon::Feeder.stub(:start)
@@ -65,8 +65,7 @@ describe Rapns::Daemon, "when starting" do
 
   it 'prints a warning if there are no apps' do
     Rapns::App.stub(:count => 0)
-    Rapns::Daemon.should_receive(:puts).any_number_of_times
-    Rapns::Daemon.should_receive(:exit).with(1)
+    logger.should_receive(:warn).any_number_of_times
     Rapns::Daemon.start(config)
   end
 
