@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::Connection do
+describe Rapns::Daemon::Apns::Connection do
   let(:ssl_context) { stub(:key= => nil, :cert= => nil) }
   let(:rsa_key) { stub }
   let(:certificate) { stub }
@@ -11,7 +11,7 @@ describe Rapns::Daemon::Connection do
   let(:tcp_socket) { stub(:setsockopt => nil, :close => nil) }
   let(:ssl_socket) { stub(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
   let(:logger) { stub(:info => nil, :error => nil) }
-  let(:connection) { Rapns::Daemon::Connection.new('Connection 0', host, port, certificate, password) }
+  let(:connection) { Rapns::Daemon::Apns::Connection.new('Connection 0', host, port, certificate, password) }
 
   before do
     OpenSSL::SSL::SSLContext.stub(:new => ssl_context)
@@ -125,7 +125,7 @@ describe Rapns::Daemon::Connection do
       logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error_type.name}), reconnecting...").once
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::ConnectionError
+      rescue Rapns::Daemon::Apns::ConnectionError
       end
     end
 
@@ -133,21 +133,21 @@ describe Rapns::Daemon::Connection do
       connection.should_receive(:reconnect).exactly(3).times
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::ConnectionError
+      rescue Rapns::Daemon::Apns::ConnectionError
       end
     end
 
     it "raises a ConnectionError after 3 attempts at reconnecting" do
       expect do
         connection.write(nil)
-      end.to raise_error(Rapns::Daemon::ConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
+      end.to raise_error(Rapns::Daemon::Apns::ConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
     end
 
     it "sleeps 1 second before retrying the connection" do
       connection.should_receive(:sleep).with(1)
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::ConnectionError
+      rescue Rapns::Daemon::Apns::ConnectionError
       end
     end
   end
@@ -206,7 +206,7 @@ describe Rapns::Daemon::Connection do
     before { connection.connect }
 
     it 'reconnects if the connection has been idle for more than the defined period' do
-      Rapns::Daemon::Connection.stub(:idle_period => 0.1)
+      Rapns::Daemon::Apns::Connection.stub(:idle_period => 0.1)
       sleep 0.2
       connection.should_receive(:reconnect)
       connection.write('blah')
@@ -225,7 +225,7 @@ describe Rapns::Daemon::Connection do
     end
 
     it 'logs the the connection is idle' do
-      Rapns::Daemon::Connection.stub(:idle_period => 0.1)
+      Rapns::Daemon::Apns::Connection.stub(:idle_period => 0.1)
       sleep 0.2
       Rapns::Daemon.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
       connection.write('blah')

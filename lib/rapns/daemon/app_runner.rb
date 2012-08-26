@@ -31,11 +31,12 @@ module Rapns
         removed.each { |key| @all.delete(key).stop }
       end
 
-      def self.runner_class_for_app(app)
-        # Violates tell don't ask, but we can't reference Daemon scope in the client code.
+      def self.new_runner_for_app(app)
         case app.class
         when Rapns::Apns::App
           Rapns::Daemon::Apns::AppRunner.new(app)
+        when Rapns::Gcm::App
+          Rapns::Daemon::Gcm::AppRunner.new(app)
         else
           raise NotImplementedError
         end
@@ -101,6 +102,7 @@ module Rapns
 
       def start_handler
         handler = new_delivery_handler
+        handler.queue = queue
         handler.start
         handler
       end

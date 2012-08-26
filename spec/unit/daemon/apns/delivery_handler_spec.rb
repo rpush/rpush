@@ -1,13 +1,16 @@
 require "unit_spec_helper"
+require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 
 describe Rapns::Daemon::Apns::DeliveryHandler do
+  it_should_behave_like 'an DeliveryHandler sublcass'
+
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
   let(:name) { 'my_app:0' }
   let(:host) { 'localhost' }
   let(:port) { 2195 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(queue, name, host, port, certificate, password) }
+  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password) }
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:notification) { stub.as_null_object }
@@ -15,13 +18,14 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:delivery_queues) { [] }
 
   before do
-    Rapns::Daemon::Connection.stub(:new => connection)
+    Rapns::Daemon::Apns::Connection.stub(:new => connection)
     Rapns::Daemon.stub(:delivery_queues => delivery_queues, :logger => logger, :config => config)
+    delivery_handler.queue = queue
     queue.push(notification)
   end
 
   it "instantiates a new connection" do
-    Rapns::Daemon::Connection.should_receive(:new).with("DeliveryHandler:#{name}", host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with("DeliveryHandler:#{name}", host, port, certificate, password)
     delivery_handler
   end
 
@@ -31,12 +35,9 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
     delivery_handler.stop
   end
 
-  it "instructs the queue to wakeup the thread when told to stop" do
-    thread = stub
-    Thread.stub(:new => thread)
-    queue.should_receive(:wakeup).with(thread)
-    delivery_handler.start
-    delivery_handler.stop
+  it 'closes the socket' do
+    connection.should_receive(:close)
+    delivery_handler.close
   end
 
   it "sends the binary version of the notification" do
@@ -89,22 +90,6 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
     config.stub(:check_for_errors => false)
     delivery_handler.should_not_receive(:check_for_error)
     delivery_handler.send(:handle_next_notification)
-  end
-
-  describe "when being stopped" do
-    before { queue.pop }
-
-    it "closes the connection when a DeliveryQueue::WakeupError is raised" do
-      connection.should_receive(:close)
-      queue.stub(:pop).and_raise(Rapns::Daemon::DeliveryQueue::WakeupError)
-      delivery_handler.send(:handle_next_notification)
-    end
-
-    it "does not attempt to deliver a notification when a DeliveryQueue::::WakeupError is raised" do
-      queue.stub(:pop).and_raise(Rapns::Daemon::DeliveryQueue::WakeupError)
-      delivery_handler.should_not_receive(:deliver)
-      delivery_handler.send(:handle_next_notification)
-    end
   end
 
   describe "when delivery fails" do
@@ -197,7 +182,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
         delivery_handler.send(:handle_next_notification)
       end
 
-      it 'sets the error descriptipon on the notification' do
+      it 'sets the error description on the notification' do
         notification.should_receive(:error_description=).with("APNs disconnected without returning an error.")
         delivery_handler.send(:handle_next_notification)
       end

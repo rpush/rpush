@@ -14,7 +14,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   before do
     receiever.stub(:interruptible_sleep)
     Rapns::Daemon.logger = logger
-    Rapns::Daemon::Connection.stub(:new => connection)
+    Rapns::Daemon::Apns::Connection.stub(:new => connection)
     Rapns::Apns::Feedback.stub(:create!)
     receiever.instance_variable_set("@stop", false)
   end
@@ -31,7 +31,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do
-    Rapns::Daemon::Connection.should_receive(:new).with("FeedbackReceiver:#{app}", host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with("FeedbackReceiver:#{app}", host, port, certificate, password)
     receiever.check_for_feedback
   end
 
