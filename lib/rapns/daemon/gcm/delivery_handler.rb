@@ -1,7 +1,7 @@
 module Rapns
   module Daemon
     module Gcm
-      class DeliveryHandler
+      class DeliveryHandler < Rapns::Daemon::DeliveryHandler
         include DatabaseReconnectable
 
         HOST = 'https://android.googleapis.com/gcm/send'

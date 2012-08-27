@@ -17,15 +17,12 @@ module Rapns
         }
 
         attr_reader :name
-        attr_accessor :queue
 
         def initialize(name, host, port, certificate, password)
           @name = "DeliveryHandler:#{name}"
           @connection = Connection.new(@name, host, port, certificate, password)
           @connection.connect
         end
-
-        protected
 
         def close
           @connection.close
@@ -48,6 +45,8 @@ module Rapns
             raise
           end
         end
+
+        protected
 
         def check_for_error
           if @connection.select(SELECT_TIMEOUT)

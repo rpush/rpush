@@ -4,7 +4,6 @@ require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 describe Rapns::Daemon::Apns::DeliveryHandler do
   it_should_behave_like 'an DeliveryHandler sublcass'
 
-  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
   let(:name) { 'my_app:0' }
   let(:host) { 'localhost' }
   let(:port) { 2195 }
@@ -12,8 +11,9 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:password) { stub }
   let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password) }
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
-  let(:logger) { stub(:error => nil, :info => nil) }
+  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
   let(:notification) { stub.as_null_object }
+  let(:logger) { stub(:error => nil, :info => nil) }
   let(:config) { stub(:check_for_errors => true) }
   let(:delivery_queues) { [] }
 
@@ -26,11 +26,12 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   it "instantiates a new connection" do
     Rapns::Daemon::Apns::Connection.should_receive(:new).with("DeliveryHandler:#{name}", host, port, certificate, password)
-    delivery_handler
+    Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password)
   end
 
-  it "connects the socket when started" do
+  it "connects the socket when instantiated" do
     connection.should_receive(:connect)
+    Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password)
     delivery_handler.start
     delivery_handler.stop
   end

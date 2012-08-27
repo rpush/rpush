@@ -9,6 +9,11 @@ shared_examples_for "an AppRunner subclass" do
       handler.should_receive(:start)
       runner.start
     end
+
+    it 'assigns the queue to the handler' do
+      handler.should_receive(:queue=).with(queue)
+      runner.start
+    end
   end
 
   describe 'deliver' do

@@ -3,6 +3,8 @@ module Rapns
     class DeliveryHandler
       include DatabaseReconnectable
 
+      attr_accessor :queue
+
       def deliver(notification)
         raise NotImplementedError
       end
@@ -21,10 +23,10 @@ module Rapns
         queue.wakeup(@thread) if @thread
       end
 
-      protected
-
       def close
       end
+
+      protected
 
       def handle_next_notification
         begin

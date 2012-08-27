@@ -69,14 +69,6 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     Rapns::Daemon::AppRunner.sync
   end
 
-  it 'assigns the queue to the new runner' do
-    Rapns::App.stub(:all => [app, new_app])
-    new_runner = stub
-    Rapns::Daemon::AppRunner.should_receive(:new_runner_for_app).and_return(new_runner)
-    new_runner.should_receive(:queue=).with(queue)
-    Rapns::Daemon::AppRunner.sync
-  end
-
   it 'deletes old apps' do
     Rapns::App.stub(:all => [])
     runner.should_receive(:stop)
