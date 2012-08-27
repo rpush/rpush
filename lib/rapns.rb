@@ -13,6 +13,5 @@ require 'rapns/apns/notification'
 require 'rapns/apns/feedback'
 require 'rapns/apns/app'
 
-require 'rapns/gcm/collapse_key_and_data_validator'
 require 'rapns/gcm/notification'
 require 'rapns/gcm/app'

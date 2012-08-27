@@ -23,5 +23,6 @@ end
 gem 'database_cleaner'
 gem 'simplecov'
 gem 'multi_json'
+gem 'net-http-persistent'
 
 gemspec

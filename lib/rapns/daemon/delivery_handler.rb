@@ -23,7 +23,7 @@ module Rapns
         queue.wakeup(@thread) if @thread
       end
 
-      def close
+      def stopped
       end
 
       protected
@@ -32,7 +32,7 @@ module Rapns
         begin
           notification = queue.pop
         rescue DeliveryQueue::WakeupError
-          close
+          stopped
           return
         end
 

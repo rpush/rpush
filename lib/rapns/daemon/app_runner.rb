@@ -8,7 +8,7 @@ module Rapns
       @all = {}
 
       def self.deliver(notification)
-        if app = @all[notification.app]
+        if app = @all[notification.app] # TODO: Is an array of apps.
           app.deliver(notification)
         else
           Rapns::Daemon.logger.error("No such app '#{notification.app}' for notification #{notification.id}.")
@@ -18,7 +18,7 @@ module Rapns
       def self.sync
         apps = Rapns::App.all
         apps.each do |app|
-          if @all[app.key]
+          if @all[app.key] # TODO: this is a single app key.
             @all[app.key].sync(app)
           else
             runner = new_runner_for_app(app)
