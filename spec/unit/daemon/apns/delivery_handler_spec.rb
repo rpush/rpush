@@ -36,11 +36,6 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
     delivery_handler.stop
   end
 
-  it 'closes the socket' do
-    connection.should_receive(:close)
-    delivery_handler.close
-  end
-
   it "sends the binary version of the notification" do
     notification.stub(:to_binary => "hi mom")
     connection.should_receive(:write).with("hi mom")
@@ -91,6 +86,14 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
     config.stub(:check_for_errors => false)
     delivery_handler.should_not_receive(:check_for_error)
     delivery_handler.send(:handle_next_notification)
+  end
+
+  describe 'when being stopped' do
+    it 'closes the connection when a DeliveryQueue::WakeupError is raised' do
+      connection.should_receive(:close)
+      delivery_handler.start
+      delivery_handler.stop
+    end
   end
 
   describe "when delivery fails" do

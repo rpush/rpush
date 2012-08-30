@@ -34,7 +34,7 @@ module Rapns
 
         def post(notification)
           post = Net::HTTP::Post.new(GCM_URI.path, initheader = {'Content-Type' =>'application/json',
-                                                  'Authorization' => notification.auth_key})
+                                                                 'Authorization' => notification.auth_key})
           post.set_form_data(body(notification))
           @http.request(GCM_URI, post)
         end

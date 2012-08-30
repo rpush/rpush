@@ -16,11 +16,4 @@ describe Rapns::Gcm::Notification do
     notification.save!
     notification.app.should == ['foo']
   end
-
-  it 'validates that data and collapse_key are mutually exclusive' do
-    notification.collapse_key = 'foo'
-    notification.data = { :foo => :bar }
-    notification.valid?.should be_false
-    notification.errors[:base].should == ['collapse_key and data cannot both be set.']
-  end
 end

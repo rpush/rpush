@@ -24,7 +24,7 @@ module Rapns
           @connection.connect
         end
 
-        def close
+        def stopped
           @connection.close
         end
 

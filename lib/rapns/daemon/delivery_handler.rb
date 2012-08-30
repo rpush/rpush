@@ -20,7 +20,11 @@ module Rapns
 
       def stop
         @stop = true
-        queue.wakeup(@thread) if @thread
+        if @thread
+          queue.wakeup(@thread)
+          @thread.join
+        end
+        stopped
       end
 
       def stopped
@@ -32,7 +36,6 @@ module Rapns
         begin
           notification = queue.pop
         rescue DeliveryQueue::WakeupError
-          stopped
           return
         end
 
