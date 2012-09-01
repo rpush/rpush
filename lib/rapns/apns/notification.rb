@@ -10,6 +10,9 @@ module Rapns
       validates_with Rapns::Apns::BinaryNotificationValidator
       validates_with Rapns::Apns::SingleAppValidator
 
+      alias_method :attributes_for_device=, :data=
+      alias_method :attributes_for_device, :data
+
       def device_token=(token)
         write_attribute(:device_token, token.delete(" <>")) if !token.nil?
       end
@@ -38,15 +41,6 @@ module Rapns
         end
       end
 
-      def attributes_for_device=(attrs)
-        raise ArgumentError, "attributes_for_device must be a Hash" if !attrs.is_a?(Hash)
-        write_attribute(:data, multi_json_dump(attrs))
-      end
-
-      def attributes_for_device
-        multi_json_load(read_attribute(:data)) if read_attribute(:data)
-      end
-
       MDM_OVERIDE_KEY = '__rapns_mdm__'
       def mdm=(magic)
         self.attributes_for_device = { MDM_OVERIDE_KEY => magic }
@@ -66,6 +60,14 @@ module Rapns
         end
 
         json
+      end
+
+      def payload
+        multi_json_dump(as_json)
+      end
+
+      def payload_size
+        payload.bytesize
       end
 
       def to_binary(options = {})

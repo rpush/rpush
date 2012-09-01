@@ -1,7 +1,13 @@
 require 'unit_spec_helper'
+require 'unit/notification_shared.rb'
 
 describe Rapns::Gcm::Notification do
-  let(:notification) { Rapns::Gcm::Notification.new(:auth_key => 'abc123', :app => ['test']) }
+  it_should_behave_like 'an Notification subclass'
+
+  let(:notification_class) { Rapns::Gcm::Notification }
+  let(:notification) { notification_class.new(:auth_key => 'abc123', :app => ['test']) }
+  let(:data_setter) { 'data=' }
+  let(:data_getter) { 'data' }
 
   it { should validate_presence_of :auth_key }
 

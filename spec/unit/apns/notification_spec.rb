@@ -1,10 +1,16 @@
 require "unit_spec_helper"
+require 'unit/notification_shared.rb'
 
 describe Rapns::Apns::Notification do
+  it_should_behave_like 'an Notification subclass'
+
   it { should validate_presence_of(:device_token) }
   it { should validate_numericality_of(:badge) }
 
-  let(:notification) { Rapns::Apns::Notification.new }
+  let(:notification_class) { Rapns::Apns::Notification }
+  let(:notification) { notification_class.new }
+  let(:data_setter) { 'attributes_for_device=' }
+  let(:data_getter) { 'attributes_for_device' }
 
   it 'does not allow multiple apps to be assigned' do
     notification.app = ['app1', 'app2']
@@ -43,31 +49,6 @@ describe Rapns::Apns::Notification, "when assigning the device token" do
   it "should strip chevrons from the given string" do
     notification = Rapns::Apns::Notification.new(:device_token => "<omg>")
     notification.device_token.should == "omg"
-  end
-end
-
-describe Rapns::Apns::Notification, "when assigning the attributes for the device" do
-  let(:notification) { Rapns::Apns::Notification.new }
-
-  it "should raise an ArgumentError if something other than a Hash is assigned" do
-    expect do
-      notification.attributes_for_device = Array.new
-    end.to raise_error(ArgumentError, "attributes_for_device must be a Hash")
-  end
-
-  it "should encode the given Hash as JSON" do
-    notification.attributes_for_device = {:hi => "mom"}
-    notification.read_attribute(:data).should == "{\"hi\":\"mom\"}"
-  end
-
-  it "should decode the JSON when using the reader method" do
-    notification.attributes_for_device = {:hi => "mom"}
-    notification.attributes_for_device.should == {"hi" => "mom"}
-  end
-
-  it 'warns if attributes_for_device is assigned via mass-assignment' do
-    ActiveSupport::Deprecation.should_receive(:warn)
-    Rapns::Apns::Notification.new(:attributes_for_device => {:hi => 'mom'})
   end
 end
 
@@ -190,22 +171,6 @@ describe Rapns::Apns::Notification, "multi_json usage" do
       Gem.stub(:loaded_specs).and_return( { 'multi_json' => Gem::Specification.new('multi_json', '1.2.9') } )
       MultiJson.should_receive(:decode).with(any_args())
       notification.alert
-    end
-  end
-
-  describe Rapns::Apns::Notification, "attributes_for_device=" do
-    it "should call MultiJson.dump when multi_json responds to :dump" do
-      notification = Rapns::Apns::Notification.new
-      MultiJson.stub(:respond_to?).with(:dump).and_return(true)
-      MultiJson.should_receive(:dump).with(any_args())
-      notification.attributes_for_device = { :pirates => 1 }
-    end
-
-    it "should call MultiJson.encode when multi_json does not respond to :dump" do
-      notification = Rapns::Apns::Notification.new
-      MultiJson.stub(:respond_to?).with(:dump).and_return(false)
-      MultiJson.should_receive(:encode).with(any_args())
-      notification.attributes_for_device = { :ninjas => 1 }
     end
   end
 end

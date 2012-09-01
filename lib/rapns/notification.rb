@@ -30,12 +30,13 @@ module Rapns
       super(value)
     end
 
-    def payload
-      multi_json_dump(as_json)
+    def data=(attrs)
+      raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
+      write_attribute(:data, multi_json_dump(attrs))
     end
 
-    def payload_size
-      payload.bytesize
+    def data
+      multi_json_load(read_attribute(:data)) if read_attribute(:data)
     end
 
     protected
