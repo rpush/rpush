@@ -48,6 +48,14 @@ module Rapns
         end
       end
 
+      def mark_notification_delivered(notification)
+        with_database_reconnect_and_retry do
+          notification.delivered = true
+          notification.delivered_at = Time.now
+          notification.save!(:validate => false)
+        end
+      end
+
       def handle_delivery_error(notification, code, description)
         with_database_reconnect_and_retry do
           notification.delivered = false

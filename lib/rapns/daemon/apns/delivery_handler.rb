@@ -32,13 +32,7 @@ module Rapns
           begin
             @connection.write(notification.to_binary)
             check_for_error if Rapns::Daemon.config.check_for_errors
-
-            with_database_reconnect_and_retry do
-              notification.delivered = true
-              notification.delivered_at = Time.now
-              notification.save!(:validate => false)
-            end
-
+            mark_notification_delivered(notification)
             Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
           rescue Rapns::DeliveryError, Rapns::DisconnectionError => error
             handle_delivery_error(notification, error.code, error.description)
