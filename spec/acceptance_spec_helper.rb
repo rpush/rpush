@@ -60,12 +60,11 @@ def runner(str)
   in_test_rails { cmd("rails runner -e test '#{str}'").strip }
 end
 
-class MissingFixtureError < StandardError; end
-
 def read_fixture(fixture)
   path = File.join(File.dirname(__FILE__), 'acceptance/fixtures', fixture)
   if !File.exists?(path)
-    raise MissingFixtureError, "MISSING FIXTURE: #{path}"
+    STDERR.puts "MISSING FIXTURE: #{path}"
+    pending
   else
     File.read(path)
   end

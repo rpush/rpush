@@ -15,7 +15,7 @@ describe "notification delivery" do
   end
 
   after do
-    Process.kill('KILL', @rapns.pid)
+    Process.kill('KILL', @rapns.pid) if @rapns
   end
 
   it "successfully delivers a notification" do
