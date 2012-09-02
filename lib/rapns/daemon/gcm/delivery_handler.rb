@@ -22,7 +22,7 @@ module Rapns
 
         def body(notification)
           {
-            'registration_ids' => notification.apps,
+            'registration_ids' => notification.registration_ids,
             'collapse_key' => notification.collapse_key,
             'delay_while_idle' => notification.delay_while_idle,
             'time_to_live' => notification.expiry,
@@ -32,7 +32,7 @@ module Rapns
 
         def post(notification)
           post = Net::HTTP::Post.new(GCM_URI.path, initheader = {'Content-Type' =>'application/json',
-                                                                 'Authorization' => notification.auth_key})
+                                                                 'Authorization' => notification.app.auth_key})
           post.set_form_data(body(notification))
           @http.request(GCM_URI, post)
         end

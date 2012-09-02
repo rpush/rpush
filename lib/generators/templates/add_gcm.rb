@@ -33,7 +33,12 @@ class AddGcm < ActiveRecord::Migration
     add_column :rapns_notifications, :registration_ids, :text, :null => true
     add_column :rapns_notifications, :app_id, :integer, :null => true
 
-    execute("UPDATE rapns_notifications SET app_id = rapns_apps.id FROM rapns_apps WHERE rapns_apps.name = rapns_notifications.app")
+    Rapns::Notification.reset_column_information
+    Rapns::App.reset_column_information
+
+    Rapns::App.all.each do |app|
+      Rapns::Notification.update_all(['app_id = ?', app.id], ['app = ?', app.name])
+    end
 
     change_column_null :rapns_notifications, :app_id, false
     remove_column :rapns_notifications, :app
@@ -60,7 +65,12 @@ class AddGcm < ActiveRecord::Migration
 
     add_column :rapns_notifications, :app, :string, :null => true
 
-    execute("UPDATE rapns_notifications SET app = rapns_apps.key FROM rapns_apps WHERE rapns_apps.id = rapns_notifications.app_id")
+    Rapns::Notification.reset_column_information
+    Rapns::App.reset_column_information
+
+    Rapns::App.all.each do |app|
+      Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
+    end
 
     change_column_null :rapns_notifications, :key, false
     remove_column :rapns_notifications, :app_id
