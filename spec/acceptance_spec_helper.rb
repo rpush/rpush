@@ -39,14 +39,10 @@ def cmd(str, echo = false)
 end
 
 def generate
-  return if $generated
-  $generated = true
   in_test_rails { cmd('bundle exec rails g rapns') }
 end
 
 def migrate
-  return if $migrated
-  $migrated = true
   in_test_rails { cmd('bundle exec rake db:migrate') }
 end
 

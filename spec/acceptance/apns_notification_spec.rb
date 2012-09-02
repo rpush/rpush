@@ -7,10 +7,6 @@ describe "notification delivery" do
 
   before do
     setup_rapns
-    runner(<<-RUBY)
-      app = Rapns::Apns::App.create!(:name => "test", :environment => #{env.inspect}, :certificate => #{cert.inspect})
-      Rapns::Apns::Notification.create!(:device_token => #{device_token.inspect}, :alert => "test", :app => app)
-    RUBY
     @rapns = start_rapns
   end
 
@@ -18,7 +14,12 @@ describe "notification delivery" do
     Process.kill('KILL', @rapns.pid) if @rapns
   end
 
-  it "successfully delivers a notification" do
+  it 'delivers an notification with an valid device token' do
+    runner(<<-RUBY)
+      app = Rapns::Apns::App.create!(:name => "test", :environment => #{env.inspect}, :certificate => #{cert.inspect})
+      Rapns::Apns::Notification.create!(:device_token => #{device_token.inspect}, :alert => "test", :app => app)
+    RUBY
+
     delivered = false
     while true
       break if runner("puts Rapns::Apns::Notification.first.failed") == 'true'
@@ -26,5 +27,20 @@ describe "notification delivery" do
       break if delivered
     end
     delivered.should be_true
+  end
+
+  it 'does not deliver an notification with an invalid device token' do
+    runner(<<-RUBY)
+      app = Rapns::Apns::App.create!(:name => "test", :environment => #{env.inspect}, :certificate => #{cert.inspect})
+      Rapns::Apns::Notification.create!(:device_token => "a" * 64, :alert => "test", :app => app)
+    RUBY
+
+    failed = false
+    while true
+      break if runner("puts Rapns::Apns::Notification.first.delivered") == 'true'
+      failed = runner("puts Rapns::Apns::Notification.first.failed") == 'true'
+      break if failed
+    end
+    failed.should be_true
   end
 end
