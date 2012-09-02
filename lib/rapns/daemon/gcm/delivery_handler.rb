@@ -2,7 +2,6 @@ module Rapns
   module Daemon
     module Gcm
       class DeliveryHandler < Rapns::Daemon::DeliveryHandler
-        include DatabaseReconnectable
 
         GCM_URI = URI.parse('https://android.googleapis.com/gcm/send')
 
@@ -12,6 +11,7 @@ module Rapns
 
         def deliver(notification)
           response = post(notification)
+          STDERR.puts response.body
           # CHECK RESPONSE CODES
           mark_notification_delivered(notification)
           # Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
