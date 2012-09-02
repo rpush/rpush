@@ -12,12 +12,6 @@ describe Rapns::Apns::Notification do
   let(:data_setter) { 'attributes_for_device=' }
   let(:data_getter) { 'attributes_for_device' }
 
-  it 'does not allow multiple apps to be assigned' do
-    notification.app = ['app1', 'app2']
-    notification.valid?
-    notification.errors[:app].should == ['APNs does not support sending a notification to multiple apps.']
-  end
-
   it "should validate the format of the device_token" do
     notification = Rapns::Apns::Notification.new(:device_token => "{$%^&*()}")
     notification.valid?.should be_false
@@ -121,7 +115,7 @@ describe Rapns::Apns::Notification, "to_binary" do
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.attributes_for_device = {:hi => :mom}
     notification.expiry = 86400 # 1 day, \x00\x01Q\x80
-    notification.app = 'my_app'
+    notification.app = Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => '0x0')
     notification.save!
     notification.stub(:id).and_return(1234)
     notification.to_binary.should == "\x01\x00\x00\x04\xD2\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}"
@@ -148,7 +142,7 @@ describe Rapns::Apns::Notification, "bug #35" do
     notification = Rapns::Apns::Notification.new do |n|
       n.device_token = "a" * 64
       n.alert = "a" * 210
-      n.app = 'my_app'
+      n.app = Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => '0x0')
     end
 
     notification.to_binary(:for_validation => true).bytesize.should > 256

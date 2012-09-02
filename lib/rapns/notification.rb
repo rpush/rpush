@@ -2,15 +2,16 @@ module Rapns
   class Notification < ActiveRecord::Base
     self.table_name = 'rapns_notifications'
 
-    serialize :app, Array
+    serialize :registration_ids
 
-    attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry,:delivered, :auth_key,
+    belongs_to :app, :class_name => 'Rapns::App'
+
+    attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry,:delivered,
       :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
-      :alert_is_json, :app, :collapse_key, :delay_while_idle
+      :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids
 
     validates :expiry, :numericality => true, :presence => true
-
-    validates_with Rapns::AppPresenceValidator
+    validates :app, :presence => true
 
     scope :ready_for_delivery, lambda {
       where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)',
@@ -25,11 +26,6 @@ module Rapns
       super
     end
 
-    def app=(value)
-      value = [value.to_s] unless value.is_a?(Array)
-      super(value)
-    end
-
     def data=(attrs)
       raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
       write_attribute(:data, multi_json_dump(attrs))
@@ -42,7 +38,7 @@ module Rapns
     protected
 
     def multi_json_load(string, options = {})
-      # Calling load on multi_json less than v1.3.0 attempts to load a file from disk. Check the version explicitly.
+      # Calling load on multi_json less than v1.3.0 attempts to load a file from disk.
       if Gem.loaded_specs['multi_json'].version >= Gem::Version.create('1.3.0')
         MultiJson.load(string, options)
       else

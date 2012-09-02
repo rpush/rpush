@@ -18,8 +18,8 @@ module Rapns
         def started
           poll = Rapns::Daemon.config[:feedback_poll]
           host, port = ENVIRONMENTS[app.environment.to_sym][:feedback]
-          @feedback_receiver = FeedbackReceiver.new(app.key, host, port, poll,
-                                                                         app.certificate, app.password)
+          @feedback_receiver = FeedbackReceiver.new(app.name, host, port, poll,
+                                                    app.certificate, app.password)
           @feedback_receiver.start
         end
 
@@ -29,7 +29,7 @@ module Rapns
 
         def new_delivery_handler
           push_host, push_port = ENVIRONMENTS[app.environment.to_sym][:push]
-          DeliveryHandler.new(app.key, push_host, push_port, app.certificate, app.password)
+          DeliveryHandler.new(app.name, push_host, push_port, app.certificate, app.password)
         end
       end
     end

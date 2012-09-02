@@ -3,7 +3,8 @@ require "unit_spec_helper"
 describe Rapns::Daemon::Feeder do
   let(:poll) { 2 }
   let(:config) { stub(:batch_size => 5000) }
-  let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => 'my_app') }
+  let(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => '0x0') }
+  let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:logger) { stub }
 
   before do

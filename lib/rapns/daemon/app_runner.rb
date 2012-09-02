@@ -7,35 +7,44 @@ module Rapns
 
       @all = {}
 
+      # Needs to be per app, per environment, per runner type.
+
+      # registration_id must be on the Notification.
+      # AuthKey lives on the App.
+
+      # GCM multiplex (same message to many devices, same app):
+      # notification.registration_ids = []
+      # notification.app = "foo"
+
+
       def self.deliver(notification)
-        if app = @all[notification.app] # TODO: Is an array of apps.
+        if app = @all[notification.app_id] # TODO: Is an array of apps.
           app.deliver(notification)
         else
-          Rapns::Daemon.logger.error("No such app '#{notification.app}' for notification #{notification.id}.")
+          Rapns::Daemon.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
         end
       end
 
       def self.sync
         apps = Rapns::App.all
         apps.each do |app|
-          if @all[app.key] # TODO: this is a single app key.
-            @all[app.key].sync(app)
+          if @all[app.id] # TODO: this is a single app key.
+            @all[app.id].sync(app)
           else
             runner = new_runner_for_app(app)
             runner.start
-            @all[app.key] = runner
+            @all[app.id] = runner
           end
         end
 
-        removed = @all.keys - apps.map(&:key)
-        removed.each { |key| @all.delete(key).stop }
+        removed = @all.keys - apps.map(&:id)
+        removed.each { |app_id| @all.delete(app_id).stop }
       end
 
       def self.new_runner_for_app(app)
-        case app.class
-        when Rapns::Apns::App
+        if app.is_a?(Rapns::Apns::App)
           Rapns::Daemon::Apns::AppRunner.new(app)
-        when Rapns::Gcm::App
+        elsif app.is_a?(Rapns::Gcm::App)
           Rapns::Daemon::Gcm::AppRunner.new(app)
         else
           raise NotImplementedError
@@ -91,7 +100,7 @@ module Rapns
       end
 
       def debug
-        Rapns::Daemon.logger.info("\nApp State:\n#{key}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  ready: #{ready?}")
+        Rapns::Daemon.logger.info("\nApp State:\n#{@app.name}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  ready: #{ready?}")
       end
 
       def ready?

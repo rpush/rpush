@@ -5,8 +5,8 @@ describe Rapns::Daemon::Apns::AppRunner do
   it_behaves_like 'an AppRunner subclass'
 
   let(:app_class) { Rapns::Apns::App }
-  let(:app) { app_class.new(:environment => 'development', :key => 'my_app',
-                            :certificate => 'cert', :password => 'pass') }
+  let(:app) { app_class.create!(:name => 'my_app', :environment => 'development',
+                                :certificate => 'cert', :password => 'pass') }
   let(:runner) { Rapns::Daemon::Apns::AppRunner.new(app) }
   let(:handler) { stub(:start => nil, :stop => nil, :queue= => nil) }
   let(:receiver) { stub(:start => nil, :stop => nil) }

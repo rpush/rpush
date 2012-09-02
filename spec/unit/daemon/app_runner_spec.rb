@@ -13,12 +13,12 @@ end
 
 describe Rapns::Daemon::AppRunner, 'deliver' do
   let(:runner) { stub }
-  let(:notification) { stub(:app => 'app') }
+  let(:notification) { stub(:app_id => 1) }
   let(:logger) { stub(:error => nil) }
 
   before do
     Rapns::Daemon.stub(:logger => logger)
-    Rapns::Daemon::AppRunner.all['app'] = runner
+    Rapns::Daemon::AppRunner.all[1] = runner
   end
 
   after { Rapns::Daemon::AppRunner.all.clear }
@@ -29,15 +29,15 @@ describe Rapns::Daemon::AppRunner, 'deliver' do
   end
 
   it 'logs an error if there is no runner to deliver the notification' do
-    notification.stub(:app => 'unknonw', :id => 123)
-    logger.should_receive(:error).with("No such app '#{notification.app}' for notification #{notification.id}.")
+    notification.stub(:app_id => 2, :id => 123)
+    logger.should_receive(:error).with("No such app '#{notification.app_id}' for notification #{notification.id}.")
     Rapns::Daemon::AppRunner.deliver(notification)
   end
 end
 
 describe Rapns::Daemon::AppRunner, 'sync' do
-  let(:app) { stub(:key => 'app') }
-  let(:new_app) { stub(:key => 'new_app') }
+  let(:app) { stub(:id => 1) }
+  let(:new_app) { stub(:id => 2) }
   let(:runner) { stub(:sync => nil, :stop => nil, :start => nil) }
   let(:logger) { stub(:error => nil) }
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
@@ -45,7 +45,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   before do
     Rapns::Daemon::DeliveryQueue.stub(:new => queue)
     Rapns::Daemon::AppRunner.stub(:new_runner_for_app => runner)
-    Rapns::Daemon::AppRunner.all['app'] = runner
+    Rapns::Daemon::AppRunner.all[app.id] = runner
     Rapns::App.stub(:all => [app])
   end
 

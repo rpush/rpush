@@ -26,9 +26,7 @@ module Rapns
             'collapse_key' => notification.collapse_key,
             'delay_while_idle' => notification.delay_while_idle,
             'time_to_live' => notification.expiry,
-            'data' => {
-
-            }
+            'data' => notification.data
           }
         end
 

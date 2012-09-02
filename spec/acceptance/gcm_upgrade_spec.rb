@@ -1,3 +1,3 @@
 describe "GCM upgrade" do
-  it 'does not require that notifications change their app column to an array'
+  it 'associates apps and notifications by ID'
 end
