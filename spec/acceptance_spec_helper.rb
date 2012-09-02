@@ -1,5 +1,9 @@
-require 'unit_spec_helper' # Shouldn't need to do this...
+# require 'unit_spec_helper' # Shouldn't need to do this...
 require 'fileutils'
+
+ENV['RAILS_ENV'] = 'test'
+require 'bundler'
+Bundler.require(:default)
 
 TMP_DIR = '/tmp'
 RAILS_DIR = File.join(TMP_DIR, 'rapns_test')
