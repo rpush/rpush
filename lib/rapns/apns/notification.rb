@@ -61,14 +61,6 @@ module Rapns
         json
       end
 
-      def payload
-        multi_json_dump(as_json)
-      end
-
-      def payload_size
-        payload.bytesize
-      end
-
       def to_binary(options = {})
         id_for_pack = options[:for_validation] ? 0 : id
         [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")

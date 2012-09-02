@@ -4,6 +4,7 @@ require 'unit/notification_shared.rb'
 describe Rapns::Gcm::Notification do
   it_should_behave_like 'an Notification subclass'
 
+  let(:app) { Rapns::Gcm::App.create!(:name => 'test', :auth_key => 'abc') }
   let(:notification_class) { Rapns::Gcm::Notification }
   let(:notification) { notification_class.new }
   let(:data_setter) { 'data=' }
@@ -11,14 +12,44 @@ describe Rapns::Gcm::Notification do
 
   it { should validate_presence_of :registration_ids }
 
-  it 'has a payload limit of 4096 bytes'
-  it 'allows assignment of many registration IDs'
-  it 'allows assignment of a single registration ID'
+  it 'has a payload limit of 4096 bytes' do
+    notification.data = { :key => "a" * 4096 }
+    notification.valid?.should be_false
+    notification.errors[:base].should == ["GCM notification payload cannot be larger than 4096 bytes."]
+  end
+
+  it 'allows assignment of many registration IDs' do
+    notification.app = app
+    notification.registration_ids = ['a', 'b']
+    notification.save!
+    reloaded_notification = notification_class.find(notification.id)
+    reloaded_notification.registration_ids.should == ['a', 'b']
+  end
+
+  it 'allows assignment of a single registration ID' do
+    notification.app = app
+    notification.registration_ids = 'a'
+    notification.save!
+    reloaded_notification = notification_class.find(notification.id)
+    reloaded_notification.registration_ids.should == ['a']
+  end
 
   it 'validates expiry is present if collapse_key is set' do
     notification.collapse_key = 'test'
     notification.expiry = nil
     notification.valid?.should be_false
     notification.errors[:expiry].should == ['must be set when using a collapse_key']
+  end
+
+  it 'does not include time_to_live in the payload if collapse_key is not set' do
+    notification.expiry = 100
+    notification.collapse_key = nil
+    notification.as_json.key?('time_to_live').should be_false
+  end
+
+  it 'includes time_to_live in the payload if collapse_key is set' do
+    notification.expiry = 100
+    notification.collapse_key = 'sync'
+    notification.as_json['time_to_live'].should == 100
   end
 end

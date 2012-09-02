@@ -35,6 +35,14 @@ module Rapns
       multi_json_load(read_attribute(:data)) if read_attribute(:data)
     end
 
+    def payload
+      multi_json_dump(as_json)
+    end
+
+    def payload_size
+      payload.bytesize
+    end
+
     protected
 
     def multi_json_load(string, options = {})
