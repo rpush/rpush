@@ -20,6 +20,7 @@ class AddGcm < ActiveRecord::Migration
     change_column_null :rapns_notifications, :type, false
     change_column_null :rapns_apps, :type, false
     change_column_null :rapns_notifications, :device_token, true
+    change_column_null :rapns_notifications, :expiry, true
     change_column_null :rapns_apps, :environment, true
     change_column_null :rapns_apps, :certificate, true
 
@@ -51,6 +52,7 @@ class AddGcm < ActiveRecord::Migration
     remove_column :rapns_apps, :type
 
     change_column_null :rapns_notifications, :device_token, false
+    change_column_null :rapns_notifications, :expiry, false
     change_column_null :rapns_apps, :environment, false
     change_column_null :rapns_apps, :certificate, false
 

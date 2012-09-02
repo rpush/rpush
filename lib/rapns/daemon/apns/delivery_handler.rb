@@ -34,7 +34,7 @@ module Rapns
             check_for_error if Rapns::Daemon.config.check_for_errors
             mark_notification_delivered(notification)
             Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
-          rescue Rapns::DeliveryError, Rapns::DisconnectionError => error
+          rescue Rapns::DeliveryError, Rapns::Apns::DisconnectionError => error
             handle_delivery_error(notification, error.code, error.description)
             raise
           end
@@ -52,7 +52,7 @@ module Rapns
               description = APN_ERRORS[code.to_i] || "Unknown error. Possible rapns bug?"
               error = Rapns::DeliveryError.new(code, notification_id, description)
             else
-              error = Rapns::DisconnectionError.new
+              error = Rapns::Apns::DisconnectionError.new
             end
 
             begin

@@ -175,8 +175,8 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
       end
 
       it 'raises a DisconnectError error if the connection is closed without an error being returned' do
-        error = Rapns::DisconnectionError.new
-        Rapns::DisconnectionError.should_receive(:new).and_return(error)
+        error = Rapns::Apns::DisconnectionError.new
+        Rapns::Apns::DisconnectionError.should_receive(:new).and_return(error)
         Rapns::Daemon.logger.should_receive(:error).with(error)
         delivery_handler.send(:handle_next_notification)
       end

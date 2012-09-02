@@ -25,6 +25,14 @@ module Rapns
         end
       end
 
+      def self.mark_notification_delivered(notification)
+        with_database_reconnect_and_retry do
+          notification.delivered = true
+          notification.delivered_at = Time.now
+          notification.save!(:validate => false)
+        end
+      end
+
       def self.sync
         apps = Rapns::App.all
         apps.each do |app|
