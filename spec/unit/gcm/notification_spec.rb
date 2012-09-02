@@ -14,4 +14,11 @@ describe Rapns::Gcm::Notification do
   it 'has a payload limit of 4096 bytes'
   it 'allows assignment of many registration IDs'
   it 'allows assignment of a single registration ID'
+
+  it 'validates expiry is present if collapse_key is set' do
+    notification.collapse_key = 'test'
+    notification.expiry = nil
+    notification.valid?.should be_false
+    notification.errors[:expiry].should == ['must be set when using a collapse_key']
+  end
 end

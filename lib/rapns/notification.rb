@@ -10,7 +10,7 @@ module Rapns
       :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
       :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids
 
-    validates :expiry, :numericality => true, :presence => true
+    validates :expiry, :numericality => true, :allow_nil => true
     validates :app, :presence => true
 
     scope :ready_for_delivery, lambda {
