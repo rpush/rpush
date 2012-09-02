@@ -25,14 +25,13 @@ def setup_rails
       cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}', :branch => '#{branch}'\" >> Gemfile")
     end
 
-    Bundler.with_clean_env { cmd("bundle") }
+    cmd("bundle install")
   end
 end
 
-def cmd(str)
-  puts "* #{str}"
+def cmd(str, echo = false)
+  puts "* #{str}" if echo
   Bundler.with_clean_env { `#{str}` }
-  $? == 0
 end
 
 def generate
@@ -57,6 +56,10 @@ def in_test_rails
   end
 end
 
+def runner(str)
+  in_test_rails { cmd("rails runner -e test '#{str}'").strip }
+end
+
 class MissingFixtureError < StandardError; end
 
 def read_fixture(fixture)
@@ -68,63 +71,10 @@ def read_fixture(fixture)
   end
 end
 
-# def connect_console
-#   in_test_rails do
-#     Bundler.with_clean_env do
-#       io = IO.popen('bundle exec rails c test', 'w+')
-#       read_output(io) # Loading development environment (Rails x.x.x)
-#       read_output(io) # Switch to inspect mode.
-#       io.puts("ActiveRecord::Base.logger = ::Logger.new(nil)") # Turn of SQL logging.
-#       io
-#     end
-#   end
-# end
-
 def start_rapns
   in_test_rails do
     Bundler.with_clean_env do
       IO.popen('bundle exec rapns test -f', 'r')
     end
-  end
-end
-
-class Console
-  def initialize
-    in_test_rails do
-      Bundler.with_clean_env do
-        @io = IO.popen('bundle exec rails c test', 'w+')
-      end
-    end
-    readline # Loading development environment (Rails x.x.x)
-    readline # Switch to inspect mode.
-    disable_logging
-  end
-
-  def exec(cmd)
-    @io.puts(cmd)
-    readline # ignore echo
-    readline
-  end
-
-  def readline
-    line = ''
-    while result = IO.select([@io])
-      next if result.empty?
-      c = @io.read(1)
-      break if c.nil? || c == "\n"
-      line << c
-    end
-    p line
-    line
-  end
-
-  def close
-    @io.close
-  end
-
-  protected
-
-  def disable_logging
-    exec("ActiveRecord::Base.logger = ::Logger.new(nil)")
   end
 end

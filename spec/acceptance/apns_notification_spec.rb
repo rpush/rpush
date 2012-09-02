@@ -7,26 +7,24 @@ describe "notification delivery" do
 
   before do
     setup_rapns
-    @console = Console.new
-    @console.exec("Rapns::Apns::App.create!(:key => 'test', :environment => #{env.inspect}, :certificate => #{cert.inspect})")
+    runner(<<-RUBY)
+      app = Rapns::Apns::App.create!(:name => "test", :environment => #{env.inspect}, :certificate => #{cert.inspect})
+      Rapns::Apns::Notification.create!(:device_token => #{device_token.inspect}, :alert => "test", :app => app)
+    RUBY
     @rapns = start_rapns
   end
 
   after do
-    @console.close if @console
-    @rapns.close if @rapns
+    Process.kill('KILL', @rapns.pid)
   end
 
-  # it "successfully delivers a notification" do
-  #   @console.exec("Rapns::Apns::Notification.create!(:device_token => #{device_token.inspect}, :alert => 'test', :app => 'test')")
-
-  #   delivered = false
-  #   while delivered != true
-  #     output = @console.exec("Rapns::Apns::Notification.first.failed")
-  #     output.should == 'false'
-  #     output = @console.exec("Rapns::Apns::Notification.first.delivered")
-  #     delivered = output == 'true'
-  #     sleep 0.1
-  #   end
-  # end
+  it "successfully delivers a notification" do
+    delivered = false
+    while true
+      break if runner("puts Rapns::Apns::Notification.first.failed") == 'true'
+      delivered = runner("puts Rapns::Apns::Notification.first.delivered") == 'true'
+      break if delivered
+    end
+    delivered.should be_true
+  end
 end
