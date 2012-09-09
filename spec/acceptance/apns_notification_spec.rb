@@ -1,6 +1,6 @@
 require 'acceptance_spec_helper'
 
-describe "notification delivery" do
+describe "APNs notification delivery" do
   let(:device_token) { read_fixture('device_token.txt').strip }
   let(:env) { 'production' }
   let(:cert) { read_fixture("#{env}.pem") }

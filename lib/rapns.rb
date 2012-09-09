@@ -2,6 +2,7 @@ require 'active_record'
 require 'multi_json'
 
 require 'rapns/version'
+require 'rapns/multi_json_helper'
 require 'rapns/notification'
 require 'rapns/app'
 

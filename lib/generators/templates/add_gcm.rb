@@ -24,6 +24,8 @@ class AddGcm < ActiveRecord::Migration
     change_column_null :rapns_apps, :environment, true
     change_column_null :rapns_apps, :certificate, true
 
+    change_column :rapns_notifications, :error_description, :text
+
     rename_column :rapns_notifications, :attributes_for_device, :data
     rename_column :rapns_apps, :key, :name
 
@@ -33,6 +35,7 @@ class AddGcm < ActiveRecord::Migration
     add_column :rapns_notifications, :delay_while_idle, :boolean, :null => false, :default => false
     add_column :rapns_notifications, :registration_ids, :text, :null => true
     add_column :rapns_notifications, :app_id, :integer, :null => true
+    add_column :rapns_notifications, :retries, :integer, :null => true, :default => 0
 
     Rapns::Notification.reset_column_information
     Rapns::App.reset_column_information
@@ -56,6 +59,8 @@ class AddGcm < ActiveRecord::Migration
     change_column_null :rapns_apps, :environment, false
     change_column_null :rapns_apps, :certificate, false
 
+    change_column :rapns_notifications, :error_description, :string
+
     rename_column :rapns_notifications, :data, :attributes_for_device
     rename_column :rapns_apps, :name, :key
 
@@ -64,6 +69,7 @@ class AddGcm < ActiveRecord::Migration
     remove_column :rapns_notifications, :collapse_key
     remove_column :rapns_notifications, :delay_while_idle
     remove_column :rapns_notifications, :registration_ids
+    remove_column :rapns_notifications, :retries
 
     add_column :rapns_notifications, :app, :string, :null => true
 

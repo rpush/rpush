@@ -21,11 +21,11 @@ module Rapns
       end
 
       def database_connection_lost
-        Rapns::Daemon.logger.warn("[#{name}] Lost connection to database, reconnecting...")
+        Rapns::Daemon.logger.warn("Lost connection to database, reconnecting...")
         attempts = 0
         loop do
           begin
-            Rapns::Daemon.logger.warn("[#{name}] Attempt #{attempts += 1}")
+            Rapns::Daemon.logger.warn("Attempt #{attempts += 1}")
             reconnect_database
             check_database_is_connected
             break
@@ -34,7 +34,7 @@ module Rapns
             sleep_to_avoid_thrashing
           end
         end
-        Rapns::Daemon.logger.warn("[#{name}] Database reconnected")
+        Rapns::Daemon.logger.warn("Database reconnected")
       end
 
       def reconnect_database

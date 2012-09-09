@@ -1,7 +1,10 @@
 module Rapns
   class Notification < ActiveRecord::Base
+    include Rapns::MultiJsonHelper
+
     self.table_name = 'rapns_notifications'
 
+    # TODO: Dump using multi json.
     serialize :registration_ids
 
     belongs_to :app, :class_name => 'Rapns::App'
@@ -27,6 +30,7 @@ module Rapns
     end
 
     def data=(attrs)
+      return unless attrs
       raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
       write_attribute(:data, multi_json_dump(attrs))
     end
@@ -41,21 +45,6 @@ module Rapns
 
     def payload_size
       payload.bytesize
-    end
-
-    protected
-
-    def multi_json_load(string, options = {})
-      # Calling load on multi_json less than v1.3.0 attempts to load a file from disk.
-      if Gem.loaded_specs['multi_json'].version >= Gem::Version.create('1.3.0')
-        MultiJson.load(string, options)
-      else
-        MultiJson.decode(string, options)
-      end
-    end
-
-    def multi_json_dump(string, options = {})
-      MultiJson.respond_to?(:dump) ? MultiJson.dump(string, options) : MultiJson.encode(string, options)
     end
   end
 end

@@ -5,18 +5,20 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
   it_should_behave_like 'an DeliveryHandler sublcass'
 
   let(:delivery_handler) { Rapns::Daemon::Gcm::DeliveryHandler.new }
-  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
-  let(:notification) { stub.as_null_object }
-  let(:logger) { stub(:error => nil, :info => nil) }
-  let(:config) { stub(:check_for_errors => true) }
-  let(:delivery_queues) { [] }
+  let(:notification) { stub }
   let(:http) { stub(:shutdown => nil)}
+  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
 
   before do
     Net::HTTP::Persistent.stub(:new => http)
-    Rapns::Daemon.stub(:delivery_queues => delivery_queues, :logger => logger, :config => config)
+    Rapns::Daemon::Gcm::Delivery.stub(:perform)
     delivery_handler.queue = queue
     queue.push(notification)
+  end
+
+  it 'performs delivery of an notification' do
+    Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(http, notification)
+    delivery_handler.start
   end
 
   it 'initiates a persistent connection object' do
@@ -24,11 +26,9 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
     Rapns::Daemon::Gcm::DeliveryHandler.new
   end
 
-  describe 'when being stopped' do
-    it 'shuts down the http connection when a DeliveryQueue::WakeupError is raised' do
-      http.should_receive(:shutdown)
-      delivery_handler.start
-      delivery_handler.stop
-    end
+  it 'shuts down the http connection stopped' do
+    http.should_receive(:shutdown)
+    delivery_handler.start
+    delivery_handler.stop
   end
 end

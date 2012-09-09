@@ -32,10 +32,10 @@ module Rapns
           begin
             @connection.write(notification.to_binary)
             check_for_error if Rapns::Daemon.config.check_for_errors
-            mark_notification_delivered(notification)
+            notification.mark_delivered
             Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
           rescue Rapns::DeliveryError, Rapns::Apns::DisconnectionError => error
-            handle_delivery_error(notification, error.code, error.description)
+            notification.mark_failed(error.code, error.description)
             raise
           end
         end

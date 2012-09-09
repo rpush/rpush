@@ -9,7 +9,7 @@ module Rapns
     end
 
     def message
-      "Unable to deliver notification #{@notification_id}, received APN error #{@code} (#{@description})"
+      "Unable to deliver notification #{@notification_id}, received error #{@code} (#{@description})"
     end
   end
 end

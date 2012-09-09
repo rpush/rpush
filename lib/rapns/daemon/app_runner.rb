@@ -2,51 +2,33 @@ module Rapns
 	module Daemon
     class AppRunner
       class << self
-        attr_reader :all
+        attr_reader :runners # TODO: Needed?
       end
 
-      @all = {}
+      @runners = {}
 
-      # Needs to be per app, per environment, per runner type.
-
-      # registration_id must be on the Notification.
-      # AuthKey lives on the App.
-
-      # GCM multiplex (same message to many devices, same app):
-      # notification.registration_ids = []
-      # notification.app = "foo"
-
-
-      def self.deliver(notification)
-        if app = @all[notification.app_id] # TODO: Is an array of apps.
-          app.deliver(notification)
+      def self.enqueue(notification)
+        if app = @runners[notification.app_id]
+          app.enqueue(notification)
         else
           Rapns::Daemon.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
-        end
-      end
-
-      def self.mark_notification_delivered(notification)
-        with_database_reconnect_and_retry do
-          notification.delivered = true
-          notification.delivered_at = Time.now
-          notification.save!(:validate => false)
         end
       end
 
       def self.sync
         apps = Rapns::App.all
         apps.each do |app|
-          if @all[app.id] # TODO: this is a single app key.
-            @all[app.id].sync(app)
+          if @runners[app.id]
+            @runners[app.id].sync(app)
           else
             runner = new_runner_for_app(app)
             runner.start
-            @all[app.id] = runner
+            @runners[app.id] = runner
           end
         end
 
-        removed = @all.keys - apps.map(&:id)
-        removed.each { |app_id| @all.delete(app_id).stop }
+        removed = @runners.keys - apps.map(&:id)
+        removed.each { |app_id| @runners.delete(app_id).stop }
       end
 
       def self.new_runner_for_app(app)
@@ -60,11 +42,11 @@ module Rapns
       end
 
       def self.stop
-        @all.values.map(&:stop)
+        @runners.values.map(&:stop)
       end
 
       def self.debug
-        @all.values.map(&:debug)
+        @runners.values.map(&:debug)
       end
 
       attr_reader :app
@@ -93,7 +75,7 @@ module Rapns
         stopped
       end
 
-      def deliver(notification)
+      def enqueue(notification)
         queue.push(notification) if ready?
       end
 

@@ -1,8 +1,6 @@
 module Rapns
   module Daemon
     class DeliveryHandler
-      include DatabaseReconnectable
-
       attr_accessor :queue
 
       def deliver(notification)
@@ -30,8 +28,6 @@ module Rapns
       def stopped
       end
 
-      protected
-
       def handle_next_notification
         begin
           notification = queue.pop
@@ -45,26 +41,6 @@ module Rapns
           Rapns::Daemon.logger.error(e)
         ensure
           queue.notification_processed
-        end
-      end
-
-      def mark_notification_delivered(notification)
-        with_database_reconnect_and_retry do
-          notification.delivered = true
-          notification.delivered_at = Time.now
-          notification.save!(:validate => false)
-        end
-      end
-
-      def handle_delivery_error(notification, code, description)
-        with_database_reconnect_and_retry do
-          notification.delivered = false
-          notification.delivered_at = nil
-          notification.failed = true
-          notification.failed_at = Time.now
-          notification.error_code = code
-          notification.error_description = description
-          notification.save!(:validate => false)
         end
       end
     end
