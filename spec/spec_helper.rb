@@ -10,37 +10,37 @@ rescue LoadError
 end
 
 require 'active_record'
-adapters = ['mysql', 'mysql2', 'postgresql', 'jdbcpostgresql']
 
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 
-$adapter = if ENV['ADAPTER']
-  ENV['ADAPTER']
-elsif jruby
-  'jdbcpostgresql'
-else
-  'postgresql'
+$adapter = ENV['ADAPTER'] ||
+  if jruby
+    'jdbcpostgresql'
+  else
+    'postgresql'
+  end
+
+DATABASE_CONFIG = YAML.load_file(File.expand_path("../config/database.yml", File.dirname(__FILE__)))
+db_config = DATABASE_CONFIG[$adapter]
+
+if db_config.nil?
+  puts "No such adapter '#{$adapter}'. Valid adapters are #{DATABASE_CONFIG.keys.join(', ')}."
+  exit 1
 end
 
 if jruby
   if ENV['TRAVIS']
-    username = 'postgres'
+    db_config['username'] = 'postgres'
   else
     require 'etc'
-    username = Etc.getlogin
+    db_config['username'] = Etc.getlogin
   end
-else
-  username = nil
-end
-
-if !adapters.include?($adapter)
-  puts "No such adapter '#{$adapter}'. Valid adapters are #{adapters.join(', ')}."
-  exit 1
 end
 
 puts "Using #{$adapter} adapter."
 
-ActiveRecord::Base.establish_connection('username' => username, 'adapter' => $adapter, 'database' => 'rapns_test')
+ActiveRecord::Base.establish_connection(db_config)
+
 require 'generators/templates/create_rapns_notifications'
 require 'generators/templates/create_rapns_feedback'
 require 'generators/templates/add_alert_is_json_to_rapns_notifications'
