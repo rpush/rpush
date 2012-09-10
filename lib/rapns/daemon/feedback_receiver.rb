@@ -5,8 +5,8 @@ module Rapns
 
       FEEDBACK_TUPLE_BYTES = 38
 
-      def initialize(app, host, port, poll, certificate, password)
-        @app = app
+      def initialize(name, host, port, poll, certificate, password)
+        @name = name
         @host = host
         @port = port
         @poll = poll
@@ -33,7 +33,7 @@ module Rapns
       def check_for_feedback
         connection = nil
         begin
-          connection = Connection.new("FeedbackReceiver:#{@app}", @host, @port, @certificate, @password)
+          connection = Connection.new("FeedbackReceiver:#{@name}", @host, @port, @certificate, @password)
           connection.connect
 
           while tuple = connection.read(FEEDBACK_TUPLE_BYTES)
@@ -56,8 +56,8 @@ module Rapns
 
       def create_feedback(failed_at, device_token)
         formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
-        Rapns::Daemon.logger.info("[FeedbackReceiver:#{@app}] Delivery failed at #{formatted_failed_at} for #{device_token}")
-        Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @app)
+        Rapns::Daemon.logger.info("[FeedbackReceiver:#{@name}] Delivery failed at #{formatted_failed_at} for #{device_token}")
+        Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @name)
       end
     end
   end
