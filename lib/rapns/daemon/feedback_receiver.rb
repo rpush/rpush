@@ -25,8 +25,8 @@ module Rapns
               # and retrying later might make sense (for example, a network outage)
               @stop = true
               break
-            rescue StandardError => e
-              Rapns::Daemon.logger.error e
+            rescue
+              # error will be logged in check_for_feedback
             end
             interruptible_sleep @poll
           end
@@ -49,6 +49,9 @@ module Rapns
             timestamp, device_token = parse_tuple(tuple)
             create_feedback(timestamp, device_token)
           end
+        rescue StandardError => e
+          Rapns::Daemon.logger.error(e)
+          raise
         ensure
           connection.close if connection
         end
