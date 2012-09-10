@@ -42,8 +42,12 @@ module Rapns
             feedback_host, feedback_port = HOSTS[app.environment.to_sym][:feedback]
             feedback_poll = Rapns::Daemon.config.feedback_poll
             runner = AppRunner.new(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
-            runner.start
-            @all[app.key] = runner
+            begin
+              runner.start
+              @all[app.key] = runner
+            rescue
+              Rapns::Daemon.logger.info("[App:#{app.key}] failed to start. No notifications will be sent.")
+            end
           end
         end
 
@@ -72,11 +76,19 @@ module Rapns
         @handlers = []
       end
 
-      def start
-        @feedback_receiver = FeedbackReceiver.new(@app.key, @feedback_host, @feedback_port, @feedback_poll, @app.certificate, @app.password)
-        @feedback_receiver.start
 
-        @app.connections.times { @handlers << start_handler }
+      def start
+        begin
+          @feedback_receiver = FeedbackReceiver.new(@app.key, @feedback_host, @feedback_port, @feedback_poll, @app.certificate, @app.password)
+          @feedback_receiver.start
+
+          @app.connections.times { @handlers << start_handler }
+        rescue OpenSSL::SSL::SSLError
+          # these errors mean that a connection is not possible, raise back to caller
+          raise
+        rescue StandardError => e
+          Rapns::Daemon.logger.error(e)
+        end
       end
 
       def deliver(notification)

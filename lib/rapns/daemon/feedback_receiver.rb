@@ -17,8 +17,17 @@ module Rapns
       def start
         @thread = Thread.new do
           loop do
-            break if @stop
-            check_for_feedback
+            begin
+              break if @stop
+              check_for_feedback
+            rescue OpenSSL::SSL::SSLError
+              # stop the thread if there is an SSL error. Other errors might be recoverable,
+              # and retrying later might make sense (for example, a network outage)
+              @stop = true
+              break
+            rescue StandardError => e
+              Rapns::Daemon.logger.error e
+            end
             interruptible_sleep @poll
           end
         end
@@ -40,8 +49,6 @@ module Rapns
             timestamp, device_token = parse_tuple(tuple)
             create_feedback(timestamp, device_token)
           end
-        rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
         ensure
           connection.close if connection
         end
