@@ -4,7 +4,7 @@ postgresql:
   adapter: postgresql
   database: rapns_test
   host: localhost
-  username: rapns_test
+  username: postgres
   password: ""
 
 jdbcpostgresql:
