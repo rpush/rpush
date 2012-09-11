@@ -2,7 +2,7 @@
 
 postgresql:
   adapter: postgresql
-  database: postgres
+  database: rapns_test
   host: localhost
   username: rapns_test
   password: ""
