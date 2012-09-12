@@ -43,7 +43,7 @@ end
 
 describe Rapns::Notification, "when assigning the attributes for the device" do
   it "should raise an ArgumentError if something other than a Hash is assigned" do
-    expect { Rapns::Notification.new(:attributes_for_device => Array.new) }.should
+    expect { Rapns::Notification.new(:attributes_for_device => Array.new) }.to \
       raise_error(ArgumentError, "attributes_for_device must be a Hash")
   end
 

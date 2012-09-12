@@ -66,7 +66,7 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
     error = StandardError.new('bork!')
     connection.stub(:read).and_raise(error)
     Rapns::Daemon.logger.should_receive(:error).with(error)
-    receiever.check_for_feedback
+    lambda { receiever.check_for_feedback }.should raise_error
   end
 
   it 'sleeps for the feedback poll period' do

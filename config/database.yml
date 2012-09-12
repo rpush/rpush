@@ -1,0 +1,31 @@
+# postgresql is the default if no ADAPTER environment variable is set when running specs.
+
+postgresql:
+  adapter: postgresql
+  database: rapns_test
+  host: localhost
+  username: postgres
+  password: ""
+
+jdbcpostgresql:
+  adapter: jdbcpostgresql
+  database: rapns_test
+  host: localhost
+  username: postgres
+  password: ""
+
+mysql:
+  adapter: mysql
+  database: rapns_test
+  host: localhost
+  username: rapns_test
+  password: ""
+  encoding: utf8
+
+mysql2:
+  adapter: mysql
+  database: rapns_test
+  host: localhost
+  username: rapns_test
+  password: ""
+  encoding: utf8

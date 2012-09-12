@@ -105,6 +105,9 @@ module Rapns
         ssl_socket.connect
         Rapns::Daemon.logger.info("[#{@name}] Connected to #{@host}:#{@port}")
         [tcp_socket, ssl_socket]
+      rescue StandardError => e
+        Rapns::Daemon.logger.error("[#{@name}] Error connecting to #{@host}:#{@port} : #{e}")
+        raise
       end
     end
   end
