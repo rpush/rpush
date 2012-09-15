@@ -7,7 +7,6 @@ describe Rapns::Daemon::DatabaseReconnectable do
     attr_reader :name
 
     def initialize(error, max_calls)
-      @name = 'TestDouble'
       @error = error
       @max_calls = max_calls
       @calls = 0
@@ -53,12 +52,12 @@ describe Rapns::Daemon::DatabaseReconnectable do
   end
 
   it "should log that the database is being reconnected" do
-    Rapns::Daemon.logger.should_receive(:warn).with("[TestDouble] Lost connection to database, reconnecting...")
+    Rapns::Daemon.logger.should_receive(:warn).with("Lost connection to database, reconnecting...")
     test_double.perform
   end
 
   it "should log the reconnection attempt" do
-    Rapns::Daemon.logger.should_receive(:warn).with("[TestDouble] Attempt 1")
+    Rapns::Daemon.logger.should_receive(:warn).with("Attempt 1")
     test_double.perform
   end
 
@@ -91,7 +90,7 @@ describe Rapns::Daemon::DatabaseReconnectable do
     end
 
     it "should log the 2nd attempt" do
-      Rapns::Daemon.logger.should_receive(:warn).with("[TestDouble] Attempt 2")
+      Rapns::Daemon.logger.should_receive(:warn).with("Attempt 2")
       test_double.perform
     end
 

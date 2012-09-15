@@ -2,7 +2,7 @@ require "unit_spec_helper"
 require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 
 describe Rapns::Daemon::Gcm::DeliveryHandler do
-  it_should_behave_like 'an DeliveryHandler sublcass'
+  it_should_behave_like 'an DeliveryHandler subclass'
 
   let(:delivery_handler) { Rapns::Daemon::Gcm::DeliveryHandler.new }
   let(:notification) { stub }
@@ -18,7 +18,7 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
 
   it 'performs delivery of an notification' do
     Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(http, notification)
-    delivery_handler.start
+    delivery_handler.handle_next_notification
   end
 
   it 'initiates a persistent connection object' do

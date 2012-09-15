@@ -15,6 +15,7 @@ require 'rapns/daemon/logger'
 require 'rapns/daemon/app_runner'
 require 'rapns/daemon/delivery_handler'
 
+require 'rapns/daemon/apns/delivery'
 require 'rapns/daemon/apns/disconnection_error'
 require 'rapns/daemon/apns/connection'
 require 'rapns/daemon/apns/app_runner'

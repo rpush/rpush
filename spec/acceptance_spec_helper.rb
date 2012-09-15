@@ -33,9 +33,11 @@ def setup_rails
   end
 end
 
-def cmd(str, echo = false)
+def cmd(str, echo = true)
   puts "* #{str}" if echo
-  Bundler.with_clean_env { `#{str}` }
+  retval = Bundler.with_clean_env { `#{str}` }
+  puts retval if echo
+  retval
 end
 
 def generate

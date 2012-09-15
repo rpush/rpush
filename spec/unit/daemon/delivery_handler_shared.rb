@@ -1,4 +1,4 @@
-shared_examples_for 'an DeliveryHandler sublcass' do
+shared_examples_for 'an DeliveryHandler subclass' do
   it "instructs the queue to wakeup the thread when told to stop" do
     thread = stub(:join => nil)
     Thread.stub(:new => thread)
