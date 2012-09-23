@@ -97,19 +97,24 @@ module Rapns
           new_notification.assign_attributes(@notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle'))
           new_notification.data = @notification.data
           new_notification.registration_ids = unavailable_idxs.map { |i| @notification.registration_ids[i] }
+          new_notification.deliver_after = deliver_after_header(response)
           with_database_reconnect_and_retry { new_notification.save! }
           raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors) + " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}.")
         end
 
-        def retry_delivery(notification, response)
+        def deliver_after_header(response)
           if response.header['retry-after']
             retry_after = if response.header['retry-after'].to_s =~ /^[0-9]+$/
               Time.now + response.header['retry-after'].to_i
             else
               Time.httpdate(response.header['retry-after'])
             end
+          end
+        end
 
-            retry_after(notification, retry_after)
+        def retry_delivery(notification, response)
+          if time = deliver_after_header(response)
+            retry_after(notification, time)
           else
             retry_exponentially(notification)
           end

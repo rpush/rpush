@@ -119,11 +119,6 @@ describe Rapns::Daemon::Gcm::Delivery do
         new_notification.deliver_after.should == now + 10.seconds
       end
 
-      it 'sets the delivery time on the new notification to use exponential back-off if the the Retry-After header is not present' do
-        perform rescue Rapns::DeliveryError
-        new_notification.deliver_after.should == now + 2.seconds
-      end
-
       it 'raises a DeliveryError' do
         expect { perform }.to raise_error(Rapns::DeliveryError)
       end
@@ -179,7 +174,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 400) }
 
     it 'marks the notification as failed' do
-      perform
+      perform rescue Rapns::DeliveryError
       notification.reload
       notification.failed.should be_true
       notification.failed_at.should == now

@@ -8,9 +8,11 @@ module Rapns
       end
 
       def retry_after(notification, deliver_after)
-        notification.retries += 1
-        notification.deliver_after = deliver_after
-        notification.save!(:validate => false)
+        with_database_reconnect_and_retry do
+          notification.retries += 1
+          notification.deliver_after = deliver_after
+          notification.save!(:validate => false)
+        end
       end
 
       def retry_exponentially(notification)
