@@ -1,6 +1,7 @@
 module Rapns
   module Daemon
     module Gcm
+      # http://developer.android.com/guide/google/gcm/gcm.html#response
       class Delivery < Rapns::Daemon::Delivery
         include Rapns::MultiJsonHelper
 
@@ -41,13 +42,16 @@ module Rapns
           when 503
             service_unavailable(response)
           else
-            raise Rapns::DeliveryError.new(response.code, notification.id, HTTP_STATUS_CODES[response.code.to_i])
+            raise Rapns::DeliveryError.new(response.code, @notification.id, HTTP_STATUS_CODES[response.code.to_i])
           end
         end
 
         def ok(response)
           body = multi_json_load(response.body)
-          if body['failure'].to_i == 0
+          failure_count = body['failure'].to_i
+          success_count = body['success'].to_i
+
+          if failure_count == 0
             mark_delivered
             # SUCCESS
             # Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
@@ -58,7 +62,7 @@ module Rapns
               errors[i] = result['error'] if result['error']
             end
 
-            if errors.values.all? { |error| error.in?(UNAVAILABLE_STATES) }
+            if success_count == 0 && errors.values.all? { |error| error.in?(UNAVAILABLE_STATES) }
               all_devices_unavailable(response)
             elsif errors.values.any? { |error| error.in?(UNAVAILABLE_STATES) }
               some_devices_unavailable(response, errors)

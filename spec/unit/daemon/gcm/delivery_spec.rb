@@ -29,18 +29,21 @@ describe Rapns::Daemon::Gcm::Delivery do
       end.to change(notification, :delivered).to(true)
     end
 
-    # it 'marks the notification as failed if delivery failed to any of the devices' do
-    #   response.stub(:body => JSON.dump({
-    #     'failure' => 1,
-    #     'success' => 1,
-    #     'results' => [
-    #       { 'message_id' => '1:08' },
-    #       { 'error' => 'Unavailable' }
-    #     ]}))
-
-    #   notification.should_receive(:mark_failed)
-    #   delivery_handler.perform(notification) rescue Rapns::DeliveryError
-    # end
+    it 'marks a notification as failed if any deliveries failed that cannot be retried.' do
+      body = {
+        'failure' => 1,
+        'success' => 1,
+        'results' => [
+          { 'message_id' => '1:000' },
+          { 'error' => 'NotRegistered' }
+      ]}
+      response.stub(:body => JSON.dump(body))
+      perform rescue Rapns::DeliveryError
+      notification.reload
+      notification.failed.should be_true
+      notification.error_code = nil
+      notification.error_description = "Weee"
+    end
 
     describe 'all deliveries returned Unavailable or InternalServerError' do
       let(:body) {{
@@ -82,15 +85,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       end
     end
 
-    describe 'all deliveries failed with some as Unavailable or InternalServerError' do
-      let(:body) {{
-        'failure' => 3,
-        'success' => 0,
-        'results' => [
-          { 'error' => 'Unavailable' },
-          { 'error' => 'NotRegistered' },
-          { 'error' => 'Unavailable' }
-        ]}}
+    shared_examples_for 'an notification with some delivery failures' do
       let(:new_notification) { Rapns::Gcm::Notification.where('id != ?', notification.id).first }
 
       before { response.stub(:body => JSON.dump(body)) }
@@ -101,7 +96,7 @@ describe Rapns::Daemon::Gcm::Delivery do
         notification.failed.should be_true
         notification.failed_at = now
         notification.error_code.should be_nil
-        notification.error_description.should == "Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification 2."
+        notification.error_description.should == error_description
       end
 
       it 'creates a new notification for the unavailable devices' do
@@ -123,6 +118,32 @@ describe Rapns::Daemon::Gcm::Delivery do
         expect { perform }.to raise_error(Rapns::DeliveryError)
       end
     end
+
+    describe 'all deliveries failed with some as Unavailable or InternalServerError' do
+      let(:body) {{
+        'failure' => 3,
+        'success' => 0,
+        'results' => [
+          { 'error' => 'Unavailable' },
+          { 'error' => 'NotRegistered' },
+          { 'error' => 'Unavailable' }
+        ]}}
+      let(:error_description) { "Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification 2." }
+      it_should_behave_like 'an notification with some delivery failures'
+    end
+  end
+
+  describe 'some deliveries failed with Unavailable or InternalServerError' do
+    let(:body) {{
+        'failure' => 2,
+        'success' => 1,
+        'results' => [
+          { 'error' => 'Unavailable' },
+          { 'message_id' => '1:000' },
+          { 'error' => 'InternalServerError' }
+        ]}}
+    let(:error_description) { "Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification 2." }
+    it_should_behave_like 'an notification with some delivery failures'
   end
 
   describe 'an 503 response' do
@@ -180,6 +201,19 @@ describe Rapns::Daemon::Gcm::Delivery do
       notification.failed_at.should == now
       notification.error_code.should == 400
       notification.error_description.should == 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.'
+    end
+  end
+
+  describe 'an un-handled response' do
+    before { response.stub(:code => 418) }
+
+    it 'marks the notification as failed' do
+      perform rescue Rapns::DeliveryError
+      notification.reload
+      notification.failed.should be_true
+      notification.failed_at.should == now
+      notification.error_code.should == 418
+      notification.error_description.should == "I'm a Teapot"
     end
   end
 end
