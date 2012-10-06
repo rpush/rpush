@@ -12,7 +12,9 @@ module Rapns
 
       def with_database_reconnect_and_retry
         begin
-          yield
+          ActiveRecord::Base.connection_pool.with_connection do
+            yield
+          end
         rescue *ADAPTER_ERRORS => e
           Rapns::Daemon.logger.error(e)
           database_connection_lost

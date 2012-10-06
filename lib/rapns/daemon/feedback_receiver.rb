@@ -2,6 +2,7 @@ module Rapns
   module Daemon
     class FeedbackReceiver
       include InterruptibleSleep
+      include DatabaseReconnectable
 
       FEEDBACK_TUPLE_BYTES = 38
 
@@ -66,8 +67,10 @@ module Rapns
 
       def create_feedback(failed_at, device_token)
         formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
-        Rapns::Daemon.logger.info("[FeedbackReceiver:#{@name}] Delivery failed at #{formatted_failed_at} for #{device_token}")
-        Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @name)
+        with_database_reconnect_and_retry do
+          Rapns::Daemon.logger.info("[FeedbackReceiver:#{@name}] Delivery failed at #{formatted_failed_at} for #{device_token}")
+          Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @name)
+        end
       end
     end
   end
