@@ -1,3 +1,7 @@
+## 2.0.5.rc1 (Oct 5, 2012) ##
+  * Release db connections back into the pool after use (#72).
+  * Continue to start daemon if a connection cannot be made during startup (#62) (@mattconnolly).
+
 ## 2.0.4 (Aug 6, 2012) ##
   * Don't exit when there aren't any Rapns::App instances, just warn (#55).
 
