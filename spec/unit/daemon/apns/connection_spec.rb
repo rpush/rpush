@@ -110,7 +110,7 @@ describe Rapns::Daemon::Apns::Connection do
     it "ignores IOError when the socket is already closed" do
       tcp_socket.stub(:close).and_raise(IOError)
       connection.connect
-      expect { connection.close }.should_not raise_error(IOError)
+      expect { connection.close }.to_not raise_error(IOError)
     end
   end
 

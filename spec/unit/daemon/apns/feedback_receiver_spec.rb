@@ -6,7 +6,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:poll) { 60 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:app) { 'my_app' }
+  let(:app) { stub(:name => 'my_app') }
   let(:connection) { stub(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:receiever) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, host, port, poll, certificate, password) }
@@ -31,7 +31,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with("FeedbackReceiver:#{app}", host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with("FeedbackReceiver:#{app.name}", host, port, certificate, password)
     receiever.check_for_feedback
   end
 
@@ -58,7 +58,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'creates the feedback' do
     stub_connection_read_with_tuple
-    Rapns::Apns::Feedback.should_receive(:create!).with(:failed_at => Time.at(1323533325), :device_token => '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', :app => 'my_app')
+    Rapns::Apns::Feedback.should_receive(:create!).with(:failed_at => Time.at(1323533325), :device_token => '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', :app => app)
     receiever.check_for_feedback
   end
 

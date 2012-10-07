@@ -82,7 +82,7 @@ describe Rapns::Apns::Notification, "as_json" do
     notification.as_json["aps"].key?("sound").should be_false
   end
 
-  it "should include attrbutes for the device" do
+  it "should include attributes for the device" do
     notification = Rapns::Apns::Notification.new
     notification.attributes_for_device = {:omg => :lol, :wtf => :dunno}
     notification.as_json["omg"].should == "lol"

@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/ileitch/rapns.png)](http://travis-ci.org/ileitch/rapns)
+[![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
 
 # Features
 
@@ -165,3 +165,4 @@ Thank you to the following wonderful people for contributing to rapns:
 * [@EpicDraws](https://github.com/EpicDraws)
 * [@dei79](https://github.com/dei79)
 * [@adorr](https://github.com/adorr)
+* [@mattconnolly](https://github.com/mattconnolly)

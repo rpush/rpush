@@ -11,9 +11,9 @@ Gem::Specification.new do |s|
   s.summary     = %q{Easy to use, full featured APNs daemon for Rails 3}
   s.description = %q{Easy to use, full featured APNs daemon for Rails 3}
 
-  s.files         = `git ls-files lib`.split("\n") + ["README.md", "CHANGELOG.md", "LICENSE"]
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features,config}`.split("\n")
+  s.executables   = `git ls-files -- bin`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
   s.add_dependency "multi_json", "~> 1.0"

@@ -22,8 +22,13 @@ module Rapns
             @runners[app.id].sync(app)
           else
             runner = new_runner_for_app(app)
-            runner.start
-            @runners[app.id] = runner
+            begin
+              runner.start
+              @runners[app.id] = runner
+            rescue StandardError => e
+              Rapns::Daemon.logger.error("[App:#{app.name}] failed to start. No notifications will be sent.")
+              Rapns::Daemon.logger.error(e)
+            end
           end
         end
 
