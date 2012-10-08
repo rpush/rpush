@@ -7,13 +7,13 @@ module Rapns
 
         FEEDBACK_TUPLE_BYTES = 38
 
-        def initialize(app, host, port, poll, certificate, password)
+        def initialize(app, host, port, poll)
           @app = app
           @host = host
           @port = port
           @poll = poll
-          @certificate = certificate
-          @password = password
+          @certificate = app.certificate
+          @password = app.password
         end
 
         def start

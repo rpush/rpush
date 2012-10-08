@@ -19,8 +19,8 @@ describe Rapns::Daemon::Apns::AppRunner do
   end
 
   it 'instantiates a new feedback receiver when started' do
-    Rapns::Daemon::Apns::FeedbackReceiver.should_receive(:new).with('my_app', 'feedback.sandbox.push.apple.com',
-                                                                    2196, 60, 'cert', 'pass')
+    Rapns::Daemon::Apns::FeedbackReceiver.should_receive(:new).with(app, 'feedback.sandbox.push.apple.com',
+                                                                    2196, 60)
     runner.start
   end
 

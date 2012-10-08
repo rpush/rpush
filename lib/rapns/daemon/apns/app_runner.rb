@@ -18,8 +18,7 @@ module Rapns
         def started
           poll = Rapns::Daemon.config[:feedback_poll]
           host, port = ENVIRONMENTS[app.environment.to_sym][:feedback]
-          @feedback_receiver = FeedbackReceiver.new(app.name, host, port, poll,
-                                                    app.certificate, app.password)
+          @feedback_receiver = FeedbackReceiver.new(app, host, port, poll)
           @feedback_receiver.start
         end
 

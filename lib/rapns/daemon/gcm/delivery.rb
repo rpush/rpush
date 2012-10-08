@@ -24,11 +24,6 @@ module Rapns
 
         protected
 
-        # http://developer.android.com/guide/google/gcm/gcm.html#response
-        #
-        # Handle re-try, back-off. Create new Notification for failed IDs? Warn with an Error?
-        # What to do with new canonical IDs? New table?
-
         def handle_response(response)
           case response.code.to_i
           when 200

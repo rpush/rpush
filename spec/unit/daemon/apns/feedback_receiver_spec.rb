@@ -6,10 +6,10 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:poll) { 60 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:app) { stub(:name => 'my_app') }
+  let(:app) { stub(:name => 'my_app', :password => password, :certificate => certificate) }
   let(:connection) { stub(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
-  let(:receiever) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, host, port, poll, certificate, password) }
+  let(:receiever) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, host, port, poll) }
 
   before do
     receiever.stub(:interruptible_sleep)
