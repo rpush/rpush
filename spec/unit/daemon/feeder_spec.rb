@@ -26,44 +26,44 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
-  it "delivers the notification" do
+  it "enqueue the notification" do
     notification.update_attributes!(:delivered => false)
-    Rapns::Daemon::AppRunner.should_receive(:deliver).with(notification)
+    Rapns::Daemon::AppRunner.should_receive(:enqueue).with(notification)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it 'does not enqueue the notification if the app runner is still processing the previous batch' do
-    Rapns::Daemon::AppRunner.should_not_receive(:deliver)
+    Rapns::Daemon::AppRunner.should_not_receive(:enqueue)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it "enqueues an undelivered notification without deliver_after set" do
     notification.update_attributes!(:delivered => false, :deliver_after => nil)
-    Rapns::Daemon::AppRunner.should_receive(:deliver).with(notification)
+    Rapns::Daemon::AppRunner.should_receive(:enqueue).with(notification)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it "enqueues a notification with a deliver_after time in the past" do
     notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.ago)
-    Rapns::Daemon::AppRunner.should_receive(:deliver).with(notification)
+    Rapns::Daemon::AppRunner.should_receive(:enqueue).with(notification)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it "does not enqueue a notification with a deliver_after time in the future" do
     notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.from_now)
-    Rapns::Daemon::AppRunner.should_not_receive(:deliver)
+    Rapns::Daemon::AppRunner.should_not_receive(:enqueue)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it "does not enqueue a previously delivered notification" do
     notification.update_attributes!(:delivered => true, :delivered_at => Time.now)
-    Rapns::Daemon::AppRunner.should_not_receive(:deliver)
+    Rapns::Daemon::AppRunner.should_not_receive(:enqueue)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
   it "does not enqueue a notification that has previously failed delivery" do
     notification.update_attributes!(:delivered => false, :failed => true)
-    Rapns::Daemon::AppRunner.should_not_receive(:deliver)
+    Rapns::Daemon::AppRunner.should_not_receive(:enqueue)
     Rapns::Daemon::Feeder.enqueue_notifications
   end
 
