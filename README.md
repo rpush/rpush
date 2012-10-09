@@ -15,7 +15,7 @@
 
 ### Who uses rapns?
 
-[GateGuru](http://gateguruapp.com), among others!
+[GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
 
 *I'd love to hear if you use rapns - @ileitch on twitter.*
 
