@@ -89,4 +89,30 @@ describe Rapns::Daemon::FeedbackReceiver, 'check_for_feedback' do
     receiver.should_receive(:interrupt_sleep)
     receiver.stop
   end
+
+  it 'calls the configuration feedback_callback when feedback is received and the callback is set' do
+    stub_connection_read_with_tuple
+    Rapns::configuration.feedback_callback = Proc.new {}
+    feedback = Object.new
+    Rapns::Feedback.stub(:create! => feedback)
+    Rapns::configuration.feedback_callback.should_receive(:call).with(feedback)
+    receiver.check_for_feedback
+  end
+
+  it 'catches exceptions in the feedback_callback' do
+    error = StandardError.new('bork!')
+    stub_connection_read_with_tuple
+    callback = Proc.new { raise error }
+    Rapns::configuration.feedback_callback = callback
+    expect { receiver.check_for_feedback }.not_to raise_error
+  end
+
+  it 'logs an exception from the feedback_callback' do
+    error = StandardError.new('bork!')
+    stub_connection_read_with_tuple
+    callback = Proc.new { raise error }
+    Rapns::Daemon.logger.should_receive(:error).with(error)
+    Rapns::configuration.feedback_callback = callback
+    receiver.check_for_feedback
+  end
 end
