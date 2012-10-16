@@ -5,13 +5,7 @@ require 'rapns'
 
 environment = ARGV[0]
 
-config = Struct.new(:foreground, :push_poll, :feedback_poll, :airbrake_notify, :check_for_errors, :pid_file, :batch_size).new
-config.foreground = false
-config.push_poll = 2
-config.feedback_poll = 60
-config.airbrake_notify = true
-config.check_for_errors = true
-config.batch_size = 5000
+config = Rapns.configuration
 
 banner = 'Usage: rapns <Rails environment> [options]'
 ARGV.options do |opts|
@@ -35,6 +29,7 @@ end
 
 ENV['RAILS_ENV'] = environment
 load 'config/environment.rb'
+load 'config/initializers/rapns.rb' if File.exist?('config/initializers/rapns.rb')
 
 require 'rapns/daemon'
 require 'rapns/patches'

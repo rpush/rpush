@@ -69,7 +69,12 @@ module Rapns
         formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
         with_database_reconnect_and_retry do
           Rapns::Daemon.logger.info("[FeedbackReceiver:#{@name}] Delivery failed at #{formatted_failed_at} for #{device_token}")
-          Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @name)
+          feedback = Rapns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @name)
+          begin
+            Rapns.configuration.feedback_callback.call(feedback) if Rapns.configuration.feedback_callback
+          rescue Exception => e
+            Rapns::Daemon.logger.error(e)
+          end
         end
       end
     end
