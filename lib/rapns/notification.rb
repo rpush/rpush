@@ -52,22 +52,36 @@ module Rapns
       multi_json_load(read_attribute(:attributes_for_device)) if read_attribute(:attributes_for_device)
     end
 
-    MDM_OVERIDE_KEY = '__rapns_mdm__'
+    MDM_KEY = '__rapns_mdm__'
     def mdm=(magic)
-      self.attributes_for_device = {MDM_OVERIDE_KEY => magic}
+      self.attributes_for_device = { MDM_KEY => magic }
+    end
+
+    CONTENT_AVAILABLE_KEY = '__rapns_content_available__'
+    def content_available=(bool)
+      return unless bool
+      self.attributes_for_device = { CONTENT_AVAILABLE_KEY => true }
     end
 
     def as_json
       json = ActiveSupport::OrderedHash.new
 
-      if attributes_for_device && attributes_for_device.key?(MDM_OVERIDE_KEY)
-        json['mdm'] = attributes_for_device[MDM_OVERIDE_KEY]
+      if attributes_for_device && attributes_for_device.key?(MDM_KEY)
+        json['mdm'] = attributes_for_device[MDM_KEY]
       else
         json['aps'] = ActiveSupport::OrderedHash.new
         json['aps']['alert'] = alert if alert
         json['aps']['badge'] = badge if badge
         json['aps']['sound'] = sound if sound
-        attributes_for_device.each { |k, v| json[k.to_s] = v.to_s } if attributes_for_device
+
+        if attributes_for_device && attributes_for_device[CONTENT_AVAILABLE_KEY]
+          json['aps']['content-available'] = 1
+        end
+
+        if attributes_for_device
+          non_aps_attributes = attributes_for_device.reject { |k, v| k == CONTENT_AVAILABLE_KEY }
+          non_aps_attributes.each { |k, v| json[k.to_s] = v.to_s }
+        end
       end
 
       json

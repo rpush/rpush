@@ -118,6 +118,24 @@ describe Rapns::Notification, 'MDM' do
   end
 end
 
+describe Rapns::Notification, 'content-available' do
+  let(:notification) { Rapns::Notification.new }
+
+  it 'includes content-available in the payload' do
+    notification.content_available = true
+    notification.as_json['aps']['content-available'].should == 1
+  end
+
+  it 'does not include content-available in the payload if not set' do
+    notification.as_json['aps'].key?('content-available').should be_false
+  end
+
+  it 'does not include convert-available as a non-aps attribute' do
+    notification.content_available = true
+    notification.as_json.key?('content-available').should be_false
+  end
+end
+
 describe Rapns::Notification, "to_binary" do
   it "should correctly convert the notification to binary" do
     notification = Rapns::Notification.new
