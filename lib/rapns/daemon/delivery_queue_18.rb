@@ -1,6 +1,6 @@
 module Rapns
   module Daemon
-  	class DeliveryQueue18
+    class DeliveryQueue18
       def push(obj)
         Thread.critical = true
         @queue.push obj
@@ -39,6 +39,6 @@ module Rapns
           Thread.critical = false
         end
       end
-  	end
+    end
   end
 end

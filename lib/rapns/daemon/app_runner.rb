@@ -1,5 +1,5 @@
 module Rapns
-	module Daemon
+  module Daemon
     class AppRunner
       class << self
         attr_reader :runners # TODO: Needed?
@@ -119,5 +119,5 @@ module Rapns
         @handler ||= []
       end
     end
-	end
+  end
 end

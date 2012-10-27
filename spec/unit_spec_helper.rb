@@ -1,10 +1,9 @@
 ENV['RAILS_ENV'] = 'test'
 
 begin
-  require 'simplecov'
-  SimpleCov.start do
-    add_filter '/spec/'
-  end
+  require './spec/support/simplecov_helper'
+  include SimpleCovHelper
+  start_simple_cov('unit')
 rescue LoadError
   puts "Coverage disabled."
 end

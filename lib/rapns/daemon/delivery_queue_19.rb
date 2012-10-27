@@ -1,6 +1,6 @@
 module Rapns
   module Daemon
-  	class DeliveryQueue19
+    class DeliveryQueue19
       def initialize
         @mutex = Mutex.new
       end
@@ -35,8 +35,8 @@ module Rapns
       protected
 
       def synchronize(&blk)
-      	@mutex.synchronize(&blk)
+        @mutex.synchronize(&blk)
       end
-  	end
+    end
   end
 end

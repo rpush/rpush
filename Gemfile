@@ -4,6 +4,7 @@ gem 'rake'
 gem 'rspec'
 gem 'shoulda'
 gem 'rails'
+gem 'cane'
 
 platform :ruby do
   gem 'pg'
