@@ -27,13 +27,11 @@ if db_config.nil?
   exit 1
 end
 
-if jruby
-  if ENV['TRAVIS']
-    db_config['username'] = 'postgres'
-  else
-    require 'etc'
-    db_config['username'] = Etc.getlogin
-  end
+if ENV['TRAVIS']
+  db_config['username'] = 'postgres'
+else
+  require 'etc'
+  db_config['username'] = Etc.getlogin
 end
 
 puts "Using #{$adapter} adapter."
