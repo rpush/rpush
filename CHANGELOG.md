@@ -1,3 +1,8 @@
+##  2.0.5 (Nov 4, 2012) ##
+  * Support content-available (#68).
+  * Append to log files.
+  * Fire a callback when Feedback is received.
+
 ## 2.0.5.rc1 (Oct 5, 2012) ##
   * Release db connections back into the pool after use (#72).
   * Continue to start daemon if a connection cannot be made during startup (#62) (@mattconnolly).
