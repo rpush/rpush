@@ -8,4 +8,4 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.rspec_opts = ['--backtrace']
 end
 
-task :default => :spec
+task :default => 'spec:cane'

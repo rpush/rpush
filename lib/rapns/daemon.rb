@@ -100,19 +100,6 @@ module Rapns
       delete_pid_file
     end
 
-    def self.daemonize
-      exit if pid = fork
-      Process.setsid
-      exit if pid = fork
-
-      Dir.chdir '/'
-      File.umask 0000
-
-      STDIN.reopen '/dev/null'
-      STDOUT.reopen '/dev/null', 'a'
-      STDERR.reopen STDOUT
-    end
-
     def self.write_pid_file
       if !config.pid_file.blank?
         begin
@@ -126,6 +113,20 @@ module Rapns
     def self.delete_pid_file
       pid_file = config.pid_file
       File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
+    end
+
+    # :nocov:
+    def self.daemonize
+      exit if pid = fork
+      Process.setsid
+      exit if pid = fork
+
+      Dir.chdir '/'
+      File.umask 0000
+
+      STDIN.reopen '/dev/null'
+      STDOUT.reopen '/dev/null', 'a'
+      STDERR.reopen STDOUT
     end
   end
 end

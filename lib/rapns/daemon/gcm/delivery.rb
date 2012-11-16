@@ -43,27 +43,28 @@ module Rapns
 
         def ok(response)
           body = multi_json_load(response.body)
-          failure_count = body['failure'].to_i
-          success_count = body['success'].to_i
 
-          if failure_count == 0
+          if body['failure'].to_i == 0
             mark_delivered
-            # SUCCESS
-            # Rapns::Daemon.logger.info("[#{@name}] #{notification.id} sent to #{notification.device_token}")
+            Rapns::Daemon.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
           else
-            errors = {}
+            handle_errors(response, body)
+          end
+        end
 
-            body['results'].each_with_index do |result, i|
-              errors[i] = result['error'] if result['error']
-            end
+        def handle_errors(response, body)
+          errors = {}
 
-            if success_count == 0 && errors.values.all? { |error| error.in?(UNAVAILABLE_STATES) }
-              all_devices_unavailable(response)
-            elsif errors.values.any? { |error| error.in?(UNAVAILABLE_STATES) }
-              some_devices_unavailable(response, errors)
-            else
-              raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
-            end
+          body['results'].each_with_index do |result, i|
+            errors[i] = result['error'] if result['error']
+          end
+
+          if body['success'].to_i == 0 && errors.values.all? { |error| error.in?(UNAVAILABLE_STATES) }
+            all_devices_unavailable(response)
+          elsif errors.values.any? { |error| error.in?(UNAVAILABLE_STATES) }
+            some_devices_unavailable(response, errors)
+          else
+            raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
           end
         end
 

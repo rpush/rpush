@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rapns::Daemon::Gcm::Delivery do
-  let(:app) { Rapns::Gcm::App.new(:name => 'test', :auth_key => 'abc123') }
+  let(:app) { Rapns::Gcm::App.new(:name => 'MyApp', :auth_key => 'abc123') }
   let(:notification) { Rapns::Gcm::Notification.create!(:app => app, :registration_ids => ['xyz']) }
   let(:logger) { stub(:error => nil, :info => nil, :warn => nil) }
   let(:response) { stub(:code => 200, :header => {}) }
@@ -27,6 +27,12 @@ describe Rapns::Daemon::Gcm::Delivery do
       expect do
         perform
       end.to change(notification, :delivered).to(true)
+    end
+
+    it 'logs that the notification was delivered' do
+      response.stub(:body => JSON.dump({ 'failure' => 0 }))
+      logger.should_receive(:info).with("[MyApp] 1 sent to xyz")
+      perform
     end
 
     it 'marks a notification as failed if any deliveries failed that cannot be retried.' do
@@ -149,7 +155,10 @@ describe Rapns::Daemon::Gcm::Delivery do
   describe 'an 503 response' do
     before { response.stub(:code => 503) }
 
-    it 'logs a warning that the notification will be retried.'
+    it 'logs a warning that the notification will be retried.' do
+      logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification 1 will be retired after 2012-10-14 00:00:02 (retry 1).")
+      perform
+    end
 
     it 'respects an integer Retry-After header' do
       response.stub(:header => { 'retry-after' => 10 })
@@ -188,6 +197,14 @@ describe Rapns::Daemon::Gcm::Delivery do
         perform
         notification.reload
       end.to change(notification, :deliver_after).to(now + 2 ** 3)
+    end
+  end
+
+  describe 'an 401 response' do
+    before { response.stub(:code => 401) }
+
+    it 'raises an error' do
+      expect { perform }.to raise_error(Rapns::DeliveryError)
     end
   end
 

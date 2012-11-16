@@ -8,6 +8,10 @@ module Rapns
       @description = description
     end
 
+    def to_s
+      message
+    end
+
     def message
       "Unable to deliver notification #{@notification_id}, received error #{@code} (#{@description})"
     end
