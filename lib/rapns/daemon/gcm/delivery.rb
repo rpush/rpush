@@ -8,7 +8,8 @@ module Rapns
         GCM_URI = URI.parse('https://android.googleapis.com/gcm/send')
         UNAVAILABLE_STATES = ['Unavailable', 'InternalServerError']
 
-        def initialize(http, notification)
+        def initialize(app, http, notification)
+          @app = app
           @http = http
           @notification = notification
         end

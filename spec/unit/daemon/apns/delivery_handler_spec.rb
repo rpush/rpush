@@ -9,8 +9,9 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:port) { 2195 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password) }
-  let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
+  let(:app) { stub(:password => password, :certificate => certificate, :name => name)}
+  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port) }
+  let(:connection) { stub('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:notification) { stub }
   let(:http) { stub(:shutdown => nil)}
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
@@ -23,8 +24,8 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   end
 
   it "instantiates a new connection" do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with("DeliveryHandler:#{name}", host, port, certificate, password)
-    Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app.name, host, port, certificate, password)
+    Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port)
   end
 
   it 'performs delivery of an notification' do
@@ -34,7 +35,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   it "connects the socket when instantiated" do
     connection.should_receive(:connect)
-    Rapns::Daemon::Apns::DeliveryHandler.new(name, host, port, certificate, password)
+    Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port)
     delivery_handler.start
     delivery_handler.stop
   end
