@@ -16,7 +16,7 @@ public class GcmTestActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		checkNotNull(SENDER_ID, "SENDER_ID");
 
 		GCMRegistrar.checkDevice(this);
@@ -24,9 +24,9 @@ public class GcmTestActivity extends Activity {
 
 		setContentView(R.layout.main);
 		mDisplay = (TextView) findViewById(R.id.display);
-
+		
 		final String regId = GCMRegistrar.getRegistrationId(this);
-		Log.i(TAG, "registration id =====&nbsp; " + regId);
+		Log.i(TAG, "registration id: " + regId);
 
 		if (regId.equals("")) {
 			GCMRegistrar.register(this, SENDER_ID);
