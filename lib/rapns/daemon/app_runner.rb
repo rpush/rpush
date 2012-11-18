@@ -39,7 +39,7 @@ module Rapns
 
       def self.new_runner(app)
         type = app.class.parent.name.demodulize
-        "Rapns::Daemon::#{type}::AppRunner".constantize
+        "Rapns::Daemon::#{type}::AppRunner".constantize.new(app)
       end
 
       def self.stop
