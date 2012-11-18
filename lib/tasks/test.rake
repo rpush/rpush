@@ -28,5 +28,7 @@ namespace :test do
     ensure
       Dir.chdir(pwd)
     end
+
+    puts "Built into #{path}"
   end
 end
