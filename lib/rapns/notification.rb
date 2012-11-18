@@ -21,6 +21,10 @@ module Rapns
             false, false, Time.now)
     }
 
+    scope :for_apps, lambda { |apps|
+      where(:app_id => apps.map(&:id))
+    }
+
     def initialize(attributes = nil, options = {})
       if attributes.is_a?(Hash) && attributes.keys.include?(:attributes_for_device)
         msg = ":attributes_for_device via mass-assignment is deprecated. Use :data or the attributes_for_device= instance method."

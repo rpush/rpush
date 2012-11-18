@@ -54,6 +54,10 @@ module Rapns
         @runners.values.map(&:debug)
       end
 
+      def self.idle
+        runners.values.find_all { |runner| runner.idle? }
+      end
+
       attr_reader :app
 
       def initialize(app)
@@ -81,7 +85,7 @@ module Rapns
       end
 
       def enqueue(notification)
-        queue.push(notification) if ready?
+        queue.push(notification) if idle?
       end
 
       def sync(app)
@@ -94,11 +98,15 @@ module Rapns
         end
       end
 
-      def debug
-        Rapns::Daemon.logger.info("\nApp State:\n#{@app.name}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  ready: #{ready?}")
+      def idle?
+        pool.mailbox_size == 0
       end
 
-      def ready?
+      def debug
+        Rapns::Daemon.logger.info("\nApp State:\n#{@app.name}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  idle: #{idle?}")
+      end
+
+      def idle?
         queue.notifications_processed?
       end
 
