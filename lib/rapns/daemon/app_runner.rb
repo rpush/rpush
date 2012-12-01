@@ -81,7 +81,7 @@ module Rapns
       end
 
       def enqueue(notification)
-        queue.push(notification) if idle?
+        queue.push(notification)
       end
 
       def sync(app)
@@ -96,9 +96,10 @@ module Rapns
 
       def debug
         Rapns::Daemon.logger.info <<-EOS
+
 #{@app.name}:
   handlers: #{handlers.size}
-  backlog: #{queue.size}
+  queued: #{queue.size}
   idle: #{idle?}
         EOS
       end
