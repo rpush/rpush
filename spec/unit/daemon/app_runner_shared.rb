@@ -34,15 +34,15 @@ shared_examples_for "an AppRunner subclass" do
     end
   end
 
-  describe 'ready?' do
-    it 'is ready if all notifications have been processed' do
+  describe 'idle?' do
+    it 'is idle if all notifications have been processed' do
       queue.stub(:notifications_processed? => true)
-      runner.ready?.should be_true
+      runner.idle?.should be_true
     end
 
-    it 'is not ready if not all notifications have been processed' do
+    it 'is not idle if not all notifications have been processed' do
       queue.stub(:notifications_processed? => false)
-      runner.ready?.should be_false
+      runner.idle?.should be_false
     end
   end
 

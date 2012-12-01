@@ -10,9 +10,9 @@ module Rapns
 
       def self.start(poll)
         loop do
-          break if @stop
           enqueue_notifications
           interruptible_sleep poll
+          break if @stop
         end
       end
 

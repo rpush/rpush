@@ -9,7 +9,7 @@ describe Rapns::Daemon::Gcm::Delivery do
   let(:now) { Time.parse('2012-10-14 00:00:00') }
 
   def perform
-    Rapns::Daemon::Gcm::Delivery.perform(http, notification)
+    Rapns::Daemon::Gcm::Delivery.perform(app, http, notification)
   end
 
   before do

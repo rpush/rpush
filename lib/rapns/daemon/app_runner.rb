@@ -94,22 +94,13 @@ module Rapns
         end
       end
 
-<<<<<<< HEAD
-      def idle?
-        pool.mailbox_size == 0
-=======
       def debug
         Rapns::Daemon.logger.info <<-EOS
 #{@app.name}:
-  handlers: #{pool.size}
-  backlog: #{pool.mailbox_size}
-  ready: #{ready?}
+  handlers: #{handlers.size}
+  backlog: #{queue.size}
+  idle: #{idle?}
         EOS
->>>>>>> ccd9670... Minor refactor.
-      end
-
-      def debug
-        Rapns::Daemon.logger.info("\nApp State:\n#{@app.name}:\n  handlers: #{handlers.size}\n  backlog: #{queue.size}\n  idle: #{idle?}")
       end
 
       def idle?

@@ -4,12 +4,11 @@ require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 describe Rapns::Daemon::Apns::DeliveryHandler do
   it_should_behave_like 'an DeliveryHandler subclass'
 
-  let(:name) { 'my_app:0' }
   let(:host) { 'localhost' }
   let(:port) { 2195 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:app) { stub(:password => password, :certificate => certificate, :name => name)}
+  let(:app) { stub(:password => password, :certificate => certificate, :name => 'MyApp')}
   let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port) }
   let(:connection) { stub('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:notification) { stub }
@@ -29,7 +28,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   end
 
   it 'performs delivery of an notification' do
-    Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(connection, notification)
+    Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(app, connection, notification)
     delivery_handler.handle_next_notification
   end
 

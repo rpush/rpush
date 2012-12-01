@@ -4,7 +4,8 @@ require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 describe Rapns::Daemon::Gcm::DeliveryHandler do
   it_should_behave_like 'an DeliveryHandler subclass'
 
-  let(:delivery_handler) { Rapns::Daemon::Gcm::DeliveryHandler.new }
+  let(:app) { stub }
+  let(:delivery_handler) { Rapns::Daemon::Gcm::DeliveryHandler.new(app) }
   let(:notification) { stub }
   let(:http) { stub(:shutdown => nil)}
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
@@ -17,13 +18,13 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
   end
 
   it 'performs delivery of an notification' do
-    Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(http, notification)
+    Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(app, http, notification)
     delivery_handler.handle_next_notification
   end
 
   it 'initiates a persistent connection object' do
     Net::HTTP::Persistent.should_receive(:new).with('rapns')
-    Rapns::Daemon::Gcm::DeliveryHandler.new
+    Rapns::Daemon::Gcm::DeliveryHandler.new(app)
   end
 
   it 'shuts down the http connection stopped' do

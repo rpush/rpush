@@ -9,7 +9,7 @@ module Rapns
         end
 
         def deliver(notification)
-          Rapns::Daemon::Apns::Delivery.perform(@connection, notification)
+          Rapns::Daemon::Apns::Delivery.perform(@app, @connection, notification)
         end
 
         def stopped

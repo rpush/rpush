@@ -36,15 +36,16 @@ describe Rapns::Daemon::AppRunner, 'deliver' do
 end
 
 describe Rapns::Daemon::AppRunner, 'sync' do
-  let(:app) { stub(:id => 1) }
-  let(:new_app) { stub(:id => 2) }
+  let(:app) { Rapns::Apns::App.new }
+  let(:new_app) { Rapns::Apns::App.new }
   let(:runner) { stub(:sync => nil, :stop => nil, :start => nil) }
   let(:logger) { stub(:error => nil) }
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
 
   before do
+    app.stub(:id => 1)
+    new_app.stub(:id => 2)
     Rapns::Daemon::DeliveryQueue.stub(:new => queue)
-    Rapns::Daemon::AppRunner.stub(:new_runner_for_app => runner)
     Rapns::Daemon::AppRunner.runners[app.id] = runner
     Rapns::App.stub(:all => [app])
   end
@@ -64,7 +65,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   it 'starts a runner for a new app' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = stub
-    Rapns::Daemon::AppRunner.should_receive(:new_runner_for_app).and_return(new_runner)
+    Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
   end

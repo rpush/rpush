@@ -1,12 +1,12 @@
 require 'unit_spec_helper'
 
 describe Rapns::Daemon::Apns::Delivery do
-
+  let(:app) { stub(:name => 'MyApp') }
   let(:notification) { stub.as_null_object }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:config) { stub(:check_for_errors => true) }
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
-  let(:delivery) { Rapns::Daemon::Apns::Delivery.new(connection, notification) }
+  let(:delivery) { Rapns::Daemon::Apns::Delivery.new(app, connection, notification) }
 
   def perform
     begin
@@ -27,7 +27,7 @@ describe Rapns::Daemon::Apns::Delivery do
 
   it "logs the notification delivery" do
     notification.stub(:id => 666, :device_token => 'abc123')
-    logger.should_receive(:info).with("[DeliveryHandler:my_app:0] 666 sent to abc123")
+    logger.should_receive(:info).with("[MyApp] 666 sent to abc123")
     perform
   end
 
@@ -97,8 +97,7 @@ describe Rapns::Daemon::Apns::Delivery do
     it "logs the delivery error" do
       error = Rapns::DeliveryError.new(4, 12, "Missing payload")
       Rapns::DeliveryError.stub(:new => error)
-      logger.should_receive(:error).with(error)
-      perform
+      expect { delivery.perform }.to raise_error(error)
     end
 
     it "sets the notification error description" do
@@ -128,7 +127,7 @@ describe Rapns::Daemon::Apns::Delivery do
     end
 
     it "logs that the connection is being reconnected" do
-      Rapns::Daemon.logger.should_receive(:error).with("[DeliveryHandler:my_app:0] Error received, reconnecting...")
+      Rapns::Daemon.logger.should_receive(:error).with("[MyApp] Error received, reconnecting...")
       perform
     end
 
@@ -138,10 +137,7 @@ describe Rapns::Daemon::Apns::Delivery do
       end
 
       it 'raises a DisconnectError error if the connection is closed without an error being returned' do
-        error = Rapns::Apns::DisconnectionError.new
-        Rapns::Apns::DisconnectionError.should_receive(:new).and_return(error)
-        Rapns::Daemon.logger.should_receive(:error).with(error)
-        perform
+        expect { delivery.perform }.to raise_error(Rapns::Apns::DisconnectionError)
       end
 
       it 'does not set the error code on the notification' do

@@ -16,8 +16,8 @@ module Rapns
           255 => "None (unknown error)"
         }
 
-        def initialize(conneciton, notification)
-          @name = "FIXME"
+        def initialize(app, conneciton, notification)
+          @app = app
           @connection = conneciton
           @notification = notification
         end
@@ -27,7 +27,7 @@ module Rapns
             @connection.write(@notification.to_binary)
             check_for_error if Rapns::Daemon.config.check_for_errors
             mark_delivered
-            Rapns::Daemon.logger.info("[#{@name}] #{@notification.id} sent to #{@notification.device_token}")
+            Rapns::Daemon.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.device_token}")
           rescue Rapns::DeliveryError, Rapns::Apns::DisconnectionError => error
             mark_failed(error.code, error.description)
             raise
@@ -50,7 +50,7 @@ module Rapns
             end
 
             begin
-              Rapns::Daemon.logger.error("[#{@name}] Error received, reconnecting...")
+              Rapns::Daemon.logger.error("[#{@app.name}] Error received, reconnecting...")
               @connection.reconnect
             ensure
               raise error if error
