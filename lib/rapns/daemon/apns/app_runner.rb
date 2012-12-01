@@ -28,7 +28,7 @@ module Rapns
 
         def new_delivery_handler
           push_host, push_port = ENVIRONMENTS[app.environment.to_sym][:push]
-          DeliveryHandler.new(app.name, push_host, push_port, app.certificate, app.password)
+          DeliveryHandler.new(app, push_host, push_port)
         end
       end
     end

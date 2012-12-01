@@ -5,7 +5,7 @@ module Rapns
         protected
 
         def new_delivery_handler
-          DeliveryHandler.new
+          DeliveryHandler.new(app)
         end
       end
     end
