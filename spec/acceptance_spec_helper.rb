@@ -7,7 +7,11 @@ Bundler.require(:default)
 
 TMP_DIR = '/tmp'
 RAILS_DIR = File.join(TMP_DIR, 'rapns_test')
-RAPNS_ROOT = File.expand_path(__FILE__ + '/../../')
+if ENV['TRAVIS']
+  RAPNS_ROOT = 'git://github.com/ileitch/rapns.git'
+else
+  RAPNS_ROOT = File.expand_path(__FILE__ + '/../../')
+end
 
 def setup_rails
   return if $rails_is_setup
