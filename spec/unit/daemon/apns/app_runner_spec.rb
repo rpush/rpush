@@ -6,7 +6,7 @@ describe Rapns::Daemon::Apns::AppRunner do
 
   let(:app_class) { Rapns::Apns::App }
   let(:app) { app_class.create!(:name => 'my_app', :environment => 'development',
-                                :certificate => 'cert', :password => 'pass') }
+                                :certificate => TEST_CERT, :password => 'pass') }
   let(:runner) { Rapns::Daemon::Apns::AppRunner.new(app) }
   let(:handler) { stub(:start => nil, :stop => nil, :queue= => nil) }
   let(:receiver) { stub(:start => nil, :stop => nil) }

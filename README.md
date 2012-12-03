@@ -15,7 +15,7 @@
 
 ### Who uses rapns?
 
-[GateGuru](http://gateguruapp.com), among others!
+[GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
 
 *I'd love to hear if you use rapns - @ileitch on twitter.*
 
@@ -166,3 +166,4 @@ Thank you to the following wonderful people for contributing to rapns:
 * [@dei79](https://github.com/dei79)
 * [@adorr](https://github.com/adorr)
 * [@mattconnolly](https://github.com/mattconnolly)
+* [@emeitch](https://github.com/emeitch)

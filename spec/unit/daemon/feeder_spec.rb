@@ -2,11 +2,12 @@ require "unit_spec_helper"
 
 describe Rapns::Daemon::Feeder do
   let(:config) { stub(:batch_size => 5000) }
-  let(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => '0x0') }
+  let(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:logger) { stub }
 
   before do
+    Rapns::Apns::App.any_instance.stub(:certificate_has_matching_private_key)
     Rapns::Daemon::Feeder.stub(:sleep)
     Rapns::Daemon::Feeder.stub(:interruptible_sleep)
     Rapns::Daemon.stub(:logger => logger, :config => config)
