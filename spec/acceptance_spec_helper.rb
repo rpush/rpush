@@ -8,6 +8,7 @@ Bundler.require(:default)
 TMP_DIR = '/tmp'
 RAILS_DIR = File.join(TMP_DIR, 'rapns_test')
 if ENV['TRAVIS']
+  TRAVIS_BRANCH = 'gcm'
   RAPNS_ROOT = 'git://github.com/ileitch/rapns.git'
 else
   RAPNS_ROOT = File.expand_path(__FILE__ + '/../../')
@@ -22,7 +23,7 @@ def setup_rails
   in_test_rails do
     cmd('echo "gem \'rake\'" >> Gemfile')
     if ENV['TRAVIS']
-      cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}'\" >> Gemfile")
+      cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}', :branch => '#{TRAVIS_BRANCH}'\" >> Gemfile")
     else
       cmd("echo \"gem 'rapns', :git => '#{RAPNS_ROOT}', :branch => '#{branch}'\" >> Gemfile")
     end
