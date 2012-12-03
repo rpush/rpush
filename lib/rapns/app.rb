@@ -4,6 +4,8 @@ module Rapns
 
     attr_accessible :name, :environment, :certificate, :password, :connections, :auth_key
 
+    has_many :notifications
+
     validates :name, :presence => true, :uniqueness => { :scope => [:type, :environment] }
     validates_numericality_of :connections, :greater_than => 0, :only_integer => true
   end

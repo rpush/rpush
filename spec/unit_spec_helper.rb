@@ -20,23 +20,22 @@ $adapter = ENV['ADAPTER'] ||
   end
 
 DATABASE_CONFIG = YAML.load_file(File.expand_path("../config/database.yml", File.dirname(__FILE__)))
-db_config = DATABASE_CONFIG[$adapter]
 
-if db_config.nil?
+if DATABASE_CONFIG[$adapter].nil?
   puts "No such adapter '#{$adapter}'. Valid adapters are #{DATABASE_CONFIG.keys.join(', ')}."
   exit 1
 end
 
 if ENV['TRAVIS']
-  db_config['username'] = 'postgres'
+  DATABASE_CONFIG[$adapter]['username'] = 'postgres'
 else
   require 'etc'
-  db_config['username'] = Etc.getlogin
+  DATABASE_CONFIG[$adapter]['username'] = Etc.getlogin
 end
 
 puts "Using #{$adapter} adapter."
 
-ActiveRecord::Base.establish_connection(db_config)
+ActiveRecord::Base.establish_connection(DATABASE_CONFIG[$adapter])
 
 require 'generators/templates/create_rapns_notifications'
 require 'generators/templates/create_rapns_feedback'

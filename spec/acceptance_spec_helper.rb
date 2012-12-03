@@ -1,4 +1,4 @@
-# require 'unit_spec_helper' # Shouldn't need to do this...
+require 'unit_spec_helper'
 require 'fileutils'
 
 ENV['RAILS_ENV'] = 'test'
@@ -8,12 +8,6 @@ Bundler.require(:default)
 TMP_DIR = '/tmp'
 RAILS_DIR = File.join(TMP_DIR, 'rapns_test')
 RAPNS_ROOT = File.expand_path(__FILE__ + '/../../')
-
-def setup_rapns
-  setup_rails
-  generate
-  migrate
-end
 
 def setup_rails
   return if $rails_is_setup
@@ -33,10 +27,23 @@ def setup_rails
   end
 end
 
+def as_test_rails_db(env='development')
+  orig_config = ActiveRecord::Base.connection_config
+  begin
+    in_test_rails do
+      config = YAML.load_file('config/database.yml')
+      ActiveRecord::Base.establish_connection(config[env])
+      yield
+    end
+  ensure
+    ActiveRecord::Base.establish_connection(orig_config)
+  end
+end
+
 def cmd(str, echo = true)
-  puts "* #{str}" if echo
+  puts "* #{str.strip}" if echo
   retval = Bundler.with_clean_env { `#{str}` }
-  puts retval if echo
+  puts retval.strip if echo
   retval
 end
 
@@ -44,8 +51,18 @@ def generate
   in_test_rails { cmd('bundle exec rails g rapns') }
 end
 
-def migrate
-  in_test_rails { cmd('bundle exec rake db:migrate') }
+def migrate(*migrations)
+  in_test_rails do
+    if migrations.present?
+      migrations.each do |name|
+        migration = Dir.entries('db/migrate').find { |entry| entry =~ /#{name}/ }
+        version = migration.split('_').first
+        cmd("bundle exec rake db:migrate VERSION=#{version} RAILS_ENV=development")
+      end
+    else
+      cmd('bundle exec rake db:migrate RAILS_ENV=development')
+    end
+  end
 end
 
 def in_test_rails
@@ -60,22 +77,4 @@ end
 
 def runner(str)
   in_test_rails { cmd("rails runner -e test '#{str}'").strip }
-end
-
-def read_fixture(fixture)
-  path = File.join(File.dirname(__FILE__), 'acceptance/fixtures', fixture)
-  if !File.exists?(path)
-    STDERR.puts "MISSING FIXTURE: #{path}"
-    pending
-  else
-    File.read(path)
-  end
-end
-
-def start_rapns
-  in_test_rails do
-    Bundler.with_clean_env do
-      IO.popen('bundle exec rapns test -f', 'r')
-    end
-  end
 end

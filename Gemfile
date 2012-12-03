@@ -5,6 +5,7 @@ gem 'rspec'
 gem 'shoulda'
 gem 'rails'
 gem 'cane'
+gem 'sqlite3'
 
 platform :ruby do
   gem 'pg'
