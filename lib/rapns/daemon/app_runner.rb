@@ -51,7 +51,7 @@ module Rapns
       end
 
       def self.idle
-        runners.values.find_all { |runner| runner.idle? }
+        runners.values.select { |runner| runner.idle? }
       end
 
       attr_reader :app

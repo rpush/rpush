@@ -1,11 +1,11 @@
 module Rapns
 
-  # A globally accessible instance of Rapns::Config
+  # A globally accessible instance of Rapns::Configuration
   def self.configuration
-    @configuration ||= Rapns::Config.new
+    @configuration ||= Rapns::Configuration.new
   end
 
-  # Call the given block yielding to it the global Rapns::Config instance for setting
+  # Call the given block yielding to it the global Rapns::Configuration instance for setting
   # configuration values / callbacks.
   #
   # Typically this would be used in your Rails application's config/initializers/rapns.rb file
@@ -14,7 +14,7 @@ module Rapns
   end
 
   # A class to hold Rapns configuration settings and callbacks.
-  class Config < Struct.new(:foreground, :push_poll, :feedback_poll, :airbrake_notify, :check_for_errors, :pid_file, :batch_size)
+  class Configuration < Struct.new(:foreground, :push_poll, :feedback_poll, :airbrake_notify, :check_for_errors, :pid_file, :batch_size)
 
     attr_accessor :feedback_callback
 

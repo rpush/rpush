@@ -19,7 +19,8 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
 
   it 'performs delivery of an notification' do
     Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(app, http, notification)
-    delivery_handler.handle_next_notification
+    delivery_handler.start
+    delivery_handler.stop
   end
 
   it 'initiates a persistent connection object' do

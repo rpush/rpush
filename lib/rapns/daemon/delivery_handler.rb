@@ -10,8 +10,8 @@ module Rapns
       def start
         @thread = Thread.new do
           loop do
-            break if @stop
             handle_next_notification
+            break if @stop
           end
         end
       end
@@ -24,6 +24,8 @@ module Rapns
         end
         stopped
       end
+
+      protected
 
       def stopped
       end

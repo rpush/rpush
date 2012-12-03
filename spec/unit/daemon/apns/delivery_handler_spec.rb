@@ -29,7 +29,8 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   it 'performs delivery of an notification' do
     Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(app, connection, notification)
-    delivery_handler.handle_next_notification
+    delivery_handler.start
+    delivery_handler.stop
   end
 
   it "connects the socket when instantiated" do

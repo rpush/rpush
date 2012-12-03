@@ -92,10 +92,10 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'calls the configuration feedback_callback when feedback is received and the callback is set' do
     stub_connection_read_with_tuple
-    Rapns::configuration.feedback_callback = Proc.new {}
+    Rapns.configuration.feedback_callback = Proc.new {}
     feedback = Object.new
     Rapns::Apns::Feedback.stub(:create! => feedback)
-    Rapns::configuration.feedback_callback.should_receive(:call).with(feedback)
+    Rapns.configuration.feedback_callback.should_receive(:call).with(feedback)
     receiver.check_for_feedback
   end
 
