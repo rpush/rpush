@@ -4,8 +4,11 @@ gem 'rake'
 gem 'rspec'
 gem 'shoulda'
 gem 'rails'
-gem 'cane'
 gem 'sqlite3'
+
+platform :ruby_19 do
+  gem 'cane'
+end
 
 platform :ruby do
   gem 'pg'
