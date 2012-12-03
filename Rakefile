@@ -10,4 +10,6 @@ end
 
 if RUBY_VERSION > '1.9'
   task :default => 'spec:cane'
+else
+  task :default => 'spec'
 end
