@@ -8,7 +8,7 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.rspec_opts = ['--backtrace']
 end
 
-if RUBY_VERSION > '1.9'
+if RUBY_VERSION > '1.9' && defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
   task :default => 'spec:cane'
 else
   task :default => 'spec'
