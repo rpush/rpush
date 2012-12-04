@@ -1,3 +1,3 @@
 module Rapns
-  VERSION = '2.0.5'
+  VERSION = '3.0.0.beta.1'
 end
