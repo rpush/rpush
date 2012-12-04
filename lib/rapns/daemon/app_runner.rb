@@ -1,130 +1,129 @@
 module Rapns
-	module Daemon
+  module Daemon
     class AppRunner
-      HOSTS = {
-        :production => {
-          :push => ['gateway.push.apple.com', 2195],
-          :feedback => ['feedback.push.apple.com', 2196]
-        },
-        :development => {
-          :push => ['gateway.sandbox.push.apple.com', 2195],
-          :feedback => ['feedback.sandbox.push.apple.com', 2196]
-        }
-      }
-
       class << self
-        attr_reader :all
+        attr_reader :runners # TODO: Needed?
       end
 
-      @all = {}
+      @runners = {}
 
-      def self.ready
-        ready = []
-        @all.each { |app, runner| ready << app if runner.ready? }
-        ready
-      end
-
-      def self.deliver(notification)
-        if app = @all[notification.app]
-          app.deliver(notification)
+      def self.enqueue(notification)
+        if app = @runners[notification.app_id]
+          app.enqueue(notification)
         else
-          Rapns::Daemon.logger.error("No such app '#{notification.app}' for notification #{notification.id}.")
+          Rapns::Daemon.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
         end
       end
 
       def self.sync
         apps = Rapns::App.all
-        apps.each do |app|
-          if @all[app.key]
-            @all[app.key].sync(app)
-          else
-            push_host, push_port = HOSTS[app.environment.to_sym][:push]
-            feedback_host, feedback_port = HOSTS[app.environment.to_sym][:feedback]
-            feedback_poll = Rapns::Daemon.config.feedback_poll
-            runner = AppRunner.new(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
-            begin
-              runner.start
-              @all[app.key] = runner
-            rescue
-              Rapns::Daemon.logger.info("[App:#{app.key}] failed to start. No notifications will be sent.")
-            end
+        apps.each { |app| sync_app(app) }
+        removed = runners.keys - apps.map(&:id)
+        removed.each { |app_id| runners.delete(app_id).stop }
+      end
+
+      def self.sync_app(app)
+        if runners[app.id]
+          runners[app.id].sync(app)
+        else
+          runner = new_runner(app)
+          begin
+            runner.start
+            runners[app.id] = runner
+          rescue StandardError => e
+            Rapns::Daemon.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
+            Rapns::Daemon.logger.error(e)
           end
         end
+      end
 
-        removed = @all.keys - apps.map(&:key)
-        removed.each { |key| @all.delete(key).stop }
+      def self.new_runner(app)
+        type = app.class.parent.name.demodulize
+        "Rapns::Daemon::#{type}::AppRunner".constantize.new(app)
       end
 
       def self.stop
-        @all.values.map(&:stop)
+        @runners.values.map(&:stop)
       end
 
       def self.debug
-        @all.values.map(&:debug)
+        @runners.values.map(&:debug)
       end
 
-      def initialize(app, push_host, push_port, feedback_host, feedback_port, feedback_poll)
+      def self.idle
+        runners.values.select { |runner| runner.idle? }
+      end
+
+      attr_reader :app
+
+      def initialize(app)
         @app = app
-        @push_host = push_host
-        @push_port = push_port
-        @feedback_host = feedback_host
-        @feedback_port = feedback_port
-        @feedback_poll = feedback_poll
-
-        @queue = DeliveryQueue.new
-        @feedback_receiver = nil
-        @handlers = []
       end
 
+      def new_delivery_handler
+        raise NotImplementedError
+      end
+
+      def started
+      end
+
+      def stopped
+      end
 
       def start
-        begin
-          @feedback_receiver = FeedbackReceiver.new(@app.key, @feedback_host, @feedback_port, @feedback_poll, @app.certificate, @app.password)
-          @feedback_receiver.start
-
-          @app.connections.times { @handlers << start_handler }
-        rescue OpenSSL::SSL::SSLError
-          # these errors mean that a connection is not possible, raise back to caller
-          raise
-        rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
-        end
-      end
-
-      def deliver(notification)
-        @queue.push(notification)
+        app.connections.times { handlers << start_handler }
+        started
       end
 
       def stop
-        @handlers.map(&:stop)
-        @feedback_receiver.stop if @feedback_receiver
+        handlers.map(&:stop)
+        stopped
+      end
+
+      def enqueue(notification)
+        queue.push(notification)
       end
 
       def sync(app)
         @app = app
-        diff = @handlers.size - app.connections
+        diff = handlers.size - app.connections
         if diff > 0
-          diff.times { @handlers.pop.stop }
+          diff.times { handlers.pop.stop }
         else
-          diff.abs.times { @handlers << start_handler }
+          diff.abs.times { handlers << start_handler }
         end
       end
 
-      def ready?
-        @queue.notifications_processed?
+      def debug
+        Rapns::Daemon.logger.info <<-EOS
+
+#{@app.name}:
+  handlers: #{handlers.size}
+  queued: #{queue.size}
+  idle: #{idle?}
+        EOS
       end
 
-      def debug
-        Rapns::Daemon.logger.info("\nAppRunner State:\n#{@app.key}:\n  handlers: #{@handlers.size}\n  backlog: #{@queue.size}\n  ready: #{ready?}")
+      def idle?
+        queue.notifications_processed?
       end
 
       protected
 
       def start_handler
-        handler = DeliveryHandler.new(@queue, @app.key, @push_host, @push_port, @app.certificate, @app.password)
+        handler = new_delivery_handler
+        handler.queue = queue
         handler.start
         handler
       end
+
+      def queue
+        @queue ||= Rapns::Daemon::DeliveryQueue.new
+      end
+
+      def handlers
+        @handler ||= []
+      end
     end
-	end
+  end
 end

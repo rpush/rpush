@@ -6,3 +6,4 @@ coverage/
 .rbx/
 spec/acceptance/fixtures
 .rbenv-version
+gcm_test/bin

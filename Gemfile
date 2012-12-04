@@ -3,7 +3,12 @@ source 'http://rubygems.org'
 gem 'rake'
 gem 'rspec'
 gem 'shoulda'
-gem 'activerecord', :require => 'active_record'
+gem 'rails'
+gem 'sqlite3'
+
+platform :ruby_19 do
+  gem 'cane'
+end
 
 platform :ruby do
   gem 'pg'
@@ -23,5 +28,6 @@ end
 gem 'database_cleaner'
 gem 'simplecov'
 gem 'multi_json'
+gem 'net-http-persistent'
 
 gemspec

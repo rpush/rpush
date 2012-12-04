@@ -3,18 +3,28 @@ require 'socket'
 require 'pathname'
 require 'openssl'
 
+require 'net/http/persistent'
+
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/delivery_error'
-require 'rapns/daemon/disconnection_error'
-require 'rapns/daemon/connection'
 require 'rapns/daemon/database_reconnectable'
+require 'rapns/daemon/delivery'
 require 'rapns/daemon/delivery_queue'
-require 'rapns/daemon/delivery_handler'
-require 'rapns/daemon/delivery_handler_pool'
-require 'rapns/daemon/feedback_receiver'
-require 'rapns/daemon/app_runner'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/logger'
+require 'rapns/daemon/app_runner'
+require 'rapns/daemon/delivery_handler'
+
+require 'rapns/daemon/apns/delivery'
+require 'rapns/daemon/apns/disconnection_error'
+require 'rapns/daemon/apns/connection'
+require 'rapns/daemon/apns/app_runner'
+require 'rapns/daemon/apns/delivery_handler'
+require 'rapns/daemon/apns/feedback_receiver'
+
+require 'rapns/daemon/gcm/delivery'
+require 'rapns/daemon/gcm/app_runner'
+require 'rapns/daemon/gcm/delivery_handler'
 
 module Rapns
   module Daemon
@@ -90,19 +100,6 @@ module Rapns
       delete_pid_file
     end
 
-    def self.daemonize
-      exit if pid = fork
-      Process.setsid
-      exit if pid = fork
-
-      Dir.chdir '/'
-      File.umask 0000
-
-      STDIN.reopen '/dev/null'
-      STDOUT.reopen '/dev/null', 'a'
-      STDERR.reopen STDOUT
-    end
-
     def self.write_pid_file
       if !config.pid_file.blank?
         begin
@@ -116,6 +113,20 @@ module Rapns
     def self.delete_pid_file
       pid_file = config.pid_file
       File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
+    end
+
+    # :nocov:
+    def self.daemonize
+      exit if pid = fork
+      Process.setsid
+      exit if pid = fork
+
+      Dir.chdir '/'
+      File.umask 0000
+
+      STDIN.reopen '/dev/null'
+      STDOUT.reopen '/dev/null', 'a'
+      STDERR.reopen STDOUT
     end
   end
 end

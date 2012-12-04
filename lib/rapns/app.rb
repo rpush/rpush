@@ -2,11 +2,11 @@ module Rapns
   class App < ActiveRecord::Base
     self.table_name = 'rapns_apps'
 
-    attr_accessible :key, :environment, :certificate, :password, :connections
+    attr_accessible :name, :environment, :certificate, :password, :connections, :auth_key
 
-    validates :key, :presence => true, :uniqueness => true
-    validates :environment, :presence => true, :inclusion => { :in => %w(development production) }
-    validates :certificate, :presence => true
+    has_many :notifications
+
+    validates :name, :presence => true, :uniqueness => { :scope => [:type, :environment] }
     validates_numericality_of :connections, :greater_than => 0, :only_integer => true
 
     validate :certificate_has_matching_private_key
@@ -20,11 +20,10 @@ module Rapns
         pkey = OpenSSL::PKey::RSA.new certificate rescue nil
         result = !x509.nil? && !pkey.nil?
         unless result
-          errors.add :certificate, "Certificate value must contain a certificate and a private key"
+          errors.add :certificate, 'Certificate value must contain a certificate and a private key.'
         end
       end
       result
     end
   end
 end
-

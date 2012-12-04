@@ -1,0 +1,8 @@
+# 3.0
+
+* Migration upgrade test.
+* Document USR1.
+* Log on HUP.
+* Detect only 2.0 usage? Direct to upgrade doc in the Wiki?
+* Update README for 3.0
+* Document config.rb
