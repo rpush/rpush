@@ -6,3 +6,4 @@
 * Detect only 2.0 usage? Direct to upgrade doc in the Wiki?
 * Update README for 3.0
 * Document config.rb
+* Add option to quit after sending pending notifications.
