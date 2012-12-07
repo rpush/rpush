@@ -153,6 +153,10 @@ When running specs, please note that the ActiveRecord adapter can be changed by 
 
 Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
 
+Note that the database username is changed at runtime to be the currently logged in user's name. So if you're testing
+with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rapns_test'
+mysql database.
+
 ### Contributors
 
 Thank you to the following wonderful people for contributing to rapns:
