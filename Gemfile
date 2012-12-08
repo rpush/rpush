@@ -4,7 +4,6 @@ gem 'rake'
 gem 'rspec'
 gem 'shoulda'
 gem 'rails'
-gem 'sqlite3'
 
 platform :ruby_19 do
   gem 'cane'
@@ -15,6 +14,7 @@ platform :ruby do
   gem 'mysql2'
   gem 'mysql'
   gem 'yajl-ruby'
+  gem 'sqlite3'
   #gem 'perftools.rb'
 end
 
