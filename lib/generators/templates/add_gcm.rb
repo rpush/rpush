@@ -25,6 +25,7 @@ class AddGcm < ActiveRecord::Migration
     change_column_null :rapns_apps, :certificate, true
 
     change_column :rapns_notifications, :error_description, :text
+    change_column :rapns_notifications, :sound, :string, :default => 'default'
 
     rename_column :rapns_notifications, :attributes_for_device, :data
     rename_column :rapns_apps, :key, :name

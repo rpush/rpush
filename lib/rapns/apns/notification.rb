@@ -8,6 +8,7 @@ module Rapns
 
       validates_with Rapns::Apns::DeviceTokenFormatValidator
       validates_with Rapns::Apns::BinaryNotificationValidator
+      validate :validate_required_fields
 
       alias_method :attributes_for_device=, :data=
       alias_method :attributes_for_device, :data
@@ -79,6 +80,18 @@ module Rapns
         id_for_pack = options[:for_validation] ? 0 : id
         [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
       end
+
+
+      private
+
+      # Notifications must contain one of alert, badge or sound as per:
+      # https://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html
+      def validate_required_fields
+        if alert.nil? && badge.nil? && sound.nil?
+          errors[:base] << "APN Notification must contain one of alert, badge, or sound"
+        end
+      end
+
     end
   end
 end
