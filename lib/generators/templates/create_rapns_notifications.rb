@@ -3,7 +3,7 @@ class CreateRapnsNotifications < ActiveRecord::Migration
     create_table :rapns_notifications do |t|
       t.integer   :badge,                 :null => true
       t.string    :device_token,          :null => false, :limit => 64
-      t.string    :sound,                 :null => true,  :default => "default"
+      t.string    :sound,                 :null => true,  :default => "1.aiff"
       t.string    :alert,                 :null => true
       t.text      :attributes_for_device, :null => true
       t.integer   :expiry,                :null => false, :default => 1.day.to_i
