@@ -95,9 +95,14 @@ describe Rapns::Daemon::Apns::Delivery do
     end
 
     it "logs the delivery error" do
-      error = Rapns::DeliveryError.new(4, 12, "Missing payload")
-      Rapns::DeliveryError.stub(:new => error)
-      expect { delivery.perform }.to raise_error(error)
+      # checking for the stubbed error doesn't work in jruby, but checking
+      # for the exception by class does.
+
+      #error = Rapns::DeliveryError.new(4, 12, "Missing payload")
+      #Rapns::DeliveryError.stub(:new => error)
+      #expect { delivery.perform }.to raise_error(error)
+
+      expect { delivery.perform }.to raise_error(Rapns::DeliveryError)
     end
 
     it "sets the notification error description" do
