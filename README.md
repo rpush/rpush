@@ -49,26 +49,22 @@ Generate the migration, rapns.yml and migrate:
     <tr>
         <td>
             <pre>
-                <code>
-app = Rapns::Apns::App.new
+                <code>app = Rapns::Apns::App.new
 app.name = "ios_app"
 app.certificate = File.read("/path/to/development.pem")
 app.environment = "development"
 app.password = "certificate password"
 app.connections = 1
-app.save!
-                </code>
+app.save!</code>
             </pre>
         </td>
         <td>
             <pre>
-                <code>
-app = Rapns::Gcm::App.new
+                <code>app = Rapns::Gcm::App.new
 app.name = 'android_app'
 app.auth_key = "..."
 app.connections = 1
 app.save!
-
 
                 </code>
             </pre>
