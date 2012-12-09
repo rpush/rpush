@@ -1,11 +1,19 @@
 # 3.0
 
+* Implement -C config option.
+* Implement -D(?) for database.yml path
+* Add ActiveRecord, ActiveSupport to gemspec.
+* Generate config/initializers/rapns.rb
+
 * Migration upgrade test.
 * Document USR1.
 * Log on HUP.
 * Detect only 2.0 usage? Direct to upgrade doc in the Wiki?
 * Update README for 3.0
 * Document config.rb
+
+
+# 3.1
 * Add option to quit after sending pending notifications.
 * Warn if number of workers is more than db pool size?
 * statsd probes?
