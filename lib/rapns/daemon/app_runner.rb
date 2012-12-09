@@ -8,7 +8,7 @@ module Rapns
       @runners = {}
 
       def self.enqueue(notification)
-        if app = @runners[notification.app_id]
+        if app = runners[notification.app_id]
           app.enqueue(notification)
         else
           Rapns::Daemon.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
@@ -43,11 +43,11 @@ module Rapns
       end
 
       def self.stop
-        @runners.values.map(&:stop)
+        runners.values.map(&:stop)
       end
 
       def self.debug
-        @runners.values.map(&:debug)
+        runners.values.map(&:debug)
       end
 
       def self.idle

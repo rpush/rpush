@@ -1,5 +1,127 @@
 [![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
 
+rapns - Professional grade APNs and GCM daemon.
+
+* Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
+* Seamless Rails integration.
+* Scalable - choose the number of threads each app spawns.
+* Designed for uptime - signal -HUP to add, update apps.
+* Stable - reconnects database and network connections when lost.
+* Works with MRI, JRuby, Rubinius 1.8 and 1.9.
+* [Airbrake](http://airbrakeapp.com/) integration.
+
+### Who uses rapns?
+
+[GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
+
+*I'd love to hear if you use rapns - @ileitch on twitter.*
+
+## Getting Started
+
+Add rapns to your Gemfile:
+
+    gem 'rapns'
+
+Generate the migration, rapns.yml and migrate:
+
+    rails g rapns
+    rake db:migrate
+
+## Generating Certificates
+
+1. Open up Keychain Access and select the `Certificates` category in the sidebar.
+2. Expand the disclosure arrow next to the iOS Push Services certificate you want to export.
+3. Select both the certificate and private key.
+4. Right click and select `Export 2 items...`.
+5. Save the file as `cert.p12`, make sure the File Format is `Personal Information Exchange (p12)`.
+6. If you decide to set a password for your exported certificate, please read the 'Adding Apps' section below.
+7. Convert the certificate to a .pem, where `<environment>` should be `development` or `production`, depending on the certificate you exported.
+
+    `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
+
+## Create an App
+
+<table>
+    <tr>
+        <td>APNs</td>
+        <td>GCM</td>
+    </tr>
+    <tr>
+        <td>
+            <pre>
+                <code>
+                    app = Rapns::Apns::App.new
+                    app.name = "ios_app"
+                    app.certificate = File.read("/path/to/development.pem")
+                    app.environment = "development"
+                    app.password = "certificate password"
+                    app.connections = 1
+                    app.save!
+                </code>
+            </pre>
+        </td>
+        <td>
+            <pre>
+                <code>
+                    app = Rapns::Gcm::App.new
+                    app.name = 'android_app'
+                    app.auth_key = "..."
+                    app.connections = 1
+                    app.save!
+                </code>
+            </pre>
+        </td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td>APNs</td>
+        <td>GCM</td>
+    </tr>
+    <tr>
+        <td>
+            <pre>
+                <code>
+                </code>
+            </pre>
+        </td>
+        <td>
+            <pre>
+                <code>
+                    n = Rapns::Gcm::Notification.new
+                    n.app = Rapns::Gcm::App.find_by_name("android_app")
+                    n.registration_ids = ["..."]
+                    n.data = {:message => "hi mom!"}
+                    n.save!
+                </code>
+            </pre>
+        </td>
+    </tr>
+</table>
+
+
+## Starting the rapns Daemon
+
+    cd /path/to/rails/app
+    bundle exec rapns <Rails environment> [options]
+
+
+* Install
+    - Note on updates.
+* Basic usage
+    - Generate cert.
+    - Apns, GCM
+* Wiki links
+
+
+
+
+==================================================================================
+
+
+[![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
+
 # Features
 
 * Works with Rails 3 and Ruby 1.9 & 1.8.
