@@ -51,8 +51,8 @@ app.environment = "development"                         |
 app.password = "certificate password"                   |
 app.connections = 1                                     |
 app.save!                                               |
-```
-
+```                                                     |
+------------------------------------------------------- | ------
 <table>
     <tr>
         <th>APNs</th>
