@@ -64,6 +64,14 @@ app.save!
 ## Create a Notification
 
 #### APNs
+```ruby
+n = Rapns::Apns::Notification.new
+n.app = Rapns::Apns::App.find_by_name("ios_app")
+n.device_token = "..."
+n.alert = "hi mom!"
+n.attributes_for_device = {:foo => :bar}
+n.save!
+```
 
 #### GCM
 ```ruby
@@ -74,10 +82,12 @@ n.data = {:message => "hi mom!"}
 n.save!
 ```
 
-## Starting the rapns Daemon
+## Starting rapns
 
     cd /path/to/rails/app
-    bundle exec rapns <Rails environment> [options]
+    rapns <Rails environment> [options]
+
+See [Configuration](wiki/Heroku) for a list of options, or run `rapns --help`.
 
 
 * Install
