@@ -66,26 +66,22 @@ app.save!
     </tr>
     <tr>
         <td>
-            <pre>
-<code>app = Rapns::Apns::App.new
-app.name = "ios_app"
-app.certificate = File.read("/path/to/development.pem")
-app.environment = "development"
-app.password = "certificate password"
-app.connections = 1
-app.save!</code>
-            </pre>
+<div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="no">Rapns</span><span class="o">::</span><span class="no">Apns</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">new</span>
+<span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"ios_app"</span>
+<span class="n">app</span><span class="o">.</span><span class="n">certificate</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"/path/to/development.pem"</span><span class="p">)</span>
+<span class="n">app</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="s2">"development"</span>
+<span class="n">app</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="s2">"certificate password"</span>
+<span class="n">app</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">app</span><span class="o">.</span><span class="n">save!</span>
+</pre></div>
         </td>
         <td>
-            <pre>
-<code>app = Rapns::Gcm::App.new
-app.name = "android_app"
-app.auth_key = "..."
-app.connections = 1
-app.save!
-
-</code>
-            </pre>
+<div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="no">Rapns</span><span class="o">::</span><span class="no">Gcm</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">new</span>
+<span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"android_app"</span>
+<span class="n">app</span><span class="o">.</span><span class="n">auth_key</span> <span class="o">=</span> <span class="s2">"..."</span>
+<span class="n">app</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">app</span><span class="o">.</span><span class="n">save!</span>
+</pre></div>
         </td>
     </tr>
 </table>
