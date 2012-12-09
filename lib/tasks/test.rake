@@ -16,12 +16,11 @@ namespace :test do
     pwd = Dir.pwd
 
     cmd("bundle exec rails new #{path} --skip-bundle")
-    branch = cmd("git branch | grep '\*'").split(' ').last
 
     begin
       Dir.chdir(path)
       cmd('echo "gem \'rake\'" >> Gemfile')
-      cmd("echo \"gem 'rapns', :git => '#{rapns_root}', :branch => '#{branch}'\" >> Gemfile")
+      cmd("echo \"gem 'rapns', :path => '#{rapns_root}'\"")
       cmd('bundle install')
       cmd('bundle exec rails g rapns')
       cmd('bundle exec rake db:migrate')

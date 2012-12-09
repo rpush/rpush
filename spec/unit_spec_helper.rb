@@ -12,12 +12,8 @@ require 'active_record'
 
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 
-$adapter = ENV['ADAPTER'] ||
-  if jruby
-    'jdbcpostgresql'
-  else
-    'postgresql'
-  end
+$adapter = ENV['ADAPTER'] || 'postgresql'
+$adapter = 'jdbc' + $adapter if jruby
 
 DATABASE_CONFIG = YAML.load_file(File.expand_path("../config/database.yml", File.dirname(__FILE__)))
 

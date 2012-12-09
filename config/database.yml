@@ -29,3 +29,11 @@ mysql2:
   username: rapns_test
   password: ""
   encoding: utf8
+
+jdbcmysql:
+  adapter: jdbcmysql
+  database: rapns_test
+  host: localhost
+  username: rapns_test
+  password: ""
+  encoding: utf8

@@ -8,6 +8,7 @@ module Rapns
 
       validates_with Rapns::Apns::DeviceTokenFormatValidator
       validates_with Rapns::Apns::BinaryNotificationValidator
+      validates_with Rapns::Apns::RequiredFieldsValidator
 
       alias_method :attributes_for_device=, :data=
       alias_method :attributes_for_device, :data
@@ -79,6 +80,7 @@ module Rapns
         id_for_pack = options[:for_validation] ? 0 : id
         [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
       end
+
     end
   end
 end

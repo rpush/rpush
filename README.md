@@ -143,6 +143,7 @@ After updating you should run `rails g rapns` to check for any new migrations.
 
 * [Deploying to Heroku](https://github.com/ileitch/rapns/wiki/Heroku)
 * [Why open multiple connections to the APNs?](https://github.com/ileitch/rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
+* [Upgrading from version 2.x to 3.0](https://github.com/ileitch/rapns/wiki/Upgrading-from-version-2.x-to-3.0)
 
 ## Contributing to rapns
 
@@ -151,6 +152,10 @@ Fork as usual and go crazy!
 When running specs, please note that the ActiveRecord adapter can be changed by setting the `ADAPTER` environment variable. For example: `ADAPTER=postgresql rake`.
 
 Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
+
+Note that the database username is changed at runtime to be the currently logged in user's name. So if you're testing
+with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rapns_test'
+mysql database.
 
 ### Contributors
 

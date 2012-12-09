@@ -25,12 +25,22 @@ describe Rapns::Apns::Notification do
     notification.errors[:base].include?("APN notification cannot be larger than 256 bytes. Try condensing your alert and device attributes.").should be_true
   end
 
-  it "should default the sound to 1.aiff" do
-    notification.sound.should == "1.aiff"
+  it "should default the sound to 'default'" do
+    notification.sound.should eq('default')
   end
 
   it "should default the expiry to 1 day" do
     notification.expiry.should == 1.day.to_i
+  end
+
+  # The notification must contain one of alert, sound or badge.
+  # @see https://developer.apple.com/library/ios/#documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/ApplePushService/ApplePushService.html
+  it "should not be valid if there is none of alert,sound,badge present" do
+    notification.alert = nil
+    notification.sound = nil
+    notification.badge = nil
+    notification.valid?.should be_false
+    notification.errors[:base].should include("APN Notification must contain one of alert, badge, or sound")
   end
 end
 
