@@ -41,7 +41,7 @@ Generate the migration, rapns.yml and migrate:
 
 ## Create an App
 
-### APNs
+#### APNs
 ```ruby
 app = Rapns::Apns::App.new
 app.name = "ios_app"
@@ -52,7 +52,7 @@ app.connections = 1
 app.save!
 ```
 
-### GCM
+#### GCM
 ```ruby
 app = Rapns::Gcm::App.new
 app.name = "android_app"
@@ -63,9 +63,9 @@ app.save!
 
 ## Create a Notification
 
-### APNs
+#### APNs
 
-### GCM
+#### GCM
 ```ruby
 n = Rapns::Gcm::Notification.new
 n.app = Rapns::Gcm::App.find_by_name("android_app")
