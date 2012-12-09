@@ -42,32 +42,32 @@ Generate the migration, rapns.yml and migrate:
 ## Create an App
 
 <table>
-    <tr>
+    <th>
         <td>APNs</td>
         <td>GCM</td>
-    </tr>
+    </th>
     <tr>
         <td>
             <pre>
                 <code>
-                    app = Rapns::Apns::App.new
-                    app.name = "ios_app"
-                    app.certificate = File.read("/path/to/development.pem")
-                    app.environment = "development"
-                    app.password = "certificate password"
-                    app.connections = 1
-                    app.save!
+app = Rapns::Apns::App.new
+app.name = "ios_app"
+app.certificate = File.read("/path/to/development.pem")
+app.environment = "development"
+app.password = "certificate password"
+app.connections = 1
+app.save!
                 </code>
             </pre>
         </td>
         <td>
             <pre>
                 <code>
-                    app = Rapns::Gcm::App.new
-                    app.name = 'android_app'
-                    app.auth_key = "..."
-                    app.connections = 1
-                    app.save!
+app = Rapns::Gcm::App.new
+app.name = 'android_app'
+app.auth_key = "..."
+app.connections = 1
+app.save!
                 </code>
             </pre>
         </td>
@@ -75,10 +75,10 @@ Generate the migration, rapns.yml and migrate:
 </table>
 
 <table>
-    <tr>
+    <th>
         <td>APNs</td>
         <td>GCM</td>
-    </tr>
+    </th>
     <tr>
         <td>
             <pre>
@@ -89,11 +89,11 @@ Generate the migration, rapns.yml and migrate:
         <td>
             <pre>
                 <code>
-                    n = Rapns::Gcm::Notification.new
-                    n.app = Rapns::Gcm::App.find_by_name("android_app")
-                    n.registration_ids = ["..."]
-                    n.data = {:message => "hi mom!"}
-                    n.save!
+n = Rapns::Gcm::Notification.new
+n.app = Rapns::Gcm::App.find_by_name("android_app")
+n.registration_ids = ["..."]
+n.data = {:message => "hi mom!"}
+n.save!
                 </code>
             </pre>
         </td>
