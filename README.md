@@ -41,6 +41,10 @@ Generate the migration, rapns.yml and migrate:
 
 ## Create an App
 
+```ruby
+foo = Foo.new
+```
+
 <table>
     <tr>
         <th>APNs</th>
@@ -61,11 +65,10 @@ app.save!</code>
         <td>
             <pre>
 <code>app = Rapns::Gcm::App.new
-app.name = 'android_app'
+app.name = "android_app"
 app.auth_key = "..."
 app.connections = 1
 app.save!
-
 
 </code>
             </pre>
