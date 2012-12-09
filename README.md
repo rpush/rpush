@@ -41,6 +41,7 @@ Generate the migration, rapns.yml and migrate:
 
 ## Create an App
 
+### APNs
 ```ruby
 app = Rapns::Apns::App.new
 app.name = "ios_app"
@@ -51,6 +52,7 @@ app.connections = 1
 app.save!
 ```
 
+### GCM
 ```ruby
 app = Rapns::Gcm::App.new
 app.name = "android_app"
@@ -59,59 +61,18 @@ app.connections = 1
 app.save!
 ```
 
-<table>
-    <tr>
-        <th>APNs</th>
-        <th>GCM</th>
-    </tr>
-    <tr>
-        <td>
-<div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="no">Rapns</span><span class="o">::</span><span class="no">Apns</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">new</span>
-<span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"ios_app"</span>
-<span class="n">app</span><span class="o">.</span><span class="n">certificate</span> <span class="o">=</span> <span class="no">File</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s2">"/path/to/development.pem"</span><span class="p">)</span>
-<span class="n">app</span><span class="o">.</span><span class="n">environment</span> <span class="o">=</span> <span class="s2">"development"</span>
-<span class="n">app</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="s2">"certificate password"</span>
-<span class="n">app</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">app</span><span class="o">.</span><span class="n">save!</span>
-</pre></div>
-        </td>
-        <td>
-<div class="highlight"><pre><span class="n">app</span> <span class="o">=</span> <span class="no">Rapns</span><span class="o">::</span><span class="no">Gcm</span><span class="o">::</span><span class="no">App</span><span class="o">.</span><span class="n">new</span>
-<span class="n">app</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"android_app"</span>
-<span class="n">app</span><span class="o">.</span><span class="n">auth_key</span> <span class="o">=</span> <span class="s2">"..."</span>
-<span class="n">app</span><span class="o">.</span><span class="n">connections</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">app</span><span class="o">.</span><span class="n">save!</span>
-</pre></div>
-        </td>
-    </tr>
-</table>
+## Create a Notification
 
-<table>
-    <tr>
-        <th>APNs</th>
-        <th>GCM</th>
-    </tr>
-    <tr>
-        <td>
-            <pre>
-                <code>
-                </code>
-            </pre>
-        </td>
-        <td>
-            <pre>
-                <code>
+### APNs
+
+### GCM
+```ruby
 n = Rapns::Gcm::Notification.new
 n.app = Rapns::Gcm::App.find_by_name("android_app")
 n.registration_ids = ["..."]
 n.data = {:message => "hi mom!"}
 n.save!
-                </code>
-            </pre>
-        </td>
-    </tr>
-</table>
-
+```
 
 ## Starting the rapns Daemon
 
