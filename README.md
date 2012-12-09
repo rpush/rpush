@@ -42,7 +42,21 @@ Generate the migration, rapns.yml and migrate:
 ## Create an App
 
 ```ruby
-foo = Foo.new
+app = Rapns::Apns::App.new
+app.name = "ios_app"
+app.certificate = File.read("/path/to/development.pem")
+app.environment = "development"
+app.password = "certificate password"
+app.connections = 1
+app.save!
+```
+
+```ruby
+app = Rapns::Gcm::App.new
+app.name = "android_app"
+app.auth_key = "..."
+app.connections = 1
+app.save!
 ```
 
 <table>
