@@ -41,6 +41,18 @@ Generate the migration, rapns.yml and migrate:
 
 ## Create an App
 
+APNs                                                    | GCM
+----------------------------------------------------------------
+```ruby                                                 | hello
+app = Rapns::Apns::App.new                              |
+app.name = "ios_app"                                    |
+app.certificate = File.read("/path/to/development.pem") |
+app.environment = "development"                         |
+app.password = "certificate password"                   |
+app.connections = 1                                     |
+app.save!                                               |
+```
+
 <table>
     <tr>
         <th>APNs</th>
