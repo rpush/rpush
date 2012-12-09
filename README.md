@@ -65,6 +65,8 @@ app.name = 'android_app'
 app.auth_key = "..."
 app.connections = 1
 app.save!
+
+
 </code>
             </pre>
         </td>
