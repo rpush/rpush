@@ -42,7 +42,7 @@ Generate the migration, rapns.yml and migrate:
 ## Create an App
 
 APNs                                                    | GCM
-----------------------------------------------------------------
+------------------------------------------------------- | ------
 ```ruby                                                 | hello
 app = Rapns::Apns::App.new                              |
 app.name = "ios_app"                                    |
