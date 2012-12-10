@@ -1,4 +1,13 @@
 shared_examples_for 'an DeliveryHandler subclass' do
+  it 'logs all delivery errors' do
+    logger = stub
+    Rapns::Daemon.stub(:logger => logger)
+    error = StandardError.new
+    delivery_handler.stub(:deliver).and_raise(error)
+    Rapns::Daemon.logger.should_receive(:error).with(error)
+    delivery_handler.send(:handle_next_notification)
+  end
+
   it "instructs the queue to wakeup the thread when told to stop" do
     thread = stub(:join => nil)
     Thread.stub(:new => thread)

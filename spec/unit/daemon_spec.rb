@@ -92,6 +92,18 @@ describe Rapns::Daemon, "when being shutdown" do
     Rapns::Daemon::AppRunner.stub(:stop)
   end
 
+  it "shuts down when signaled signaled SIGINT" do
+    Rapns::Daemon.setup_signal_hooks
+    Rapns::Daemon.should_receive(:shutdown)
+    Process.kill("SIGINT", Process.pid)
+  end
+
+  it "shuts down when signaled signaled SIGTERM" do
+    Rapns::Daemon.setup_signal_hooks
+    Rapns::Daemon.should_receive(:shutdown)
+    Process.kill("SIGTERM", Process.pid)
+  end
+
   it "stops the feeder" do
     Rapns::Daemon::Feeder.should_receive(:stop)
     Rapns::Daemon.send(:shutdown)

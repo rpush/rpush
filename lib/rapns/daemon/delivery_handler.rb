@@ -3,10 +3,6 @@ module Rapns
     class DeliveryHandler
       attr_accessor :queue
 
-      def deliver(notification)
-        raise NotImplementedError
-      end
-
       def start
         @thread = Thread.new do
           loop do

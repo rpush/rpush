@@ -60,10 +60,6 @@ module Rapns
         @app = app
       end
 
-      def new_delivery_handler
-        raise NotImplementedError
-      end
-
       def started
       end
 
