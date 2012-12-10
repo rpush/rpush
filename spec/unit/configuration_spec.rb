@@ -15,7 +15,7 @@ describe Rapns::Configuration do
 
   it 'configures a feedback callback' do
     b = Proc.new {}
-    config.on_feedback(&b)
-    config.feedback_callback.should == b
+    config.on_apns_feedback(&b)
+    config.apns_feedback_callback.should == b
   end
 end

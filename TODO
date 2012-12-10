@@ -1,7 +1,5 @@
 # 3.0
 
-* Generate config/initializers/rapns.rb
-* Log on HUP.
 * Detect only 2.0 usage? Direct to upgrade doc in the Wiki?
 * Document config.rb
 

@@ -18,6 +18,10 @@ class RapnsGenerator < Rails::Generators::Base
     add_rapns_migration('add_gcm')
   end
 
+   def copy_config
+    copy_file 'rapns.rb', 'config/initializers/rapns.rb'
+  end
+
   protected
 
   def add_rapns_migration(template)

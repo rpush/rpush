@@ -62,7 +62,7 @@ module Rapns
             Rapns::Daemon.logger.info("[FeedbackReceiver:#{@app.name}] Delivery failed at #{formatted_failed_at} for #{device_token}")
             feedback = Rapns::Apns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @app)
             begin
-              Rapns.configuration.feedback_callback.call(feedback) if Rapns.configuration.feedback_callback
+              Rapns.configuration.apns_feedback_callback.call(feedback) if Rapns.configuration.apns_feedback_callback
             rescue StandardError => e
               Rapns::Daemon.logger.error(e)
             end
