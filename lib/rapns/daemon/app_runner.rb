@@ -84,12 +84,13 @@ module Rapns
       def sync(app)
         @app = app
         diff = handlers.size - app.connections
+        return if diff == 0
         if diff > 0
           diff.times { handlers.pop.stop }
-          Rapns::Daemon.logger.info("[#{app.name}] Terminated #{handlers_str(diff)}. #{handlers_str} running.")
+          Rapns::Daemon.logger.info("[#{app.name}] Terminated #{handlers_str(diff)}. #{handlers_str} remaining.")
         else
           diff.abs.times { handlers << start_handler }
-          Rapns::Daemon.logger.info("[#{app.name}] Added #{handlers_str(diff)}. #{handlers_str} running.")
+          Rapns::Daemon.logger.info("[#{app.name}] Added #{handlers_str(diff)}. #{handlers_str} remaining.")
         end
       end
 
@@ -125,7 +126,8 @@ module Rapns
       end
 
       def handlers_str(count = app.connections)
-        str = count > 1 ? 'handlers' : 'handler'
+        count = count.abs
+        str = count == 1 ? 'handler' : 'handlers'
         "#{count} #{str}"
       end
     end
