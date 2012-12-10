@@ -1,6 +1,6 @@
 [![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
 
-### rapns - Professional grade APNs and GCM daemon
+### Rapns - Professional grade APNs and GCM daemon
 
 * Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
 * Seamless Rails integration.
@@ -10,15 +10,15 @@
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * [Airbrake](http://airbrakeapp.com/) integration.
 
-### Who uses rapns?
+### Who uses Rapns?
 
 [GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
 
-*I'd love to hear if you use rapns - @ileitch on twitter.*
+*I'd love to hear if you use Rapns - @ileitch on twitter.*
 
 ## Getting Started
 
-Add rapns to your Gemfile:
+Add Rapns to your Gemfile:
 
     gem 'rapns'
 
@@ -82,14 +82,14 @@ n.data = {:message => "hi mom!"}
 n.save!
 ```
 
-## Starting rapns
+## Starting Rapns
 
     cd /path/to/rails/app
     rapns <Rails environment> [options]
 
 See [Configuration](wiki/Configuration) for a list of options, or run `rapns --help`.
 
-## Updating rapns
+## Updating Rapns
 
 After updating you should run `rails g rapns` to check for any new migrations.
 
@@ -109,7 +109,7 @@ After updating you should run `rails g rapns` to check for any new migrations.
 
 ### GCM
 
-## Contributing to rapns
+## Contributing
 
 Fork as usual and go crazy!
 
@@ -123,7 +123,7 @@ mysql database.
 
 ### Contributors
 
-Thank you to the following wonderful people for contributing to rapns:
+Thank you to the following wonderful people for contributing:
 
 * [@blakewatters](https://github.com/blakewatters)
 * [@forresty](https://github.com/forresty)
