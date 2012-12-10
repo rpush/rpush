@@ -8,8 +8,10 @@ describe Rapns::Daemon::Gcm::AppRunner do
   let(:app) { app_class.new }
   let(:runner) { Rapns::Daemon::Gcm::AppRunner.new(app) }
   let(:handler) { stub(:start => nil, :stop => nil, :queue= => nil) }
+  let(:logger) { stub(:info => nil) }
 
   before do
+    Rapns::Daemon.stub(:logger => logger)
     Rapns::Daemon::Gcm::DeliveryHandler.stub(:new => handler)
   end
 end
