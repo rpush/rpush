@@ -8,7 +8,7 @@ module Rapns
       @runners = {}
 
       def self.enqueue(notification)
-        if app = @runners[notification.app_id]
+        if app = runners[notification.app_id]
           app.enqueue(notification)
         else
           Rapns::Daemon.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
@@ -43,11 +43,11 @@ module Rapns
       end
 
       def self.stop
-        @runners.values.map(&:stop)
+        runners.values.map(&:stop)
       end
 
       def self.debug
-        @runners.values.map(&:debug)
+        runners.values.map(&:debug)
       end
 
       def self.idle
@@ -60,10 +60,6 @@ module Rapns
         @app = app
       end
 
-      def new_delivery_handler
-        raise NotImplementedError
-      end
-
       def started
       end
 
@@ -73,6 +69,7 @@ module Rapns
       def start
         app.connections.times { handlers << start_handler }
         started
+        Rapns::Daemon.logger.info("[#{app.name}] Started, #{handlers_str}.")
       end
 
       def stop
@@ -89,8 +86,10 @@ module Rapns
         diff = handlers.size - app.connections
         if diff > 0
           diff.times { handlers.pop.stop }
+          Rapns::Daemon.logger.info("[#{app.name}] Terminated #{handlers_str(diff)}. #{handlers_str} running.")
         else
           diff.abs.times { handlers << start_handler }
+          Rapns::Daemon.logger.info("[#{app.name}] Added #{handlers_str(diff)}. #{handlers_str} running.")
         end
       end
 
@@ -123,6 +122,11 @@ module Rapns
 
       def handlers
         @handler ||= []
+      end
+
+      def handlers_str(count = app.connections)
+        str = count > 1 ? 'handlers' : 'handler'
+        "#{count} #{str}"
       end
     end
   end

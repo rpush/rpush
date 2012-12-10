@@ -5,7 +5,6 @@ gem 'rspec'
 gem 'shoulda'
 gem 'rails'
 
-# ruby 1.9 but not rubinius
 platform :mri_19 do
   gem 'cane'
 end

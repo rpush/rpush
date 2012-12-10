@@ -4,10 +4,6 @@ module Rapns
       extend InterruptibleSleep
       extend DatabaseReconnectable
 
-      def self.name
-        'Feeder'
-      end
-
       def self.start(poll)
         loop do
           enqueue_notifications

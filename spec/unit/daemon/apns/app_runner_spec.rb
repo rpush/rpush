@@ -11,8 +11,10 @@ describe Rapns::Daemon::Apns::AppRunner do
   let(:handler) { stub(:start => nil, :stop => nil, :queue= => nil) }
   let(:receiver) { stub(:start => nil, :stop => nil) }
   let(:config) { {:feedback_poll => 60 } }
+  let(:logger) { stub(:info => nil) }
 
   before do
+    Rapns::Daemon.stub(:logger => logger)
     Rapns::Daemon::Apns::DeliveryHandler.stub(:new => handler)
     Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => receiver)
     Rapns::Daemon.stub(:config => config)

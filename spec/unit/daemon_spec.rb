@@ -92,6 +92,21 @@ describe Rapns::Daemon, "when being shutdown" do
     Rapns::Daemon::AppRunner.stub(:stop)
   end
 
+  # These tests do not work on JRuby.
+  unless defined? JRUBY_VERSION
+    it "shuts down when signaled signaled SIGINT" do
+      Rapns::Daemon.setup_signal_hooks
+      Rapns::Daemon.should_receive(:shutdown)
+      Process.kill("SIGINT", Process.pid)
+    end
+
+    it "shuts down when signaled signaled SIGTERM" do
+      Rapns::Daemon.setup_signal_hooks
+      Rapns::Daemon.should_receive(:shutdown)
+      Process.kill("SIGTERM", Process.pid)
+    end
+  end
+
   it "stops the feeder" do
     Rapns::Daemon::Feeder.should_receive(:stop)
     Rapns::Daemon.send(:shutdown)

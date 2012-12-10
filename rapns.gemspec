@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Ian Leitch"]
   s.email       = ["port001@gmail.com"]
   s.homepage    = "https://github.com/ileitch/rapns"
-  s.summary     = %q{Easy to use, full featured APNs daemon for Rails 3}
-  s.description = %q{Easy to use, full featured APNs daemon for Rails 3}
+  s.summary     = %q{Professional grade APNs and GCM daemon}
+  s.description = %q{Professional grade APNs and GCM daemon}
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features,config}`.split("\n")

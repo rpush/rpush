@@ -3,12 +3,11 @@ begin
 
   desc "Run cane to check quality metrics"
   Cane::RakeTask.new(:quality) do |cane|
-    cane.add_threshold 'coverage/covered_percent', :>=, 97
+    cane.add_threshold 'coverage/covered_percent', :>=, 99
     cane.no_style = false
     cane.style_measure = 1000
     cane.no_doc = true
-    cane.abc_max = 15
-    cane.abc_exclude = %w(Rapns::Daemon::Gcm::Delivery#handle_errors)
+    cane.abc_max = 20
   end
 
   namespace :spec do

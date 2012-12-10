@@ -3,7 +3,7 @@ ENV['RAILS_ENV'] = 'test'
 begin
   require './spec/support/simplecov_helper'
   include SimpleCovHelper
-  start_simple_cov('unit')
+  start_simple_cov("unit-#{RUBY_VERSION}")
 rescue LoadError
   puts "Coverage disabled."
 end
