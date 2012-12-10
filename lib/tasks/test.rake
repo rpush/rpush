@@ -20,7 +20,7 @@ namespace :test do
     begin
       Dir.chdir(path)
       cmd('echo "gem \'rake\'" >> Gemfile')
-      cmd("echo \"gem 'rapns', :path => '#{rapns_root}'\"")
+      cmd("echo \"gem 'rapns', :path => '#{rapns_root}'\" >> Gemfile")
       cmd('bundle install')
       cmd('bundle exec rails g rapns')
       cmd('bundle exec rake db:migrate')

@@ -7,8 +7,7 @@ begin
     cane.no_style = false
     cane.style_measure = 1000
     cane.no_doc = true
-    cane.abc_max = 15
-    cane.abc_exclude = %w(Rapns::Daemon::Gcm::Delivery#handle_errors)
+    cane.abc_max = 20
   end
 
   namespace :spec do
