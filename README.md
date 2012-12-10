@@ -1,6 +1,6 @@
 [![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
 
-_rapns - Professional grade APNs and GCM daemon._
+### rapns - Professional grade APNs and GCM daemon
 
 * Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
 * Seamless Rails integration.

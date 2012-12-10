@@ -75,4 +75,55 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     runner.should_receive(:stop)
     Rapns::Daemon::AppRunner.sync
   end
+
+  it 'logs an error if the app could not be started' do
+    Rapns::App.stub(:all => [app, new_app])
+    new_runner = stub
+    Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
+    new_runner.stub(:start).and_raise(StandardError)
+    Rapns::Daemon.logger.should_receive(:error).any_number_of_times
+    Rapns::Daemon::AppRunner.sync
+  end
+end
+
+describe Rapns::Daemon::AppRunner, 'debug' do
+  let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
+    :environment => 'development', :certificate => TEST_CERT) }
+  let(:logger) { stub(:info => nil) }
+
+  before do
+    Rapns::Daemon.stub(:config => {})
+    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => stub.as_null_object)
+    Rapns::Daemon::Apns::Connection.stub(:new => stub.as_null_object)
+    Rapns::Daemon.stub(:logger => logger)
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  after { Rapns::Daemon::AppRunner.runners.clear }
+
+  it 'prints debug app states to the log' do
+    Rapns::Daemon.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 0\n  idle: true\n")
+    Rapns::Daemon::AppRunner.debug
+  end
+end
+
+describe Rapns::Daemon::AppRunner, 'idle' do
+  let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
+    :environment => 'development', :certificate => TEST_CERT) }
+  let(:logger) { stub(:info => nil) }
+
+  before do
+    Rapns::Daemon.stub(:config => {})
+    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => stub.as_null_object)
+    Rapns::Daemon::Apns::Connection.stub(:new => stub.as_null_object)
+    Rapns::Daemon.stub(:logger => logger)
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  after { Rapns::Daemon::AppRunner.runners.clear }
+
+  it 'returns idle runners' do
+    runner = Rapns::Daemon::AppRunner.runners[app.id]
+    Rapns::Daemon::AppRunner.idle.should == [runner]
+  end
 end
