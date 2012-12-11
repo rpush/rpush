@@ -16,7 +16,8 @@ describe Rapns::Daemon::Apns::Delivery do
   end
 
   before do
-    Rapns::Daemon.stub(:logger => logger, :config => config)
+    Rapns.stub(:config => config)
+    Rapns::Daemon.stub(:logger => logger)
   end
 
   it "sends the binary version of the notification" do

@@ -31,15 +31,15 @@ module Rapns
     extend DatabaseReconnectable
 
     class << self
-      attr_accessor :logger, :config
+      attr_accessor :logger
     end
 
-    def self.start(config)
-      self.config = config
-      self.logger = Logger.new(:foreground => config.foreground, :airbrake_notify => config.airbrake_notify)
+    def self.start
+      self.logger = Logger.new(:foreground => Rapns.config.foreground,
+                               :airbrake_notify => Rapns.config.airbrake_notify)
       setup_signal_hooks
 
-      unless config.foreground
+      unless Rapns.config.foreground
         daemonize
         reconnect_database
       end
@@ -47,7 +47,7 @@ module Rapns
       write_pid_file
       ensure_upgraded
       AppRunner.sync
-      Feeder.start(config.push_poll)
+      Feeder.start(Rapns.config.push_poll)
     end
 
     protected
@@ -61,18 +61,22 @@ module Rapns
         puts "!!!! RAPNS NOT STARTED !!!!"
         puts
         puts "As of version v2.0.0 apps are configured in the database instead of rapns.yml."
-        puts "Please run 'rails g rapns' to generate the new migrations and create your apps with Rapns::App."
+        puts "Please run 'rails g rapns' to generate the new migrations and create your app."
         puts "See https://github.com/ileitch/rapns for further instructions."
         puts
         exit 1
       end
 
       if count == 0
-        logger.warn("You have not created an Rapns::App yet. See https://github.com/ileitch/rapns for instructions.")
+        logger.warn("You have not created an app yet. See https://github.com/ileitch/rapns for instructions.")
       end
 
       if File.exists?(File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
-        logger.warn("Since 2.0.0 rapns uses command-line options instead of a configuration file. Please remove config/rapns/rapns.yml.")
+        logger.warn(<<-EOS)
+Since 2.0.0 rapns uses command-line options and a Ruby based configuration file.
+Please run 'rails g rapns' to generate a new configuration file into config/initializers.
+Remove config/rapns/rapns.yml to avoid this warning.
+        EOS
       end
     end
 
@@ -101,17 +105,17 @@ module Rapns
     end
 
     def self.write_pid_file
-      if !config.pid_file.blank?
+      if !Rapns.config.pid_file.blank?
         begin
-          File.open(config.pid_file, 'w') { |f| f.puts Process.pid }
+          File.open(Rapns.config.pid_file, 'w') { |f| f.puts Process.pid }
         rescue SystemCallError => e
-          logger.error("Failed to write PID to '#{config.pid_file}': #{e.inspect}")
+          logger.error("Failed to write PID to '#{Rapns.config.pid_file}': #{e.inspect}")
         end
       end
     end
 
     def self.delete_pid_file
-      pid_file = config.pid_file
+      pid_file = Rapns.config.pid_file
       File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
     end
 

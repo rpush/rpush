@@ -5,15 +5,20 @@ require 'rapns'
 
 environment = ARGV[0]
 
-config = Rapns.configuration
-
 banner = 'Usage: rapns <Rails environment> [options]'
+if environment.nil? || environment =~ /^-/
+  puts banner
+  exit 1
+end
+
+config = Rapns::Configuration.new
+
 ARGV.options do |opts|
   opts.banner = banner
   opts.on('-f', '--foreground', 'Run in the foreground.') { config.foreground = true }
   opts.on('-P N', '--db-poll N', Integer, "Frequency in seconds to check for new notifications. Default: #{config.push_poll}.") { |n| config.push_poll = n }
   opts.on('-F N', '--feedback-poll N', Integer, "Frequency in seconds to check for feedback. Default: #{config.feedback_poll}.") { |n| config.feedback_poll = n }
-  opts.on('-e', '--no-error-checks', 'Disable error checking after notification delivery.') { config.airbrake_notify = false }
+  opts.on('-e', '--no-error-checks', 'Disable APNs error checking after notification delivery.') { config.airbrake_notify = false }
   opts.on('-n', '--no-airbrake-notify', 'Disables error notifications via Airbrake.') { config.check_for_errors = false }
   opts.on('-p PATH', '--pid-file PATH', String, 'Path to write PID file. Relative to Rails root unless absolute.') { |path| config.pid_file = path }
   opts.on('-b N', '--batch-size N', Integer, 'ActiveRecord notifications batch size.') { |n| config.batch_size = n }
@@ -22,20 +27,13 @@ ARGV.options do |opts|
   opts.parse!
 end
 
-if environment.nil? || environment =~ /^-/
-  puts banner
-  exit 1
-end
-
 ENV['RAILS_ENV'] = environment
 load 'config/environment.rb'
 load 'config/initializers/rapns.rb' if File.exist?('config/initializers/rapns.rb')
 
+Rapns.config.update(config)
+
 require 'rapns/daemon'
 require 'rapns/patches'
 
-if config.pid_file && !Pathname.new(config.pid_file).absolute?
-  config.pid_file = File.join(Rails.root, config.pid_file)
-end
-
-Rapns::Daemon.start(config)
+Rapns::Daemon.start

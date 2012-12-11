@@ -1,14 +1,16 @@
 module Rapns
-  def self.configuration
-    @configuration ||= Rapns::Configuration.new
+  def self.config
+    @config ||= Rapns::Configuration.new
   end
 
   def self.configure
-    yield configuration if block_given?
+    yield config if block_given?
   end
 
-  class Configuration < Struct.new(:foreground, :push_poll, :feedback_poll, :airbrake_notify, :check_for_errors, :pid_file, :batch_size)
+  ATTRS = [:foreground, :push_poll, :feedback_poll,
+    :airbrake_notify, :check_for_errors, :pid_file, :batch_size]
 
+  class Configuration < Struct.new(*ATTRS)
     attr_accessor :apns_feedback_callback
 
     def initialize
@@ -22,8 +24,20 @@ module Rapns
       self.batch_size = 5000
     end
 
+    def update(other)
+      ATTRS.each { |attr| send("#{attr}=", other.send(attr)) }
+    end
+
     def on_apns_feedback(&block)
       self.apns_feedback_callback = block
+    end
+
+    def pid_file=(path)
+      if path && !Pathname.new(path).absolute?
+        super(File.join(Rails.root, config.pid_file))
+      else
+        super
+      end
     end
   end
 end

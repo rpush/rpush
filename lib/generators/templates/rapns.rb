@@ -1,4 +1,4 @@
- # Rapns configuration. Options set here are override by command-line options.
+ # Rapns configuration. Options set here are overridden by command-line options.
 
  Rapns.configure do |config|
 
