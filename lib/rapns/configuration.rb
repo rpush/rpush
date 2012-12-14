@@ -25,7 +25,10 @@ module Rapns
     end
 
     def update(other)
-      CONFIG_ATTRS.each { |attr| send("#{attr}=", other.send(attr)) }
+      CONFIG_ATTRS.each do |attr|
+        other_value = other.send(attr)
+        send("#{attr}=", other_value) unless other_value.nil?
+      end
     end
 
     def on_apns_feedback(&block)
