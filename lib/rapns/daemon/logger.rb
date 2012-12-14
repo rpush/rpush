@@ -3,6 +3,7 @@ module Rapns
     class Logger
       def initialize(options)
         @options = options
+
         begin
           log = File.open(File.join(Rails.root, 'log', 'rapns.log'), 'a')
           log.sync = true
@@ -21,16 +22,16 @@ module Rapns
 
       def error(msg, options = {})
         airbrake_notify(msg) if notify_via_airbrake?(msg, options)
-        log(:error, msg, 'ERROR')
+        log(:error, msg, 'ERROR', STDERR)
       end
 
       def warn(msg)
-        log(:warn, msg, 'WARNING')
+        log(:warn, msg, 'WARNING', STDERR)
       end
 
       private
 
-      def log(where, msg, prefix = nil)
+      def log(where, msg, prefix = nil, io = STDOUT)
         if msg.is_a?(Exception)
           formatted_backtrace = msg.backtrace.join("\n")
           msg = "#{msg.class.name}, #{msg.message}\n#{formatted_backtrace}"
@@ -39,7 +40,13 @@ module Rapns
         formatted_msg = "[#{Time.now.to_s(:db)}] "
         formatted_msg << "[#{prefix}] " if prefix
         formatted_msg << msg
-        puts formatted_msg if @options[:foreground]
+
+        if io == STDERR
+          io.puts formatted_msg
+        elsif @options[:foreground]
+          io.puts formatted_msg
+        end
+
         @logger.send(where, formatted_msg) if @logger
       end
 

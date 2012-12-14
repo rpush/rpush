@@ -31,6 +31,14 @@ describe Rapns::Daemon::Logger do
     ActiveSupport::BufferedLogger.stub(:new).and_return(@buffered_logger)
     Rapns::Daemon.stub(:config => config)
     File.stub(:open => log)
+    STDERR.stub(:puts)
+  end
+
+  it "disables logging if the log file cannot be opened" do
+    File.stub(:open).and_raise(Errno::ENOENT)
+    STDERR.should_receive(:puts).with(/No such file or directory/)
+    STDERR.should_receive(:puts).with(/Logging disabled/)
+    Rapns::Daemon::Logger.new(:foreground => true)
   end
 
   it "should open the a log file in the Rails log directory" do
@@ -50,13 +58,13 @@ describe Rapns::Daemon::Logger do
 
   it "should print out the msg if running in the foreground" do
     logger = Rapns::Daemon::Logger.new(:foreground => true)
-    logger.should_receive(:puts).with(/hi mom/)
+    STDOUT.should_receive(:puts).with(/hi mom/)
     logger.info("hi mom")
   end
 
   it "should not print out the msg if not running in the foreground" do
     logger = Rapns::Daemon::Logger.new(:foreground => false)
-    logger.should_not_receive(:puts).with(/hi mom/)
+    STDOUT.should_not_receive(:puts).with(/hi mom/)
     logger.info("hi mom")
   end
 

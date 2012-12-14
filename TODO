@@ -1,7 +1,5 @@
 # 3.0
 
-* Command-line options should override rapns.rb.
-* Detect only 2.0 usage? Direct to upgrade doc in the Wiki?
 * Document config.rb
 
 # 3.1
