@@ -3,10 +3,16 @@ module Rapns
     class Logger
       def initialize(options)
         @options = options
-        log = File.open(File.join(Rails.root, 'log', 'rapns.log'), 'a')
-        log.sync = true
-        @logger = ActiveSupport::BufferedLogger.new(log, Rails.logger.level)
-        @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
+        begin
+          log = File.open(File.join(Rails.root, 'log', 'rapns.log'), 'a')
+          log.sync = true
+          @logger = ActiveSupport::BufferedLogger.new(log, Rails.logger.level)
+          @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
+        rescue Errno::ENOENT, Errno::EPERM => e
+          @logger = nil
+          error(e)
+          error('Logging disabled.')
+        end
       end
 
       def info(msg)
@@ -34,7 +40,7 @@ module Rapns
         formatted_msg << "[#{prefix}] " if prefix
         formatted_msg << msg
         puts formatted_msg if @options[:foreground]
-        @logger.send(where, formatted_msg)
+        @logger.send(where, formatted_msg) if @logger
       end
 
       def airbrake_notify(e)
