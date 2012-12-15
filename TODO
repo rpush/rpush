@@ -1,5 +1,6 @@
 # 3.0
 
+* Start without bundle exec?
 * Document config.rb
 
 # 3.1

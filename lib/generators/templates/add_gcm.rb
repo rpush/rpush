@@ -47,6 +47,9 @@ class AddGcm < ActiveRecord::Migration
 
     change_column_null :rapns_notifications, :app_id, false
     remove_column :rapns_notifications, :app
+
+    remove_index :rapns_notifications, :name => "index_rapns_notifications_multi"
+    add_index :rapns_notifications, [:app_id, :delivered, :failed, :deliver_after], :name => "index_rapns_notifications_multi"
   end
 
   def self.down
@@ -84,5 +87,8 @@ class AddGcm < ActiveRecord::Migration
 
     change_column_null :rapns_notifications, :key, false
     remove_column :rapns_notifications, :app_id
+
+    remove_index :rapns_notifications, :name => "index_rapns_notifications_multi"
+    add_index :rapns_notifications, [:delivered, :failed, :deliver_after], :name => "index_rapns_notifications_multi"
   end
 end
