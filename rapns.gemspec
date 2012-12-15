@@ -19,7 +19,8 @@ Gem::Specification.new do |s|
   s.add_dependency "multi_json", "~> 1.0"
   s.add_dependency "net-http-persistent"
 
-  if defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
+  if defined? JRUBY_VERSION
+    s.platform = 'java'
     s.add_dependency "jruby-openssl"
     s.add_dependency "activerecord-jdbc-adapter"
   end
