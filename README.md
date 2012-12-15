@@ -22,6 +22,10 @@ Add Rapns to your Gemfile:
 
     gem 'rapns'
 
+JRuby users:
+
+    gem 'rapns-java'
+
 Generate the migration, rapns.yml and migrate:
 
     rails g rapns
