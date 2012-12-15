@@ -1,3 +1,7 @@
+## 3.0.0 (Sat 15, 2012)
+  * Add support for Google Cloud Messaging.
+  * Fix Heroku logging issue.
+
 ##  2.0.5 (Nov 4, 2012) ##
   * Support content-available (#68).
   * Append to log files.
