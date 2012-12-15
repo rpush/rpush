@@ -10,6 +10,8 @@
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * [Airbrake](http://airbrakeapp.com/) integration.
 
+#### 2.x users please read [upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
+
 ### Who uses Rapns?
 
 [GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
@@ -22,12 +24,12 @@ Add Rapns to your Gemfile:
 
     gem 'rapns'
 
-Generate the migration, rapns.yml and migrate:
+Generate the migrations, rapns.yml and migrate:
 
     rails g rapns
     rake db:migrate
 
-## Generating Certificates
+## Generating Certificates (APNs only)
 
 1. Open up Keychain Access and select the `Certificates` category in the sidebar.
 2. Expand the disclosure arrow next to the iOS Push Services certificate you want to export.
@@ -87,7 +89,7 @@ n.save!
     cd /path/to/rails/app
     rapns <Rails environment> [options]
 
-See [Configuration](wiki/Configuration) for a list of options, or run `rapns --help`.
+See [Configuration](rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
 
 ## Updating Rapns
 
@@ -96,16 +98,16 @@ After updating you should run `rails g rapns` to check for any new migrations.
 ## Wiki
 
 ### General
-* [Configuration](wiki/Configuration)
-* [Upgrading from 2.x to 3.0](wiki/Upgrading-from-version-2.x-to-3.0)
-* [Deploying to Heroku](wiki/Heroku)
-* [Hot App Updates](wiki/Hot-App-Updates)
+* [Configuration](rapns/wiki/Configuration)
+* [Upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
+* [Deploying to Heroku](rapns/wiki/Heroku)
+* [Hot App Updates](rapns/wiki/Hot-App-Updates)
 
 ### APNs
-* [Advanced APNs Features](wiki/Advanced-APNs-Features)
-* [APNs Delivery Failure Handling](wiki/APNs-Delivery-Failure-Handling)
-* [Why open multiple connections to the APNs?](wiki/Why-open-multiple-connections-to-the-APNs%3F)
-* [Silent failures might be dropped connections](wiki/Dropped-connections)
+* [Advanced APNs Features](rapns/wiki/Advanced-APNs-Features)
+* [APNs Delivery Failure Handling](rapns/wiki/APNs-Delivery-Failure-Handling)
+* [Why open multiple connections to the APNs?](rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
+* [Silent failures might be dropped connections](rapns/wiki/Dropped-connections)
 
 ### GCM
 
