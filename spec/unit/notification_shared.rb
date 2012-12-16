@@ -31,7 +31,7 @@ shared_examples_for "an Notification subclass" do
     end
 
     it 'warns if attributes_for_device is assigned via mass-assignment' do
-      ActiveSupport::Deprecation.should_receive(:warn)
+      Rapns::Deprecation.should_receive(:warn)
       notification_class.new(:attributes_for_device => {:hi => 'mom'})
     end
   end
