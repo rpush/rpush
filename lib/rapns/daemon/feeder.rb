@@ -3,6 +3,7 @@ module Rapns
     class Feeder
       extend InterruptibleSleep
       extend DatabaseReconnectable
+      extend Reflectable
 
       def self.start(poll)
         loop do
@@ -26,10 +27,12 @@ module Rapns
             idle = Rapns::Daemon::AppRunner.idle.map(&:app)
             Rapns::Notification.ready_for_delivery.for_apps(idle).limit(batch_size).each do |notification|
               Rapns::Daemon::AppRunner.enqueue(notification)
+              reflect(:notification_enqueued, notification)
             end
           end
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
+          reflect(:error, e)
         end
       end
     end

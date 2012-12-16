@@ -31,7 +31,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with("FeedbackReceiver:#{app.name}", host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
     receiver.check_for_feedback
   end
 
@@ -52,7 +52,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'logs the feedback' do
     stub_connection_read_with_tuple
-    Rapns::Daemon.logger.should_receive(:info).with("[FeedbackReceiver:my_app] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17")
+    Rapns::Daemon.logger.should_receive(:info).with("[my_app] [FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17.")
     receiver.check_for_feedback
   end
 

@@ -2,6 +2,7 @@ module Rapns
   module Daemon
     class Delivery
       include DatabaseReconnectable
+      include Reflectable
 
       def self.perform(*args)
         new(*args).perform
@@ -13,6 +14,7 @@ module Rapns
           notification.deliver_after = deliver_after
           notification.save!(:validate => false)
         end
+        reflect(:notification_will_retry, notification)
       end
 
       def retry_exponentially(notification)
@@ -25,6 +27,7 @@ module Rapns
           @notification.delivered_at = Time.now
           @notification.save!(:validate => false)
         end
+        reflect(:notification_delivered, @notification)
       end
 
       def mark_failed(code, description)
@@ -37,6 +40,7 @@ module Rapns
           @notification.error_description = description
           @notification.save!(:validate => false)
         end
+        reflect(:notification_failed, @notification)
       end
     end
   end

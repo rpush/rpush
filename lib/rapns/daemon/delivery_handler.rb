@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class DeliveryHandler
+      include Reflectable
+
       attr_accessor :queue
 
       def start
@@ -35,8 +37,10 @@ module Rapns
 
         begin
           deliver(notification)
+          reflect(:notification_delivered, notification)
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
+          reflect(:error, e)
         ensure
           queue.notification_processed
         end

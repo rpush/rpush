@@ -2,6 +2,7 @@ module Rapns
   module Daemon
     module Apns
       class FeedbackReceiver
+        include Reflectable
         include InterruptibleSleep
         include DatabaseReconnectable
 
@@ -35,7 +36,7 @@ module Rapns
         def check_for_feedback
           connection = nil
           begin
-            connection = Connection.new("FeedbackReceiver:#{@app.name}", @host, @port, @certificate, @password)
+            connection = Connection.new(@app, @host, @port)
             connection.connect
 
             while tuple = connection.read(FEEDBACK_TUPLE_BYTES)
@@ -59,8 +60,11 @@ module Rapns
         def create_feedback(failed_at, device_token)
           formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
           with_database_reconnect_and_retry do
-            Rapns::Daemon.logger.info("[FeedbackReceiver:#{@app.name}] Delivery failed at #{formatted_failed_at} for #{device_token}")
+            Rapns::Daemon.logger.info("[#{@app.name}] [FeedbackReceiver] Delivery failed at #{formatted_failed_at} for #{device_token}.")
             feedback = Rapns::Apns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @app)
+            reflect(:apns_feedback, feedback)
+
+            # Deprecated.
             begin
               Rapns.config.apns_feedback_callback.call(feedback) if Rapns.config.apns_feedback_callback
             rescue StandardError => e

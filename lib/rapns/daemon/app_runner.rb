@@ -2,7 +2,7 @@ module Rapns
   module Daemon
     class AppRunner
       class << self
-        attr_reader :runners # TODO: Needed?
+        attr_reader :runners
       end
 
       @runners = {}
@@ -86,26 +86,42 @@ module Rapns
         diff = handlers.size - app.connections
         return if diff == 0
         if diff > 0
-          diff.times { handlers.pop.stop }
-          Rapns::Daemon.logger.info("[#{app.name}] Terminated #{handlers_str(diff)}. #{handlers_str} remaining.")
+          diff.times { decrement_handlers }
+          Rapns::Daemon.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} remaining.")
         else
-          diff.abs.times { handlers << start_handler }
-          Rapns::Daemon.logger.info("[#{app.name}] Added #{handlers_str(diff)}. #{handlers_str} remaining.")
+          diff.abs.times { increment_handlers }
+          Rapns::Daemon.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} remaining.")
         end
+      end
+
+      def decrement_handlers
+        handlers.pop.stop
+      end
+
+      def increment_handlers
+        handlers << start_handler
       end
 
       def debug
         Rapns::Daemon.logger.info <<-EOS
 
 #{@app.name}:
-  handlers: #{handlers.size}
-  queued: #{queue.size}
+  handlers: #{num_handlers}
+  queued: #{queue_size}
   idle: #{idle?}
         EOS
       end
 
       def idle?
         queue.notifications_processed?
+      end
+
+      def queue_size
+        queue.size
+      end
+
+      def num_handlers
+        handlers.size
       end
 
       protected
