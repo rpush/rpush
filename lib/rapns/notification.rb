@@ -25,10 +25,11 @@ module Rapns
       where(:app_id => apps.map(&:id))
     }
 
-    def initialize(attributes = nil, options = {})
+    def initialize(*args)
+      attributes = args.first
       if attributes.is_a?(Hash) && attributes.keys.include?(:attributes_for_device)
         msg = ":attributes_for_device via mass-assignment is deprecated. Use :data or the attributes_for_device= instance method."
-        ActiveSupport::Deprecation.warn(msg, caller(1))
+        Rapns::Deprecation.warn(msg)
       end
       super
     end
