@@ -36,7 +36,7 @@ Rapns.reflect do |on|
   # Called when a notification is queued internally for delivery.
   # The internal queue for each app runner can be inspected:
   #
-  # Rapns::Daemon::AppRunner.runners.each do |runner|
+  # Rapns::Daemon::AppRunner.runners.each do |app_id, runner|
   #   runner.app
   #   runner.queue_size
   # end
@@ -63,7 +63,7 @@ Rapns.reflect do |on|
   # on.apns_connection_lost do |app, error|
   # end
 
-  # Called when any exception is raised.
+  # Called when an exception is raised.
   # on.error do |error|
   # end
 
