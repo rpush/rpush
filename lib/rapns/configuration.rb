@@ -44,8 +44,6 @@ module Rapns
     def on_apns_feedback(&block)
       self.apns_feedback_callback = block
     end
-    deprecated(:on_apns_feedback, <<-EOS)
-      ....
-    EOS
+    deprecated(:on_apns_feedback, 3.2, "Please use the Rapns.reflect API instead.")
   end
 end

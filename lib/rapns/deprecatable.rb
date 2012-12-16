@@ -5,11 +5,9 @@ module Rapns
     end
 
     module ClassMethods
-      def deprecated(method_name, msg)
+      def deprecated(method_name, version, msg=nil)
+        Rapns::Deprecation.new(self, method_name, version, msg)
       end
-    end
-
-    def deprecated(method_name, msg)
     end
   end
 end

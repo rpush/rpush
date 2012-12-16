@@ -103,7 +103,9 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     error = StandardError.new('bork!')
     stub_connection_read_with_tuple
     callback = Proc.new { raise error }
-    Rapns.config.on_apns_feedback &callback
+    Rapns::Deprecation.silenced do
+      Rapns.config.on_apns_feedback &callback
+    end
     expect { receiver.check_for_feedback }.not_to raise_error
   end
 
@@ -112,7 +114,9 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     stub_connection_read_with_tuple
     callback = Proc.new { raise error }
     Rapns::Daemon.logger.should_receive(:error).with(error)
-    Rapns.config.on_apns_feedback &callback
+    Rapns::Deprecation.silenced do
+      Rapns.config.on_apns_feedback &callback
+    end
     receiver.check_for_feedback
   end
 end
