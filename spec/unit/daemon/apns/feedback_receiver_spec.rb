@@ -10,12 +10,13 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:connection) { stub(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:receiver) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, host, port, poll) }
+  let(:feedback) { stub }
 
   before do
     receiver.stub(:interruptible_sleep)
     Rapns::Daemon.logger = logger
     Rapns::Daemon::Apns::Connection.stub(:new => connection)
-    Rapns::Apns::Feedback.stub(:create!)
+    Rapns::Apns::Feedback.stub(:create! => feedback)
     receiver.instance_variable_set("@stop", false)
   end
 
@@ -90,11 +91,15 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     receiver.stop
   end
 
+  it 'reflects feedback was received' do
+    stub_connection_read_with_tuple
+    receiver.should_receive(:reflect).with(:apns_feedback, feedback)
+    receiver.check_for_feedback
+  end
+
   it 'calls the apns_feedback_callback when feedback is received and the callback is set' do
     stub_connection_read_with_tuple
     Rapns.config.apns_feedback_callback = Proc.new {}
-    feedback = Object.new
-    Rapns::Apns::Feedback.stub(:create! => feedback)
     Rapns.config.apns_feedback_callback.should_receive(:call).with(feedback)
     receiver.check_for_feedback
   end

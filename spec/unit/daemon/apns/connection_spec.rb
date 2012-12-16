@@ -122,6 +122,14 @@ describe Rapns::Daemon::Apns::Connection do
       ssl_socket.stub(:write).and_raise(error_type)
     end
 
+    it 'reflects the connection has been lost' do
+      connection.should_receive(:reflect).with(:apns_connection_lost, app, kind_of(error_type))
+      begin
+        connection.write(nil)
+      rescue Rapns::Daemon::Apns::ConnectionError
+      end
+    end
+
     it "logs that the connection has been lost once only" do
       logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error_type.name}), reconnecting...").once
       begin

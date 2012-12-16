@@ -37,6 +37,11 @@ describe Rapns::Daemon::Apns::Delivery do
     perform
   end
 
+  it 'reflects the notification was delivered' do
+    delivery.should_receive(:reflect).with(:notification_delivered, notification)
+    perform
+  end
+
   it "sets the time the notification was delivered" do
     now = Time.now
     Time.stub(:now).and_return(now)
@@ -80,6 +85,11 @@ describe Rapns::Daemon::Apns::Delivery do
 
     it "sets the notification as failed" do
       notification.should_receive(:failed=).with(true)
+      perform
+    end
+
+    it 'reflects the notification delivery failed' do
+      delivery.should_receive(:reflect).with(:notification_failed, notification)
       perform
     end
 

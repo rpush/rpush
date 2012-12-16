@@ -7,9 +7,10 @@ describe Rapns::Daemon::Gcm::Delivery do
   let(:response) { stub(:code => 200, :header => {}) }
   let(:http) { stub(:shutdown => nil, :request => response)}
   let(:now) { Time.parse('2012-10-14 00:00:00') }
+  let(:delivery) { Rapns::Daemon::Gcm::Delivery.new(app, http, notification) }
 
   def perform
-    Rapns::Daemon::Gcm::Delivery.perform(app, http, notification)
+    delivery.perform
   end
 
   before do
@@ -28,6 +29,12 @@ describe Rapns::Daemon::Gcm::Delivery do
         perform
       end.to change(notification, :delivered).to(true)
     end
+
+    it 'reflects the notification was delivered' do
+      response.stub(:body => JSON.dump({ 'failure' => 0 }))
+      delivery.should_receive(:reflect).with(:notification_delivered, notification)
+      perform
+  end
 
     it 'logs that the notification was delivered' do
       response.stub(:body => JSON.dump({ 'failure' => 0 }))
@@ -105,6 +112,11 @@ describe Rapns::Daemon::Gcm::Delivery do
         notification.error_description.should == error_description
       end
 
+      it 'reflects the notification delivery failed' do
+        delivery.should_receive(:reflect).with(:notification_failed, notification)
+        perform rescue Rapns::DeliveryError
+      end
+
       it 'creates a new notification for the unavailable devices' do
         notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
         perform rescue Rapns::DeliveryError
@@ -179,6 +191,11 @@ describe Rapns::Daemon::Gcm::Delivery do
         perform
       end.to change(notification, :deliver_after).to(now + 2 ** 1)
     end
+
+    it 'reflects the notification will be retried' do
+      delivery.should_receive(:reflect).with(:notification_will_retry, notification)
+      perform
+    end
   end
 
   describe 'an 500 response' do
@@ -197,6 +214,11 @@ describe Rapns::Daemon::Gcm::Delivery do
         perform
         notification.reload
       end.to change(notification, :deliver_after).to(now + 2 ** 3)
+    end
+
+    it 'reflects the notification will be retried' do
+      delivery.should_receive(:reflect).with(:notification_will_retry, notification)
+      perform
     end
   end
 
@@ -219,6 +241,11 @@ describe Rapns::Daemon::Gcm::Delivery do
       notification.error_code.should == 400
       notification.error_description.should == 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.'
     end
+
+    it 'reflects the notification delivery failed' do
+      delivery.should_receive(:reflect).with(:notification_failed, notification)
+      perform rescue Rapns::DeliveryError
+    end
   end
 
   describe 'an un-handled response' do
@@ -231,6 +258,11 @@ describe Rapns::Daemon::Gcm::Delivery do
       notification.failed_at.should == now
       notification.error_code.should == 418
       notification.error_description.should == "I'm a Teapot"
+    end
+
+    it 'reflects the notification delivery failed' do
+      delivery.should_receive(:reflect).with(:notification_failed, notification)
+      perform rescue Rapns::DeliveryError
     end
   end
 end
