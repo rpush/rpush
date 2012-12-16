@@ -1,3 +1,6 @@
+## 3.0.1 (Sun 16, 2012)
+  * Fix compatibility with Rails 3.0.x. Fixes #89.
+
 ## 3.0.0 (Sat 15, 2012)
   * Add support for Google Cloud Messaging.
   * Fix Heroku logging issue.
