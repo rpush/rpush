@@ -7,8 +7,11 @@ module Rapns
     yield config if block_given?
   end
 
-  CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll,
+  CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
     :airbrake_notify, :check_for_errors, :pid_file, :batch_size]
+
+  class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
+  end
 
   class Configuration < Struct.new(*CONFIG_ATTRS)
     attr_accessor :apns_feedback_callback
@@ -22,6 +25,7 @@ module Rapns
       self.airbrake_notify = true
       self.check_for_errors = true
       self.batch_size = 5000
+      self.embedded = false
     end
 
     def update(other)
