@@ -7,6 +7,8 @@ module Rapns
     config.embedded = true
     Rapns.config.update(config)
     Rapns::Daemon.start
+
+    Kernel.at_exit { shutdown }
   end
 
   def self.shutdown

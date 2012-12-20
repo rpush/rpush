@@ -3,6 +3,7 @@ require 'unit_spec_helper'
 describe Rapns, 'embed' do
   before do
     Rapns::Daemon.stub(:start)
+    Kernel.stub(:at_exit)
   end
 
   it 'sets the embedded config option to true' do
