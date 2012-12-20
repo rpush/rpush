@@ -14,4 +14,12 @@ module Rapns
   def self.shutdown
     Rapns::Daemon.shutdown
   end
+
+  def self.sync
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  def self.debug
+    Rapns::Daemon::AppRunner.debug
+  end
 end

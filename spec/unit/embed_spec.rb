@@ -28,3 +28,17 @@ describe Rapns, 'shutdown' do
     Rapns.shutdown
   end
 end
+
+describe Rapns, 'sync' do
+  it 'syncs the AppRunner' do
+    Rapns::Daemon::AppRunner.should_receive(:sync)
+    Rapns.sync
+  end
+end
+
+describe Rapns, 'debug' do
+  it 'debugs the AppRunner' do
+    Rapns::Daemon::AppRunner.should_receive(:debug)
+    Rapns.debug
+  end
+end

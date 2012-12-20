@@ -37,7 +37,8 @@ module Rapns
     def self.start
       self.logger = Logger.new(:foreground => Rapns.config.foreground,
                                :airbrake_notify => Rapns.config.airbrake_notify)
-      setup_signal_hooks
+
+      setup_signal_hooks unless Rapns.config.embedded
 
       unless Rapns.config.foreground || Rapns.config.embedded
         daemonize
@@ -53,6 +54,13 @@ module Rapns
       else
         start_feeder
       end
+    end
+
+    def self.shutdown
+      puts "\nShutting down..."
+      Feeder.stop
+      AppRunner.stop
+      delete_pid_file
     end
 
     protected
@@ -104,13 +112,6 @@ Remove config/rapns/rapns.yml to avoid this warning.
       exit 1 if @shutting_down
       @shutting_down = true
       shutdown
-    end
-
-    def self.shutdown
-      puts "\nShutting down..."
-      Feeder.stop
-      AppRunner.stop
-      delete_pid_file
     end
 
     def self.write_pid_file

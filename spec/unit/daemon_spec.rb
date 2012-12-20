@@ -38,6 +38,17 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start
   end
 
+  it 'sets up setup signal hooks' do
+    Rapns::Daemon.should_receive(:setup_signal_hooks)
+    Rapns::Daemon.start
+  end
+
+  it 'does not setup signal hooks when embedded' do
+    config.stub(:embedded => true)
+    Rapns::Daemon.should_not_receive(:setup_signal_hooks)
+    Rapns::Daemon.start
+  end
+
   it "writes the process ID to the PID file" do
     Rapns::Daemon.should_receive(:write_pid_file)
     Rapns::Daemon.start
@@ -125,29 +136,29 @@ describe Rapns::Daemon, "when being shutdown" do
 
   it "stops the feeder" do
     Rapns::Daemon::Feeder.should_receive(:stop)
-    Rapns::Daemon.send(:shutdown)
+    Rapns::Daemon.shutdown
   end
 
   it "stops the app runners" do
     Rapns::Daemon::AppRunner.should_receive(:stop)
-    Rapns::Daemon.send(:shutdown)
+    Rapns::Daemon.shutdown
   end
 
   it "removes the PID file if one was written" do
     File.stub(:exists?).and_return(true)
     File.should_receive(:delete).with("/rails_root/rapns.pid")
-    Rapns::Daemon.send(:shutdown)
+    Rapns::Daemon.shutdown
   end
 
   it "does not attempt to remove the PID file if it does not exist" do
     File.stub(:exists?).and_return(false)
     File.should_not_receive(:delete)
-    Rapns::Daemon.send(:shutdown)
+    Rapns::Daemon.shutdown
   end
 
   it "does not attempt to remove the PID file if one was not written" do
     config.stub(:pid_file).and_return(nil)
     File.should_not_receive(:delete)
-    Rapns::Daemon.send(:shutdown)
+    Rapns::Daemon.shutdown
   end
 end
