@@ -56,8 +56,8 @@ module Rapns
       end
     end
 
-    def self.shutdown
-      puts "\nShutting down..."
+    def self.shutdown(quiet = false)
+      puts "\nShutting down..." unless quiet
       Feeder.stop
       AppRunner.stop
       delete_pid_file
@@ -81,7 +81,7 @@ module Rapns
         puts "Please run 'rails g rapns' to generate the new migrations and create your app."
         puts "See https://github.com/ileitch/rapns for further instructions."
         puts
-        exit 1
+        exit 1 unless Rapns.config.embedded
       end
 
       if count == 0

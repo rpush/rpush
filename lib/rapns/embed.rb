@@ -12,14 +12,17 @@ module Rapns
   end
 
   def self.shutdown
+    return unless Rapns.config.embedded
     Rapns::Daemon.shutdown
   end
 
   def self.sync
+    return unless Rapns.config.embedded
     Rapns::Daemon::AppRunner.sync
   end
 
   def self.debug
+    return unless Rapns.config.embedded
     Rapns::Daemon::AppRunner.debug
   end
 end
