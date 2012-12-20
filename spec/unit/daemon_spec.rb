@@ -5,7 +5,8 @@ describe Rapns::Daemon, "when starting" do
 
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:config) { stub(:pid_file => nil, :push_poll => 2, :airbrake_notify => false, :foreground => true) }
+  let(:config) { stub(:pid_file => nil, :push_poll => 2, :airbrake_notify => false,
+    :foreground => true, :embedded => false) }
   let(:logger) { stub(:info => nil, :error => nil, :warn => nil) }
 
   before do
@@ -31,6 +32,12 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start
   end
 
+  it "does not fork into a daemon if the embedded option is true" do
+    config.stub(:embedded => true)
+    Rapns::Daemon.should_not_receive(:daemonize)
+    Rapns::Daemon.start
+  end
+
   it "writes the process ID to the PID file" do
     Rapns::Daemon.should_receive(:write_pid_file)
     Rapns::Daemon.start
@@ -44,6 +51,13 @@ describe Rapns::Daemon, "when starting" do
   end
 
   it "starts the feeder" do
+    Rapns::Daemon::Feeder.should_receive(:start).with(2)
+    Rapns::Daemon.start
+  end
+
+  it "starts the feeder in a new thread if embedded" do
+    config.stub(:embedded => true)
+    Thread.should_receive(:new).and_yield
     Rapns::Daemon::Feeder.should_receive(:start).with(2)
     Rapns::Daemon.start
   end

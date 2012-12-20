@@ -39,7 +39,7 @@ module Rapns
                                :airbrake_notify => Rapns.config.airbrake_notify)
       setup_signal_hooks
 
-      unless Rapns.config.foreground
+      unless Rapns.config.foreground || Rapns.config.embedded
         daemonize
         reconnect_database
       end
@@ -47,10 +47,19 @@ module Rapns
       write_pid_file
       ensure_upgraded
       AppRunner.sync
-      Feeder.start(Rapns.config.push_poll)
+
+      if Rapns.config.embedded
+        Thread.new { start_feeder }
+      else
+        start_feeder
+      end
     end
 
     protected
+
+    def self.start_feeder
+      Feeder.start(Rapns.config.push_poll)
+    end
 
     def self.ensure_upgraded
       count = 0

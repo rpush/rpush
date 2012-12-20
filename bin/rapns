@@ -11,9 +11,7 @@ if environment.nil? || environment =~ /^-/
   exit 1
 end
 
-# A mock configuration to be used before the Rails environment is loaded.
-class CommandlineConfig < Struct.new(*Rapns::CONFIG_ATTRS); end
-config = CommandlineConfig.new
+config = Rapns::ConfigurationWithoutDefaults.new
 
 ARGV.options do |opts|
   opts.banner = banner
@@ -34,8 +32,5 @@ load 'config/environment.rb'
 load 'config/initializers/rapns.rb' if File.exist?('config/initializers/rapns.rb')
 
 Rapns.config.update(config)
-
-require 'rapns/daemon'
-require 'rapns/patches'
-
+Rapns.require_for_daemon
 Rapns::Daemon.start
