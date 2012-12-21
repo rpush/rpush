@@ -38,7 +38,7 @@ module Rapns
       self.logger = Logger.new(:foreground => Rapns.config.foreground,
                                :airbrake_notify => Rapns.config.airbrake_notify)
 
-      setup_signal_hooks unless Rapns.config.embedded
+      setup_signal_traps if trap_signals?
 
       if daemonize?
         daemonize
@@ -92,7 +92,11 @@ Remove config/rapns/rapns.yml to avoid this warning.
       end
     end
 
-    def self.setup_signal_hooks
+    def self.trap_signals?
+      !(Rapns.config.embedded || Rapns.config.push)
+    end
+
+    def self.setup_signal_traps
       @shutting_down = false
 
       Signal.trap('SIGHUP') { AppRunner.sync }

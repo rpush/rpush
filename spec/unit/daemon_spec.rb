@@ -44,14 +44,20 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start
   end
 
-  it 'sets up setup signal hooks' do
-    Rapns::Daemon.should_receive(:setup_signal_hooks)
+  it 'sets up setup signal traps' do
+    Rapns::Daemon.should_receive(:setup_signal_traps)
     Rapns::Daemon.start
   end
 
-  it 'does not setup signal hooks when embedded' do
+  it 'does not setup signal traps when embedded' do
     config.stub(:embedded => true)
-    Rapns::Daemon.should_not_receive(:setup_signal_hooks)
+    Rapns::Daemon.should_not_receive(:setup_signal_traps)
+    Rapns::Daemon.start
+  end
+
+  it 'does not setup signal traps when in push mode' do
+    config.stub(:push => true)
+    Rapns::Daemon.should_not_receive(:setup_signal_traps)
     Rapns::Daemon.start
   end
 
@@ -129,13 +135,13 @@ describe Rapns::Daemon, "when being shutdown" do
   # These tests do not work on JRuby.
   unless defined? JRUBY_VERSION
     it "shuts down when signaled signaled SIGINT" do
-      Rapns::Daemon.setup_signal_hooks
+      Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)
       Process.kill("SIGINT", Process.pid)
     end
 
     it "shuts down when signaled signaled SIGTERM" do
-      Rapns::Daemon.setup_signal_hooks
+      Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)
       Process.kill("SIGTERM", Process.pid)
     end
