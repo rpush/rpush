@@ -31,7 +31,7 @@ module Rapns
         end
       end
 
-      def stop?
+      def self.stop?
         @stop
       end
 
