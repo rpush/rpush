@@ -19,17 +19,7 @@ module Rapns
 
     def initialize
       super
-
-      self.foreground = false
-      self.push_poll = 2
-      self.feedback_poll = 60
-      self.airbrake_notify = true
-      self.check_for_errors = true
-      self.batch_size = 5000
-
-      # Internal options.
-      self.embedded = false
-      self.push = false
+      set_defaults
     end
 
     def update(other)
@@ -49,6 +39,27 @@ module Rapns
       else
         super
       end
+    end
+
+    def reset
+      set_defaults
+    end
+
+    private
+
+    def set_defaults
+      self.foreground = false
+      self.push_poll = 2
+      self.feedback_poll = 60
+      self.airbrake_notify = true
+      self.check_for_errors = true
+      self.batch_size = 5000
+      self.pid_file = nil
+      self.apns_feedback_callback = nil
+
+      # Internal options.
+      self.embedded = false
+      self.push = false
     end
   end
 end

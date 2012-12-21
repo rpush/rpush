@@ -8,7 +8,7 @@ describe Rapns, 'push' do
 
   it 'sets the push config option to true' do
     Rapns.push
-    Rapns.config.embedded.should be_true
+    Rapns.config.push.should be_true
   end
 
   it 'starts the daemon' do
