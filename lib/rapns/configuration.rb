@@ -44,10 +44,6 @@ module Rapns
     end
     deprecated(:on_apns_feedback, 3.2, "Please use the Rapns.reflect API instead.")
 
-    def reset
-      set_defaults
-    end
-
     private
 
     def set_defaults

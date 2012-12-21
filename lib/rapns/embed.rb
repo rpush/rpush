@@ -5,7 +5,6 @@ module Rapns
     config = Rapns::ConfigurationWithoutDefaults.new
     options.each { |k, v| config.send("#{k}=", v) }
     config.embedded = true
-    Rapns.config.reset
     Rapns.config.update(config)
     Rapns::Daemon.start
 
