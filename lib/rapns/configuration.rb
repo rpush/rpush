@@ -8,7 +8,8 @@ module Rapns
   end
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
-    :airbrake_notify, :check_for_errors, :pid_file, :batch_size]
+    :airbrake_notify, :check_for_errors, :pid_file, :batch_size,
+    :push]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end
@@ -25,7 +26,10 @@ module Rapns
       self.airbrake_notify = true
       self.check_for_errors = true
       self.batch_size = 5000
+
+      # Internal options.
       self.embedded = false
+      self.push = false
     end
 
     def update(other)

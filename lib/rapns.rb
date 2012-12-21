@@ -9,6 +9,7 @@ require 'rapns/notification'
 require 'rapns/app'
 require 'rapns/configuration'
 require 'rapns/embed'
+require 'rapns/push'
 
 require 'rapns/apns/binary_notification_validator'
 require 'rapns/apns/device_token_format_validator'

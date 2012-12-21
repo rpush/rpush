@@ -1,19 +1,27 @@
 require "unit_spec_helper"
 
 describe Rapns::Daemon::Feeder do
-  let(:config) { stub(:batch_size => 5000) }
+  let(:config) { stub(:batch_size => 5000, :push_poll => 0, :embedded => false,
+    :push => false) }
   let!(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:logger) { stub }
 
   before do
-    Rapns::Daemon.stub(:logger => logger, :config => config)
+    Rapns.stub(:config => config)
     Rapns::Daemon::Feeder.instance_variable_set("@stop", true)
     Rapns::Daemon::AppRunner.stub(:idle => [stub(:app => app)])
   end
 
   def start
-    Rapns::Daemon::Feeder.start(0)
+    Rapns::Daemon::Feeder.start
+  end
+
+  it "starts the loop in a new thread if embedded" do
+    config.stub(:embedded => true)
+    Thread.should_receive(:new).and_yield
+    Rapns::Daemon::Feeder.should_receive(:feed_forever)
+    start
   end
 
   it "checks for new notifications with the ability to reconnect the database" do
@@ -21,9 +29,24 @@ describe Rapns::Daemon::Feeder do
     start
   end
 
+  it 'enqueues notifications without looping if in push mode' do
+    config.stub(:push => true)
+    Rapns::Daemon::Feeder.should_not_receive(:feed_forever)
+    Rapns::Daemon::Feeder.should_receive(:enqueue_notifications)
+    start
+  end
+
   it 'loads notifications in batches' do
     relation = stub.as_null_object
     relation.should_receive(:limit).with(5000)
+    Rapns::Notification.stub(:ready_for_delivery => relation)
+    start
+  end
+
+  it 'does not load notification in batches if in push mode' do
+    config.stub(:push => true)
+    relation = stub.as_null_object
+    relation.should_not_receive(:limit)
     Rapns::Notification.stub(:ready_for_delivery => relation)
     start
   end
@@ -88,8 +111,9 @@ describe Rapns::Daemon::Feeder do
   end
 
   it "sleeps for the given period" do
+    config.stub(:push_poll => 2)
     Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(2)
     Rapns::Daemon::Feeder.stub(:loop).and_yield
-    Rapns::Daemon::Feeder.start(2)
+    Rapns::Daemon::Feeder.start
   end
 end

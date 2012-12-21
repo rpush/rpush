@@ -4,11 +4,13 @@ module Rapns
       extend InterruptibleSleep
       extend DatabaseReconnectable
 
-      def self.start(poll)
-        loop do
+      def self.start
+        if Rapns.config.embedded
+          Thread.new { feed_forever }
+        elsif Rapns.config.push
           enqueue_notifications
-          interruptible_sleep poll
-          break if @stop
+        else
+          feed_forever
         end
       end
 
@@ -19,12 +21,22 @@ module Rapns
 
       protected
 
+      def self.feed_forever
+        loop do
+          enqueue_notifications
+          interruptible_sleep(Rapns.config.push_poll)
+          break if @stop
+        end
+      end
+
       def self.enqueue_notifications
         begin
           with_database_reconnect_and_retry do
             batch_size = Rapns.config.batch_size
             idle = Rapns::Daemon::AppRunner.idle.map(&:app)
-            Rapns::Notification.ready_for_delivery.for_apps(idle).limit(batch_size).each do |notification|
+            relation = Rapns::Notification.ready_for_delivery.for_apps(idle)
+            relation = relation.limit(batch_size) unless Rapns.config.push
+            relation.each do |notification|
               Rapns::Daemon::AppRunner.enqueue(notification)
             end
           end

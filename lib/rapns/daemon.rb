@@ -40,7 +40,7 @@ module Rapns
 
       setup_signal_hooks unless Rapns.config.embedded
 
-      unless Rapns.config.foreground || Rapns.config.embedded
+      if daemonize?
         daemonize
         reconnect_database
       end
@@ -48,12 +48,7 @@ module Rapns
       write_pid_file
       ensure_upgraded
       AppRunner.sync
-
-      if Rapns.config.embedded
-        Thread.new { start_feeder }
-      else
-        start_feeder
-      end
+      Feeder.start
     end
 
     def self.shutdown(quiet = false)
@@ -65,8 +60,12 @@ module Rapns
 
     protected
 
+    def self.daemonize?
+      !(Rapns.config.foreground || Rapns.config.embedded || Rapns.config.push)
+    end
+
     def self.start_feeder
-      Feeder.start(Rapns.config.push_poll)
+
     end
 
     def self.ensure_upgraded
