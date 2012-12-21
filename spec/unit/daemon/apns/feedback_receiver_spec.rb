@@ -10,12 +10,13 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:connection) { stub(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:receiver) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, host, port, poll) }
+  let(:feedback) { stub }
 
   before do
     receiver.stub(:interruptible_sleep)
     Rapns::Daemon.logger = logger
     Rapns::Daemon::Apns::Connection.stub(:new => connection)
-    Rapns::Apns::Feedback.stub(:create!)
+    Rapns::Apns::Feedback.stub(:create! => feedback)
     receiver.instance_variable_set("@stop", false)
   end
 
@@ -31,7 +32,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with("FeedbackReceiver:#{app.name}", host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
     receiver.check_for_feedback
   end
 
@@ -52,7 +53,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'logs the feedback' do
     stub_connection_read_with_tuple
-    Rapns::Daemon.logger.should_receive(:info).with("[FeedbackReceiver:my_app] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17")
+    Rapns::Daemon.logger.should_receive(:info).with("[my_app] [FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17.")
     receiver.check_for_feedback
   end
 
@@ -90,11 +91,15 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     receiver.stop
   end
 
+  it 'reflects feedback was received' do
+    stub_connection_read_with_tuple
+    receiver.should_receive(:reflect).with(:apns_feedback, feedback)
+    receiver.check_for_feedback
+  end
+
   it 'calls the apns_feedback_callback when feedback is received and the callback is set' do
     stub_connection_read_with_tuple
     Rapns.config.apns_feedback_callback = Proc.new {}
-    feedback = Object.new
-    Rapns::Apns::Feedback.stub(:create! => feedback)
     Rapns.config.apns_feedback_callback.should_receive(:call).with(feedback)
     receiver.check_for_feedback
   end
@@ -103,7 +108,9 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     error = StandardError.new('bork!')
     stub_connection_read_with_tuple
     callback = Proc.new { raise error }
-    Rapns.config.on_apns_feedback &callback
+    Rapns::Deprecation.silenced do
+      Rapns.config.on_apns_feedback &callback
+    end
     expect { receiver.check_for_feedback }.not_to raise_error
   end
 
@@ -112,7 +119,9 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     stub_connection_read_with_tuple
     callback = Proc.new { raise error }
     Rapns::Daemon.logger.should_receive(:error).with(error)
-    Rapns.config.on_apns_feedback &callback
+    Rapns::Deprecation.silenced do
+      Rapns.config.on_apns_feedback &callback
+    end
     receiver.check_for_feedback
   end
 end

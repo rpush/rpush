@@ -4,7 +4,7 @@ module Rapns
       class DeliveryHandler < Rapns::Daemon::DeliveryHandler
         def initialize(app, host, port)
           @app = app
-          @connection = Connection.new(@app.name, host, port, @app.certificate, @app.password)
+          @connection = Connection.new(@app, host, port)
           @connection.connect
         end
 

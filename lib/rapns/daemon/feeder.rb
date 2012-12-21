@@ -3,6 +3,7 @@ module Rapns
     class Feeder
       extend InterruptibleSleep
       extend DatabaseReconnectable
+      extend Reflectable
 
       def self.start
         @stop = false
@@ -44,10 +45,12 @@ module Rapns
             relation = relation.limit(batch_size) unless Rapns.config.push
             relation.each do |notification|
               Rapns::Daemon::AppRunner.enqueue(notification)
+              reflect(:notification_enqueued, notification)
             end
           end
         rescue StandardError => e
           Rapns::Daemon.logger.error(e)
+          reflect(:error, e)
         end
       end
     end

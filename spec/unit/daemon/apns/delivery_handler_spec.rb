@@ -23,7 +23,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   end
 
   it "instantiates a new connection" do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app.name, host, port, certificate, password)
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
     Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port)
   end
 

@@ -11,7 +11,8 @@ describe Rapns::Daemon::Apns::Connection do
   let(:tcp_socket) { stub(:setsockopt => nil, :close => nil) }
   let(:ssl_socket) { stub(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
   let(:logger) { stub(:info => nil, :error => nil) }
-  let(:connection) { Rapns::Daemon::Apns::Connection.new('Connection 0', host, port, certificate, password) }
+  let(:app) { stub(:name => 'Connection 0', :certificate => certificate, :password => password)}
+  let(:connection) { Rapns::Daemon::Apns::Connection.new(app, host, port) }
 
   before do
     OpenSSL::SSL::SSLContext.stub(:new => ssl_context)
@@ -119,6 +120,14 @@ describe Rapns::Daemon::Apns::Connection do
       connection.stub(:sleep)
       connection.connect
       ssl_socket.stub(:write).and_raise(error_type)
+    end
+
+    it 'reflects the connection has been lost' do
+      connection.should_receive(:reflect).with(:apns_connection_lost, app, kind_of(error_type))
+      begin
+        connection.write(nil)
+      rescue Rapns::Daemon::Apns::ConnectionError
+      end
     end
 
     it "logs that the connection has been lost once only" do

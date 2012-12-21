@@ -5,6 +5,7 @@ require 'openssl'
 
 require 'net/http/persistent'
 
+require 'rapns/daemon/reflectable'
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/delivery_error'
 require 'rapns/daemon/database_reconnectable'

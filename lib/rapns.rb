@@ -8,6 +8,7 @@ require 'rapns/multi_json_helper'
 require 'rapns/notification'
 require 'rapns/app'
 require 'rapns/configuration'
+require 'rapns/reflection'
 require 'rapns/embed'
 require 'rapns/push'
 

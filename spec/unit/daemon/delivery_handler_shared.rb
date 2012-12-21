@@ -8,6 +8,14 @@ shared_examples_for 'an DeliveryHandler subclass' do
     delivery_handler.send(:handle_next_notification)
   end
 
+  it 'reflects an exception' do
+    Rapns::Daemon.stub(:logger => stub(:error => nil))
+    error = StandardError.new
+    delivery_handler.stub(:deliver).and_raise(error)
+    delivery_handler.should_receive(:reflect).with(:error, error)
+    delivery_handler.send(:handle_next_notification)
+  end
+
   it "instructs the queue to wakeup the thread when told to stop" do
     thread = stub(:join => nil)
     Thread.stub(:new => thread)

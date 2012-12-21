@@ -4,18 +4,20 @@ module Rapns
       class ConnectionError < StandardError; end
 
       class Connection
+        include Reflectable
+
         attr_accessor :last_write
 
         def self.idle_period
           30.minutes
         end
 
-        def initialize(name, host, port, certificate, password)
-          @name = name
+        def initialize(app, host, port)
+          @app = app
           @host = host
           @port = port
-          @certificate = certificate
-          @password = password
+          @certificate = app.certificate
+          @password = app.password
           written
         end
 
@@ -51,7 +53,8 @@ module Rapns
             retry_count += 1;
 
             if retry_count == 1
-              Rapns::Daemon.logger.error("[#{@name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
+              Rapns::Daemon.logger.error("[#{@app.name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
+              reflect(:apns_connection_lost, @app, e)
             end
 
             if retry_count <= 3
@@ -59,7 +62,7 @@ module Rapns
               sleep 1
               retry
             else
-              raise ConnectionError, "#{@name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
+              raise ConnectionError, "#{@app.name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
             end
           end
         end
@@ -72,7 +75,7 @@ module Rapns
         protected
 
         def reconnect_idle
-          Rapns::Daemon.logger.info("[#{@name}] Idle period exceeded, reconnecting...")
+          Rapns::Daemon.logger.info("[#{@app.name}] Idle period exceeded, reconnecting...")
           reconnect
         end
 
@@ -104,7 +107,7 @@ module Rapns
           ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
           ssl_socket.sync = true
           ssl_socket.connect
-          Rapns::Daemon.logger.info("[#{@name}] Connected to #{@host}:#{@port}")
+          Rapns::Daemon.logger.info("[#{@app.name}] Connected to #{@host}:#{@port}")
           [tcp_socket, ssl_socket]
         end
       end

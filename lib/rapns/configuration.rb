@@ -15,6 +15,8 @@ module Rapns
   end
 
   class Configuration < Struct.new(*CONFIG_ATTRS)
+    include Deprecatable
+
     attr_accessor :apns_feedback_callback
 
     def initialize
@@ -29,10 +31,6 @@ module Rapns
       end
     end
 
-    def on_apns_feedback(&block)
-      self.apns_feedback_callback = block
-    end
-
     def pid_file=(path)
       if path && !Pathname.new(path).absolute?
         super(File.join(Rails.root, path))
@@ -40,6 +38,11 @@ module Rapns
         super
       end
     end
+
+    def on_apns_feedback(&block)
+      self.apns_feedback_callback = block
+    end
+    deprecated(:on_apns_feedback, 3.2, "Please use the Rapns.reflect API instead.")
 
     def reset
       set_defaults

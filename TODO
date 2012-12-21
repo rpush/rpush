@@ -1,9 +1,8 @@
 # 3.0
 
 * Document config.rb
-* Do not exit() from ensure_upgraded when embedded.
 
 # 3.1
-* Add option to quit after sending pending notifications.
 * Warn if number of workers is more than db pool size?
-* statsd probes?
+* Bugsnag
+* Generator should merge rapns.rb
