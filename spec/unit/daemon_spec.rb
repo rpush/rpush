@@ -115,6 +115,14 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start
   end
 
+  it 'does not exit if Rapns has not been upgraded and is in push mode' do
+    config.stub(:push => true)
+    Rapns::App.stub(:count).and_raise(ActiveRecord::StatementInvalid)
+    Rapns::Daemon.should_receive(:puts).any_number_of_times
+    Rapns::Daemon.should_not_receive(:exit)
+    Rapns::Daemon.start
+  end
+
   it 'warns if rapns.yml still exists' do
     File.should_receive(:exists?).with('/rails_root/config/rapns/rapns.yml').and_return(true)
     logger.should_receive(:warn).with("Since 2.0.0 rapns uses command-line options and a Ruby based configuration file.\nPlease run 'rails g rapns' to generate a new configuration file into config/initializers.\nRemove config/rapns/rapns.yml to avoid this warning.\n")

@@ -77,7 +77,7 @@ module Rapns
         puts "Please run 'rails g rapns' to generate the new migrations and create your app."
         puts "See https://github.com/ileitch/rapns for further instructions."
         puts
-        exit 1 unless Rapns.config.embedded
+        exit 1 unless Rapns.config.embedded || Rapns.config.push
       end
 
       if count == 0
