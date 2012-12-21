@@ -64,10 +64,6 @@ module Rapns
       !(Rapns.config.foreground || Rapns.config.embedded || Rapns.config.push)
     end
 
-    def self.start_feeder
-
-    end
-
     def self.ensure_upgraded
       count = 0
 

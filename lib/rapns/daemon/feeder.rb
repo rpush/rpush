@@ -5,6 +5,8 @@ module Rapns
       extend DatabaseReconnectable
 
       def self.start
+        @stop = false
+
         if Rapns.config.embedded
           Thread.new { feed_forever }
         elsif Rapns.config.push
@@ -25,8 +27,12 @@ module Rapns
         loop do
           enqueue_notifications
           interruptible_sleep(Rapns.config.push_poll)
-          break if @stop
+          break if stop?
         end
+      end
+
+      def stop?
+        @stop
       end
 
       def self.enqueue_notifications

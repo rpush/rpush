@@ -9,7 +9,7 @@ describe Rapns::Daemon::Feeder do
 
   before do
     Rapns.stub(:config => config)
-    Rapns::Daemon::Feeder.instance_variable_set("@stop", true)
+    Rapns::Daemon::Feeder.stub(:stop? => true)
     Rapns::Daemon::AppRunner.stub(:idle => [stub(:app => app)])
   end
 
