@@ -1,5 +1,5 @@
 ## 3.1.0 (unreleased)
-  * Rapns.relfect API for fine-grained introspection.
+  * Rapns.reflect API for fine-grained introspection.
   * Rapns.embed API for embedding Rapns into an existing process.
   * Rapns.push API for using Rapns in scheduled jobs.
 
