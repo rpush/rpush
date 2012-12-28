@@ -39,6 +39,15 @@ module Rapns
       end
     end
 
+    def foreground=(bool)
+      if defined? JRUBY_VERSION
+        # The JVM does not support fork().
+        super(true)
+      else
+        super
+      end
+    end
+
     def on_apns_feedback(&block)
       self.apns_feedback_callback = block
     end
@@ -47,7 +56,13 @@ module Rapns
     private
 
     def set_defaults
-      self.foreground = false
+      if defined? JRUBY_VERSION
+        # The JVM does not support fork().
+        self.foreground = true
+      else
+        self.foreground = false
+      end
+
       self.push_poll = 2
       self.feedback_poll = 60
       self.airbrake_notify = true

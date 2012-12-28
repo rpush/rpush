@@ -37,4 +37,11 @@ describe Rapns::Configuration do
     config.pid_file = '/tmp/rapns.pid'
     config.pid_file.should == '/tmp/rapns.pid'
   end
+
+  it 'does not allow foreground to be set to false if the platform is JRuby' do
+    config.foreground = true
+    stub_const('Rapns::Configuration::JRUBY_VERSION', '1.7.1')
+    config.foreground = false
+    config.foreground.should be_true
+  end
 end

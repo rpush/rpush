@@ -62,7 +62,7 @@ module Rapns
     protected
 
     def self.daemonize?
-      !(Rapns.config.foreground || Rapns.config.embedded || Rapns.config.push)
+      !(Rapns.config.foreground || Rapns.config.embedded || Rapns.config.push || defined?(JRUBY_VERSION))
     end
 
     def self.ensure_upgraded
