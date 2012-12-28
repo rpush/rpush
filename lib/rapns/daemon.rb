@@ -135,13 +135,13 @@ Remove config/rapns/rapns.yml to avoid this warning.
         exit if fork
         Process.setsid
         exit if fork
-        Dir.chdir "/" 
+        Dir.chdir "/"
         STDIN.reopen "/dev/null"
-        STDOUT.reopen "/dev/null", "a" 
-        STDERR.reopen "/dev/null", "a" 
+        STDOUT.reopen "/dev/null", "a"
+        STDERR.reopen "/dev/null", "a"
       else
         Process.daemon
-      end 
+      end
     end
   end
 end
