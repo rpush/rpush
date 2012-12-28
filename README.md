@@ -36,10 +36,15 @@ Generate the migrations, rapns.yml and migrate:
 3. Select both the certificate and private key.
 4. Right click and select `Export 2 items...`.
 5. Save the file as `cert.p12`, make sure the File Format is `Personal Information Exchange (p12)`.
-6. If you decide to set a password for your exported certificate, please read the 'Adding Apps' section below.
-7. Convert the certificate to a .pem, where `<environment>` should be `development` or `production`, depending on the certificate you exported.
+6. Convert the certificate to a .pem, where `<environment>` should be `development` or `production`, depending on the certificate you exported.
+
+Without a password:
 
     `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
+
+With a password:
+
+    `openssl pkcs12 -clcerts -in cert.p12 -out <environment>.pem`
 
 ## Create an App
 
