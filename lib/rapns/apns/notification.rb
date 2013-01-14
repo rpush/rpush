@@ -43,13 +43,13 @@ module Rapns
 
       MDM_KEY = '__rapns_mdm__'
       def mdm=(magic)
-        self.attributes_for_device = { MDM_KEY => magic }
+        self.attributes_for_device = (attributes_for_device || {}).merge({ MDM_KEY => magic })
       end
 
       CONTENT_AVAILABLE_KEY = '__rapns_content_available__'
       def content_available=(bool)
         return unless bool
-        self.attributes_for_device = { CONTENT_AVAILABLE_KEY => true }
+        self.attributes_for_device = (attributes_for_device || {}).merge({ CONTENT_AVAILABLE_KEY => true })
       end
 
       def as_json
@@ -79,6 +79,12 @@ module Rapns
       def to_binary(options = {})
         id_for_pack = options[:for_validation] ? 0 : id
         [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
+      end
+
+      def data=(attrs)
+        return unless attrs
+        raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
+        super attrs.merge(data || {})
       end
 
     end
