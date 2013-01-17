@@ -4,6 +4,7 @@ module Rapns
       validates :registration_ids, :presence => true
       validates_with Rapns::Gcm::ExpiryCollapseKeyMutualInclusionValidator
       validates_with Rapns::Gcm::PayloadDataSizeValidator
+      validates_with Rapns::Gcm::RegistrationIdsCountValidator
 
       def registration_ids=(ids)
         ids = [ids] if ids && !ids.is_a?(Array)

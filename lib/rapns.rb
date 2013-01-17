@@ -21,6 +21,7 @@ require 'rapns/apns/app'
 
 require 'rapns/gcm/expiry_collapse_key_mutual_inclusion_validator'
 require 'rapns/gcm/payload_data_size_validator'
+require 'rapns/gcm/registration_ids_count_validator'
 require 'rapns/gcm/notification'
 require 'rapns/gcm/app'
 
