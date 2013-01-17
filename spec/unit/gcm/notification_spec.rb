@@ -12,10 +12,10 @@ describe Rapns::Gcm::Notification do
 
   it { should validate_presence_of :registration_ids }
 
-  it 'has a payload limit of 4096 bytes' do
+  it "has a 'data' payload limit of 4096 bytes" do
     notification.data = { :key => "a" * 4096 }
     notification.valid?.should be_false
-    notification.errors[:base].should == ["GCM notification payload cannot be larger than 4096 bytes."]
+    notification.errors[:base].should == ["GCM notification payload data cannot be larger than 4096 bytes."]
   end
 
   it 'allows assignment of many registration IDs' do
