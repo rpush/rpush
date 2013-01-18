@@ -34,7 +34,9 @@ class AddGcm < ActiveRecord::Migration
 
     add_column :rapns_notifications, :collapse_key, :string, :null => true
     add_column :rapns_notifications, :delay_while_idle, :boolean, :null => false, :default => false
-    add_column :rapns_notifications, :registration_ids, :text, :null => true, :limit => 4*1024*1000
+
+    reg_ids_type = ActiveRecord::Base.connection.adapter_name.include?('Mysql') ? :mediumtext : :text
+    add_column :rapns_notifications, :registration_ids, reg_ids_type, :null => true
     add_column :rapns_notifications, :app_id, :integer, :null => true
     add_column :rapns_notifications, :retries, :integer, :null => true, :default => 0
 
