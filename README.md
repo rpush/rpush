@@ -100,7 +100,7 @@ As a daemon:
     cd /path/to/rails/app
     rapns <Rails environment> [options]
 
-Inside an existing process:
+Inside an existing process (see [Embedding API](rapns/wiki/Embedding-API)):
 
     Rapns.embed
 
