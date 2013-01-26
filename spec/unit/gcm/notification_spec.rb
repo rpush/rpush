@@ -25,7 +25,7 @@ describe Rapns::Gcm::Notification do
     reloaded_notification = notification_class.find(notification.id)
     reloaded_notification.registration_ids.should == ['a', 'b']
   end
-  
+
   it 'num of registration Ids limit of 1000' do
     notification.registration_ids = ['a']*(1000+1)
     notification.valid?.should be_false

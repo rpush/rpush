@@ -132,21 +132,21 @@ describe Rapns::Apns::Notification, 'content-available' do
     notification.content_available = true
     notification.as_json.key?('content-available').should be_false
   end
-  
+
   it 'does not overwrite existing attributes for the device' do
     notification.data = {:hi => :mom}
     notification.content_available = true
     notification.as_json['aps']['content-available'].should == 1
     notification.as_json['hi'].should == 'mom'
   end
-  
+
   it 'does not overwrite the content-available flag when setting attributes for the device' do
     notification.content_available = true
     notification.data = {:hi => :mom}
     notification.as_json['aps']['content-available'].should == 1
-    notification.as_json['hi'].should == 'mom'    
+    notification.as_json['hi'].should == 'mom'
   end
-  
+
 end
 
 describe Rapns::Apns::Notification, "to_binary" do

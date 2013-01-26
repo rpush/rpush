@@ -143,3 +143,6 @@ Thank you to the following wonderful people for contributing:
 * [@adorr](https://github.com/adorr)
 * [@mattconnolly](https://github.com/mattconnolly)
 * [@emeitch](https://github.com/emeitch)
+* [@jeffarena](https://github.com/jeffarena)
+* [@DianthuDia](https://github.com/DianthuDia)
+* [@dup2](https://github.com/dup2)

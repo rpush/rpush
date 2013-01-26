@@ -1,12 +1,15 @@
-## 3.1.0 (unreleased)
+## 3.1.0 (Jan 26, 2013)
   * Rapns.reflect API for fine-grained introspection.
   * Rapns.embed API for embedding Rapns into an existing process.
   * Rapns.push API for using Rapns in scheduled jobs.
+  * Fix issue with integration with ActiveScaffold (#98) (@jeffarena).
+  * Fix content-available setter for APNs (#95) (@dup2).
+  * GCM validation fixes (#96) (@DianthuDia).
 
-## 3.0.1 (Sun 16, 2012)
+## 3.0.1 (Dec 16, 2012)
   * Fix compatibility with Rails 3.0.x. Fixes #89.
 
-## 3.0.0 (Sat 15, 2012)
+## 3.0.0 (Dec 15, 2012)
   * Add support for Google Cloud Messaging.
   * Fix Heroku logging issue.
 
