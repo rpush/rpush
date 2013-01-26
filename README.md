@@ -12,7 +12,7 @@
 * Reflection API for fine-grained instrumentation ([Reflection API](rapns/wiki/Relfection-API)).
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * [Airbrake](http://airbrakeapp.com/) integration.
-* Built with a love for Open Source :)
+* Built with love.
 
 #### 2.x users please read [upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
 
