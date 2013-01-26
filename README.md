@@ -106,6 +106,10 @@ Inside an existing process (see [Embedding API](rapns/wiki/Embedding-API)):
 
 *Please note that only ever a single instance of Rapns should be running.*
 
+In a scheduler:
+
+    Rapns.push
+
 See [Configuration](rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
 
 ## Updating Rapns
