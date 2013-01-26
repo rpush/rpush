@@ -7,3 +7,4 @@ coverage/
 spec/acceptance/fixtures
 .rbenv-version
 gcm_test/bin
+.DS_Store
