@@ -102,7 +102,7 @@ As a daemon:
 
 Inside an existing process:
 
-  Rapns.embed
+    Rapns.embed
 
 *Please note that only ever a single instance of Rapns should be running.*
 
