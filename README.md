@@ -1,14 +1,18 @@
 [![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
 
-### Rapns - Professional grade APNs and GCM daemon
+### Rapns - Professional grade APNs and GCM for Ruby.
 
 * Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
 * Seamless Rails integration.
 * Scalable - choose the number of threads each app spawns.
 * Designed for uptime - signal -HUP to add, update apps.
 * Stable - reconnects database and network connections when lost.
+* Run as a daemon or inside an existing process.
+* Use in a scheduler for low-workload deployments ([Push API](rapns/wiki/Push-API)).
+* Reflection API for fine-grained instrumentation ([Reflection API](rapns/wiki/Relfection-API)).
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * [Airbrake](http://airbrakeapp.com/) integration.
+* Built with a love for Open Source :)
 
 #### 2.x users please read [upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
 
@@ -91,8 +95,16 @@ n.save!
 
 ## Starting Rapns
 
+As a daemon:
+
     cd /path/to/rails/app
     rapns <Rails environment> [options]
+
+Inside an existing process:
+
+  Rapns.embed
+
+*Please note that only ever a single instance of Rapns should be running.*
 
 See [Configuration](rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
 
@@ -107,6 +119,9 @@ After updating you should run `rails g rapns` to check for any new migrations.
 * [Upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
 * [Deploying to Heroku](rapns/wiki/Heroku)
 * [Hot App Updates](rapns/wiki/Hot-App-Updates)
+* [Reflection API](rapns/wiki/Reflection-API)
+* [Push API](rapns/wiki/Push-API)
+* [Embedding API](rapns/wiki/Embedding-API)
 
 ### APNs
 * [Advanced APNs Features](rapns/wiki/Advanced-APNs-Features)
