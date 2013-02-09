@@ -19,7 +19,7 @@ platform :ruby do
 end
 
 platform :jruby do
-  gem 'activerecord-jdbc-adapter'
+  gem 'activerecord-jdbc-adapter', '>= 1.2.6'
   gem 'activerecord-jdbcpostgresql-adapter'
   gem 'activerecord-jdbcmysql-adapter'
   gem 'activerecord-jdbcsqlite3-adapter'

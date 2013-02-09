@@ -19,29 +19,31 @@ describe Rapns::Daemon, "when starting" do
     Rails.stub(:root).and_return("/rails_root")
   end
 
-  it "forks into a daemon if the foreground option is false" do
-    config.stub(:foreground => false)
-    ActiveRecord::Base.stub(:establish_connection)
-    Rapns::Daemon.should_receive(:daemonize)
-    Rapns::Daemon.start
-  end
+  unless defined?(JRUBY_VERSION)
+    it "forks into a daemon if the foreground option is false" do
+      config.stub(:foreground => false)
+      ActiveRecord::Base.stub(:establish_connection)
+      Rapns::Daemon.should_receive(:daemonize)
+      Rapns::Daemon.start
+    end
 
-  it "does not fork into a daemon if the foreground option is true" do
-    config.stub(:foreground => true)
-    Rapns::Daemon.should_not_receive(:daemonize)
-    Rapns::Daemon.start
-  end
+    it "does not fork into a daemon if the foreground option is true" do
+      config.stub(:foreground => true)
+      Rapns::Daemon.should_not_receive(:daemonize)
+      Rapns::Daemon.start
+    end
 
-  it "does not fork into a daemon if the push option is true" do
-    config.stub(:push => true)
-    Rapns::Daemon.should_not_receive(:daemonize)
-    Rapns::Daemon.start
-  end
+    it "does not fork into a daemon if the push option is true" do
+      config.stub(:push => true)
+      Rapns::Daemon.should_not_receive(:daemonize)
+      Rapns::Daemon.start
+    end
 
-  it "does not fork into a daemon if the embedded option is true" do
-    config.stub(:embedded => true)
-    Rapns::Daemon.should_not_receive(:daemonize)
-    Rapns::Daemon.start
+    it "does not fork into a daemon if the embedded option is true" do
+      config.stub(:embedded => true)
+      Rapns::Daemon.should_not_receive(:daemonize)
+      Rapns::Daemon.start
+    end
   end
 
   it 'sets up setup signal traps' do
