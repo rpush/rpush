@@ -17,12 +17,12 @@ class AddGcm < ActiveRecord::Migration
     AddGcm::Rapns::Notification.update_all :type => 'Rapns::Apns::Notification'
     AddGcm::Rapns::App.update_all :type => 'Rapns::Apns::App'
 
-    change_column_null :rapns_notifications, :type, false
-    change_column_null :rapns_apps, :type, false
-    change_column_null :rapns_notifications, :device_token, true
-    change_column_null :rapns_notifications, :expiry, true
-    change_column_null :rapns_apps, :environment, true
-    change_column_null :rapns_apps, :certificate, true
+    change_column :rapns_notifications, :type, :string, :null => false
+    change_column :rapns_apps, :type, :string, :null => false
+    change_column :rapns_notifications, :device_token, :string, { :null => true, :limit => 64 }
+    change_column :rapns_notifications, :expiry, :integer, { :null => true, :default => 1.day.to_i }
+    change_column :rapns_apps, :environment, :string, :null => true
+    change_column :rapns_apps, :certificate, :text, :null => true
 
     change_column :rapns_notifications, :error_description, :text
     change_column :rapns_notifications, :sound, :string, :default => 'default'
@@ -47,7 +47,7 @@ class AddGcm < ActiveRecord::Migration
       Rapns::Notification.update_all(['app_id = ?', app.id], ['app = ?', app.name])
     end
 
-    change_column_null :rapns_notifications, :app_id, false
+    change_column :rapns_notifications, :app_id, :integer, :null => false
     remove_column :rapns_notifications, :app
 
     remove_index :rapns_notifications, :name => "index_rapns_notifications_multi"
@@ -60,10 +60,10 @@ class AddGcm < ActiveRecord::Migration
     remove_column :rapns_notifications, :type
     remove_column :rapns_apps, :type
 
-    change_column_null :rapns_notifications, :device_token, false
-    change_column_null :rapns_notifications, :expiry, false
-    change_column_null :rapns_apps, :environment, false
-    change_column_null :rapns_apps, :certificate, false
+    change_column :rapns_notifications, :device_token, :string, { :null => false, :limit => 64 }
+    change_column :rapns_notifications, :expiry, :integer, { :null => false, :default => 1.day.to_i }
+    change_column :rapns_apps, :environment, :string, :null => false
+    change_column :rapns_apps, :certificate, :text, :null => false
 
     change_column :rapns_notifications, :error_description, :string
     change_column :rapns_notifications, :sound, :string, :default => '1.aiff'
@@ -87,7 +87,7 @@ class AddGcm < ActiveRecord::Migration
       Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
     end
 
-    change_column_null :rapns_notifications, :key, false
+    change_column :rapns_notifications, :key, :string, :null => false
     remove_column :rapns_notifications, :app_id
 
     remove_index :rapns_notifications, :name => "index_rapns_notifications_multi"
