@@ -8,13 +8,13 @@
 * Designed for uptime - signal -HUP to add, update apps.
 * Stable - reconnects database and network connections when lost.
 * Run as a daemon or inside an existing process.
-* Use in a scheduler for low-workload deployments ([Push API](rapns/wiki/Push-API)).
-* Reflection API for fine-grained instrumentation ([Reflection API](rapns/wiki/Relfection-API)).
+* Use in a scheduler for low-workload deployments ([Push API](https://github.com/ileitch/rapns/wiki/Push-API)).
+* Reflection API for fine-grained instrumentation ([Reflection API](https://github.com/ileitch/rapns/wiki/Relfection-API)).
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * [Airbrake](http://airbrakeapp.com/) integration.
 * Built with love.
 
-#### 2.x users please read [upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
+#### 2.x users please read [upgrading from 2.x to 3.0](https://github.com/ileitch/rapns/wiki/Upgrading-from-version-2.x-to-3.0)
 
 ### Who uses Rapns?
 
@@ -100,7 +100,7 @@ As a daemon:
     cd /path/to/rails/app
     rapns <Rails environment> [options]
 
-Inside an existing process (see [Embedding API](rapns/wiki/Embedding-API)):
+Inside an existing process (see [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)):
 
     Rapns.embed
 
@@ -110,7 +110,7 @@ In a scheduler:
 
     Rapns.push
 
-See [Configuration](rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
+See [Configuration](https://github.com/ileitch/rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
 
 ## Updating Rapns
 
@@ -119,19 +119,20 @@ After updating you should run `rails g rapns` to check for any new migrations.
 ## Wiki
 
 ### General
-* [Configuration](rapns/wiki/Configuration)
-* [Upgrading from 2.x to 3.0](rapns/wiki/Upgrading-from-version-2.x-to-3.0)
-* [Deploying to Heroku](rapns/wiki/Heroku)
-* [Hot App Updates](rapns/wiki/Hot-App-Updates)
-* [Reflection API](rapns/wiki/Reflection-API)
-* [Push API](rapns/wiki/Push-API)
-* [Embedding API](rapns/wiki/Embedding-API)
+* [Configuration](https://github.com/ileitch/rapns/wiki/Configuration)
+* [Upgrading from 2.x to 3.0](https://github.com/ileitch/rapns/wiki/Upgrading-from-version-2.x-to-3.0)
+* [Deploying to Heroku](https://github.com/ileitch/rapns/wiki/Heroku)
+* [Hot App Updates](https://github.com/ileitch/rapns/wiki/Hot-App-Updates)
+* [Signals](https://github.com/ileitch/rapns/wiki/Signals)
+* [Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)
+* [Push API](https://github.com/ileitch/rapns/wiki/Push-API)
+* [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)
 
 ### APNs
-* [Advanced APNs Features](rapns/wiki/Advanced-APNs-Features)
-* [APNs Delivery Failure Handling](rapns/wiki/APNs-Delivery-Failure-Handling)
-* [Why open multiple connections to the APNs?](rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
-* [Silent failures might be dropped connections](rapns/wiki/Dropped-connections)
+* [Advanced APNs Features](https://github.com/ileitch/rapns/wiki/Advanced-APNs-Features)
+* [APNs Delivery Failure Handling](https://github.com/ileitch/rapns/wiki/APNs-Delivery-Failure-Handling)
+* [Why open multiple connections to the APNs?](https://github.com/ileitch/rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
+* [Silent failures might be dropped connections](https://github.com/ileitch/rapns/wiki/Dropped-connections)
 
 ### GCM
 
