@@ -32,6 +32,8 @@ describe Rapns::Daemon::DatabaseReconnectable do
       ActiveRecord::JDBCError
     when 'jdbcmysql'
       ActiveRecord::JDBCError
+    when 'jdbch2'
+      ActiveRecord::JDBCError
     else
       raise "Please update #{__FILE__} for adapter #{$adapter}"
     end

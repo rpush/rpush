@@ -38,7 +38,7 @@ describe Rapns::Daemon::Gcm::Delivery do
 
     it 'logs that the notification was delivered' do
       response.stub(:body => JSON.dump({ 'failure' => 0 }))
-      logger.should_receive(:info).with("[MyApp] 1 sent to xyz")
+      logger.should_receive(:info).with("[MyApp] #{notification.id} sent to xyz")
       perform
     end
 
@@ -146,7 +146,7 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'error' => 'NotRegistered' },
           { 'error' => 'Unavailable' }
         ]}}
-      let(:error_description) { "Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification 2." }
+      let(:error_description) { "Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification #{notification.id + 1}." }
       it_should_behave_like 'an notification with some delivery failures'
     end
   end
@@ -160,7 +160,7 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'message_id' => '1:000' },
           { 'error' => 'InternalServerError' }
         ]}}
-    let(:error_description) { "Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification 2." }
+    let(:error_description) { "Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification #{notification.id + 1}." }
     it_should_behave_like 'an notification with some delivery failures'
   end
 
@@ -168,7 +168,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 503) }
 
     it 'logs a warning that the notification will be retried.' do
-      logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification 1 will be retired after 2012-10-14 00:00:02 (retry 1).")
+      logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
       perform
     end
 
