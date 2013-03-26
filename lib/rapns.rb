@@ -11,6 +11,7 @@ require 'rapns/configuration'
 require 'rapns/reflection'
 require 'rapns/embed'
 require 'rapns/push'
+require 'rapns/apns_feedback'
 
 require 'rapns/apns/binary_notification_validator'
 require 'rapns/apns/device_token_format_validator'

@@ -4,12 +4,12 @@ require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 describe Rapns::Daemon::Apns::DeliveryHandler do
   it_should_behave_like 'an DeliveryHandler subclass'
 
-  let(:host) { 'localhost' }
+  let(:host) { 'gateway.push.apple.com' }
   let(:port) { 2195 }
   let(:certificate) { stub }
   let(:password) { stub }
-  let(:app) { stub(:password => password, :certificate => certificate, :name => 'MyApp')}
-  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port) }
+  let(:app) { stub(:password => password, :certificate => certificate, :name => 'MyApp', :environment => 'production')}
+  let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app) }
   let(:connection) { stub('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:notification) { stub }
   let(:http) { stub(:shutdown => nil)}
@@ -24,7 +24,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   it "instantiates a new connection" do
     Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
-    Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port)
+    Rapns::Daemon::Apns::DeliveryHandler.new(app)
   end
 
   it 'performs delivery of an notification' do
@@ -35,7 +35,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   it "connects the socket when instantiated" do
     connection.should_receive(:connect)
-    Rapns::Daemon::Apns::DeliveryHandler.new(app, host, port)
+    Rapns::Daemon::Apns::DeliveryHandler.new(app)
     delivery_handler.start
     delivery_handler.stop
   end

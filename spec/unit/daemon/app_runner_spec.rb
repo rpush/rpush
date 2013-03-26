@@ -48,6 +48,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     Rapns::Daemon::DeliveryQueue.stub(:new => queue)
     Rapns::Daemon::AppRunner.runners[app.id] = runner
     Rapns::App.stub(:all => [app])
+    Rapns::Daemon.stub(:logger => logger)
   end
 
   after { Rapns::Daemon::AppRunner.runners.clear }

@@ -10,19 +10,18 @@ describe Rapns::Daemon::Apns::AppRunner do
   let(:runner) { Rapns::Daemon::Apns::AppRunner.new(app) }
   let(:handler) { stub(:start => nil, :stop => nil, :queue= => nil) }
   let(:receiver) { stub(:start => nil, :stop => nil) }
-  let(:config) { {:feedback_poll => 60 } }
+  let(:config) { stub(:feedback_poll => 60, :push => false) }
   let(:logger) { stub(:info => nil) }
 
   before do
     Rapns::Daemon.stub(:logger => logger)
     Rapns::Daemon::Apns::DeliveryHandler.stub(:new => handler)
     Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => receiver)
-    Rapns::Daemon.stub(:config => config)
+    Rapns.stub(:config => config)
   end
 
   it 'instantiates a new feedback receiver when started' do
-    Rapns::Daemon::Apns::FeedbackReceiver.should_receive(:new).with(app, 'feedback.sandbox.push.apple.com',
-                                                                    2196, 60)
+    Rapns::Daemon::Apns::FeedbackReceiver.should_receive(:new).with(app, 60)
     runner.start
   end
 
@@ -35,5 +34,11 @@ describe Rapns::Daemon::Apns::AppRunner do
     runner.start
     receiver.should_receive(:stop)
     runner.stop
+  end
+
+  it 'does not check for feedback when in push mode' do
+    config.stub(:push => true)
+    Rapns::Daemon::Apns::FeedbackReceiver.should_not_receive(:new)
+    runner.start
   end
 end

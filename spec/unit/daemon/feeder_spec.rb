@@ -11,6 +11,7 @@ describe Rapns::Daemon::Feeder do
     Rapns.stub(:config => config)
     Rapns::Daemon::Feeder.stub(:stop? => true)
     Rapns::Daemon::AppRunner.stub(:idle => [stub(:app => app)])
+    Rapns::Daemon.stub(:logger => logger)
   end
 
   def start

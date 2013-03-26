@@ -41,7 +41,7 @@ Generate the migrations, rapns.yml and migrate:
 3. Select both the certificate and private key.
 4. Right click and select `Export 2 items...`.
 5. Save the file as `cert.p12`, make sure the File Format is `Personal Information Exchange (p12)`.
-6. Convert the certificate to a .pem, where `<environment>` should be `development` or `production`, depending on the certificate you exported.
+6. Convert the certificate to a .pem, where `<environment>` should be `sandbox` or `production`, depending on the certificate you exported.
 
 Without a password:
 
@@ -57,8 +57,8 @@ With a password:
 ```ruby
 app = Rapns::Apns::App.new
 app.name = "ios_app"
-app.certificate = File.read("/path/to/development.pem")
-app.environment = "development"
+app.certificate = File.read("/path/to/sandbox.pem")
+app.environment = "sandbox"
 app.password = "certificate password"
 app.connections = 1
 app.save!

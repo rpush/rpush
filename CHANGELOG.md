@@ -1,3 +1,6 @@
+## 3.2.0 (not released)
+  * Rapns.apns_feedback for one time feedback retrieval. Rapns.push no longer checks for feedback.
+
 ## 3.1.0 (Jan 26, 2013)
   * Rapns.reflect API for fine-grained introspection.
   * Rapns.embed API for embedding Rapns into an existing process.

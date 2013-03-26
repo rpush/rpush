@@ -7,11 +7,15 @@ module Rapns
         include DatabaseReconnectable
 
         FEEDBACK_TUPLE_BYTES = 38
+        HOSTS = {
+          :production  => ['feedback.push.apple.com', 2196],
+          :development => ['feedback.sandbox.push.apple.com', 2196], # deprecated
+          :sandbox     => ['feedback.sandbox.push.apple.com', 2196]
+        }
 
-        def initialize(app, host, port, poll)
+        def initialize(app, poll)
           @app = app
-          @host = host
-          @port = port
+          @host, @port = HOSTS[@app.environment.to_sym]
           @poll = poll
           @certificate = app.certificate
           @password = app.password

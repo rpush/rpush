@@ -69,7 +69,12 @@ RSpec.configure do |config|
   #   PerfTools::CpuProfiler.stop
   # end
 
-  config.before(:each) { DatabaseCleaner.clean }
+  config.before(:each) do
+    DatabaseCleaner.clean
+    Rails.stub(:root).and_return("/rails_root")
+  end
+
+  config.after(:each) { Rapns::Daemon.logger = nil }
 end
 
 # a test certificate that contains both an X509 certificate and

@@ -7,12 +7,12 @@ describe Rapns::Daemon, "when starting" do
   let(:password) { stub }
   let(:config) { stub(:pid_file => nil, :airbrake_notify => false,
     :foreground => true, :embedded => false, :push => false) }
-  let(:logger) { stub(:info => nil, :error => nil, :warn => nil) }
+  let(:logger) { stub(:logger, :info => nil, :error => nil, :warn => nil) }
 
   before do
     Rapns.stub(:config => config)
     Rapns::Daemon::Feeder.stub(:start)
-    Rapns::Daemon::Logger.stub(:new).and_return(logger)
+    Rapns::Daemon::Logger.stub(:new => logger)
     Rapns::Daemon::AppRunner.stub(:sync => nil, :stop => nil)
     Rapns::Daemon.stub(:daemonize => nil, :reconnect_database => nil, :exit => nil, :puts => nil)
     File.stub(:open)

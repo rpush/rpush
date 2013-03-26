@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rapns, 'push' do
-    before do
+  before do
     Rapns::Daemon.stub(:start)
     Rapns::Daemon.stub(:shutdown)
   end

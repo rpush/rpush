@@ -31,14 +31,16 @@ module Rapns
   module Daemon
     extend DatabaseReconnectable
 
-    class << self
-      attr_accessor :logger
+    def self.logger
+      @logger ||= Logger.new(:foreground => Rapns.config.foreground,
+                             :airbrake_notify => Rapns.config.airbrake_notify)
+    end
+
+    def self.logger=(logger)
+      @logger = logger
     end
 
     def self.start
-      self.logger = Logger.new(:foreground => Rapns.config.foreground,
-                               :airbrake_notify => Rapns.config.airbrake_notify)
-
       setup_signal_traps if trap_signals?
 
       if daemonize?
