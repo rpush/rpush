@@ -24,7 +24,14 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   it "instantiates a new connection" do
     Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
-    Rapns::Daemon::Apns::DeliveryHandler.new(app)
+    delivery_handler.start
+    delivery_handler.stop
+  end
+
+  it "connects the socket" do
+    connection.should_receive(:connect)
+    delivery_handler.start
+    delivery_handler.stop
   end
 
   it 'performs delivery of an notification' do
@@ -33,16 +40,14 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
     delivery_handler.stop
   end
 
-  it "connects the socket when instantiated" do
-    connection.should_receive(:connect)
-    Rapns::Daemon::Apns::DeliveryHandler.new(app)
+  it 'closes the connection stopped' do
+    connection.should_receive(:close)
     delivery_handler.start
     delivery_handler.stop
   end
 
-  it 'closes the connection stopped' do
-    connection.should_receive(:close)
-    delivery_handler.start
+  it 'does not attempt to close the connection if the connection was not established' do
+    connection.should_not_receive(:close)
     delivery_handler.stop
   end
 end

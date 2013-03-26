@@ -10,17 +10,24 @@ module Rapns
 
         def initialize(app)
           @app = app
-          host, port = HOSTS[@app.environment.to_sym]
-          @connection = Connection.new(@app, host, port)
-          @connection.connect
+          @host, @port = HOSTS[@app.environment.to_sym]
         end
 
         def deliver(notification)
-          Rapns::Daemon::Apns::Delivery.perform(@app, @connection, notification)
+          Rapns::Daemon::Apns::Delivery.perform(@app, connection, notification)
         end
 
         def stopped
-          @connection.close
+          connection.close if @connection
+        end
+
+        protected
+
+        def connection
+          return @connection if defined? @connection
+          @connection = Connection.new(@app, @host, @port)
+          @connection.connect
+          @connection
         end
       end
     end
