@@ -27,6 +27,11 @@ describe Rapns, 'push' do
     Rapns.push
   end
 
+  it 'stops on the app runner' do
+    Rapns::Daemon::AppRunner.should_receive(:stop)
+    Rapns.push
+  end
+
   it 'overrides the default config options with those given as a hash' do
     Rapns.config.batch_size = 20
     expect { Rapns.push(:batch_size => 10) }.to change(Rapns.config, :batch_size).to(10)

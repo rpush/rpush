@@ -44,6 +44,7 @@ module Rapns
 
       def self.stop
         runners.values.map(&:stop)
+        runners.clear
       end
 
       def self.debug
@@ -79,6 +80,7 @@ module Rapns
       def stop
         handlers.map(&:stop)
         stopped
+        handlers.clear
       end
 
       def enqueue(notification)

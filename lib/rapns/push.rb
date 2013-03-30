@@ -11,5 +11,6 @@ module Rapns
     Rapns::Daemon::AppRunner.sync
     Rapns::Daemon::Feeder.start
     Rapns::Daemon::AppRunner.wait
+    Rapns::Daemon::AppRunner.stop
   end
 end
