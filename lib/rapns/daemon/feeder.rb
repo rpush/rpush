@@ -49,7 +49,7 @@ module Rapns
             end
           end
         rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
+          Rapns.logger.error(e)
           reflect(:error, e)
         end
       end

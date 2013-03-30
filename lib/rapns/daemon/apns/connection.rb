@@ -53,7 +53,7 @@ module Rapns
             retry_count += 1;
 
             if retry_count == 1
-              Rapns::Daemon.logger.error("[#{@app.name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
+              Rapns.logger.error("[#{@app.name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
               reflect(:apns_connection_lost, @app, e)
             end
 
@@ -75,7 +75,7 @@ module Rapns
         protected
 
         def reconnect_idle
-          Rapns::Daemon.logger.info("[#{@app.name}] Idle period exceeded, reconnecting...")
+          Rapns.logger.info("[#{@app.name}] Idle period exceeded, reconnecting...")
           reconnect
         end
 
@@ -107,7 +107,7 @@ module Rapns
           ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
           ssl_socket.sync = true
           ssl_socket.connect
-          Rapns::Daemon.logger.info("[#{@app.name}] Connected to #{@host}:#{@port}")
+          Rapns.logger.info("[#{@app.name}] Connected to #{@host}:#{@port}")
           [tcp_socket, ssl_socket]
         end
       end

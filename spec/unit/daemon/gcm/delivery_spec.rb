@@ -15,7 +15,7 @@ describe Rapns::Daemon::Gcm::Delivery do
 
   before do
     Time.stub(:now => now)
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger)
   end
 
   describe 'an 200 response' do
@@ -93,7 +93,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       end
 
       it 'logs that the notification will be retried' do
-        Rapns::Daemon.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
+        Rapns.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
         perform
       end
     end
@@ -205,7 +205,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     end
 
     it 'logs a warning that the notification has been re-queued.' do
-      Rapns::Daemon.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retired after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
+      Rapns.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retired after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
       perform
     end
 

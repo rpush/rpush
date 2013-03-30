@@ -11,7 +11,7 @@ module Rapns
         if app = runners[notification.app_id]
           app.enqueue(notification)
         else
-          Rapns::Daemon.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
+          Rapns.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
         end
       end
 
@@ -31,8 +31,8 @@ module Rapns
             runner.start
             runners[app.id] = runner
           rescue StandardError => e
-            Rapns::Daemon.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
-            Rapns::Daemon.logger.error(e)
+            Rapns.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
+            Rapns.logger.error(e)
           end
         end
       end
@@ -51,7 +51,11 @@ module Rapns
       end
 
       def self.idle
-        runners.values.select { |runner| runner.idle? }
+        runners.values.select(&:idle?)
+      end
+
+      def self.wait
+        sleep 0.1 while !runners.values.all?(&:idle?)
       end
 
       attr_reader :app
@@ -69,7 +73,7 @@ module Rapns
       def start
         app.connections.times { handlers << start_handler }
         started
-        Rapns::Daemon.logger.info("[#{app.name}] Started, #{handlers_str}.")
+        Rapns.logger.info("[#{app.name}] Started, #{handlers_str}.")
       end
 
       def stop
@@ -87,10 +91,10 @@ module Rapns
         return if diff == 0
         if diff > 0
           diff.times { decrement_handlers }
-          Rapns::Daemon.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} remaining.")
+          Rapns.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} remaining.")
         else
           diff.abs.times { increment_handlers }
-          Rapns::Daemon.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} remaining.")
+          Rapns.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} remaining.")
         end
       end
 
@@ -103,7 +107,7 @@ module Rapns
       end
 
       def debug
-        Rapns::Daemon.logger.info <<-EOS
+        Rapns.logger.info <<-EOS
 
 #{@app.name}:
   handlers: #{num_handlers}

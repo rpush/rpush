@@ -5,7 +5,7 @@ module Rapns
         begin
           Rapns.reflections.__dispatch(name, *args)
         rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
+          Rapns.logger.error(e)
         end
       end
     end

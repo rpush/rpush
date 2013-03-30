@@ -16,8 +16,7 @@ describe Rapns::Daemon::Apns::Delivery do
   end
 
   before do
-    Rapns.stub(:config => config)
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:config => config, :logger => logger)
   end
 
   it "sends the binary version of the notification" do
@@ -143,7 +142,7 @@ describe Rapns::Daemon::Apns::Delivery do
     end
 
     it "logs that the connection is being reconnected" do
-      Rapns::Daemon.logger.should_receive(:error).with("[MyApp] Error received, reconnecting...")
+      Rapns.logger.should_receive(:error).with("[MyApp] Error received, reconnecting...")
       perform
     end
 

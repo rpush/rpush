@@ -6,7 +6,10 @@ module Rapns
     options.each { |k, v| config.send("#{k}=", v) }
     config.push = true
     Rapns.config.update(config)
-    Rapns::Daemon.start
-    Rapns::Daemon.shutdown(true)
+
+    Upgraded.check(:exit => false)
+    Rapns::Daemon::AppRunner.sync
+    Rapns::Daemon::Feeder.start
+    Rapns::Daemon::AppRunner.wait
   end
 end

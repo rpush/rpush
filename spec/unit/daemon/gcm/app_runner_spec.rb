@@ -11,7 +11,7 @@ describe Rapns::Daemon::Gcm::AppRunner do
   let(:logger) { stub(:info => nil) }
 
   before do
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger)
     Rapns::Daemon::Gcm::DeliveryHandler.stub(:new => handler)
   end
 end

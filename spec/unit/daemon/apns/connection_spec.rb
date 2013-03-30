@@ -20,7 +20,7 @@ describe Rapns::Daemon::Apns::Connection do
     OpenSSL::X509::Certificate.stub(:new => x509_certificate)
     TCPSocket.stub(:new => tcp_socket)
     OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger)
   end
 
   it "reads the number of bytes from the SSL socket" do
@@ -236,7 +236,7 @@ describe Rapns::Daemon::Apns::Connection do
     it 'logs the the connection is idle' do
       Rapns::Daemon::Apns::Connection.stub(:idle_period => 0.1)
       sleep 0.2
-      Rapns::Daemon.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
+      Rapns.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
       connection.write('blah')
     end
   end

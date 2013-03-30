@@ -16,27 +16,27 @@ module Rapns
             yield
           end
         rescue *ADAPTER_ERRORS => e
-          Rapns::Daemon.logger.error(e)
+          Rapns.logger.error(e)
           database_connection_lost
           retry
         end
       end
 
       def database_connection_lost
-        Rapns::Daemon.logger.warn("Lost connection to database, reconnecting...")
+        Rapns.logger.warn("Lost connection to database, reconnecting...")
         attempts = 0
         loop do
           begin
-            Rapns::Daemon.logger.warn("Attempt #{attempts += 1}")
+            Rapns.logger.warn("Attempt #{attempts += 1}")
             reconnect_database
             check_database_is_connected
             break
           rescue *ADAPTER_ERRORS => e
-            Rapns::Daemon.logger.error(e, :airbrake_notify => false)
+            Rapns.logger.error(e, :airbrake_notify => false)
             sleep_to_avoid_thrashing
           end
         end
-        Rapns::Daemon.logger.warn("Database reconnected")
+        Rapns.logger.warn("Database reconnected")
       end
 
       def reconnect_database

@@ -12,7 +12,6 @@ require 'rapns/daemon/database_reconnectable'
 require 'rapns/daemon/delivery'
 require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/feeder'
-require 'rapns/daemon/logger'
 require 'rapns/daemon/app_runner'
 require 'rapns/daemon/delivery_handler'
 
@@ -31,15 +30,6 @@ module Rapns
   module Daemon
     extend DatabaseReconnectable
 
-    def self.logger
-      @logger ||= Logger.new(:foreground => Rapns.config.foreground,
-                             :airbrake_notify => Rapns.config.airbrake_notify)
-    end
-
-    def self.logger=(logger)
-      @logger = logger
-    end
-
     def self.start
       setup_signal_traps if trap_signals?
 
@@ -49,7 +39,7 @@ module Rapns
       end
 
       write_pid_file
-      ensure_upgraded
+      Upgraded.check(:exit => true)
       AppRunner.sync
       Feeder.start
     end
@@ -64,39 +54,11 @@ module Rapns
     protected
 
     def self.daemonize?
-      !(Rapns.config.foreground || Rapns.config.embedded || Rapns.config.push || defined?(JRUBY_VERSION))
-    end
-
-    def self.ensure_upgraded
-      count = 0
-
-      begin
-        count = Rapns::App.count
-      rescue ActiveRecord::StatementInvalid
-        puts "!!!! RAPNS NOT STARTED !!!!"
-        puts
-        puts "As of version v2.0.0 apps are configured in the database instead of rapns.yml."
-        puts "Please run 'rails g rapns' to generate the new migrations and create your app."
-        puts "See https://github.com/ileitch/rapns for further instructions."
-        puts
-        exit 1 unless Rapns.config.embedded || Rapns.config.push
-      end
-
-      if count == 0
-        logger.warn("You have not created an app yet. See https://github.com/ileitch/rapns for instructions.")
-      end
-
-      if File.exists?(File.join(Rails.root, 'config', 'rapns', 'rapns.yml'))
-        logger.warn(<<-EOS)
-Since 2.0.0 rapns uses command-line options and a Ruby based configuration file.
-Please run 'rails g rapns' to generate a new configuration file into config/initializers.
-Remove config/rapns/rapns.yml to avoid this warning.
-        EOS
-      end
+      !(Rapns.config.foreground || Rapns.config.embedded || defined?(JRUBY_VERSION))
     end
 
     def self.trap_signals?
-      !(Rapns.config.embedded || Rapns.config.push)
+      !Rapns.config.embedded
     end
 
     def self.setup_signal_traps
@@ -121,7 +83,7 @@ Remove config/rapns/rapns.yml to avoid this warning.
         begin
           File.open(Rapns.config.pid_file, 'w') { |f| f.puts Process.pid }
         rescue SystemCallError => e
-          logger.error("Failed to write PID to '#{Rapns.config.pid_file}': #{e.inspect}")
+          Rapns.logger.error("Failed to write PID to '#{Rapns.config.pid_file}': #{e.inspect}")
         end
       end
     end

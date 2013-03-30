@@ -14,7 +14,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   before do
     receiver.stub(:interruptible_sleep)
-    Rapns::Daemon.logger = logger
+    Rapns.stub(:logger => logger)
     Rapns::Daemon::Apns::Connection.stub(:new => connection)
     Rapns::Apns::Feedback.stub(:create! => feedback)
     receiver.instance_variable_set("@stop", false)
@@ -53,7 +53,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'logs the feedback' do
     stub_connection_read_with_tuple
-    Rapns::Daemon.logger.should_receive(:info).with("[my_app] [FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17.")
+    Rapns.logger.should_receive(:info).with("[my_app] [FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17.")
     receiver.check_for_feedback
   end
 
@@ -66,7 +66,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   it 'logs errors' do
     error = StandardError.new('bork!')
     connection.stub(:read).and_raise(error)
-    Rapns::Daemon.logger.should_receive(:error).with(error)
+    Rapns.logger.should_receive(:error).with(error)
     receiver.check_for_feedback
   end
 
@@ -118,7 +118,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     error = StandardError.new('bork!')
     stub_connection_read_with_tuple
     callback = Proc.new { raise error }
-    Rapns::Daemon.logger.should_receive(:error).with(error)
+    Rapns.logger.should_receive(:error).with(error)
     Rapns::Deprecation.silenced do
       Rapns.config.on_apns_feedback &callback
     end

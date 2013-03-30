@@ -11,7 +11,7 @@ describe Rapns::Daemon::Feeder do
     Rapns.stub(:config => config)
     Rapns::Daemon::Feeder.stub(:stop? => true)
     Rapns::Daemon::AppRunner.stub(:idle => [stub(:app => app)])
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger)
   end
 
   def start
@@ -103,7 +103,7 @@ describe Rapns::Daemon::Feeder do
   it "logs errors" do
     e = StandardError.new("bork")
     Rapns::Notification.stub(:ready_for_delivery).and_raise(e)
-    Rapns::Daemon.logger.should_receive(:error).with(e)
+    Rapns.logger.should_receive(:error).with(e)
     start
   end
 

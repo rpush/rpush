@@ -10,7 +10,7 @@ describe Rapns::Daemon::Reflectable do
 
   before do
     Rapns.reflections.stub(:__dispatch)
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger)
   end
 
   it 'dispatches the given reflection' do
@@ -21,7 +21,7 @@ describe Rapns::Daemon::Reflectable do
   it 'logs errors raise by the reflection' do
     error = StandardError.new
     Rapns.reflections.stub(:__dispatch).and_raise(error)
-    Rapns::Daemon.logger.should_receive(:error).with(error)
+    Rapns.logger.should_receive(:error).with(error)
     test_reflectable.reflect(:error)
   end
 end

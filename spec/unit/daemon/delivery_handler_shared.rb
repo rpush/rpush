@@ -1,15 +1,15 @@
 shared_examples_for 'an DeliveryHandler subclass' do
   it 'logs all delivery errors' do
     logger = stub
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger)
     error = StandardError.new
     delivery_handler.stub(:deliver).and_raise(error)
-    Rapns::Daemon.logger.should_receive(:error).with(error)
+    Rapns.logger.should_receive(:error).with(error)
     delivery_handler.send(:handle_next_notification)
   end
 
   it 'reflects an exception' do
-    Rapns::Daemon.stub(:logger => stub(:error => nil))
+    Rapns.stub(:logger => stub(:error => nil))
     error = StandardError.new
     delivery_handler.stub(:deliver).and_raise(error)
     delivery_handler.should_receive(:reflect).with(:error, error)

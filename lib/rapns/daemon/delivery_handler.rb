@@ -39,7 +39,7 @@ module Rapns
           deliver(notification)
           reflect(:notification_delivered, notification)
         rescue StandardError => e
-          Rapns::Daemon.logger.error(e)
+          Rapns.logger.error(e)
           reflect(:error, e)
         ensure
           queue.notification_processed

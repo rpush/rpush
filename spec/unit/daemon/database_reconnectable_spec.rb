@@ -43,7 +43,7 @@ describe Rapns::Daemon::DatabaseReconnectable do
 
   before do
     @logger = mock("Logger", :info => nil, :error => nil, :warn => nil)
-    Rapns::Daemon.stub(:logger).and_return(@logger)
+    Rapns.stub(:logger).and_return(@logger)
 
     ActiveRecord::Base.stub(:clear_all_connections!)
     ActiveRecord::Base.stub(:establish_connection)
@@ -51,17 +51,17 @@ describe Rapns::Daemon::DatabaseReconnectable do
   end
 
   it "should log the error raised" do
-    Rapns::Daemon.logger.should_receive(:error).with(error)
+    Rapns.logger.should_receive(:error).with(error)
     test_double.perform
   end
 
   it "should log that the database is being reconnected" do
-    Rapns::Daemon.logger.should_receive(:warn).with("Lost connection to database, reconnecting...")
+    Rapns.logger.should_receive(:warn).with("Lost connection to database, reconnecting...")
     test_double.perform
   end
 
   it "should log the reconnection attempt" do
-    Rapns::Daemon.logger.should_receive(:warn).with("Attempt 1")
+    Rapns.logger.should_receive(:warn).with("Attempt 1")
     test_double.perform
   end
 
@@ -94,12 +94,12 @@ describe Rapns::Daemon::DatabaseReconnectable do
     end
 
     it "should log the 2nd attempt" do
-      Rapns::Daemon.logger.should_receive(:warn).with("Attempt 2")
+      Rapns.logger.should_receive(:warn).with("Attempt 2")
       test_double.perform
     end
 
     it "should log errors raised when the reconnection is not successful without notifying airbrake" do
-      Rapns::Daemon.logger.should_receive(:error).with(error, :airbrake_notify => false)
+      Rapns.logger.should_receive(:error).with(error, :airbrake_notify => false)
       test_double.perform
     end
 

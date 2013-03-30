@@ -47,7 +47,7 @@ module Rapns
 
           if body['failure'].to_i == 0
             mark_delivered
-            Rapns::Daemon.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
+            Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
           else
             handle_errors(response, body)
           end
@@ -79,17 +79,17 @@ module Rapns
 
         def internal_server_error(response)
           retry_delivery(@notification, response)
-          Rapns::Daemon.logger.warn("GCM responded with an Internal Error. " + retry_message)
+          Rapns.logger.warn("GCM responded with an Internal Error. " + retry_message)
         end
 
         def service_unavailable(response)
           retry_delivery(@notification, response)
-          Rapns::Daemon.logger.warn("GCM responded with an Service Unavailable Error. " + retry_message)
+          Rapns.logger.warn("GCM responded with an Service Unavailable Error. " + retry_message)
         end
 
         def all_devices_unavailable(response)
           retry_delivery(@notification, response)
-          Rapns::Daemon.logger.warn("All recipients unavailable. " + retry_message)
+          Rapns.logger.warn("All recipients unavailable. " + retry_message)
         end
 
         def some_devices_unavailable(response, errors)

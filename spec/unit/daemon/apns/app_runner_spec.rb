@@ -14,10 +14,9 @@ describe Rapns::Daemon::Apns::AppRunner do
   let(:logger) { stub(:info => nil) }
 
   before do
-    Rapns::Daemon.stub(:logger => logger)
+    Rapns.stub(:logger => logger, :config => config)
     Rapns::Daemon::Apns::DeliveryHandler.stub(:new => handler)
     Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => receiver)
-    Rapns.stub(:config => config)
   end
 
   it 'instantiates a new feedback receiver when started' do
