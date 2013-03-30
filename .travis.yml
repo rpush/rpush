@@ -2,7 +2,11 @@ before_script: "psql -c 'create database rapns_test;' -U postgres >/dev/null"
 language: ruby
 rvm:
   - 1.9.3
+  - 2.0.0
   - ree
   - jruby-19mode
   - jruby-18mode
   - rbx-19mode
+matrix:
+  allow_failures:
+    - rvm: 2.0.0
