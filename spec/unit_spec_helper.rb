@@ -49,7 +49,6 @@ end
 require 'bundler'
 Bundler.require(:default)
 
-require 'shoulda'
 require 'database_cleaner'
 
 DatabaseCleaner.strategy = :truncation

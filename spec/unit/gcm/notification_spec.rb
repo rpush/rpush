@@ -10,8 +10,6 @@ describe Rapns::Gcm::Notification do
   let(:data_setter) { 'data=' }
   let(:data_getter) { 'data' }
 
-  it { should validate_presence_of :registration_ids }
-
   it "has a 'data' payload limit of 4096 bytes" do
     notification.data = { :key => "a" * 4096 }
     notification.valid?.should be_false

@@ -4,9 +4,6 @@ require 'unit/notification_shared.rb'
 describe Rapns::Apns::Notification do
   it_should_behave_like 'an Notification subclass'
 
-  it { should validate_presence_of(:device_token) }
-  it { should validate_numericality_of(:badge) }
-
   let(:notification_class) { Rapns::Apns::Notification }
   let(:notification) { notification_class.new }
   let(:data_setter) { 'attributes_for_device=' }

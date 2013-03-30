@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'rspec'
-gem 'shoulda'
 gem 'rails'
 gem 'database_cleaner'
 gem 'simplecov'
