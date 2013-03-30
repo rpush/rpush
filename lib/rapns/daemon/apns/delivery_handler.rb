@@ -18,16 +18,16 @@ module Rapns
         end
 
         def stopped
-          connection.close if @connection
+          @connection.close if @connection
         end
 
         protected
 
         def connection
           return @connection if defined? @connection
-          @connection = Connection.new(@app, @host, @port)
-          @connection.connect
-          @connection
+          connection = Connection.new(@app, @host, @port)
+          connection.connect
+          @connection = connection
         end
       end
     end
