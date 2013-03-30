@@ -4,8 +4,10 @@ gem 'rake'
 gem 'rspec'
 gem 'shoulda'
 gem 'rails'
+gem 'database_cleaner'
+gem 'simplecov'
 
-platform :mri_19 do
+platform :mri_19, :mri_20 do
   gem 'cane'
 end
 
@@ -27,10 +29,5 @@ platform :jruby do
   gem 'jdbc-postgres'
   gem 'jruby-openssl'
 end
-
-gem 'database_cleaner'
-gem 'simplecov'
-gem 'multi_json'
-gem 'net-http-persistent'
 
 gemspec
