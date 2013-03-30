@@ -71,7 +71,6 @@ RSpec.configure do |config|
 
   config.before(:each) do
     DatabaseCleaner.clean
-    Rails.stub(:root).and_return("/rails_root")
   end
 
   config.after(:each) { Rapns::Daemon.logger = nil }

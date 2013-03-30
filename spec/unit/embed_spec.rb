@@ -23,6 +23,8 @@ describe Rapns, 'embed' do
 end
 
 describe Rapns, 'shutdown' do
+  before { Rapns.config.embedded = true }
+
   it 'shuts down the daemon' do
     Rapns::Daemon.should_receive(:shutdown)
     Rapns.shutdown
@@ -30,6 +32,8 @@ describe Rapns, 'shutdown' do
 end
 
 describe Rapns, 'sync' do
+  before { Rapns.config.embedded = true }
+
   it 'syncs the AppRunner' do
     Rapns::Daemon::AppRunner.should_receive(:sync)
     Rapns.sync
@@ -37,6 +41,8 @@ describe Rapns, 'sync' do
 end
 
 describe Rapns, 'debug' do
+  before { Rapns.config.embedded = true }
+
   it 'debugs the AppRunner' do
     Rapns::Daemon::AppRunner.should_receive(:debug)
     Rapns.debug

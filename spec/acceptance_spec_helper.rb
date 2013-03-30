@@ -48,7 +48,7 @@ end
 def cmd(str, echo = true)
   puts "* #{str.strip}" if echo
   retval = Bundler.with_clean_env { `#{str}` }
-  puts retval.strip if echo
+  puts retval.strip if echo && retval.strip != ""
   retval
 end
 

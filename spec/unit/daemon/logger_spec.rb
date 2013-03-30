@@ -25,6 +25,7 @@ describe Rapns::Daemon::Logger do
   let(:config) { stub(:airbrake_notify => true) }
 
   before do
+    Rails.stub(:root).and_return("/rails_root")
     @buffered_logger = mock("BufferedLogger", :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
     Rails.logger = @buffered_logger
     ActiveSupport::BufferedLogger.stub(:new).and_return(@buffered_logger)
