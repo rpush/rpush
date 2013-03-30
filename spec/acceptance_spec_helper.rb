@@ -8,7 +8,7 @@ Bundler.require(:default)
 TMP_DIR = '/tmp'
 RAILS_DIR = File.join(TMP_DIR, 'rapns_test')
 if ENV['TRAVIS']
-  TRAVIS_BRANCH = 'gcm'
+  TRAVIS_BRANCH = 'master'
   RAPNS_ROOT = 'git://github.com/ileitch/rapns.git'
 else
   RAPNS_ROOT = File.expand_path(__FILE__ + '/../../')
