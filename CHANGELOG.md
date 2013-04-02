@@ -1,4 +1,4 @@
-## 3.2.0 (not released)
+## 3.2.0 (Apr 1, 2013)
   * Rapns.apns_feedback for one time feedback retrieval. Rapns.push no longer checks for feedback (#117, #105).
   * Lazily connect to the APNs only when a notification is to be delivered (#111).
   * Ensure all notifications are sent when using Rapns.push (#107).
