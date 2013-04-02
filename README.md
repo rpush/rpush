@@ -107,9 +107,10 @@ Inside an existing process (see [Embedding API](https://github.com/ileitch/rapns
 
 *Please note that only ever a single instance of Rapns should be running.*
 
-In a scheduler:
+In a scheduler (see [Push API](https://github.com/ileitch/rapns/wiki/Push-API)):
 
     Rapns.push
+    Rapns.apns_feedback
 
 See [Configuration](https://github.com/ileitch/rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
 
