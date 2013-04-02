@@ -34,26 +34,12 @@ Generate the migrations, rapns.yml and migrate:
     rails g rapns
     rake db:migrate
 
-## Generating Certificates (APNs only)
-
-1. Open up Keychain Access and select the `Certificates` category in the sidebar.
-2. Expand the disclosure arrow next to the iOS Push Services certificate you want to export.
-3. Select both the certificate and private key.
-4. Right click and select `Export 2 items...`.
-5. Save the file as `cert.p12`, make sure the File Format is `Personal Information Exchange (p12)`.
-6. Convert the certificate to a .pem, where `<environment>` should be `sandbox` or `production`, depending on the certificate you exported.
-
-Without a password:
-
-    `openssl pkcs12 -nodes -clcerts -in cert.p12 -out <environment>.pem`
-
-With a password:
-
-    `openssl pkcs12 -clcerts -in cert.p12 -out <environment>.pem`
-
 ## Create an App
 
 #### APNs
+
+If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/ileitch/rapns/wiki/Generating-Certificates) for instructions.
+
 ```ruby
 app = Rapns::Apns::App.new
 app.name = "ios_app"
@@ -131,6 +117,7 @@ After updating you should run `rails g rapns` to check for any new migrations.
 * [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)
 
 ### APNs
+* [Generating Certificates](https://github.com/ileitch/rapns/wiki/Generating-Certificates)
 * [Advanced APNs Features](https://github.com/ileitch/rapns/wiki/Advanced-APNs-Features)
 * [APNs Delivery Failure Handling](https://github.com/ileitch/rapns/wiki/APNs-Delivery-Failure-Handling)
 * [Why open multiple connections to the APNs?](https://github.com/ileitch/rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
