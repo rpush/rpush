@@ -1,4 +1,5 @@
 require 'unit_spec_helper'
+require 'rapns/daemon/store/active_record'
 
 describe Rapns::Daemon, "when starting" do
   module Rails; end
@@ -6,12 +7,11 @@ describe Rapns::Daemon, "when starting" do
   let(:certificate) { stub }
   let(:password) { stub }
   let(:config) { stub(:pid_file => nil, :airbrake_notify => false,
-    :foreground => true, :embedded => false, :push => false) }
+    :foreground => true, :embedded => false, :push => false, :store => :active_record) }
   let(:logger) { stub(:logger, :info => nil, :error => nil, :warn => nil) }
 
   before do
-    Rapns.stub(:config => config)
-    Rapns::Logger.stub(:new => logger)
+    Rapns.stub(:config => config, :logger => logger)
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon::AppRunner.stub(:sync => nil, :stop => nil)
     Rapns::Daemon.stub(:daemonize => nil, :reconnect_database => nil, :exit => nil, :puts => nil)
@@ -19,7 +19,7 @@ describe Rapns::Daemon, "when starting" do
     Rails.stub(:root).and_return("/rails_root")
   end
 
-  unless defined?(JRUBY_VERSION)
+  unless Rapns.jruby?
     it "forks into a daemon if the foreground option is false" do
       config.stub(:foreground => false)
       ActiveRecord::Base.stub(:establish_connection)
@@ -57,6 +57,18 @@ describe Rapns::Daemon, "when starting" do
     Rapns::Daemon.start
   end
 
+  it 'instantiates the store' do
+    config.stub(:store => :active_record)
+    Rapns::Daemon.start
+    Rapns::Daemon.store.should be_kind_of(Rapns::Daemon::Store::ActiveRecord)
+  end
+
+  it 'logs an error if the store cannot be loaded' do
+    config.stub(:store => :foo_bar)
+    Rapns.logger.should_receive(:error).with(kind_of(LoadError))
+    Rapns::Daemon.start
+  end
+
   it "writes the process ID to the PID file" do
     Rapns::Daemon.should_receive(:write_pid_file)
     Rapns::Daemon.start
@@ -91,7 +103,7 @@ describe Rapns::Daemon, "when being shutdown" do
   end
 
   # These tests do not work on JRuby.
-  unless defined? JRUBY_VERSION
+  unless Rapns.jruby?
     it "shuts down when signaled signaled SIGINT" do
       Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)

@@ -35,7 +35,7 @@ module Rapns
       end
 
       def notifications_processed?
-        synchronize { @num_notifications == 0 }
+        synchronize { @num_notifications <= 0 }
       end
     end
   end

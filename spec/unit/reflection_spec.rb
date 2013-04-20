@@ -12,10 +12,6 @@ describe Rapns do
   end
 end
 
-# :apns_feedback, :notification_enqueued, :notification_delivered,
-#       :notification_failed, :notification_will_retry, :apns_connection_lost,
-#       :error
-
 describe Rapns::Reflections do
   it 'dispatches the given reflection' do
     did_yield = false

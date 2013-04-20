@@ -7,6 +7,7 @@ describe Rapns::Daemon::Apns::Delivery do
   let(:config) { stub(:check_for_errors => true) }
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:delivery) { Rapns::Daemon::Apns::Delivery.new(app, connection, notification) }
+  let(:store) { stub(:mark_failed => nil, :mark_delivered => nil) }
 
   def perform
     begin
@@ -16,6 +17,7 @@ describe Rapns::Daemon::Apns::Delivery do
   end
 
   before do
+    Rapns::Daemon.stub(:store => store)
     Rapns.stub(:config => config, :logger => logger)
   end
 
@@ -32,29 +34,12 @@ describe Rapns::Daemon::Apns::Delivery do
   end
 
   it "marks the notification as delivered" do
-    notification.should_receive(:delivered=).with(true)
+    store.should_receive(:mark_delivered).with(notification)
     perform
   end
 
   it 'reflects the notification was delivered' do
     delivery.should_receive(:reflect).with(:notification_delivered, notification)
-    perform
-  end
-
-  it "sets the time the notification was delivered" do
-    now = Time.now
-    Time.stub(:now).and_return(now)
-    notification.should_receive(:delivered_at=).with(now)
-    perform
-  end
-
-  it "does not trigger validations when saving the notification" do
-    notification.should_receive(:save!).with(:validate => false)
-    perform
-  end
-
-  it "updates notification with the ability to reconnect the database" do
-    delivery.should_receive(:with_database_reconnect_and_retry)
     perform
   end
 
@@ -67,40 +52,13 @@ describe Rapns::Daemon::Apns::Delivery do
   describe "when delivery fails" do
     before { connection.stub(:select => true, :read => [8, 4, 69].pack("ccN")) }
 
-    it "updates notification with the ability to reconnect the database" do
-      delivery.should_receive(:with_database_reconnect_and_retry)
-      perform
-    end
-
-    it "sets the notification as not delivered" do
-      notification.should_receive(:delivered=).with(false)
-      perform
-    end
-
-    it "sets the notification delivered_at timestamp to nil" do
-      notification.should_receive(:delivered_at=).with(nil)
-      perform
-    end
-
-    it "sets the notification as failed" do
-      notification.should_receive(:failed=).with(true)
+    it "marks the notification as failed" do
+      store.should_receive(:mark_failed).with(notification, 4, "Missing payload")
       perform
     end
 
     it 'reflects the notification delivery failed' do
       delivery.should_receive(:reflect).with(:notification_failed, notification)
-      perform
-    end
-
-    it "sets the notification failed_at timestamp" do
-      now = Time.now
-      Time.stub(:now).and_return(now)
-      notification.should_receive(:failed_at=).with(now)
-      perform
-    end
-
-    it "sets the notification error code" do
-      notification.should_receive(:error_code=).with(4)
       perform
     end
 
@@ -113,16 +71,6 @@ describe Rapns::Daemon::Apns::Delivery do
       #expect { delivery.perform }.to raise_error(error)
 
       expect { delivery.perform }.to raise_error(Rapns::DeliveryError)
-    end
-
-    it "sets the notification error description" do
-      notification.should_receive(:error_description=).with("Missing payload")
-      perform
-    end
-
-    it "skips validation when saving the notification" do
-      notification.should_receive(:save!).with(:validate => false)
-      perform
     end
 
     it "reads 6 bytes from the socket" do
@@ -155,13 +103,8 @@ describe Rapns::Daemon::Apns::Delivery do
         expect { delivery.perform }.to raise_error(Rapns::Apns::DisconnectionError)
       end
 
-      it 'does not set the error code on the notification' do
-        notification.should_receive(:error_code=).with(nil)
-        perform
-      end
-
-      it 'sets the error description on the notification' do
-        notification.should_receive(:error_description=).with("APNs disconnected without returning an error.")
+      it 'marks the notification as failed' do
+        store.should_receive(:mark_failed).with(notification, nil, "APNs disconnected without returning an error.")
         perform
       end
     end

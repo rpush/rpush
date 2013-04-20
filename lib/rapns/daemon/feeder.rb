@@ -2,7 +2,6 @@ module Rapns
   module Daemon
     class Feeder
       extend InterruptibleSleep
-      extend DatabaseReconnectable
       extend Reflectable
 
       def self.start
@@ -38,15 +37,11 @@ module Rapns
 
       def self.enqueue_notifications
         begin
-          with_database_reconnect_and_retry do
-            batch_size = Rapns.config.batch_size
-            idle = Rapns::Daemon::AppRunner.idle.map(&:app)
-            relation = Rapns::Notification.ready_for_delivery.for_apps(idle)
-            relation = relation.limit(batch_size) unless Rapns.config.push
-            relation.each do |notification|
-              Rapns::Daemon::AppRunner.enqueue(notification)
-              reflect(:notification_enqueued, notification)
-            end
+          idle = Rapns::Daemon::AppRunner.idle.map(&:app)
+
+          Rapns::Daemon.store.deliverable_notifications(idle).each do |notification|
+            Rapns::Daemon::AppRunner.enqueue(notification)
+            reflect(:notification_enqueued, notification)
           end
         rescue StandardError => e
           Rapns.logger.error(e)

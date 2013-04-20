@@ -40,7 +40,7 @@ describe Rapns::Configuration do
 
   it 'does not allow foreground to be set to false if the platform is JRuby' do
     config.foreground = true
-    stub_const('Rapns::Configuration::JRUBY_VERSION', '1.7.1')
+    Rapns.stub(:jruby? => true)
     config.foreground = false
     config.foreground.should be_true
   end

@@ -4,7 +4,6 @@ module Rapns
       class FeedbackReceiver
         include Reflectable
         include InterruptibleSleep
-        include DatabaseReconnectable
 
         FEEDBACK_TUPLE_BYTES = 38
         HOSTS = {
@@ -63,17 +62,16 @@ module Rapns
 
         def create_feedback(failed_at, device_token)
           formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
-          with_database_reconnect_and_retry do
-            Rapns.logger.info("[#{@app.name}] [FeedbackReceiver] Delivery failed at #{formatted_failed_at} for #{device_token}.")
-            feedback = Rapns::Apns::Feedback.create!(:failed_at => failed_at, :device_token => device_token, :app => @app)
-            reflect(:apns_feedback, feedback)
+          Rapns.logger.info("[#{@app.name}] [FeedbackReceiver] Delivery failed at #{formatted_failed_at} for #{device_token}.")
 
-            # Deprecated.
-            begin
-              Rapns.config.apns_feedback_callback.call(feedback) if Rapns.config.apns_feedback_callback
-            rescue StandardError => e
-              Rapns.logger.error(e)
-            end
+          feedback = Rapns::Daemon.store.create_apns_feedback(failed_at, device_token, @app)
+          reflect(:apns_feedback, feedback)
+
+          # Deprecated.
+          begin
+            Rapns.config.apns_feedback_callback.call(feedback) if Rapns.config.apns_feedback_callback
+          rescue StandardError => e
+            Rapns.logger.error(e)
           end
         end
       end

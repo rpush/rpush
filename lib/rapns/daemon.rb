@@ -8,7 +8,6 @@ require 'net/http/persistent'
 require 'rapns/daemon/reflectable'
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/delivery_error'
-require 'rapns/daemon/database_reconnectable'
 require 'rapns/daemon/delivery'
 require 'rapns/daemon/delivery_queue'
 require 'rapns/daemon/feeder'
@@ -28,10 +27,15 @@ require 'rapns/daemon/gcm/delivery_handler'
 
 module Rapns
   module Daemon
-    extend DatabaseReconnectable
+    class << self
+      attr_accessor :store
+    end
 
     def self.start
       setup_signal_traps if trap_signals?
+
+      initialize_store
+      return unless store
 
       if daemonize?
         daemonize
@@ -53,8 +57,20 @@ module Rapns
 
     protected
 
+    def self.initialize_store
+      return if store
+      begin
+        require "rapns/daemon/store/#{Rapns.config.store}"
+        klass = "Rapns::Daemon::Store::#{Rapns.config.store.to_s.camelcase}".constantize
+        self.store = klass.new
+      rescue StandardError, LoadError => e
+        Rapns.logger.error("Failed to load '#{Rapns.config.store}' storage backend.")
+        Rapns.logger.error(e)
+      end
+    end
+
     def self.daemonize?
-      !(Rapns.config.foreground || Rapns.config.embedded || defined?(JRUBY_VERSION))
+      !(Rapns.config.foreground || Rapns.config.embedded || Rapns.jruby?)
     end
 
     def self.trap_signals?
