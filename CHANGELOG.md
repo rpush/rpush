@@ -1,4 +1,5 @@
 ## 3.3.0 (April 21, 2013)
+  * GCM: collapse_key is no longer required to set expiry (time_to_live).
   * Add reflection for GCM canonical IDs.
   * Add Rapns::Daemon.store to decouple storage backend.
 
