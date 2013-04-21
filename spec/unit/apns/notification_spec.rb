@@ -1,3 +1,5 @@
+# encoding: US-ASCII
+
 require "unit_spec_helper"
 require 'unit/notification_shared.rb'
 
