@@ -14,7 +14,7 @@ describe Rapns::Daemon, "when starting" do
     Rapns.stub(:config => config, :logger => logger)
     Rapns::Daemon::Feeder.stub(:start)
     Rapns::Daemon::AppRunner.stub(:sync => nil, :stop => nil)
-    Rapns::Daemon.stub(:daemonize => nil, :reconnect_database => nil, :exit => nil, :puts => nil)
+    Rapns::Daemon.stub(:daemonize => nil, :exit => nil, :puts => nil)
     File.stub(:open)
     Rails.stub(:root).and_return("/rails_root")
   end
@@ -22,8 +22,16 @@ describe Rapns::Daemon, "when starting" do
   unless Rapns.jruby?
     it "forks into a daemon if the foreground option is false" do
       config.stub(:foreground => false)
-      ActiveRecord::Base.stub(:establish_connection)
+      Rapns::Daemon.initialize_store
+      Rapns::Daemon.store.stub(:after_daemonize => nil)
       Rapns::Daemon.should_receive(:daemonize)
+      Rapns::Daemon.start
+    end
+
+    it 'notifies the store after forking' do
+      config.stub(:foreground => false)
+      Rapns::Daemon.initialize_store
+      Rapns::Daemon.store.should_receive(:after_daemonize)
       Rapns::Daemon.start
     end
 

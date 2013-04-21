@@ -39,7 +39,7 @@ module Rapns
 
       if daemonize?
         daemonize
-        reconnect_database
+        store.after_daemonize
       end
 
       write_pid_file
@@ -55,8 +55,6 @@ module Rapns
       delete_pid_file
     end
 
-    protected
-
     def self.initialize_store
       return if store
       begin
@@ -68,6 +66,8 @@ module Rapns
         Rapns.logger.error(e)
       end
     end
+
+    protected
 
     def self.daemonize?
       !(Rapns.config.foreground || Rapns.config.embedded || Rapns.jruby?)

@@ -64,6 +64,10 @@ module Rapns
             notification
           end
         end
+
+        def after_daemonize
+          reconnect_database
+        end
       end
     end
   end
