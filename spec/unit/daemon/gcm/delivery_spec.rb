@@ -112,15 +112,7 @@ describe Rapns::Daemon::Gcm::Delivery do
         attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
         store.should_receive(:create_gcm_notification).with(attrs, notification.data,
             ['id_0', 'id_2'], now + 10.seconds, notification.app)
-
         perform rescue Rapns::DeliveryError
-
-
-
-        # new_notification.registration_ids.should == ['id_0', 'id_2']
-        # new_notification.data.should == {'one' => 1}
-        # new_notification.collapse_key.should == 'thing'
-        # new_notification.delay_while_idle.should be_true
       end
 
       it 'raises a DeliveryError' do
