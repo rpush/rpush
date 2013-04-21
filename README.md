@@ -89,14 +89,18 @@ As a daemon:
 
 Inside an existing process (see [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)):
 
-    Rapns.embed
+```ruby
+Rapns.embed
+```
 
 *Please note that only ever a single instance of Rapns should be running.*
 
 In a scheduler (see [Push API](https://github.com/ileitch/rapns/wiki/Push-API)):
 
-    Rapns.push
-    Rapns.apns_feedback
+```ruby
+Rapns.push
+Rapns.apns_feedback
+```
 
 See [Configuration](https://github.com/ileitch/rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
 
@@ -115,6 +119,7 @@ After updating you should run `rails g rapns` to check for any new migrations.
 * [Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)
 * [Push API](https://github.com/ileitch/rapns/wiki/Push-API)
 * [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)
+* [Implementing your own storage backend](https://github.com/ileitch/rapns/wiki/Implementing-your-own-storage-backend)
 
 ### APNs
 * [Generating Certificates](https://github.com/ileitch/rapns/wiki/Generating-Certificates)
