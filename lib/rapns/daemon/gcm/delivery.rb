@@ -51,6 +51,8 @@ module Rapns
           else
             handle_errors(response, body)
           end
+
+          handle_canonical_ids(response, body)
         end
 
         def handle_errors(response, body)
@@ -66,6 +68,17 @@ module Rapns
             some_devices_unavailable(response, errors)
           else
             raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
+          end
+        end
+
+        def handle_canonical_ids(response, body)
+          if body['canonical_ids'] && body['canonical_ids'].to_i > 0
+            body['results'].each_with_index do |result, i|
+              if result['message_id'] && result['registration_id']
+                old_id = @notification.registration_ids[i]
+                reflect(:gcm_canonical_id, old_id, result['registration_id'])
+              end
+            end
           end
         end
 

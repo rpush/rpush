@@ -15,6 +15,7 @@ describe Rapns::Daemon::Gcm::Delivery do
   end
 
   before do
+    delivery.stub(:reflect => nil)
     Rapns::Daemon.stub(:store => store)
     Time.stub(:now => now)
     Rapns.stub(:logger => logger)
@@ -54,6 +55,23 @@ describe Rapns::Daemon::Gcm::Delivery do
       response.stub(:body => JSON.dump(body))
       store.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: NotRegistered.")
       perform rescue Rapns::DeliveryError
+    end
+
+    it 'reflects on canonical IDs' do
+      body = {
+        'failure' => 0,
+        'success' => 3,
+        'canonical_ids' => 1,
+        'results' => [
+          { 'message_id' => '1:000' },
+          { 'message_id' => '1:000', 'registration_id' => 'canonical123' },
+          { 'message_id' => '1:000' },
+        ]}
+
+      response.stub(:body => JSON.dump(body))
+      notification.stub(:registration_ids => ['1', '2', '3'])
+      delivery.should_receive(:reflect).with(:gcm_canonical_id, '2', 'canonical123')
+      perform
     end
 
     describe 'all deliveries returned Unavailable or InternalServerError' do
