@@ -27,7 +27,7 @@ describe Rapns::Gcm::Notification do
   it 'num of registration Ids limit of 1000' do
     notification.registration_ids = ['a']*(1000+1)
     notification.valid?.should be_false
-    notification.errors[:base].should == ["GCM notification num of registration_ids cannot be larger than 1000."]
+    notification.errors[:base].should == ["GCM notification number of registration_ids cannot be larger than 1000."]
   end
 
   it 'allows assignment of a single registration ID' do
@@ -45,15 +45,8 @@ describe Rapns::Gcm::Notification do
     notification.errors[:expiry].should == ['must be set when using a collapse_key']
   end
 
-  it 'does not include time_to_live in the payload if collapse_key is not set' do
+  it 'includes time_to_live in the payload' do
     notification.expiry = 100
-    notification.collapse_key = nil
-    notification.as_json.key?('time_to_live').should be_false
-  end
-
-  it 'includes time_to_live in the payload if collapse_key is set' do
-    notification.expiry = 100
-    notification.collapse_key = 'sync'
     notification.as_json['time_to_live'].should == 100
   end
 end

@@ -124,6 +124,9 @@ After updating you should run `rails g rapns` to check for any new migrations.
 * [Silent failures might be dropped connections](https://github.com/ileitch/rapns/wiki/Dropped-connections)
 
 ### GCM
+* [Notification Options](https://github.com/ileitch/rapns/wiki//GCM-Notification-Options)
+* [Canonical IDs](https://github.com/ileitch/rapns/wiki/Canonical-IDs)
+* [Delivery Failures & Retries](https://github.com/ileitch/rapns/wiki/Delivery-Failures-&-Retries)
 
 ## Contributing
 

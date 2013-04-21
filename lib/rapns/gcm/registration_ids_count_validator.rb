@@ -5,7 +5,7 @@ module Rapns
 
       def validate(record)
         if record.registration_ids && record.registration_ids.size > LIMIT
-          record.errors[:base] << "GCM notification num of registration_ids cannot be larger than #{LIMIT}."
+          record.errors[:base] << "GCM notification number of registration_ids cannot be larger than #{LIMIT}."
         end
       end
     end
