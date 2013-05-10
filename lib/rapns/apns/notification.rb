@@ -69,7 +69,7 @@ module Rapns
 
           if attributes_for_device
             non_aps_attributes = attributes_for_device.reject { |k, v| k == CONTENT_AVAILABLE_KEY }
-            non_aps_attributes.each { |k, v| json[k.to_s] = v.to_s }
+            non_aps_attributes.each { |k, v| json[k.to_s] = v }
           end
         end
 
