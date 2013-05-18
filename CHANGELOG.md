@@ -1,3 +1,8 @@
+## 3.3.0 (April 21, 2013)
+  * GCM: collapse_key is no longer required to set expiry (time_to_live).
+  * Add reflection for GCM canonical IDs.
+  * Add Rapns::Daemon.store to decouple storage backend.
+
 ## 3.2.0 (Apr 1, 2013)
   * Rapns.apns_feedback for one time feedback retrieval. Rapns.push no longer checks for feedback (#117, #105).
   * Lazily connect to the APNs only when a notification is to be delivered (#111).

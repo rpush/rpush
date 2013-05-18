@@ -72,7 +72,10 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
-  config.after(:each) { Rapns.logger = nil }
+  config.after(:each) do
+    Rapns.logger = nil
+    Rapns::Daemon.store = nil
+  end
 end
 
 # a test certificate that contains both an X509 certificate and

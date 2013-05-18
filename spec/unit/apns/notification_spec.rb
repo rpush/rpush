@@ -1,3 +1,5 @@
+# encoding: US-ASCII
+
 require "unit_spec_helper"
 require 'unit/notification_shared.rb'
 
@@ -95,6 +97,13 @@ describe Rapns::Apns::Notification, "as_json" do
     notification.as_json["omg"].should == "lol"
     notification.as_json["wtf"].should == "dunno"
   end
+
+  it "should allow attributes to include a hash" do
+    notification = Rapns::Apns::Notification.new
+    notification.attributes_for_device = {:omg => {:ilike => :hashes}}
+    notification.as_json["omg"]["ilike"].should == "hashes"
+  end
+
 end
 
 describe Rapns::Apns::Notification, 'MDM' do

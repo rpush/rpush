@@ -19,10 +19,11 @@ module Rapns
         }
 
         if collapse_key
-          json.merge!({
-            'collapse_key' => collapse_key,
-            'time_to_live' => expiry
-          })
+          json['collapse_key'] = collapse_key
+        end
+
+        if expiry
+          json['time_to_live'] = expiry
         end
 
         json

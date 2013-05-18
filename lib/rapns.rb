@@ -29,6 +29,10 @@ require 'rapns/gcm/notification'
 require 'rapns/gcm/app'
 
 module Rapns
+  def self.jruby?
+    defined? JRUBY_VERSION
+  end
+
   def self.require_for_daemon
     require 'rapns/daemon'
     require 'rapns/patches'

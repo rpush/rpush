@@ -9,7 +9,7 @@ module Rapns
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
     :airbrake_notify, :check_for_errors, :pid_file, :batch_size,
-    :push]
+    :push, :store]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end
@@ -40,7 +40,7 @@ module Rapns
     end
 
     def foreground=(bool)
-      if defined? JRUBY_VERSION
+      if Rapns.jruby?
         # The JVM does not support fork().
         super(true)
       else
@@ -56,7 +56,7 @@ module Rapns
     private
 
     def set_defaults
-      if defined? JRUBY_VERSION
+      if Rapns.jruby?
         # The JVM does not support fork().
         self.foreground = true
       else
@@ -70,6 +70,7 @@ module Rapns
       self.batch_size = 5000
       self.pid_file = nil
       self.apns_feedback_callback = nil
+      self.store = :active_record
 
       # Internal options.
       self.embedded = false

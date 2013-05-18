@@ -2,18 +2,21 @@ require 'unit_spec_helper'
 
 describe Rapns::Daemon::Gcm::Delivery do
   let(:app) { Rapns::Gcm::App.new(:name => 'MyApp', :auth_key => 'abc123') }
-  let(:notification) { Rapns::Gcm::Notification.create!(:app => app, :registration_ids => ['xyz']) }
+  let(:notification) { Rapns::Gcm::Notification.create!(:app => app, :registration_ids => ['xyz'], :deliver_after => Time.now) }
   let(:logger) { stub(:error => nil, :info => nil, :warn => nil) }
   let(:response) { stub(:code => 200, :header => {}) }
   let(:http) { stub(:shutdown => nil, :request => response)}
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:delivery) { Rapns::Daemon::Gcm::Delivery.new(app, http, notification) }
+  let(:store) { stub(:mark_failed => nil, :mark_delivered => nil, :retry_after => nil, :create_gcm_notification => stub(:id => 2)) }
 
   def perform
     delivery.perform
   end
 
   before do
+    delivery.stub(:reflect => nil)
+    Rapns::Daemon.stub(:store => store)
     Time.stub(:now => now)
     Rapns.stub(:logger => logger)
   end
@@ -25,9 +28,8 @@ describe Rapns::Daemon::Gcm::Delivery do
 
     it 'marks the notification as delivered if delivered successfully to all devices' do
       response.stub(:body => JSON.dump({ 'failure' => 0 }))
-      expect do
-        perform
-      end.to change(notification, :delivered).to(true)
+      store.should_receive(:mark_delivered).with(notification)
+      perform
     end
 
     it 'reflects the notification was delivered' do
@@ -51,11 +53,25 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'error' => 'NotRegistered' }
       ]}
       response.stub(:body => JSON.dump(body))
+      store.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: NotRegistered.")
       perform rescue Rapns::DeliveryError
-      notification.reload
-      notification.failed.should be_true
-      notification.error_code = nil
-      notification.error_description = "Weee"
+    end
+
+    it 'reflects on canonical IDs' do
+      body = {
+        'failure' => 0,
+        'success' => 3,
+        'canonical_ids' => 1,
+        'results' => [
+          { 'message_id' => '1:000' },
+          { 'message_id' => '1:000', 'registration_id' => 'canonical123' },
+          { 'message_id' => '1:000' },
+        ]}
+
+      response.stub(:body => JSON.dump(body))
+      notification.stub(:registration_ids => ['1', '2', '3'])
+      delivery.should_receive(:reflect).with(:gcm_canonical_id, '2', 'canonical123')
+      perform
     end
 
     describe 'all deliveries returned Unavailable or InternalServerError' do
@@ -71,28 +87,23 @@ describe Rapns::Daemon::Gcm::Delivery do
 
       it 'retries the notification respecting the Retry-After header' do
         response.stub(:header => { 'retry-after' => 10 })
+        store.should_receive(:retry_after).with(notification, now + 10.seconds)
         perform
-        notification.reload
-        notification.retries.should == 1
-        notification.deliver_after.should == now + 10.seconds
       end
 
       it 'retries the notification using exponential back-off if the Retry-After header is not present' do
-        notification.update_attribute(:retries, 8)
+        store.should_receive(:retry_after).with(notification, now + 2)
         perform
-        notification.reload
-        notification.retries.should == 9
-        notification.deliver_after.should == now + 2 ** 9
       end
 
       it 'does not mark the notification as failed' do
-        expect do
-          perform
-          notification.reload
-        end.to_not change(notification, :failed).to(true)
+        store.should_not_receive(:mark_failed)
+        perform
       end
 
       it 'logs that the notification will be retried' do
+        notification.retries = 1
+        notification.deliver_after = now + 2
         Rapns.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
         perform
       end
@@ -104,12 +115,8 @@ describe Rapns::Daemon::Gcm::Delivery do
       before { response.stub(:body => JSON.dump(body)) }
 
       it 'marks the original notification as failed' do
+        store.should_receive(:mark_failed).with(notification, nil, error_description)
         perform rescue Rapns::DeliveryError
-        notification.reload
-        notification.failed.should be_true
-        notification.failed_at = now
-        notification.error_code.should be_nil
-        notification.error_description.should == error_description
       end
 
       it 'reflects the notification delivery failed' do
@@ -119,17 +126,11 @@ describe Rapns::Daemon::Gcm::Delivery do
 
       it 'creates a new notification for the unavailable devices' do
         notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
-        perform rescue Rapns::DeliveryError
-        new_notification.registration_ids.should == ['id_0', 'id_2']
-        new_notification.data.should == {'one' => 1}
-        new_notification.collapse_key.should == 'thing'
-        new_notification.delay_while_idle.should be_true
-      end
-
-      it 'sets the delivery time on the new notification to respect the Retry-After header' do
         response.stub(:header => { 'retry-after' => 10 })
+        attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
+        store.should_receive(:create_gcm_notification).with(attrs, notification.data,
+            ['id_0', 'id_2'], now + 10.seconds, notification.app)
         perform rescue Rapns::DeliveryError
-        new_notification.deliver_after.should == now + 10.seconds
       end
 
       it 'raises a DeliveryError' do
@@ -168,28 +169,27 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 503) }
 
     it 'logs a warning that the notification will be retried.' do
+      notification.retries = 1
+      notification.deliver_after = now + 2
       logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
       perform
     end
 
     it 'respects an integer Retry-After header' do
       response.stub(:header => { 'retry-after' => 10 })
-      expect do
-        perform
-      end.to change(notification, :deliver_after).to(now + 10)
+      store.should_receive(:retry_after).with(notification, now + 10.seconds)
+      perform
     end
 
     it 'respects a HTTP-date Retry-After header' do
       response.stub(:header => { 'retry-after' => 'Wed, 03 Oct 2012 20:55:11 GMT' })
-      expect do
-        perform
-      end.to change(notification, :deliver_after).to(Time.parse('Wed, 03 Oct 2012 20:55:11 GMT'))
+      store.should_receive(:retry_after).with(notification, Time.parse('Wed, 03 Oct 2012 20:55:11 GMT'))
+      perform
     end
 
     it 'defaults to exponential back-off if the Retry-After header is not present' do
-      expect do
-        perform
-      end.to change(notification, :deliver_after).to(now + 2 ** 1)
+      store.should_receive(:retry_after).with(notification, now + 2 ** 1)
+      perform
     end
 
     it 'reflects the notification will be retried' do
@@ -205,15 +205,15 @@ describe Rapns::Daemon::Gcm::Delivery do
     end
 
     it 'logs a warning that the notification has been re-queued.' do
+      notification.retries = 3
+      notification.deliver_after = now + 2 ** 3
       Rapns.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retired after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
       perform
     end
 
-    it 'sets deliver_after on the notification in accordance with the exponential back-off strategy.' do
-      expect do
-        perform
-        notification.reload
-      end.to change(notification, :deliver_after).to(now + 2 ** 3)
+    it 'retries the notification in accordance with the exponential back-off strategy.' do
+      store.should_receive(:retry_after).with(notification, now + 2 ** 3)
+      perform
     end
 
     it 'reflects the notification will be retried' do
@@ -234,12 +234,8 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 400) }
 
     it 'marks the notification as failed' do
+      store.should_receive(:mark_failed).with(notification, 400, 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
       perform rescue Rapns::DeliveryError
-      notification.reload
-      notification.failed.should be_true
-      notification.failed_at.should == now
-      notification.error_code.should == 400
-      notification.error_description.should == 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.'
     end
 
     it 'reflects the notification delivery failed' do
@@ -252,12 +248,8 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 418) }
 
     it 'marks the notification as failed' do
+      store.should_receive(:mark_failed).with(notification, 418, "I'm a Teapot")
       perform rescue Rapns::DeliveryError
-      notification.reload
-      notification.failed.should be_true
-      notification.failed_at.should == now
-      notification.error_code.should == 418
-      notification.error_description.should == "I'm a Teapot"
     end
 
     it 'reflects the notification delivery failed' do

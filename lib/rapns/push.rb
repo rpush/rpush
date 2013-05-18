@@ -8,6 +8,7 @@ module Rapns
     Rapns.config.update(config)
 
     Upgraded.check(:exit => false)
+    Rapns::Daemon.initialize_store
     Rapns::Daemon::AppRunner.sync
     Rapns::Daemon::Feeder.start
     Rapns::Daemon::AppRunner.wait

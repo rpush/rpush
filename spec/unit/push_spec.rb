@@ -12,6 +12,11 @@ describe Rapns, 'push' do
     Rapns.config.push.should be_true
   end
 
+  it 'initializes the store' do
+    Rapns::Daemon.should_receive(:initialize_store)
+    Rapns.push
+  end
+
   it 'syncs the app runner' do
     Rapns::Daemon::AppRunner.should_receive(:sync)
     Rapns.push

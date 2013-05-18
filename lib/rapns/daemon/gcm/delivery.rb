@@ -51,6 +51,8 @@ module Rapns
           else
             handle_errors(response, body)
           end
+
+          handle_canonical_ids(response, body)
         end
 
         def handle_errors(response, body)
@@ -66,6 +68,17 @@ module Rapns
             some_devices_unavailable(response, errors)
           else
             raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
+          end
+        end
+
+        def handle_canonical_ids(response, body)
+          if body['canonical_ids'] && body['canonical_ids'].to_i > 0
+            body['results'].each_with_index do |result, i|
+              if result['message_id'] && result['registration_id']
+                old_id = @notification.registration_ids[i]
+                reflect(:gcm_canonical_id, old_id, result['registration_id'])
+              end
+            end
           end
         end
 
@@ -94,19 +107,16 @@ module Rapns
 
         def some_devices_unavailable(response, errors)
           unavailable_idxs = errors.find_all { |i, error| error.in?(UNAVAILABLE_STATES) }.map(&:first)
-          new_notification = build_new_notification(response, unavailable_idxs)
-          with_database_reconnect_and_retry { new_notification.save! }
+          new_notification = create_new_notification(response, unavailable_idxs)
           raise Rapns::DeliveryError.new(nil, @notification.id,
             describe_errors(errors) + " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}.")
         end
 
-        def build_new_notification(response, idxs)
-          notification = Rapns::Gcm::Notification.new
-          notification.assign_attributes(@notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle'))
-          notification.data = @notification.data
-          notification.registration_ids = idxs.map { |i| @notification.registration_ids[i] }
-          notification.deliver_after = deliver_after_header(response)
-          notification
+        def create_new_notification(response, unavailable_idxs)
+          attrs = @notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle')
+          registration_ids = unavailable_idxs.map { |i| @notification.registration_ids[i] }
+          Rapns::Daemon.store.create_gcm_notification(attrs, @notification.data,
+            registration_ids, deliver_after_header(response), @notification.app)
         end
 
         def deliver_after_header(response)
