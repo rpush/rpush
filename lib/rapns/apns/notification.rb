@@ -8,7 +8,7 @@ module Rapns
 
       validates_with Rapns::Apns::DeviceTokenFormatValidator
       validates_with Rapns::Apns::BinaryNotificationValidator
-      validates_with Rapns::Apns::RequiredFieldsValidator
+      # validates_with Rapns::Apns::RequiredFieldsValidator
 
       alias_method :attributes_for_device=, :data=
       alias_method :attributes_for_device, :data
