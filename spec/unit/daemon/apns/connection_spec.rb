@@ -185,6 +185,14 @@ describe Rapns::Daemon::Apns::Connection do
     end
   end
 
+  describe "when write raises an IOError" do
+    it_should_behave_like "when the write fails"
+
+    def error_type
+      IOError
+    end
+  end
+
   describe "when reconnecting" do
     it 'closes the socket' do
       connection.should_receive(:close)

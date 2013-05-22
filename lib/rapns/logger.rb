@@ -6,7 +6,9 @@ module Rapns
       begin
         log = File.open(File.join(Rails.root, 'log', 'rapns.log'), 'a')
         log.sync = true
-        if defined?(ActiveSupport::BufferedLogger)
+        if Rapns.config.logger
+          @logger = Rapns.config.logger
+        elsif defined?(ActiveSupport::BufferedLogger)
           @logger = ActiveSupport::BufferedLogger.new(log, Rails.logger.level)
           @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
         else
