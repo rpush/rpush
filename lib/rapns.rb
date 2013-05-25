@@ -17,7 +17,6 @@ require 'rapns/upgraded'
 
 require 'rapns/apns/binary_notification_validator'
 require 'rapns/apns/device_token_format_validator'
-require 'rapns/apns/required_fields_validator'
 require 'rapns/apns/notification'
 require 'rapns/apns/feedback'
 require 'rapns/apns/app'
