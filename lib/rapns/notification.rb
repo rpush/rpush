@@ -22,7 +22,7 @@ module Rapns
     }
 
     scope :for_apps, lambda { |apps|
-      where(:app_id => apps.map(&:id))
+      where('app_id IN (?)', apps.map(&:id))
     }
 
     def initialize(*args)
