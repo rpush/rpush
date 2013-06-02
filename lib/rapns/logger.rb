@@ -6,14 +6,7 @@ module Rapns
       begin
         log = File.open(File.join(Rails.root, 'log', 'rapns.log'), 'a')
         log.sync = true
-        if Rapns.config.logger
-          @logger = Rapns.config.logger
-        elsif defined?(ActiveSupport::BufferedLogger)
-          @logger = ActiveSupport::BufferedLogger.new(log, Rails.logger.level)
-          @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
-        else
-          @logger = ActiveSupport::Logger.new(log, Rails.logger.level)
-        end
+        setup_logger(log)
       rescue Errno::ENOENT, Errno::EPERM => e
         @logger = nil
         error(e)
@@ -35,6 +28,17 @@ module Rapns
     end
 
     private
+
+    def setup_logger(log)
+      if Rapns.config.logger
+        @logger = Rapns.config.logger
+      elsif defined?(ActiveSupport::BufferedLogger)
+        @logger = ActiveSupport::BufferedLogger.new(log, Rails.logger.level)
+        @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
+      else
+        @logger = ActiveSupport::Logger.new(log, Rails.logger.level)
+      end
+    end
 
     def log(where, msg, prefix = nil, io = STDOUT)
       if msg.is_a?(Exception)

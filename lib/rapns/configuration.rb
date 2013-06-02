@@ -57,8 +57,6 @@ module Rapns
     end
     deprecated(:on_apns_feedback, 3.2, "Please use the Rapns.reflect API instead.")
 
-    private
-
     def set_defaults
       if Rapns.jruby?
         # The JVM does not support fork().

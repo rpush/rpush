@@ -55,6 +55,14 @@ describe Rapns::Logger do
     Rapns::Logger.new(:foreground => true)
   end
 
+  it 'uses the user-defined logger' do
+    my_logger = stub
+    Rapns.config.logger = my_logger
+    logger = Rapns::Logger.new({})
+    my_logger.should_receive(:info)
+    logger.info('test')
+  end
+
   it "should print out the msg if running in the foreground" do
     logger = Rapns::Logger.new(:foreground => true)
     STDOUT.should_receive(:puts).with(/hi mom/)
