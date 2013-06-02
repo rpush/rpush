@@ -1,3 +1,10 @@
+## 3.3.1 (June 2, 2013)
+  * Fix compatibility with postgres_ext (#104).
+  * Add ability to switch the logger (@maxsz).
+  * Do not validate presence of alert, badge or sound - not actually required by the APNs (#129) (@wilg).
+  * Catch IOError from an APNs connection. (@maxsz).
+  * Allow nested hashes in APNs notification attributes (@perezda).
+
 ## 3.3.0 (April 21, 2013)
   * GCM: collapse_key is no longer required to set expiry (time_to_live).
   * Add reflection for GCM canonical IDs.

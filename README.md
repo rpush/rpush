@@ -163,3 +163,6 @@ Thank you to the following wonderful people for contributing:
 * [@jeffarena](https://github.com/jeffarena)
 * [@DianthuDia](https://github.com/DianthuDia)
 * [@dup2](https://github.com/dup2)
+* [@maxsz](https://github.com/maxsz)
+* [@wilg](https://github.com/wilg)
+* [@perezda](https://github.com/perezda)
