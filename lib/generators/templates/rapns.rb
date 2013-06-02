@@ -23,6 +23,9 @@
   # Path to write PID file. Relative to Rails root unless absolute.
   # config.pid_file = '/path/to/rapns.pid'
 
+  # Define a custom logger.
+  # config.logger = MyLogger.new
+
  end
 
 Rapns.reflect do |on|
