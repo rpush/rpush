@@ -87,7 +87,6 @@ class AddGcm < ActiveRecord::Migration
       Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
     end
 
-    change_column :rapns_notifications, :key, :string, :null => false
     remove_column :rapns_notifications, :app_id
 
     remove_index :rapns_notifications, :name => "index_rapns_notifications_multi"
