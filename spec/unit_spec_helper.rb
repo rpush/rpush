@@ -26,7 +26,8 @@ if ENV['TRAVIS']
   DATABASE_CONFIG[$adapter]['username'] = 'postgres'
 else
   require 'etc'
-  DATABASE_CONFIG[$adapter]['username'] = Etc.getlogin
+  username = $adapter =~ /mysql/ ? 'root' : Etc.getlogin
+  DATABASE_CONFIG[$adapter]['username'] = username
 end
 
 puts "Using #{$adapter} adapter."

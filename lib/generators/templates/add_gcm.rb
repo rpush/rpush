@@ -22,9 +22,9 @@ class AddGcm < ActiveRecord::Migration
     change_column :rapns_notifications, :device_token, :string, { :null => true, :limit => 64 }
     change_column :rapns_notifications, :expiry, :integer, { :null => true, :default => 1.day.to_i }
     change_column :rapns_apps, :environment, :string, :null => true
-    change_column :rapns_apps, :certificate, :text, :null => true
+    change_column :rapns_apps, :certificate, :text, :null => true, :default => nil
 
-    change_column :rapns_notifications, :error_description, :text
+    change_column :rapns_notifications, :error_description, :text, :null => true, :default => nil
     change_column :rapns_notifications, :sound, :string, :default => 'default'
 
     rename_column :rapns_notifications, :attributes_for_device, :data
@@ -65,7 +65,7 @@ class AddGcm < ActiveRecord::Migration
     change_column :rapns_apps, :environment, :string, :null => false
     change_column :rapns_apps, :certificate, :text, :null => false
 
-    change_column :rapns_notifications, :error_description, :string
+    change_column :rapns_notifications, :error_description, :string, :null => true, :default => nil
     change_column :rapns_notifications, :sound, :string, :default => '1.aiff'
 
     rename_column :rapns_notifications, :data, :attributes_for_device
