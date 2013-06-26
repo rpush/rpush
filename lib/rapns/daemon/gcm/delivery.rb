@@ -62,9 +62,9 @@ module Rapns
             errors[i] = result['error'] if result['error']
           end
 
-          if body['success'].to_i == 0 && errors.values.all? { |error| error.in?(UNAVAILABLE_STATES) }
+          if body['success'].to_i == 0 && errors.values.all? { |error| UNAVAILABLE_STATES.include?(error) }
             all_devices_unavailable(response)
-          elsif errors.values.any? { |error| error.in?(UNAVAILABLE_STATES) }
+          elsif errors.values.any? { |error| UNAVAILABLE_STATES.include?(error) }
             some_devices_unavailable(response, errors)
           else
             raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
@@ -106,7 +106,7 @@ module Rapns
         end
 
         def some_devices_unavailable(response, errors)
-          unavailable_idxs = errors.find_all { |i, error| error.in?(UNAVAILABLE_STATES) }.map(&:first)
+          unavailable_idxs = errors.find_all { |i, error| UNAVAILABLE_STATES.include?(error) }.map(&:first)
           new_notification = create_new_notification(response, unavailable_idxs)
           raise Rapns::DeliveryError.new(nil, @notification.id,
             describe_errors(errors) + " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}.")
