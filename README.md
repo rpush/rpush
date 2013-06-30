@@ -166,3 +166,5 @@ Thank you to the following wonderful people for contributing:
 * [@maxsz](https://github.com/maxsz)
 * [@wilg](https://github.com/wilg)
 * [@perezda](https://github.com/perezda)
+* [@alexperto](https://github.com/alexperto)
+* [@yoppi](https://github.com/yoppi)

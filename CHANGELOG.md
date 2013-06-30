@@ -1,3 +1,8 @@
+## 3.3.2 (June 30, 2013)
+  * Fix Rails 3.0.x compatibility (#138) (@yoppi).
+  * Ensure Rails does not set a default value for text columns (#137).
+  * Fix error in down action for add_gcm migration (#135) (@alexperto).
+
 ## 3.3.1 (June 2, 2013)
   * Fix compatibility with postgres_ext (#104).
   * Add ability to switch the logger (@maxsz).
