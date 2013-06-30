@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'rspec'
-gem 'rails'
+gem 'rails', '~> 3.2'
 gem 'database_cleaner'
 gem 'simplecov'
 
