@@ -44,7 +44,7 @@ If this is your first time using the APNs, you will need to generate SSL certifi
 app = Rapns::Apns::App.new
 app.name = "ios_app"
 app.certificate = File.read("/path/to/sandbox.pem")
-app.environment = "sandbox"
+app.environment = "sandbox" # APNs environment.
 app.password = "certificate password"
 app.connections = 1
 app.save!
