@@ -10,7 +10,7 @@
 * Stable - reconnects database and network connections when lost.
 * Run as a daemon or inside an existing process.
 * Use in a scheduler for low-workload deployments ([Push API](https://github.com/ileitch/rapns/wiki/Push-API)).
-* Reflection API for fine-grained instrumentation ([Reflection API](https://github.com/ileitch/rapns/wiki/Relfection-API)).
+* Reflection API for fine-grained instrumentation ([Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)).
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * [Airbrake](http://airbrakeapp.com/) integration.
 * Built with love.
