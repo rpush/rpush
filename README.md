@@ -80,6 +80,8 @@ n.data = {:message => "hi mom!"}
 n.save!
 ```
 
+GCM also requires you to respond to [Canonical IDs](https://github.com/ileitch/rapns/wiki/Canonical-IDs).
+
 ## Starting Rapns
 
 As a daemon:
