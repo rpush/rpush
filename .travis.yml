@@ -17,3 +17,5 @@ matrix:
       gemfile: Gemfile.rails-4.0
     - rvm: jruby-18mode
       gemfile: Gemfile.rails-4.0
+    - rvm: jruby-19mode
+      gemfile: Gemfile.rails-4.0
