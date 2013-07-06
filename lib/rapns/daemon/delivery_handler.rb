@@ -3,6 +3,8 @@ module Rapns
     class DeliveryHandler
       include Reflectable
 
+      NOOP = :noop
+
       attr_accessor :queue
 
       def start
@@ -17,7 +19,7 @@ module Rapns
       def stop
         @stop = true
         if @thread
-          queue.wakeup(@thread)
+          queue.push(NOOP)
           @thread.join
         end
         stopped
@@ -29,20 +31,17 @@ module Rapns
       end
 
       def handle_next_notification
-        begin
-          notification = queue.pop
-        rescue DeliveryQueue::WakeupError
-          return
-        end
+        notification, batch = queue.pop
+        return if notification == NOOP
 
         begin
-          deliver(notification)
+          deliver(notification, batch)
           reflect(:notification_delivered, notification)
         rescue StandardError => e
           Rapns.logger.error(e)
           reflect(:error, e)
         ensure
-          queue.notification_processed
+          batch.notification_processed
         end
       end
     end

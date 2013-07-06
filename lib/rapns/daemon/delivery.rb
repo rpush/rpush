@@ -8,7 +8,7 @@ module Rapns
       end
 
       def retry_after(notification, deliver_after)
-        Rapns::Daemon.store.retry_after(notification, deliver_after)
+        @batch.retry_after(notification, deliver_after)
         reflect(:notification_will_retry, notification)
       end
 
@@ -17,12 +17,12 @@ module Rapns
       end
 
       def mark_delivered
-        Rapns::Daemon.store.mark_delivered(@notification)
+        @batch.mark_delivered(@notification)
         reflect(:notification_delivered, @notification)
       end
 
       def mark_failed(code, description)
-        Rapns::Daemon.store.mark_failed(@notification, code, description)
+        @batch.mark_failed(@notification, code, description)
         reflect(:notification_failed, @notification)
       end
     end

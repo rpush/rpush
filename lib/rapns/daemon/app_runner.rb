@@ -1,17 +1,23 @@
 module Rapns
   module Daemon
     class AppRunner
+      include Reflectable
+
       class << self
         attr_reader :runners
       end
 
       @runners = {}
 
-      def self.enqueue(notification)
-        if app = runners[notification.app_id]
-          app.enqueue(notification)
-        else
-          Rapns.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
+      def self.enqueue(notifications)
+        notifications.group_by(&:app_id).each do |group|
+          app_id = group.first.app_id
+
+          if app = runners[app_id]
+            app.enqueue(Batch.new(group))
+          else
+            Rapns.logger.error("No such app '#{app_id}' for batch #{batch.describe}.")
+          end
         end
       end
 
@@ -83,8 +89,12 @@ module Rapns
         handlers.clear
       end
 
-      def enqueue(notification)
-        queue.push(notification)
+      def enqueue(batch)
+        @batch = batch
+        batch.notifications.each do |notification|
+          queue.push([notification, batch])
+          reflect(:notification_enqueued, notification)
+        end
       end
 
       def sync(app)
@@ -119,7 +129,7 @@ module Rapns
       end
 
       def idle?
-        queue.notifications_processed?
+        @batch ? @batch.complete? : true
       end
 
       def queue_size
@@ -140,7 +150,7 @@ module Rapns
       end
 
       def queue
-        @queue ||= Rapns::Daemon::DeliveryQueue.new
+        @queue ||= Queue.new
       end
 
       def handlers
