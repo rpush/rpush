@@ -19,3 +19,5 @@ matrix:
       gemfile: Gemfile.rails-4.0
     - rvm: jruby-19mode
       gemfile: Gemfile.rails-4.0
+    - rvm: rbx-19mode
+      gemfile: Gemfile.rails-4.0
