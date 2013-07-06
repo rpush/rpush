@@ -7,3 +7,13 @@ rvm:
   - jruby-19mode
   - jruby-18mode
   - rbx-19mode
+gemfile:
+  - Gemfile
+  - Gemfile.rails-4.0
+
+matrix:
+  exclude:
+    - rvm: ree
+      gemfile: Gemfile.rails-4.0
+    - rvm: jruby-18mode
+      gemfile: Gemfile.rails-4.0
