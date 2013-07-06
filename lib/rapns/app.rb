@@ -2,7 +2,9 @@ module Rapns
   class App < ActiveRecord::Base
     self.table_name = 'rapns_apps'
 
-    attr_accessible :name, :environment, :certificate, :password, :connections, :auth_key
+    if Rapns.attr_accessible_available?
+      attr_accessible :name, :environment, :certificate, :password, :connections, :auth_key
+    end
 
     has_many :notifications, :class_name => 'Rapns::Notification'
 
