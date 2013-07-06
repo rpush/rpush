@@ -18,7 +18,8 @@ def setup_rails
   return if $rails_is_setup
   `rm -rf #{RAILS_DIR}`
   FileUtils.mkdir_p(RAILS_DIR)
-  cmd("bundle exec rails new #{RAILS_DIR} --skip-bundle")
+  cmd("bundle exec rails --version", true, false)
+  cmd("bundle exec rails new #{RAILS_DIR} --skip-bundle", true, false)
   branch = `git branch | grep '\*'`.split(' ').last
   in_test_rails do
     cmd('echo "gem \'rake\'" >> Gemfile')
@@ -45,9 +46,13 @@ def as_test_rails_db(env='development')
   end
 end
 
-def cmd(str, echo = true)
+def cmd(str, echo = true, clean_env = true)
   puts "* #{str.strip}" if echo
-  retval = Bundler.with_clean_env { `#{str}` }
+  retval = if clean_env
+    Bundler.with_clean_env { `#{str}` }
+  else
+    `#{str}`
+  end
   puts retval.strip if echo && retval.strip != ""
   retval
 end

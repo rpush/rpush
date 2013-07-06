@@ -2,9 +2,13 @@ namespace :test do
   task :build_rails do
     require 'fileutils'
 
-    def cmd(str)
+    def cmd(str, clean_env = true)
       puts "* #{str}"
-      retval = Bundler.with_clean_env { `#{str}` }
+      retval = if clean_env
+        Bundler.with_clean_env { `#{str}` }
+      else
+        `#{str}`
+      end
       puts retval.strip
       retval
     end
@@ -15,7 +19,8 @@ namespace :test do
     FileUtils.mkdir_p(path)
     pwd = Dir.pwd
 
-    cmd("bundle exec rails new #{path} --skip-bundle")
+    cmd("bundle exec rails --version", false)
+    cmd("bundle exec rails new #{path} --skip-bundle", false)
 
     begin
       Dir.chdir(path)
