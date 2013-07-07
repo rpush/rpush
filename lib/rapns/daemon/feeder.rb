@@ -38,6 +38,7 @@ module Rapns
       def self.enqueue_notifications
         begin
           idle = Rapns::Daemon::AppRunner.idle.map(&:app)
+          return if idle.empty?
           notifications = Rapns::Daemon.store.deliverable_notifications(idle)
           Rapns::Daemon::AppRunner.enqueue(notifications)
         rescue StandardError => e

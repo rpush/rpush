@@ -30,6 +30,12 @@ describe Rapns::Daemon::Feeder do
     start
   end
 
+  it 'does not attempt to load deliverable notifications if there are no idle runners' do
+    Rapns::Daemon::AppRunner.stub(:idle => [])
+    Rapns::Daemon.store.should_not_receive(:deliverable_notifications)
+    start
+  end
+
   it 'enqueues notifications without looping if in push mode' do
     config.stub(:push => true)
     Rapns::Daemon::Feeder.should_not_receive(:feed_forever)
