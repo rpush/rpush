@@ -26,9 +26,16 @@ describe Rapns::Logger do
 
   before do
     Rails.stub(:root).and_return("/rails_root")
-    @buffered_logger = mock("BufferedLogger", :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
-    Rails.logger = @buffered_logger
-    ActiveSupport::BufferedLogger.stub(:new).and_return(@buffered_logger)
+
+    @logger_class = if defined?(ActiveSupport::BufferedLogger)
+      ActiveSupport::BufferedLogger
+    else
+      ActiveSupport::Logger
+    end
+
+    @logger = mock(@logger_class.name, :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
+    @logger_class.stub(:new).and_return(@logger)
+    Rails.logger = @logger
     File.stub(:open => log)
     STDERR.stub(:puts)
   end
@@ -50,8 +57,8 @@ describe Rapns::Logger do
     Rapns::Logger.new(:foreground => true)
   end
 
-  it 'instantiates the BufferedLogger' do
-    ActiveSupport::BufferedLogger.should_receive(:new).with(log, Rails.logger.level)
+  it 'instantiates the logger' do
+    @logger_class.should_receive(:new).with(log, Rails.logger.level)
     Rapns::Logger.new(:foreground => true)
   end
 
@@ -79,19 +86,19 @@ describe Rapns::Logger do
     now = Time.now
     Time.stub(:now).and_return(now)
     logger = Rapns::Logger.new(:foreground => false)
-    @buffered_logger.should_receive(:info).with(/#{Regexp.escape("[#{now.to_s(:db)}]")}/)
+    @logger.should_receive(:info).with(/#{Regexp.escape("[#{now.to_s(:db)}]")}/)
     logger.info("blah")
   end
 
   it "should prefix error logs with the ERROR label" do
     logger = Rapns::Logger.new(:foreground => false)
-    @buffered_logger.should_receive(:error).with(/#{Regexp.escape("[ERROR]")}/)
+    @logger.should_receive(:error).with(/#{Regexp.escape("[ERROR]")}/)
     logger.error("eeek")
   end
 
   it "should prefix warn logs with the WARNING label" do
     logger = Rapns::Logger.new(:foreground => false)
-    @buffered_logger.should_receive(:warn).with(/#{Regexp.escape("[WARNING]")}/)
+    @logger.should_receive(:warn).with(/#{Regexp.escape("[WARNING]")}/)
     logger.warn("eeek")
   end
 
@@ -99,7 +106,7 @@ describe Rapns::Logger do
     e = RuntimeError.new("hi mom")
     e.stub(:backtrace => [])
     logger = Rapns::Logger.new(:foreground => false)
-    @buffered_logger.should_receive(:error).with(/RuntimeError, hi mom/)
+    @logger.should_receive(:error).with(/RuntimeError, hi mom/)
     logger.error(e)
   end
 
@@ -158,6 +165,6 @@ describe Rapns::Logger do
     rails_logger = mock(:info => nil, :error => nil, :level => 0)
     Rails.logger = rails_logger
     logger = Rapns::Logger.new({})
-    @buffered_logger.auto_flushing.should be_true
+    @logger.auto_flushing.should be_true
   end
 end

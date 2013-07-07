@@ -1,6 +1,13 @@
 require 'active_record'
 require 'multi_json'
 
+module Rapns
+  def self.attr_accessible_available?
+    require 'rails'
+    ::Rails::VERSION::STRING < '4'
+  end
+end
+
 require 'rapns/version'
 require 'rapns/deprecation'
 require 'rapns/deprecatable'

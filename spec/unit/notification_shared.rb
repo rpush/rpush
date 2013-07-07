@@ -30,9 +30,11 @@ shared_examples_for "an Notification subclass" do
       notification.send(data_getter).should == {"hi" => "mom"}
     end
 
-    it 'warns if attributes_for_device is assigned via mass-assignment' do
-      Rapns::Deprecation.should_receive(:warn)
-      notification_class.new(:attributes_for_device => {:hi => 'mom'})
+    if Rails::VERSION::STRING < '4'
+      it 'warns if attributes_for_device is assigned via mass-assignment' do
+        Rapns::Deprecation.should_receive(:warn)
+        notification_class.new(:attributes_for_device => {:hi => 'mom'})
+      end
     end
   end
 end

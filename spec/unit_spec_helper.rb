@@ -52,6 +52,11 @@ Bundler.require(:default)
 
 require 'database_cleaner'
 
+# Ensure SQLite3Adapter is loaded before DatabaseCleaner so that DC
+# can detect the correct superclass.
+# SQLite3 is used by the acceptance tests.
+require 'active_record/connection_adapters/sqlite3_adapter'
+
 DatabaseCleaner.strategy = :truncation
 
 require 'rapns'

@@ -13,7 +13,7 @@ module Rapns
             batch_size = Rapns.config.batch_size
             relation = Rapns::Notification.ready_for_delivery.for_apps(apps)
             relation = relation.limit(batch_size) unless Rapns.config.push
-            relation.all
+            relation.to_a
           end
         end
 
