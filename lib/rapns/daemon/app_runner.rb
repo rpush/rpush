@@ -10,13 +10,12 @@ module Rapns
       @runners = {}
 
       def self.enqueue(notifications)
-        notifications.group_by(&:app_id).each do |group|
-          app_id = group.first.app_id
-
+        notifications.group_by(&:app_id).each do |app_id, group|
+          batch = Batch.new(group)
           if app = runners[app_id]
-            app.enqueue(Batch.new(group))
+            app.enqueue(batch)
           else
-            Rapns.logger.error("No such app '#{app_id}' for batch #{batch.describe}.")
+            Rapns.logger.error("No such app '#{app_id}' for notifications #{batch.describe}.")
           end
         end
       end
@@ -66,6 +65,7 @@ module Rapns
       end
 
       attr_reader :app
+      attr_accessor :batch
 
       def initialize(app)
         @app = app
@@ -90,7 +90,7 @@ module Rapns
       end
 
       def enqueue(batch)
-        @batch = batch
+        self.batch = batch
         batch.notifications.each do |notification|
           queue.push([notification, batch])
           reflect(:notification_enqueued, notification)
@@ -124,16 +124,26 @@ module Rapns
 #{@app.name}:
   handlers: #{num_handlers}
   queued: #{queue_size}
+  batch size: #{batch_size}
+  batch processed: #{batch_processed}
   idle: #{idle?}
         EOS
       end
 
       def idle?
-        @batch ? @batch.complete? : true
+        batch ? batch.complete? : true
       end
 
       def queue_size
         queue.size
+      end
+
+      def batch_size
+        batch ? batch.num_notifications : 0
+      end
+
+      def batch_processed
+        batch ? batch.num_processed : 0
       end
 
       def num_handlers

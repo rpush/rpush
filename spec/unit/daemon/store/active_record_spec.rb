@@ -63,23 +63,40 @@ describe Rapns::Daemon::Store::ActiveRecord do
     end
   end
 
-  describe 'retry_after' do
+  describe 'mark_retryable' do
     it 'increments the retry count' do
       expect do
-        store.retry_after(notification, now)
+        store.mark_retryable(notification, now)
       end.to change(notification, :retries).by(1)
     end
 
     it 'sets the deliver after timestamp' do
       deliver_after = now + 10.seconds
       expect do
-        store.retry_after(notification, deliver_after)
+        store.mark_retryable(notification, deliver_after)
       end.to change(notification, :deliver_after).to(deliver_after)
     end
 
     it 'saves the notification without validation' do
       notification.should_receive(:save!).with(:validate => false)
-      store.retry_after(notification, now)
+      store.mark_retryable(notification, now)
+    end
+  end
+
+  describe 'mark_batch_retryable' do
+    it 'increments the retired count' do
+      expect do
+        store.mark_batch_retryable([notification], now)
+        notification.reload
+      end.to change(notification, :retries).by(1)
+    end
+
+    it 'sets the deliver after timestamp' do
+      deliver_after = now + 10.seconds
+      expect do
+        store.mark_batch_retryable([notification], deliver_after)
+        notification.reload
+      end.to change(notification, :deliver_after).to(deliver_after)
     end
   end
 
@@ -99,6 +116,22 @@ describe Rapns::Daemon::Store::ActiveRecord do
     it 'saves the notification without validation' do
       notification.should_receive(:save!).with(:validate => false)
       store.mark_delivered(notification)
+    end
+  end
+
+  describe 'mark_batch_delivered' do
+    it 'marks the notifications as delivered' do
+      expect do
+        store.mark_batch_delivered([notification])
+        notification.reload
+      end.to change(notification, :delivered).to(true)
+    end
+
+    it 'sets the time the notifications were delivered' do
+      expect do
+        store.mark_batch_delivered([notification])
+        notification.reload
+      end.to change(notification, :delivered_at).to(now)
     end
   end
 
@@ -135,6 +168,42 @@ describe Rapns::Daemon::Store::ActiveRecord do
     it 'saves the notification without validation' do
       notification.should_receive(:save!).with(:validate => false)
       store.mark_failed(notification, nil, '')
+    end
+  end
+
+  describe 'mark_batch_failed' do
+    it 'marks the notification as not delivered' do
+      store.mark_batch_failed([notification], nil, '')
+      notification.reload
+      notification.delivered.should be_false
+    end
+
+    it 'marks the notification as failed' do
+      expect do
+        store.mark_batch_failed([notification], nil, '')
+        notification.reload
+      end.to change(notification, :failed).to(true)
+    end
+
+    it 'sets the time the notification delivery failed' do
+      expect do
+        store.mark_batch_failed([notification], nil, '')
+        notification.reload
+      end.to change(notification, :failed_at).to(now)
+    end
+
+    it 'sets the error code' do
+      expect do
+        store.mark_batch_failed([notification], 42, '')
+        notification.reload
+      end.to change(notification, :error_code).to(42)
+    end
+
+    it 'sets the error description' do
+      expect do
+        store.mark_batch_failed([notification], 42, 'Weeee')
+        notification.reload
+      end.to change(notification, :error_description).to('Weeee')
     end
   end
 

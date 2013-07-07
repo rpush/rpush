@@ -3,11 +3,11 @@ require 'unit_spec_helper'
 describe Rapns::Daemon::Apns::Delivery do
   let(:app) { stub(:name => 'MyApp') }
   let(:notification) { stub.as_null_object }
+  let(:batch) { stub(:mark_failed => nil, :mark_delivered => nil) }
   let(:logger) { stub(:error => nil, :info => nil) }
   let(:config) { stub(:check_for_errors => true) }
   let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
-  let(:delivery) { Rapns::Daemon::Apns::Delivery.new(app, connection, notification) }
-  let(:store) { stub(:mark_failed => nil, :mark_delivered => nil) }
+  let(:delivery) { Rapns::Daemon::Apns::Delivery.new(app, connection, notification, batch) }
 
   def perform
     begin
@@ -17,7 +17,6 @@ describe Rapns::Daemon::Apns::Delivery do
   end
 
   before do
-    Rapns::Daemon.stub(:store => store)
     Rapns.stub(:config => config, :logger => logger)
   end
 
@@ -34,7 +33,7 @@ describe Rapns::Daemon::Apns::Delivery do
   end
 
   it "marks the notification as delivered" do
-    store.should_receive(:mark_delivered).with(notification)
+    batch.should_receive(:mark_delivered).with(notification)
     perform
   end
 
@@ -53,7 +52,7 @@ describe Rapns::Daemon::Apns::Delivery do
     before { connection.stub(:select => true, :read => [8, 4, 69].pack("ccN")) }
 
     it "marks the notification as failed" do
-      store.should_receive(:mark_failed).with(notification, 4, "Missing payload")
+      batch.should_receive(:mark_failed).with(notification, 4, "Missing payload")
       perform
     end
 
@@ -104,7 +103,7 @@ describe Rapns::Daemon::Apns::Delivery do
       end
 
       it 'marks the notification as failed' do
-        store.should_receive(:mark_failed).with(notification, nil, "APNs disconnected without returning an error.")
+        batch.should_receive(:mark_failed).with(notification, nil, "APNs disconnected without returning an error.")
         perform
       end
     end

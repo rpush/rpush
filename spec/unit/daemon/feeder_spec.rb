@@ -37,14 +37,8 @@ describe Rapns::Daemon::Feeder do
     start
   end
 
-  it "enqueues the notification" do
-    Rapns::Daemon::AppRunner.should_receive(:enqueue).with(notification)
-    start
-  end
-
-  it 'reflects the notification has been enqueued' do
-    Rapns::Daemon::AppRunner.stub(:enqueue)
-    Rapns::Daemon::Feeder.should_receive(:reflect).with(:notification_enqueued, notification)
+  it "enqueues the notifications" do
+    Rapns::Daemon::AppRunner.should_receive(:enqueue).with([notification])
     start
   end
 

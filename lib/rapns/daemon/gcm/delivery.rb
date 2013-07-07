@@ -8,10 +8,11 @@ module Rapns
         GCM_URI = URI.parse('https://android.googleapis.com/gcm/send')
         UNAVAILABLE_STATES = ['Unavailable', 'InternalServerError']
 
-        def initialize(app, http, notification)
+        def initialize(app, http, notification, batch)
           @app = app
           @http = http
           @notification = notification
+          @batch = batch
         end
 
         def perform
@@ -121,7 +122,7 @@ module Rapns
 
         def deliver_after_header(response)
           if response.header['retry-after']
-            retry_after = if response.header['retry-after'].to_s =~ /^[0-9]+$/
+            if response.header['retry-after'].to_s =~ /^[0-9]+$/
               Time.now + response.header['retry-after'].to_i
             else
               Time.httpdate(response.header['retry-after'])
@@ -131,9 +132,9 @@ module Rapns
 
         def retry_delivery(notification, response)
           if time = deliver_after_header(response)
-            retry_after(notification, time)
+            mark_retryable(notification, time)
           else
-            retry_exponentially(notification)
+            mark_retryable_exponential(notification)
           end
         end
 

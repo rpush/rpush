@@ -3,7 +3,7 @@ module Rapns
     class DeliveryHandler
       include Reflectable
 
-      NOOP = :noop
+      WAKEUP = :wakeup
 
       attr_accessor :queue
 
@@ -19,7 +19,7 @@ module Rapns
       def stop
         @stop = true
         if @thread
-          queue.push(NOOP)
+          queue.push(WAKEUP)
           @thread.join
         end
         stopped
@@ -32,7 +32,7 @@ module Rapns
 
       def handle_next_notification
         notification, batch = queue.pop
-        return if notification == NOOP
+        return if notification == WAKEUP
 
         begin
           deliver(notification, batch)
