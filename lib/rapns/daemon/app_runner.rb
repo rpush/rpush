@@ -85,6 +85,8 @@ module Rapns
 
       def stop
         handlers.map(&:stop)
+        handlers.map(&:wakeup)
+        handlers.map(&:wait)
         stopped
         handlers.clear
       end
@@ -102,20 +104,23 @@ module Rapns
         diff = handlers.size - app.connections
         return if diff == 0
         if diff > 0
-          diff.times { decrement_handlers }
-          Rapns.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} remaining.")
+          decrement_handlers(diff)
+          Rapns.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} running.")
         else
-          diff.abs.times { increment_handlers }
-          Rapns.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} remaining.")
+          increment_handlers(diff.abs)
+          Rapns.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} running.")
         end
       end
 
-      def decrement_handlers
-        handlers.pop.stop
+      def decrement_handlers(num)
+        to_stop = num.times.map { handlers.pop }.compact
+        to_stop.map(&:stop)
+        (to_stop + handlers).map(&:wakeup)
+        to_stop.map(&:wait)
       end
 
-      def increment_handlers
-        handlers << start_handler
+      def increment_handlers(num)
+        num.times { handlers << start_handler }
       end
 
       def debug

@@ -33,5 +33,7 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
     http.should_receive(:shutdown)
     delivery_handler.start
     delivery_handler.stop
+        delivery_handler.wakeup
+    delivery_handler.wait
   end
 end

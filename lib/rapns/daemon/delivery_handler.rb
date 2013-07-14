@@ -18,10 +18,14 @@ module Rapns
 
       def stop
         @stop = true
-        if @thread
-          queue.push(WAKEUP)
-          @thread.join
-        end
+      end
+
+      def wakeup
+        queue.push(WAKEUP) if @thread
+      end
+
+      def wait
+        @thread.join if @thread
         stopped
       end
 
