@@ -29,6 +29,10 @@ Add Rapns to your Gemfile:
 
     gem 'rapns'
 
+For Rails 4, specify the source until version 4 is released:
+
+    gem 'rapns', :github => 'ileitch/rapns'
+
 Generate the migrations, rapns.yml and migrate:
 
     rails g rapns
