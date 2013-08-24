@@ -37,7 +37,6 @@ module Rapns
 
         begin
           deliver(notification)
-          reflect(:notification_delivered, notification)
         rescue StandardError => e
           Rapns.logger.error(e)
           reflect(:error, e)
