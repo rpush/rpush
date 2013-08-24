@@ -39,7 +39,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   let(:app) { Rapns::Apns::App.new }
   let(:new_app) { Rapns::Apns::App.new }
   let(:runner) { stub(:sync => nil, :stop => nil, :start => nil) }
-  let(:logger) { stub(:error => nil) }
+  let(:logger) { stub(:error => nil, :warn => nil) }
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
 
   before do
@@ -83,6 +83,16 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.stub(:start).and_raise(StandardError)
     Rapns.logger.should_receive(:error).any_number_of_times
+    Rapns::Daemon::AppRunner.sync
+  end
+
+  it 'reflects errors if the app could not be started' do
+    Rapns::App.stub(:all => [app, new_app])
+    new_runner = stub
+    Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
+    e = StandardError.new
+    new_runner.stub(:start).and_raise(e)
+    Rapns::Daemon::AppRunner.should_receive(:reflect).with(:error, e)
     Rapns::Daemon::AppRunner.sync
   end
 end

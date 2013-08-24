@@ -1,6 +1,8 @@
 module Rapns
   module Daemon
     class AppRunner
+      extend Reflectable
+
       class << self
         attr_reader :runners
       end
@@ -33,6 +35,7 @@ module Rapns
           rescue StandardError => e
             Rapns.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
             Rapns.logger.error(e)
+            reflect(:error, e)
           end
         end
       end
@@ -65,21 +68,22 @@ module Rapns
         @app = app
       end
 
-      def started
-      end
-
-      def stopped
-      end
+      def before_start; end
+      def after_start; end
+      def before_stop; end
+      def after_stop; end
 
       def start
+        before_start
         app.connections.times { handlers << start_handler }
-        started
+        after_start
         Rapns.logger.info("[#{app.name}] Started, #{handlers_str}.")
       end
 
       def stop
+        before_stop
         handlers.map(&:stop)
-        stopped
+        after_stop
         handlers.clear
       end
 

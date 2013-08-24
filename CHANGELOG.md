@@ -1,3 +1,6 @@
+### 3.4.0 (unreleased)
+  * Add apns_certificate_will_expire reflection.
+
 ## 3.3.2 (June 30, 2013)
   * Fix Rails 3.0.x compatibility (#138) (@yoppi).
   * Ensure Rails does not set a default value for text columns (#137).

@@ -16,6 +16,7 @@ require 'rapns/daemon/delivery_handler'
 
 require 'rapns/daemon/apns/delivery'
 require 'rapns/daemon/apns/disconnection_error'
+require 'rapns/daemon/apns/certificate_expired_error'
 require 'rapns/daemon/apns/connection'
 require 'rapns/daemon/apns/app_runner'
 require 'rapns/daemon/apns/delivery_handler'

@@ -71,8 +71,12 @@ Rapns.reflect do |on|
   # on.gcm_canonical_id do |old_id, canonical_id|
   # end
 
+  # Called when an APNs certificate will expired within 1 month.
+  # Implement on.error to catch errors raised when the certificate expires.
+  # on.apns_certificate_will_expire do |app, expiration_time|
+  # end
+
   # Called when an exception is raised.
   # on.error do |error|
   # end
-
 end
