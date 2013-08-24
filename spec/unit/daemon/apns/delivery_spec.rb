@@ -1,13 +1,13 @@
 require 'unit_spec_helper'
 
 describe Rapns::Daemon::Apns::Delivery do
-  let(:app) { stub(:name => 'MyApp') }
-  let(:notification) { stub.as_null_object }
-  let(:logger) { stub(:error => nil, :info => nil) }
-  let(:config) { stub(:check_for_errors => true) }
-  let(:connection) { stub(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
+  let(:app) { double(:name => 'MyApp') }
+  let(:notification) { double.as_null_object }
+  let(:logger) { double(:error => nil, :info => nil) }
+  let(:config) { double(:check_for_errors => true) }
+  let(:connection) { double(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:delivery) { Rapns::Daemon::Apns::Delivery.new(app, connection, notification) }
-  let(:store) { stub(:mark_failed => nil, :mark_delivered => nil) }
+  let(:store) { double(:mark_failed => nil, :mark_delivered => nil) }
 
   def perform
     begin
@@ -63,7 +63,7 @@ describe Rapns::Daemon::Apns::Delivery do
     end
 
     it "logs the delivery error" do
-      # checking for the stubbed error doesn't work in jruby, but checking
+      # checking for the doublebed error doesn't work in jruby, but checking
       # for the exception by class does.
 
       #error = Rapns::DeliveryError.new(4, 12, "Missing payload")

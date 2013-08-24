@@ -3,12 +3,12 @@ require 'unit_spec_helper'
 describe Rapns::Daemon::Gcm::Delivery do
   let(:app) { Rapns::Gcm::App.new(:name => 'MyApp', :auth_key => 'abc123') }
   let(:notification) { Rapns::Gcm::Notification.create!(:app => app, :registration_ids => ['xyz'], :deliver_after => Time.now) }
-  let(:logger) { stub(:error => nil, :info => nil, :warn => nil) }
-  let(:response) { stub(:code => 200, :header => {}) }
-  let(:http) { stub(:shutdown => nil, :request => response)}
+  let(:logger) { double(:error => nil, :info => nil, :warn => nil) }
+  let(:response) { double(:code => 200, :header => {}) }
+  let(:http) { double(:shutdown => nil, :request => response)}
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:delivery) { Rapns::Daemon::Gcm::Delivery.new(app, http, notification) }
-  let(:store) { stub(:mark_failed => nil, :mark_delivered => nil, :retry_after => nil, :create_gcm_notification => stub(:id => 2)) }
+  let(:store) { double(:mark_failed => nil, :mark_delivered => nil, :retry_after => nil, :create_gcm_notification => double(:id => 2)) }
 
   def perform
     delivery.perform
@@ -19,6 +19,35 @@ describe Rapns::Daemon::Gcm::Delivery do
     Rapns::Daemon.stub(:store => store)
     Time.stub(:now => now)
     Rapns.stub(:logger => logger)
+  end
+
+  shared_examples_for 'an notification with some delivery failures' do
+    let(:new_notification) { Rapns::Gcm::Notification.where('id != ?', notification.id).first }
+
+    before { response.stub(:body => JSON.dump(body)) }
+
+    it 'marks the original notification as failed' do
+      store.should_receive(:mark_failed).with(notification, nil, error_description)
+      perform rescue Rapns::DeliveryError
+    end
+
+    it 'reflects the notification delivery failed' do
+      delivery.should_receive(:reflect).with(:notification_failed, notification)
+      perform rescue Rapns::DeliveryError
+    end
+
+    it 'creates a new notification for the unavailable devices' do
+      notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
+      response.stub(:header => { 'retry-after' => 10 })
+      attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
+      store.should_receive(:create_gcm_notification).with(attrs, notification.data,
+          ['id_0', 'id_2'], now + 10.seconds, notification.app)
+      perform rescue Rapns::DeliveryError
+    end
+
+    it 'raises a DeliveryError' do
+      expect { perform }.to raise_error(Rapns::DeliveryError)
+    end
   end
 
   describe 'an 200 response' do
@@ -106,35 +135,6 @@ describe Rapns::Daemon::Gcm::Delivery do
         notification.deliver_after = now + 2
         Rapns.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
         perform
-      end
-    end
-
-    shared_examples_for 'an notification with some delivery failures' do
-      let(:new_notification) { Rapns::Gcm::Notification.where('id != ?', notification.id).first }
-
-      before { response.stub(:body => JSON.dump(body)) }
-
-      it 'marks the original notification as failed' do
-        store.should_receive(:mark_failed).with(notification, nil, error_description)
-        perform rescue Rapns::DeliveryError
-      end
-
-      it 'reflects the notification delivery failed' do
-        delivery.should_receive(:reflect).with(:notification_failed, notification)
-        perform rescue Rapns::DeliveryError
-      end
-
-      it 'creates a new notification for the unavailable devices' do
-        notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
-        response.stub(:header => { 'retry-after' => 10 })
-        attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
-        store.should_receive(:create_gcm_notification).with(attrs, notification.data,
-            ['id_0', 'id_2'], now + 10.seconds, notification.app)
-        perform rescue Rapns::DeliveryError
-      end
-
-      it 'raises a DeliveryError' do
-        expect { perform }.to raise_error(Rapns::DeliveryError)
       end
     end
 

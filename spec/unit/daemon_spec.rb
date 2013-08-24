@@ -4,12 +4,12 @@ require 'rapns/daemon/store/active_record'
 describe Rapns::Daemon, "when starting" do
   module Rails; end
 
-  let(:certificate) { stub }
-  let(:password) { stub }
-  let(:config) { stub(:pid_file => nil, :airbrake_notify => false,
+  let(:certificate) { double }
+  let(:password) { double }
+  let(:config) { double(:pid_file => nil, :airbrake_notify => false,
     :foreground => true, :embedded => false, :push => false,
     :store => :active_record, :logger => nil) }
-  let(:logger) { stub(:logger, :info => nil, :error => nil, :warn => nil) }
+  let(:logger) { double(:logger, :info => nil, :error => nil, :warn => nil) }
 
   before do
     Rapns.stub(:config => config, :logger => logger)
@@ -102,8 +102,8 @@ describe Rapns::Daemon, "when starting" do
 end
 
 describe Rapns::Daemon, "when being shutdown" do
-  let(:config) { stub(:pid_file => '/rails_root/rapns.pid') }
-  let(:logger) { stub(:info => nil, :error => nil, :warn => nil) }
+  let(:config) { double(:pid_file => '/rails_root/rapns.pid') }
+  let(:logger) { double(:info => nil, :error => nil, :warn => nil) }
 
   before do
     Rapns.stub(:config => config)

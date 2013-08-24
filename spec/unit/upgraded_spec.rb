@@ -1,23 +1,17 @@
 require 'unit_spec_helper'
 
 describe Rapns::Upgraded do
-  let(:logger) { stub(:logger, :warn => nil) }
-  let(:config) { stub(:config) }
+  let(:logger) { double(:logger, :warn => nil) }
+  let(:config) { double(:config) }
 
   before do
     Rails.stub(:root).and_return('/rails_root')
     Rapns.stub(:logger => logger, :config => config)
   end
 
-  it 'prints a warning if there are no apps' do
-    Rapns::App.stub(:count => 0)
-    Rapns.logger.should_receive(:warn).any_number_of_times
-    Rapns::Upgraded.check(:exit => false)
-  end
-
   it 'prints a warning and exists if rapns has not been upgraded' do
     Rapns::App.stub(:count).and_raise(ActiveRecord::StatementInvalid, "test")
-    Rapns::Upgraded.should_receive(:puts).any_number_of_times
+    Rapns::Upgraded.stub(:puts)
     Rapns::Upgraded.should_receive(:exit).with(1)
     Rapns::Upgraded.check(:exit => true)
   end
@@ -25,7 +19,7 @@ describe Rapns::Upgraded do
   it 'does not exit if Rapns has not been upgraded and :exit is false' do
     Rapns.config.stub(:embedded => true)
     Rapns::App.stub(:count).and_raise(ActiveRecord::StatementInvalid, "test")
-    Rapns::Upgraded.should_receive(:puts).any_number_of_times
+    Rapns::Upgraded.stub(:puts)
     Rapns::Upgraded.should_not_receive(:exit)
     Rapns::Upgraded.check(:exit => false)
   end
@@ -33,7 +27,7 @@ describe Rapns::Upgraded do
   it 'does not exit if Rapns has not been upgraded and is in push mode' do
     Rapns.config.stub(:push => true)
     Rapns::App.stub(:count).and_raise(ActiveRecord::StatementInvalid, "test")
-    Rapns::Upgraded.should_receive(:puts).any_number_of_times
+    Rapns::Upgraded.stub(:puts)
     Rapns::Upgraded.should_not_receive(:exit)
     Rapns::Upgraded.check(:exit => false)
   end

@@ -6,13 +6,13 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
 
   let(:host) { 'gateway.push.apple.com' }
   let(:port) { 2195 }
-  let(:certificate) { stub }
-  let(:password) { stub }
-  let(:app) { stub(:password => password, :certificate => certificate, :name => 'MyApp', :environment => 'production')}
+  let(:certificate) { double }
+  let(:password) { double }
+  let(:app) { double(:password => password, :certificate => certificate, :name => 'MyApp', :environment => 'production')}
   let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app) }
-  let(:connection) { stub('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
-  let(:notification) { stub }
-  let(:http) { stub(:shutdown => nil)}
+  let(:connection) { double('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
+  let(:notification) { double }
+  let(:http) { double(:shutdown => nil)}
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
 
   before do

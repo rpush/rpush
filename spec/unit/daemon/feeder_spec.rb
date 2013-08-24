@@ -1,17 +1,17 @@
 require "unit_spec_helper"
 
 describe Rapns::Daemon::Feeder do
-  let(:config) { stub(:batch_size => 5000, :push_poll => 0, :embedded => false,
+  let(:config) { double(:batch_size => 5000, :push_poll => 0, :embedded => false,
     :push => false) }
   let!(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
-  let(:logger) { stub }
+  let(:logger) { double }
 
   before do
     Rapns.stub(:config => config,:logger => logger)
-    Rapns::Daemon.stub(:store => stub(:deliverable_notifications => [notification]))
+    Rapns::Daemon.stub(:store => double(:deliverable_notifications => [notification]))
     Rapns::Daemon::Feeder.stub(:stop? => true)
-    Rapns::Daemon::AppRunner.stub(:enqueue => nil, :idle => [stub(:app => app)])
+    Rapns::Daemon::AppRunner.stub(:enqueue => nil, :idle => [double(:app => app)])
   end
 
   def start

@@ -1,6 +1,6 @@
 shared_examples_for 'an DeliveryHandler subclass' do
   it 'logs all delivery errors' do
-    logger = stub
+    logger = double
     Rapns.stub(:logger => logger)
     error = StandardError.new
     delivery_handler.stub(:deliver).and_raise(error)
@@ -9,7 +9,7 @@ shared_examples_for 'an DeliveryHandler subclass' do
   end
 
   it 'reflects an exception' do
-    Rapns.stub(:logger => stub(:error => nil))
+    Rapns.stub(:logger => double(:error => nil))
     error = StandardError.new
     delivery_handler.stub(:deliver).and_raise(error)
     delivery_handler.should_receive(:reflect).with(:error, error)
@@ -17,7 +17,7 @@ shared_examples_for 'an DeliveryHandler subclass' do
   end
 
   it "instructs the queue to wakeup the thread when told to stop" do
-    thread = stub(:join => nil)
+    thread = double(:join => nil)
     Thread.stub(:new => thread)
     queue.should_receive(:wakeup).with(thread)
     delivery_handler.start

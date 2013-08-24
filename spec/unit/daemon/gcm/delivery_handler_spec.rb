@@ -4,10 +4,10 @@ require File.dirname(__FILE__) + '/../delivery_handler_shared.rb'
 describe Rapns::Daemon::Gcm::DeliveryHandler do
   it_should_behave_like 'an DeliveryHandler subclass'
 
-  let(:app) { stub }
+  let(:app) { double }
   let(:delivery_handler) { Rapns::Daemon::Gcm::DeliveryHandler.new(app) }
-  let(:notification) { stub }
-  let(:http) { stub(:shutdown => nil)}
+  let(:notification) { double }
+  let(:http) { double(:shutdown => nil)}
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
 
   before do

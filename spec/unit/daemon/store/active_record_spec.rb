@@ -18,7 +18,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
     it 'loads notifications in batches' do
       Rapns.config.batch_size = 5000
       Rapns.config.push = false
-      relation = stub.as_null_object
+      relation = double.as_null_object
       relation.should_receive(:limit).with(5000)
       Rapns::Notification.stub(:ready_for_delivery => relation)
       store.deliverable_notifications([app])
@@ -26,7 +26,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'does not load notification in batches if in push mode' do
       Rapns.config.push = true
-      relation = stub.as_null_object
+      relation = double.as_null_object
       relation.should_not_receive(:limit)
       Rapns::Notification.stub(:ready_for_delivery => relation)
       store.deliverable_notifications([app])

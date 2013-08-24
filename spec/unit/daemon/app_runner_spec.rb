@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rapns::Daemon::AppRunner, 'stop' do
-  let(:runner) { stub }
+  let(:runner) { double }
   before { Rapns::Daemon::AppRunner.runners['app'] = runner }
   after { Rapns::Daemon::AppRunner.runners.clear }
 
@@ -12,9 +12,9 @@ describe Rapns::Daemon::AppRunner, 'stop' do
 end
 
 describe Rapns::Daemon::AppRunner, 'deliver' do
-  let(:runner) { stub }
-  let(:notification) { stub(:app_id => 1) }
-  let(:logger) { stub(:error => nil) }
+  let(:runner) { double }
+  let(:notification) { double(:app_id => 1) }
+  let(:logger) { double(:error => nil) }
 
   before do
     Rapns.stub(:logger => logger)
@@ -38,8 +38,8 @@ end
 describe Rapns::Daemon::AppRunner, 'sync' do
   let(:app) { Rapns::Apns::App.new }
   let(:new_app) { Rapns::Apns::App.new }
-  let(:runner) { stub(:sync => nil, :stop => nil, :start => nil) }
-  let(:logger) { stub(:error => nil, :warn => nil) }
+  let(:runner) { double(:sync => nil, :stop => nil, :start => nil) }
+  let(:logger) { double(:error => nil, :warn => nil) }
   let(:queue) { Rapns::Daemon::DeliveryQueue.new }
 
   before do
@@ -65,7 +65,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
 
   it 'starts a runner for a new app' do
     Rapns::App.stub(:all => [app, new_app])
-    new_runner = stub
+    new_runner = double
     Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
@@ -79,16 +79,16 @@ describe Rapns::Daemon::AppRunner, 'sync' do
 
   it 'logs an error if the app could not be started' do
     Rapns::App.stub(:all => [app, new_app])
-    new_runner = stub
+    new_runner = double
     Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.stub(:start).and_raise(StandardError)
-    Rapns.logger.should_receive(:error).any_number_of_times
+    Rapns.logger.should_receive(:error)
     Rapns::Daemon::AppRunner.sync
   end
 
   it 'reflects errors if the app could not be started' do
     Rapns::App.stub(:all => [app, new_app])
-    new_runner = stub
+    new_runner = double
     Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     e = StandardError.new
     new_runner.stub(:start).and_raise(e)
@@ -100,12 +100,12 @@ end
 describe Rapns::Daemon::AppRunner, 'debug' do
   let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
     :environment => 'development', :certificate => TEST_CERT) }
-  let(:logger) { stub(:info => nil) }
+  let(:logger) { double(:info => nil) }
 
   before do
     Rapns::Daemon.stub(:config => {})
-    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => stub.as_null_object)
-    Rapns::Daemon::Apns::Connection.stub(:new => stub.as_null_object)
+    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
+    Rapns::Daemon::Apns::Connection.stub(:new => double.as_null_object)
     Rapns.stub(:logger => logger)
     Rapns::Daemon::AppRunner.sync
   end
@@ -121,12 +121,12 @@ end
 describe Rapns::Daemon::AppRunner, 'idle' do
   let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
     :environment => 'development', :certificate => TEST_CERT) }
-  let(:logger) { stub(:info => nil) }
+  let(:logger) { double(:info => nil) }
 
   before do
     Rapns.stub(:logger => logger)
-    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => stub.as_null_object)
-    Rapns::Daemon::Apns::Connection.stub(:new => stub.as_null_object)
+    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
+    Rapns::Daemon::Apns::Connection.stub(:new => double.as_null_object)
     Rapns::Daemon::AppRunner.sync
   end
 
@@ -141,12 +141,12 @@ end
 describe Rapns::Daemon::AppRunner, 'wait' do
   let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
     :environment => 'development', :certificate => TEST_CERT) }
-  let(:logger) { stub(:info => nil) }
+  let(:logger) { double(:info => nil) }
 
   before do
     Rapns.stub(:logger => logger)
-    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => stub.as_null_object)
-    Rapns::Daemon::Apns::Connection.stub(:new => stub.as_null_object)
+    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
+    Rapns::Daemon::Apns::Connection.stub(:new => double.as_null_object)
     Rapns::Daemon::AppRunner.sync
   end
 

@@ -5,8 +5,8 @@ describe Rapns::Daemon::InterruptibleSleep do
     extend Rapns::Daemon::InterruptibleSleep
   end
 
-  let(:rd) { stub(:close => nil) }
-  let(:wr) { stub(:close => nil) }
+  let(:rd) { double(:close => nil) }
+  let(:wr) { double(:close => nil) }
 
   before do
     IO.stub(:pipe)

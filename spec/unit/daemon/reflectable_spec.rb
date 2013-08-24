@@ -5,7 +5,7 @@ describe Rapns::Daemon::Reflectable do
     include Rapns::Daemon::Reflectable
   end
 
-  let(:logger) { stub(:error => nil) }
+  let(:logger) { double(:error => nil) }
   let(:test_reflectable) { TestReflectable.new }
 
   before do

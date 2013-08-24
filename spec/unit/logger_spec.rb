@@ -21,8 +21,8 @@ module Airbrake
 end
 
 describe Rapns::Logger do
-  let(:log) { stub(:sync= => true) }
-  let(:config) { stub(:airbrake_notify => true) }
+  let(:log) { double(:sync= => true) }
+  let(:config) { double(:airbrake_notify => true) }
 
   before do
     Rails.stub(:root).and_return("/rails_root")
@@ -33,7 +33,7 @@ describe Rapns::Logger do
       ActiveSupport::Logger
     end
 
-    @logger = mock(@logger_class.name, :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
+    @logger = double(@logger_class.name, :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
     @logger_class.stub(:new).and_return(@logger)
     Rails.logger = @logger
     File.stub(:open => log)
@@ -63,7 +63,7 @@ describe Rapns::Logger do
   end
 
   it 'uses the user-defined logger' do
-    my_logger = stub
+    my_logger = double
     Rapns.config.logger = my_logger
     logger = Rapns::Logger.new({})
     my_logger.should_receive(:info)
@@ -162,7 +162,7 @@ describe Rapns::Logger do
   end
 
   it 'defaults auto_flushing to true if the Rails logger does not respond to auto_flushing' do
-    rails_logger = mock(:info => nil, :error => nil, :level => 0)
+    rails_logger = double(:info => nil, :error => nil, :level => 0)
     Rails.logger = rails_logger
     logger = Rapns::Logger.new({})
     @logger.auto_flushing.should be_true

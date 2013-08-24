@@ -1,5 +1,5 @@
 shared_examples_for "an AppRunner subclass" do
-  let(:queue) { stub(:notifications_processed? => true, :push => nil) }
+  let(:queue) { double(:notifications_processed? => true, :push => nil) }
 
   before { Rapns::Daemon::DeliveryQueue.stub(:new => queue) }
   after { Rapns::Daemon::AppRunner.runners.clear }
@@ -17,7 +17,7 @@ shared_examples_for "an AppRunner subclass" do
   end
 
   describe 'enqueue' do
-    let(:notification) { stub }
+    let(:notification) { double }
 
     it 'enqueues the notification' do
       queue.should_receive(:push).with(notification)

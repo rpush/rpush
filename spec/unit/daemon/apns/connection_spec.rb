@@ -1,17 +1,17 @@
 require "unit_spec_helper"
 
 describe Rapns::Daemon::Apns::Connection do
-  let(:ssl_context) { stub(:key= => nil, :cert= => nil) }
-  let(:rsa_key) { stub }
-  let(:certificate) { stub }
-  let(:password) { stub }
-  let(:x509_certificate) { stub }
+  let(:ssl_context) { double(:key= => nil, :cert= => nil) }
+  let(:rsa_key) { double }
+  let(:certificate) { double }
+  let(:password) { double }
+  let(:x509_certificate) { double }
   let(:host) { 'gateway.push.apple.com' }
   let(:port) { '2195' }
-  let(:tcp_socket) { stub(:setsockopt => nil, :close => nil) }
-  let(:ssl_socket) { stub(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
-  let(:logger) { stub(:info => nil, :error => nil) }
-  let(:app) { stub(:name => 'Connection 0', :certificate => certificate, :password => password)}
+  let(:tcp_socket) { double(:setsockopt => nil, :close => nil) }
+  let(:ssl_socket) { double(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
+  let(:logger) { double(:info => nil, :error => nil) }
+  let(:app) { double(:name => 'Connection 0', :certificate => certificate, :password => password)}
   let(:connection) { Rapns::Daemon::Apns::Connection.new(app, host, port) }
 
   before do
@@ -111,7 +111,7 @@ describe Rapns::Daemon::Apns::Connection do
     it "ignores IOError when the socket is already closed" do
       tcp_socket.stub(:close).and_raise(IOError)
       connection.connect
-      expect { connection.close }.to_not raise_error(IOError)
+      connection.close
     end
   end
 
