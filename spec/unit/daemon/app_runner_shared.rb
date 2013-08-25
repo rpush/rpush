@@ -1,7 +1,7 @@
 shared_examples_for "an AppRunner subclass" do
-  let(:queue) { double(:notifications_processed? => true, :push => nil) }
+  let(:queue) { double(:push => nil) }
 
-  before { Rapns::Daemon::DeliveryQueue.stub(:new => queue) }
+  before { Queue.stub(:new => queue) }
   after { Rapns::Daemon::AppRunner.runners.clear }
 
   describe 'start' do
@@ -18,10 +18,16 @@ shared_examples_for "an AppRunner subclass" do
 
   describe 'enqueue' do
     let(:notification) { double }
+    let(:batch) { double(:notifications => [notification]) }
 
-    it 'enqueues the notification' do
-      queue.should_receive(:push).with(notification)
-      runner.enqueue(notification)
+    it 'enqueues the batch' do
+      queue.should_receive(:push).with([notification, batch])
+      runner.enqueue(batch)
+    end
+
+    it 'reflects the notification has been enqueued' do
+      runner.should_receive(:reflect).with(:notification_enqueued, notification)
+      runner.enqueue(batch)
     end
   end
 
@@ -36,12 +42,17 @@ shared_examples_for "an AppRunner subclass" do
 
   describe 'idle?' do
     it 'is idle if all notifications have been processed' do
-      queue.stub(:notifications_processed? => true)
+      runner.batch = stub(:complete? => true)
+      runner.idle?.should be_true
+    end
+
+    it 'is idle if the runner has no associated batch' do
+      runner.batch = nil
       runner.idle?.should be_true
     end
 
     it 'is not idle if not all notifications have been processed' do
-      queue.stub(:notifications_processed? => false)
+      runner.batch = stub(:complete? => false)
       runner.idle?.should be_false
     end
   end

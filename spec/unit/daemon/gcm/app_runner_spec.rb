@@ -7,7 +7,7 @@ describe Rapns::Daemon::Gcm::AppRunner do
   let(:app_class) { Rapns::Gcm::App }
   let(:app) { app_class.new }
   let(:runner) { Rapns::Daemon::Gcm::AppRunner.new(app) }
-  let(:handler) { double(:start => nil, :stop => nil, :queue= => nil) }
+  let(:handler) { double(:start => nil, :queue= => nil) }
   let(:logger) { double(:info => nil) }
 
   before do

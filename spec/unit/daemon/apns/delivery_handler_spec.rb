@@ -12,14 +12,15 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app) }
   let(:connection) { double('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
   let(:notification) { double }
+  let(:batch) { stub(:notification_processed => nil) }
   let(:http) { double(:shutdown => nil)}
-  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
+  let(:queue) { Queue.new }
 
   before do
     Rapns::Daemon::Apns::Connection.stub(:new => connection)
     Rapns::Daemon::Apns::Delivery.stub(:perform)
     delivery_handler.queue = queue
-    queue.push(notification)
+    queue.push([notification, batch])
   end
 
   it "instantiates a new connection" do
@@ -35,7 +36,7 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   end
 
   it 'performs delivery of an notification' do
-    Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(app, connection, notification)
+    Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(app, connection, notification, batch)
     delivery_handler.start
     delivery_handler.stop
   end

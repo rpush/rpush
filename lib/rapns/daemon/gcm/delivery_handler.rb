@@ -7,8 +7,8 @@ module Rapns
           @http = Net::HTTP::Persistent.new('rapns')
         end
 
-        def deliver(notification)
-          Rapns::Daemon::Gcm::Delivery.perform(@app, @http, notification)
+        def deliver(notification, batch)
+          Rapns::Daemon::Gcm::Delivery.perform(@app, @http, notification, batch)
         end
 
         def stopped

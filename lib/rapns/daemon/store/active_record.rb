@@ -17,11 +17,18 @@ module Rapns
           end
         end
 
-        def retry_after(notification, deliver_after)
+        def mark_retryable(notification, deliver_after)
           with_database_reconnect_and_retry do
             notification.retries += 1
             notification.deliver_after = deliver_after
             notification.save!(:validate => false)
+          end
+        end
+
+        def mark_batch_retryable(notifications, deliver_after)
+          ids = notifications.map(&:id)
+          with_database_reconnect_and_retry do
+            Rapns::Notification.where(:id => ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
           end
         end
 
@@ -30,6 +37,13 @@ module Rapns
             notification.delivered = true
             notification.delivered_at = Time.now
             notification.save!(:validate => false)
+          end
+        end
+
+        def mark_batch_delivered(notifications)
+          ids = notifications.map(&:id)
+          with_database_reconnect_and_retry do
+            Rapns::Notification.where(:id => ids).update_all(['delivered = true, delivered_at = ?', Time.now])
           end
         end
 
@@ -42,6 +56,13 @@ module Rapns
             notification.error_code = code
             notification.error_description = description
             notification.save!(:validate => false)
+          end
+        end
+
+        def mark_batch_failed(notifications, code, description)
+          ids = notifications.map(&:id)
+          with_database_reconnect_and_retry do
+            Rapns::Notification.where(:id => ids).update_all(['delivered = false, delivered_at = NULL, failed = true, failed_at = ?, error_code = ?, error_description = ?', Time.now, code, description])
           end
         end
 

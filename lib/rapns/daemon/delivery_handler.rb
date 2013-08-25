@@ -3,6 +3,8 @@ module Rapns
     class DeliveryHandler
       include Reflectable
 
+      WAKEUP = :wakeup
+
       attr_accessor :queue
 
       def start
@@ -16,10 +18,14 @@ module Rapns
 
       def stop
         @stop = true
-        if @thread
-          queue.wakeup(@thread)
-          @thread.join
-        end
+      end
+
+      def wakeup
+        queue.push(WAKEUP) if @thread
+      end
+
+      def wait
+        @thread.join if @thread
         stopped
       end
 
@@ -29,19 +35,16 @@ module Rapns
       end
 
       def handle_next_notification
-        begin
-          notification = queue.pop
-        rescue DeliveryQueue::WakeupError
-          return
-        end
+        notification, batch = queue.pop
+        return if notification == WAKEUP
 
         begin
-          deliver(notification)
+          deliver(notification, batch)
         rescue StandardError => e
           Rapns.logger.error(e)
           reflect(:error, e)
         ensure
-          queue.notification_processed
+          batch.notification_processed
         end
       end
     end

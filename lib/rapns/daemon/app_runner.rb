@@ -2,6 +2,7 @@ module Rapns
   module Daemon
     class AppRunner
       extend Reflectable
+      include Reflectable
 
       class << self
         attr_reader :runners
@@ -9,11 +10,14 @@ module Rapns
 
       @runners = {}
 
-      def self.enqueue(notification)
-        if app = runners[notification.app_id]
-          app.enqueue(notification)
-        else
-          Rapns.logger.error("No such app '#{notification.app_id}' for notification #{notification.id}.")
+      def self.enqueue(notifications)
+        notifications.group_by(&:app_id).each do |app_id, group|
+          batch = Batch.new(group)
+          if app = runners[app_id]
+            app.enqueue(batch)
+          else
+            Rapns.logger.error("No such app '#{app_id}' for notifications #{batch.describe}.")
+          end
         end
       end
 
@@ -63,6 +67,7 @@ module Rapns
       end
 
       attr_reader :app
+      attr_accessor :batch
 
       def initialize(app)
         @app = app
@@ -84,11 +89,14 @@ module Rapns
         before_stop
         handlers.map(&:stop)
         after_stop
-        handlers.clear
       end
 
-      def enqueue(notification)
-        queue.push(notification)
+      def enqueue(batch)
+        self.batch = batch
+        batch.notifications.each do |notification|
+          queue.push([notification, batch])
+          reflect(:notification_enqueued, notification)
+        end
       end
 
       def sync(app)
@@ -96,20 +104,23 @@ module Rapns
         diff = handlers.size - app.connections
         return if diff == 0
         if diff > 0
-          diff.times { decrement_handlers }
-          Rapns.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} remaining.")
+          decrement_handlers(diff)
+          Rapns.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} running.")
         else
-          diff.abs.times { increment_handlers }
-          Rapns.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} remaining.")
+          increment_handlers(diff.abs)
+          Rapns.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} running.")
         end
       end
 
-      def decrement_handlers
-        handlers.pop.stop
+      def decrement_handlers(num)
+        to_stop = num.times.map { handlers.pop }.compact
+        to_stop.map(&:stop)
+        (to_stop + handlers).map(&:wakeup)
+        to_stop.map(&:wait)
       end
 
-      def increment_handlers
-        handlers << start_handler
+      def increment_handlers(num)
+        num.times { handlers << start_handler }
       end
 
       def debug
@@ -118,16 +129,26 @@ module Rapns
 #{@app.name}:
   handlers: #{num_handlers}
   queued: #{queue_size}
+  batch size: #{batch_size}
+  batch processed: #{batch_processed}
   idle: #{idle?}
         EOS
       end
 
       def idle?
-        queue.notifications_processed?
+        batch ? batch.complete? : true
       end
 
       def queue_size
         queue.size
+      end
+
+      def batch_size
+        batch ? batch.num_notifications : 0
+      end
+
+      def batch_processed
+        batch ? batch.num_processed : 0
       end
 
       def num_handlers
@@ -144,7 +165,7 @@ module Rapns
       end
 
       def queue
-        @queue ||= Rapns::Daemon::DeliveryQueue.new
+        @queue ||= Queue.new
       end
 
       def handlers

@@ -11,9 +11,10 @@ describe Rapns::Daemon::AppRunner, 'stop' do
   end
 end
 
-describe Rapns::Daemon::AppRunner, 'deliver' do
-  let(:runner) { double }
-  let(:notification) { double(:app_id => 1) }
+describe Rapns::Daemon::AppRunner, 'enqueue' do
+  let(:runner) { double(:enqueue => nil) }
+  let(:notification1) { double(:app_id => 1) }
+  let(:notification2) { double(:app_id => 2) }
   let(:logger) { double(:error => nil) }
 
   before do
@@ -23,15 +24,24 @@ describe Rapns::Daemon::AppRunner, 'deliver' do
 
   after { Rapns::Daemon::AppRunner.runners.clear }
 
-  it 'enqueues the notification' do
-    runner.should_receive(:enqueue).with(notification)
-    Rapns::Daemon::AppRunner.enqueue(notification)
+  it 'batches notifications by app' do
+    batch = stub.as_null_object
+    Rapns::Daemon::Batch.stub(:new => batch)
+    Rapns::Daemon::Batch.should_receive(:new).with([notification1])
+    Rapns::Daemon::Batch.should_receive(:new).with([notification2])
+    Rapns::Daemon::AppRunner.enqueue([notification1, notification2])
+  end
+
+  it 'enqueues each batch' do
+    runner.should_receive(:enqueue).with(kind_of(Rapns::Daemon::Batch))
+    Rapns::Daemon::AppRunner.enqueue([notification1])
   end
 
   it 'logs an error if there is no runner to deliver the notification' do
-    notification.stub(:app_id => 2, :id => 123)
-    logger.should_receive(:error).with("No such app '#{notification.app_id}' for notification #{notification.id}.")
-    Rapns::Daemon::AppRunner.enqueue(notification)
+    notification1.stub(:app_id => 2, :id => 123)
+    notification2.stub(:app_id => 2, :id => 456)
+    logger.should_receive(:error).with("No such app '#{notification1.app_id}' for notifications 123, 456.")
+    Rapns::Daemon::AppRunner.enqueue([notification1, notification2])
   end
 end
 
@@ -40,12 +50,12 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   let(:new_app) { Rapns::Apns::App.new }
   let(:runner) { double(:sync => nil, :stop => nil, :start => nil) }
   let(:logger) { double(:error => nil, :warn => nil) }
-  let(:queue) { Rapns::Daemon::DeliveryQueue.new }
+  let(:queue) { Queue.new }
 
   before do
     app.stub(:id => 1)
     new_app.stub(:id => 2)
-    Rapns::Daemon::DeliveryQueue.stub(:new => queue)
+    Queue.stub(:new => queue)
     Rapns::Daemon::AppRunner.runners[app.id] = runner
     Rapns::App.stub(:all => [app])
     Rapns.stub(:logger => logger)
@@ -112,8 +122,16 @@ describe Rapns::Daemon::AppRunner, 'debug' do
 
   after { Rapns::Daemon::AppRunner.runners.clear }
 
-  it 'prints debug app states to the log' do
-    Rapns.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 0\n  idle: true\n")
+  it 'prints debug app states to the log for an idle runner' do
+    Rapns.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 0\n  batch size: 0\n  batch processed: 0\n  idle: true\n")
+    Rapns::Daemon::AppRunner.debug
+  end
+
+  it 'prints debug app states to the log for an busy runner' do
+    runner = Rapns::Daemon::AppRunner.runners[app.id]
+    batch = Rapns::Daemon::Batch.new([nil, nil, nil, nil, nil, nil])
+    runner.enqueue(batch)
+    Rapns.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 6\n  batch size: 6\n  batch processed: 0\n  idle: false\n")
     Rapns::Daemon::AppRunner.debug
   end
 end

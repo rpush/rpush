@@ -16,10 +16,11 @@ module Rapns
           255 => "None (unknown error)"
         }
 
-        def initialize(app, conneciton, notification)
+        def initialize(app, conneciton, notification, batch)
           @app = app
           @connection = conneciton
           @notification = notification
+          @batch = batch
         end
 
         def perform

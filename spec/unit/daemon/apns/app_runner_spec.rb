@@ -8,7 +8,7 @@ describe Rapns::Daemon::Apns::AppRunner do
   let(:app) { app_class.create!(:name => 'my_app', :environment => 'development',
                                 :certificate => TEST_CERT, :password => 'pass') }
   let(:runner) { Rapns::Daemon::Apns::AppRunner.new(app) }
-  let(:handler) { double(:start => nil, :stop => nil, :queue= => nil) }
+  let(:handler) { double(:start => nil, :queue= => nil) }
   let(:receiver) { double(:start => nil, :stop => nil) }
   let(:config) { double(:feedback_poll => 60, :push => false) }
   let(:logger) { double(:info => nil, :warn => nil, :error => nil) }
