@@ -1,16 +1,16 @@
 require "unit_spec_helper"
 
 describe Rapns::Daemon::Apns::Connection do
-  let(:ssl_context) { double(:key= => nil, :cert= => nil) }
   let(:rsa_key) { double }
   let(:certificate) { double }
   let(:password) { double }
-  let(:x509_certificate) { double }
+  let(:x509_certificate) { OpenSSL::X509::Certificate.new(TEST_CERT) }
+  let(:ssl_context) { double(:key= => nil, :cert= => nil, :cert => x509_certificate) }
   let(:host) { 'gateway.push.apple.com' }
   let(:port) { '2195' }
   let(:tcp_socket) { double(:setsockopt => nil, :close => nil) }
   let(:ssl_socket) { double(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
-  let(:logger) { double(:info => nil, :error => nil) }
+  let(:logger) { double(:info => nil, :error => nil, :warn => nil) }
   let(:app) { double(:name => 'Connection 0', :certificate => certificate, :password => password)}
   let(:connection) { Rapns::Daemon::Apns::Connection.new(app, host, port) }
 
@@ -21,6 +21,7 @@ describe Rapns::Daemon::Apns::Connection do
     TCPSocket.stub(:new => tcp_socket)
     OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
     Rapns.stub(:logger => logger)
+    connection.stub(:reflect)
   end
 
   it "reads the number of bytes from the SSL socket" do
@@ -78,6 +79,39 @@ describe Rapns::Daemon::Apns::Connection do
     it "sets the socket option SO_KEEPALIVE" do
       tcp_socket.should_receive(:setsockopt).with(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
       connection.connect
+    end
+
+    describe 'certificate expiry' do
+      it 'reflects if the certificate will expire soon' do
+        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        connection.should_receive(:reflect).with(:apns_certificate_will_expire, app, cert.not_after)
+        Timecop.freeze(cert.not_after - 3.days) { connection.connect }
+      end
+
+      it 'logs that the certificate will expire soon' do
+        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        logger.should_receive(:warn).with("[#{app.name}] Certificate will expire at 2022-09-07 03:18:32 UTC.")
+        Timecop.freeze(cert.not_after - 3.days) { connection.connect }
+      end
+
+      it 'does not reflect if the certificate will not expire soon' do
+        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        connection.should_not_receive(:reflect).with(:apns_certificate_will_expire, app, kind_of(Time))
+        Timecop.freeze(cert.not_after - 2.months) { connection.connect }
+      end
+
+      it 'logs that the certificate has expired' do
+        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        logger.should_receive(:error).with("[#{app.name}] Certificate expired at 2022-09-07 03:18:32 UTC.")
+        Timecop.freeze(cert.not_after + 1.day) { connection.connect rescue Rapns::Apns::CertificateExpiredError }
+      end
+
+      it 'raises an error if the certificate has expired' do
+        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        Timecop.freeze(cert.not_after + 1.day) do
+          expect { connection.connect }.to raise_error(Rapns::Apns::CertificateExpiredError)
+        end
+      end
     end
   end
 
@@ -194,6 +228,8 @@ describe Rapns::Daemon::Apns::Connection do
   end
 
   describe "when reconnecting" do
+    before { connection.connect }
+
     it 'closes the socket' do
       connection.should_receive(:close)
       connection.send(:reconnect)

@@ -40,35 +40,4 @@ describe Rapns::Daemon::Apns::AppRunner do
     Rapns::Daemon::Apns::FeedbackReceiver.should_not_receive(:new)
     runner.start
   end
-
-  it 'reflects if the certificate will expire soon' do
-    cert = OpenSSL::X509::Certificate.new(app.certificate)
-    runner.should_receive(:reflect).with(:apns_certificate_will_expire, app, cert.not_after)
-    Timecop.freeze(cert.not_after - 3.days) { runner.start }
-  end
-
-  it 'logs that the certificate will expire soon' do
-    cert = OpenSSL::X509::Certificate.new(app.certificate)
-    logger.should_receive(:warn).with("[#{app.name}] Certificate will expire at 2022-09-07 03:18:32 UTC.")
-    Timecop.freeze(cert.not_after - 3.days) { runner.start }
-  end
-
-  it 'does not reflect if the certificate will not expire soon' do
-    cert = OpenSSL::X509::Certificate.new(app.certificate)
-    runner.should_not_receive(:reflect).with(:apns_certificate_will_expire, app, kind_of(Time))
-    Timecop.freeze(cert.not_after - 2.months) { runner.start }
-  end
-
-  it 'logs that the certificate has expired' do
-    cert = OpenSSL::X509::Certificate.new(app.certificate)
-    logger.should_receive(:error).with("[#{app.name}] Certificate expired at 2022-09-07 03:18:32 UTC.")
-    Timecop.freeze(cert.not_after + 1.day) { runner.start rescue Rapns::Apns::CertificateExpiredError }
-  end
-
-  it 'raises an error if the certificate has expired' do
-    cert = OpenSSL::X509::Certificate.new(app.certificate)
-    Timecop.freeze(cert.not_after + 1.day) do
-      expect { runner.start }.to raise_error(Rapns::Apns::CertificateExpiredError)
-    end
-  end
 end

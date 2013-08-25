@@ -101,6 +101,8 @@ module Rapns
         end
 
         def connect_socket
+          check_certificate_expiration
+
           tcp_socket = TCPSocket.new(@host, @port)
           tcp_socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
           tcp_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
@@ -109,6 +111,18 @@ module Rapns
           ssl_socket.connect
           Rapns.logger.info("[#{@app.name}] Connected to #{@host}:#{@port}")
           [tcp_socket, ssl_socket]
+        end
+
+        def check_certificate_expiration
+          if @ssl_context.cert.not_after
+            if @ssl_context.cert.not_after < Time.now.utc
+              Rapns.logger.error("[#{@app.name}] Certificate expired at #{@ssl_context.cert.not_after.inspect}.")
+              raise Rapns::Apns::CertificateExpiredError.new(@app, @ssl_context.cert.not_after)
+            elsif @ssl_context.cert.not_after < (Time.now + 1.month).utc
+              Rapns.logger.warn("[#{@app.name}] Certificate will expire at #{@ssl_context.cert.not_after.inspect}.")
+              reflect(:apns_certificate_will_expire, @app, @ssl_context.cert.not_after)
+            end
+          end
         end
       end
     end
