@@ -18,10 +18,16 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
     queue.push([notification, batch])
   end
 
-  it 'performs delivery of an notification' do
-    Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(app, http, notification, batch)
+  def run_delivery_handler
     delivery_handler.start
     delivery_handler.stop
+    delivery_handler.wakeup
+    delivery_handler.wait
+  end
+
+  it 'performs delivery of an notification' do
+    Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(app, http, notification, batch)
+    run_delivery_handler
   end
 
   it 'initiates a persistent connection object' do
@@ -31,9 +37,6 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
 
   it 'shuts down the http connection stopped' do
     http.should_receive(:shutdown)
-    delivery_handler.start
-    delivery_handler.stop
-        delivery_handler.wakeup
-    delivery_handler.wait
+    run_delivery_handler
   end
 end

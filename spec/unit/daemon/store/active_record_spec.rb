@@ -110,7 +110,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
     it 'sets the time the notification was delivered' do
       expect do
         store.mark_delivered(notification)
-      end.to change(notification, :delivered_at).to(now)
+      end.to change { notification.delivered_at.to_s }.to(now.to_s)
     end
 
     it 'saves the notification without validation' do
@@ -131,7 +131,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
       expect do
         store.mark_batch_delivered([notification])
         notification.reload
-      end.to change(notification, :delivered_at).to(now)
+      end.to change { notification.delivered_at.to_s }.to(now.to_s)
     end
   end
 
@@ -239,7 +239,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.deliver_after.should == deliver_after
+      new_notification.deliver_after.to_s.should == deliver_after.to_s
     end
 
     it 'saves the new notification' do
