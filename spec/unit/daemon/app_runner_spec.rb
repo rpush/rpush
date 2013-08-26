@@ -122,16 +122,8 @@ describe Rapns::Daemon::AppRunner, 'debug' do
 
   after { Rapns::Daemon::AppRunner.runners.clear }
 
-  it 'prints debug app states to the log for an idle runner' do
+  it 'prints debug app states to the log' do
     Rapns.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 0\n  batch size: 0\n  batch processed: 0\n  idle: true\n")
-    Rapns::Daemon::AppRunner.debug
-  end
-
-  it 'prints debug app states to the log for an busy runner' do
-    runner = Rapns::Daemon::AppRunner.runners[app.id]
-    batch = Rapns::Daemon::Batch.new([nil, nil, nil, nil, nil, nil])
-    runner.enqueue(batch)
-    Rapns.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 6\n  batch size: 6\n  batch processed: 0\n  idle: false\n")
     Rapns::Daemon::AppRunner.debug
   end
 end

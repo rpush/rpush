@@ -9,6 +9,11 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
   before { Time.stub(:now => now) }
 
+  it 'reconnects after daemonize' do
+    store.should_receive(:reconnect_database)
+    store.after_daemonize
+  end
+
   describe 'deliverable_notifications' do
     it 'checks for new notifications with the ability to reconnect the database' do
       store.should_receive(:with_database_reconnect_and_retry)

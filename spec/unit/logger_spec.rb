@@ -57,17 +57,24 @@ describe Rapns::Logger do
     Rapns::Logger.new(:foreground => true)
   end
 
-  it 'instantiates the logger' do
-    @logger_class.should_receive(:new).with(log, Rails.logger.level)
-    Rapns::Logger.new(:foreground => true)
-  end
-
   it 'uses the user-defined logger' do
     my_logger = double
     Rapns.config.logger = my_logger
     logger = Rapns::Logger.new({})
     my_logger.should_receive(:info)
     logger.info('test')
+  end
+
+  it 'uses ActiveSupport::BufferedLogger if a user-defined logger is not set' do
+    ActiveSupport::BufferedLogger.should_receive(:new).with(log, Rails.logger.level)
+    Rapns::Logger.new(:foreground => true)
+  end
+
+  it 'uses ActiveSupport::Logger if BufferedLogger does not exist' do
+    stub_const('ActiveSupport::Logger', double)
+    ActiveSupport.stub(:const_defined? => false)
+    ActiveSupport::Logger.should_receive(:new).with(log, Rails.logger.level)
+    Rapns::Logger.new(:foreground => true)
   end
 
   it "should print out the msg if running in the foreground" do

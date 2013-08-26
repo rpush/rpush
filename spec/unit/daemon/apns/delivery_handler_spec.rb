@@ -15,10 +15,11 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:batch) { double(:batch, :notification_processed => nil) }
   let(:http) { double(:http, :shutdown => nil)}
   let(:queue) { Queue.new }
+  let(:delivery) { double(:perform => nil) }
 
   before do
     Rapns::Daemon::Apns::Connection.stub(:new => connection)
-    Rapns::Daemon::Apns::Delivery.stub(:perform)
+    Rapns::Daemon::Apns::Delivery.stub(:new => delivery)
     delivery_handler.queue = queue
     queue.push([notification, batch])
   end
@@ -41,7 +42,8 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   end
 
   it 'performs delivery of an notification' do
-    Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(app, connection, notification, batch)
+    Rapns::Daemon::Apns::Delivery.should_receive(:new).with(app, connection, notification, batch).and_return(delivery)
+    delivery.should_receive(:perform)
     run_delivery_handler
   end
 

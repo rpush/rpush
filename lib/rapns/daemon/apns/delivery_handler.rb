@@ -14,7 +14,7 @@ module Rapns
         end
 
         def deliver(notification, batch)
-          Rapns::Daemon::Apns::Delivery.perform(@app, connection, notification, batch)
+          Rapns::Daemon::Apns::Delivery.new(@app, connection, notification, batch).perform
         end
 
         def stopped

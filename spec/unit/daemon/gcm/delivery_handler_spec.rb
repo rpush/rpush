@@ -9,11 +9,12 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
   let(:queue) { Queue.new }
   let(:app) { double }
   let(:delivery_handler) { Rapns::Daemon::Gcm::DeliveryHandler.new(app) }
-  let(:http) { double(:shutdown => nil)}
+  let(:http) { double(:shutdown => nil) }
+  let(:delivery) { double(:perform => nil) }
 
   before do
     Net::HTTP::Persistent.stub(:new => http)
-    Rapns::Daemon::Gcm::Delivery.stub(:perform)
+    Rapns::Daemon::Gcm::Delivery.stub(:new => delivery)
     delivery_handler.queue = queue
     queue.push([notification, batch])
   end
@@ -26,7 +27,8 @@ describe Rapns::Daemon::Gcm::DeliveryHandler do
   end
 
   it 'performs delivery of an notification' do
-    Rapns::Daemon::Gcm::Delivery.should_receive(:perform).with(app, http, notification, batch)
+    Rapns::Daemon::Gcm::Delivery.should_receive(:new).with(app, http, notification, batch).and_return(delivery)
+    delivery.should_receive(:perform)
     run_delivery_handler
   end
 

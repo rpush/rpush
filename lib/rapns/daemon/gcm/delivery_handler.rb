@@ -8,7 +8,7 @@ module Rapns
         end
 
         def deliver(notification, batch)
-          Rapns::Daemon::Gcm::Delivery.perform(@app, @http, notification, batch)
+          Rapns::Daemon::Gcm::Delivery.new(@app, @http, notification, batch).perform
         end
 
         def stopped

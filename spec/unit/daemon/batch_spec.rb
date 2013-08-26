@@ -82,6 +82,7 @@ describe Rapns::Daemon::Batch do
   describe 'complete' do
     before do
       Rapns.config.batch_storage_updates = true
+      Rapns.stub(:logger => double.as_null_object)
     end
 
     it 'clears the notifications' do
@@ -94,6 +95,13 @@ describe Rapns::Daemon::Batch do
       expect do
         2.times { batch.notification_processed }
       end.to change(batch, :complete?).to(be_true)
+    end
+
+    it 'reflects errors raised during completion' do
+      e = StandardError.new
+      batch.stub(:complete_delivered).and_raise(e)
+      batch.should_receive(:reflect).with(:error, e)
+      2.times { batch.notification_processed }
     end
 
     describe 'delivered' do

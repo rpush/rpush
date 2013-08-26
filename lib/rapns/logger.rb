@@ -32,7 +32,7 @@ module Rapns
     def setup_logger(log)
       if Rapns.config.logger
         @logger = Rapns.config.logger
-      elsif defined?(ActiveSupport::BufferedLogger)
+      elsif ActiveSupport.const_defined?('BufferedLogger')
         @logger = ActiveSupport::BufferedLogger.new(log, Rails.logger.level)
         @logger.auto_flushing = Rails.logger.respond_to?(:auto_flushing) ? Rails.logger.auto_flushing : true
       else

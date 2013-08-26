@@ -3,10 +3,6 @@ module Rapns
     class Delivery
       include Reflectable
 
-      def self.perform(*args)
-        new(*args).perform
-      end
-
       def mark_retryable(notification, deliver_after)
         @batch.mark_retryable(notification, deliver_after)
         reflect(:notification_will_retry, notification)
