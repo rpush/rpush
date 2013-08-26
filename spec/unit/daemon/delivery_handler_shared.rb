@@ -1,12 +1,18 @@
 shared_examples_for 'an DeliveryHandler subclass' do
+  def run_delivery_handler
+    delivery_handler.start
+    delivery_handler.stop
+    delivery_handler.wakeup
+    delivery_handler.wait
+  end
+
   it 'logs all delivery errors' do
     logger = double
     Rapns.stub(:logger => logger)
     error = StandardError.new
     delivery_handler.stub(:deliver).and_raise(error)
     Rapns.logger.should_receive(:error).with(error)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   it 'reflects an exception' do
@@ -14,22 +20,17 @@ shared_examples_for 'an DeliveryHandler subclass' do
     error = StandardError.new
     delivery_handler.stub(:deliver).and_raise(error)
     delivery_handler.should_receive(:reflect).with(:error, error)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   it 'instructs the batch that the notification has been processed' do
     batch.should_receive(:notification_processed)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   it "instructs the queue to wakeup the thread when told to stop" do
-    thread = double(:join => nil)
-    Thread.stub(:new => thread)
     queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::WAKEUP)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   describe "when being stopped" do

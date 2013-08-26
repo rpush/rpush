@@ -10,10 +10,10 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
   let(:password) { double }
   let(:app) { double(:password => password, :certificate => certificate, :name => 'MyApp', :environment => 'production')}
   let(:delivery_handler) { Rapns::Daemon::Apns::DeliveryHandler.new(app) }
-  let(:connection) { double('Connection', :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
-  let(:notification) { double }
-  let(:batch) { stub(:notification_processed => nil) }
-  let(:http) { double(:shutdown => nil)}
+  let(:connection) { double(:connection, :select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
+  let(:notification) { double(:notification) }
+  let(:batch) { double(:batch, :notification_processed => nil) }
+  let(:http) { double(:http, :shutdown => nil)}
   let(:queue) { Queue.new }
 
   before do
@@ -23,28 +23,31 @@ describe Rapns::Daemon::Apns::DeliveryHandler do
     queue.push([notification, batch])
   end
 
-  it "instantiates a new connection" do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
+  def run_delivery_handler
     delivery_handler.start
     delivery_handler.stop
+    delivery_handler.wakeup
+    delivery_handler.wait
+  end
+
+  it "instantiates a new connection" do
+    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
+    run_delivery_handler
   end
 
   it "connects the socket" do
     connection.should_receive(:connect)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   it 'performs delivery of an notification' do
     Rapns::Daemon::Apns::Delivery.should_receive(:perform).with(app, connection, notification, batch)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   it 'closes the connection stopped' do
     connection.should_receive(:close)
-    delivery_handler.start
-    delivery_handler.stop
+    run_delivery_handler
   end
 
   it 'does not attempt to close the connection if the connection was not established' do

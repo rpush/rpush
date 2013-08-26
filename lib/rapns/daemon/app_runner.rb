@@ -80,14 +80,14 @@ module Rapns
 
       def start
         before_start
-        app.connections.times { handlers << start_handler }
+        app.connections.times { handlers.push(start_handler) }
         after_start
         Rapns.logger.info("[#{app.name}] Started, #{handlers_str}.")
       end
 
       def stop
         before_stop
-        handlers.map(&:stop)
+        handlers.stop
         after_stop
       end
 
@@ -113,14 +113,11 @@ module Rapns
       end
 
       def decrement_handlers(num)
-        to_stop = num.times.map { handlers.pop }.compact
-        to_stop.map(&:stop)
-        (to_stop + handlers).map(&:wakeup)
-        to_stop.map(&:wait)
+        num.times { handlers.pop }
       end
 
       def increment_handlers(num)
-        num.times { handlers << start_handler }
+        num.times { handlers.push(start_handler) }
       end
 
       def debug
@@ -169,7 +166,7 @@ module Rapns
       end
 
       def handlers
-        @handler ||= []
+        @handlers ||= Rapns::Daemon::DeliveryHandlerCollection.new
       end
 
       def handlers_str(count = app.connections)

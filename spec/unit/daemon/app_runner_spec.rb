@@ -25,7 +25,7 @@ describe Rapns::Daemon::AppRunner, 'enqueue' do
   after { Rapns::Daemon::AppRunner.runners.clear }
 
   it 'batches notifications by app' do
-    batch = stub.as_null_object
+    batch = double.as_null_object
     Rapns::Daemon::Batch.stub(:new => batch)
     Rapns::Daemon::Batch.should_receive(:new).with([notification1])
     Rapns::Daemon::Batch.should_receive(:new).with([notification2])

@@ -28,7 +28,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:body => JSON.dump(body)) }
 
     it 'marks the original notification as failed' do
-      store.should_receive(:mark_failed).with(notification, nil, error_description)
+      batch.should_receive(:mark_failed).with(notification, nil, error_description)
       perform rescue Rapns::DeliveryError
     end
 

@@ -13,6 +13,7 @@ require 'rapns/daemon/feeder'
 require 'rapns/daemon/batch'
 require 'rapns/daemon/app_runner'
 require 'rapns/daemon/delivery_handler'
+require 'rapns/daemon/delivery_handler_collection'
 
 require 'rapns/daemon/apns/delivery'
 require 'rapns/daemon/apns/disconnection_error'

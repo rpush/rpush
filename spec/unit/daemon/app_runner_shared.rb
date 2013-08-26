@@ -10,6 +10,11 @@ shared_examples_for "an AppRunner subclass" do
       runner.start
     end
 
+    it 'adds the delivery handler to the collection' do
+      handler_collection.should_receive(:push).with(handler)
+      runner.start
+    end
+
     it 'assigns the queue to the handler' do
       handler.should_receive(:queue=).with(queue)
       runner.start
@@ -35,14 +40,14 @@ shared_examples_for "an AppRunner subclass" do
     before { runner.start }
 
     it 'stops the delivery handlers' do
-      handler.should_receive(:stop)
+      handler_collection.should_receive(:stop)
       runner.stop
     end
   end
 
   describe 'idle?' do
     it 'is idle if all notifications have been processed' do
-      runner.batch = stub(:complete? => true)
+      runner.batch = double(:complete? => true)
       runner.idle?.should be_true
     end
 
@@ -52,7 +57,7 @@ shared_examples_for "an AppRunner subclass" do
     end
 
     it 'is not idle if not all notifications have been processed' do
-      runner.batch = stub(:complete? => false)
+      runner.batch = double(:complete? => false)
       runner.idle?.should be_false
     end
   end
@@ -61,7 +66,7 @@ shared_examples_for "an AppRunner subclass" do
     before { runner.start }
 
     it 'reduces the number of handlers if needed' do
-      handler.should_receive(:stop)
+      handler_collection.should_receive(:pop)
       new_app = app_class.new
       new_app.stub(:connections => app.connections - 1)
       runner.sync(new_app)
@@ -69,6 +74,7 @@ shared_examples_for "an AppRunner subclass" do
 
     it 'increases the number of handlers if needed' do
       runner.should_receive(:start_handler).and_return(handler)
+      handler_collection.should_receive(:push).with(handler)
       new_app = app_class.new
       new_app.stub(:connections => app.connections + 1)
       runner.sync(new_app)

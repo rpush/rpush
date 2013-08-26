@@ -1,10 +1,10 @@
 require 'unit_spec_helper'
 
 describe Rapns::Daemon::Batch do
-  let(:notification1) { stub(:id => 1) }
-  let(:notification2) { stub(:id => 2) }
+  let(:notification1) { double(:id => 1) }
+  let(:notification2) { double(:id => 2) }
   let(:batch) { Rapns::Daemon::Batch.new([notification1, notification2]) }
-  let(:store) { stub.as_null_object }
+  let(:store) { double.as_null_object }
 
   before do
     Rapns::Daemon.stub(:store => store)
