@@ -31,6 +31,11 @@ module Rapns
       end
     end
 
+    def airbrake_notify=(bool)
+      Rapns::Deprecation.warn("airbrake_notify is deprecated. Please use the Rapns.reflect API instead.")
+      super(bool)
+    end
+
     def pid_file=(path)
       if path && !Pathname.new(path).absolute?
         super(File.join(Rails.root, path))
@@ -67,6 +72,7 @@ module Rapns
 
       self.push_poll = 2
       self.feedback_poll = 60
+      Rapns::Deprecation.muted { self.airbrake_notify = true }
       self.airbrake_notify = true
       self.check_for_errors = true
       self.batch_size = 5000

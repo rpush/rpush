@@ -1,5 +1,7 @@
 shared_examples_for "an Notification subclass" do
   describe "when assigning data for the device" do
+    before { Rapns::Deprecation.stub(:warn) }
+
     it "calls MultiJson.dump when multi_json responds to :dump" do
       notification = notification_class.new
       MultiJson.stub(:respond_to?).with(:dump).and_return(true)
@@ -32,7 +34,7 @@ shared_examples_for "an Notification subclass" do
 
     if Rails::VERSION::STRING < '4'
       it 'warns if attributes_for_device is assigned via mass-assignment' do
-        Rapns::Deprecation.should_receive(:warn)
+        Rapns::Deprecation.should_receive(:warn).with(':attributes_for_device via mass-assignment is deprecated. Use :data or the attributes_for_device= instance method.')
         notification_class.new(:attributes_for_device => {:hi => 'mom'})
       end
     end

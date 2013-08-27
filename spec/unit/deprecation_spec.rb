@@ -6,9 +6,9 @@ describe Rapns::Deprecation do
     Rapns::Deprecation.warn("msg")
   end
 
-  it 'does not print a warning when silenced' do
+  it 'does not print a warning when muted' do
     STDERR.should_not_receive(:puts)
-    Rapns::Deprecation.silenced do
+    Rapns::Deprecation.muted do
       Rapns::Deprecation.warn("msg")
     end
   end

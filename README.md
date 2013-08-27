@@ -5,14 +5,13 @@
 
 * Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
 * Seamless Rails integration.
-* Scalable - choose the number of threads each app spawns.
+* Scalable - choose the number of persistent connections for each app.
 * Designed for uptime - signal -HUP to add, update apps.
 * Stable - reconnects database and network connections when lost.
-* Run as a daemon or inside an existing process.
+* Run as a daemon or inside an [existing processs](https://github.com/ileitch/rapns/wiki/Embedding-API).
 * Use in a scheduler for low-workload deployments ([Push API](https://github.com/ileitch/rapns/wiki/Push-API)).
-* Reflection API for fine-grained instrumentation ([Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)).
+* Reflection API for fine-grained instrumentation and error handling ([Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)).
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
-* [Airbrake](http://airbrakeapp.com/) integration.
 * Built with love.
 
 #### 2.x users please read [upgrading from 2.x to 3.0](https://github.com/ileitch/rapns/wiki/Upgrading-from-version-2.x-to-3.0)

@@ -82,7 +82,9 @@ RSpec.configure do |config|
   config.after(:each) do
     Rapns.logger = nil
     Rapns::Daemon.store = nil
-    Rapns.config.set_defaults if Rapns.config.kind_of?(Rapns::Configuration)
+    Rapns::Deprecation.muted do
+      Rapns.config.set_defaults if Rapns.config.kind_of?(Rapns::Configuration)
+    end
   end
 end
 

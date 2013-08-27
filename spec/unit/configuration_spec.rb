@@ -11,20 +11,26 @@ describe Rapns do
 end
 
 describe Rapns::Configuration do
-  let(:config) { Rapns::Configuration.new }
+  let(:config) do
+    Rapns::Deprecation.muted do
+      Rapns::Configuration.new
+    end
+  end
 
   it 'configures a feedback callback' do
     b = Proc.new {}
-    Rapns::Deprecation.silenced do
+    Rapns::Deprecation.muted do
       config.on_apns_feedback(&b)
     end
     config.apns_feedback_callback.should == b
   end
 
   it 'can be updated' do
-    new_config = Rapns::Configuration.new
-    new_config.batch_size = 100
-    expect { config.update(new_config) }.to change(config, :batch_size).to(100)
+    Rapns::Deprecation.muted do
+      new_config = Rapns::Configuration.new
+      new_config.batch_size = 100
+      expect { config.update(new_config) }.to change(config, :batch_size).to(100)
+    end
   end
 
   it 'sets the pid_file relative if not absolute' do

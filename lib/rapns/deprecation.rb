@@ -1,20 +1,21 @@
 module Rapns
   class Deprecation
-    def self.silenced
+    def self.muted
       begin
-        Thread.current[:rapns_silence_deprecations] = true
+        orig_val = Thread.current[:rapns_mute_deprecations]
+        Thread.current[:rapns_mute_deprecations] = true
         yield
       ensure
-        Thread.current[:rapns_silence_deprecations] = false
+        Thread.current[:rapns_mute_deprecations] = orig_val
       end
     end
 
-    def self.silenced?
-      Thread.current[:rapns_silence_deprecations]
+    def self.muted?
+      Thread.current[:rapns_mute_deprecations] == true
     end
 
     def self.warn(msg)
-      unless Rapns::Deprecation.silenced?
+      unless Rapns::Deprecation.muted?
         STDERR.puts "DEPRECATION WARNING: #{msg}"
       end
     end

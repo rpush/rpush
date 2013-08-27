@@ -11,9 +11,6 @@
   # Frequency in seconds to check for feedback
   # config.feedback_poll = 60
 
-  # Enable/Disable error notifications via Airbrake.
-  # config.airbrake_notify = true
-
   # Disable APNs error checking after notification delivery.
   # config.check_for_errors = true
 
