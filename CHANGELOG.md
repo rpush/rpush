@@ -1,4 +1,4 @@
-### 3.4.0 (unreleased)
+### 3.4.0 (Aug 28, 2013)
   * Rails 4 support.
   * Add apns_certificate_will_expire reflection.
   * Perform storage update in batches where possible, to increase throughput.
