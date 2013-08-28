@@ -5,7 +5,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
   let(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:store) { Rapns::Daemon::Store::ActiveRecord.new }
-  let(:now) { Time.now }
+  let(:now) { Time.now.utc }
 
   before { Time.stub(:now => now) }
 
@@ -115,7 +115,8 @@ describe Rapns::Daemon::Store::ActiveRecord do
     it 'sets the time the notification was delivered' do
       expect do
         store.mark_delivered(notification)
-      end.to change { notification.delivered_at.to_s }.to(now.to_s)
+        notification.reload
+      end.to change { notification.delivered_at.try(:utc).to_s }.to(now.to_s)
     end
 
     it 'saves the notification without validation' do
@@ -136,7 +137,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
       expect do
         store.mark_batch_delivered([notification])
         notification.reload
-      end.to change { notification.delivered_at.to_s }.to(now.to_s)
+      end.to change { notification.delivered_at.try(:utc).to_s }.to(now.to_s)
     end
   end
 
@@ -149,12 +150,14 @@ describe Rapns::Daemon::Store::ActiveRecord do
     it 'marks the notification as failed' do
       expect do
         store.mark_failed(notification, nil, '')
+        notification.reload
       end.to change(notification, :failed).to(true)
     end
 
     it 'sets the time the notification delivery failed' do
       expect do
         store.mark_failed(notification, nil, '')
+        notification.reload
       end.to change { notification.failed_at.to_s }.to(now.to_s)
     end
 
@@ -194,7 +197,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
       expect do
         store.mark_batch_failed([notification], nil, '')
         notification.reload
-      end.to change { notification.failed_at.to_s }.to(now.to_s)
+      end.to change { notification.failed_at.try(:utc).to_s }.to(now.to_s)
     end
 
     it 'sets the error code' do

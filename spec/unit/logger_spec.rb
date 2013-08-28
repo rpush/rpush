@@ -66,8 +66,10 @@ describe Rapns::Logger do
   end
 
   it 'uses ActiveSupport::BufferedLogger if a user-defined logger is not set' do
-    ActiveSupport::BufferedLogger.should_receive(:new).with(log, Rails.logger.level)
-    Rapns::Logger.new(:foreground => true)
+    if ActiveSupport.const_defined?('BufferedLogger')
+      ActiveSupport::BufferedLogger.should_receive(:new).with(log, Rails.logger.level)
+      Rapns::Logger.new(:foreground => true)
+    end
   end
 
   it 'uses ActiveSupport::Logger if BufferedLogger does not exist' do
