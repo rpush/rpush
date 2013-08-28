@@ -125,16 +125,16 @@ module Rapns
         end
 
         def certificate_msg(msg)
-          time = @ssl_context.cert.not_after.strftime("%Y-%m-%d %H:%M:%S %Z")
+          time = @ssl_context.cert.not_after.utc.strftime("%Y-%m-%d %H:%M:%S %Z")
           "[#{@app.name}] Certificate #{msg} at #{time}."
         end
 
         def certificate_expired?
-          @ssl_context.cert.not_after && @ssl_context.cert.not_after < Time.now.utc
+          @ssl_context.cert.not_after && @ssl_context.cert.not_after.utc < Time.now.utc
         end
 
         def certificate_expires_soon?
-          @ssl_context.cert.not_after && @ssl_context.cert.not_after < (Time.now + 1.month).utc
+          @ssl_context.cert.not_after && @ssl_context.cert.not_after.utc < (Time.now + 1.month).utc
         end
       end
     end
