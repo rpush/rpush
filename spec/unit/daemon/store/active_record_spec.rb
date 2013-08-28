@@ -101,7 +101,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
       expect do
         store.mark_batch_retryable([notification], deliver_after)
         notification.reload
-      end.to change { notification.deliver_after.to_s }.to(deliver_after.to_s)
+      end.to change { notification.deliver_after.try(:utc).to_s }.to(deliver_after.utc.to_s)
     end
   end
 
@@ -158,7 +158,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
       expect do
         store.mark_failed(notification, nil, '')
         notification.reload
-      end.to change { notification.failed_at.to_s }.to(now.to_s)
+      end.to change { notification.failed_at.try(:utc).to_s }.to(now.to_s)
     end
 
     it 'sets the error code' do
