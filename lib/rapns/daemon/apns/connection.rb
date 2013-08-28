@@ -116,12 +116,17 @@ module Rapns
         def check_certificate_expiration
           cert = @ssl_context.cert
           if certificate_expired?
-            Rapns.logger.error("[#{@app.name}] Certificate expired at #{cert.not_after.inspect}.")
+            Rapns.logger.error(certificate_msg('expired'))
             raise Rapns::Apns::CertificateExpiredError.new(@app, cert.not_after)
           elsif certificate_expires_soon?
-            Rapns.logger.warn("[#{@app.name}] Certificate will expire at #{cert.not_after.inspect}.")
+            Rapns.logger.warn(certificate_msg('will expire'))
             reflect(:apns_certificate_will_expire, @app, cert.not_after)
           end
+        end
+
+        def certificate_msg(msg)
+          time = @ssl_context.cert.not_after.strftime("%Y-%m-%d %H:%M:%S %Z")
+          "[#{@app.name}] Certificate #{msg} at #{time}."
         end
 
         def certificate_expired?

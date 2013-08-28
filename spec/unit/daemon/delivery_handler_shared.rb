@@ -29,7 +29,7 @@ shared_examples_for 'an DeliveryHandler subclass' do
   end
 
   it "instructs the queue to wakeup the thread when told to stop" do
-    queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::WAKEUP)
+    queue.should_receive(:push).with(Rapns::Daemon::DeliveryHandler::WAKEUP).and_call_original
     run_delivery_handler
   end
 

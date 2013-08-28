@@ -5,7 +5,7 @@ gem 'rspec', '>= 2.4'
 gem 'rails', '~> 3.2'
 gem 'database_cleaner'
 gem 'simplecov'
-gem 'timecop'
+gem 'timecop', '0.5.9.2'
 
 platform :mri_19, :mri_20 do
   gem 'cane'
