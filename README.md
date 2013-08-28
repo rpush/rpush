@@ -4,7 +4,7 @@
 ### Rapns - Professional grade APNs and GCM for Ruby.
 
 * Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
-* Seamless Rails integration.
+* Seamless Rails (3, 4) integration.
 * Scalable - choose the number of persistent connections for each app.
 * Designed for uptime - signal -HUP to add, update apps.
 * Stable - reconnects database and network connections when lost.
@@ -28,16 +28,12 @@ Add Rapns to your Gemfile:
 
     gem 'rapns'
 
-For Rails 4, specify the source until version 4 is released:
-
-    gem 'rapns', :github => 'ileitch/rapns'
-
 Generate the migrations, rapns.yml and migrate:
 
     rails g rapns
     rake db:migrate
 
-## Create an App
+## Create an App & Notification
 
 #### APNs
 
@@ -53,18 +49,6 @@ app.connections = 1
 app.save!
 ```
 
-#### GCM
-```ruby
-app = Rapns::Gcm::App.new
-app.name = "android_app"
-app.auth_key = "..."
-app.connections = 1
-app.save!
-```
-
-## Create a Notification
-
-#### APNs
 ```ruby
 n = Rapns::Apns::Notification.new
 n.app = Rapns::Apns::App.find_by_name("ios_app")
@@ -74,7 +58,18 @@ n.attributes_for_device = {:foo => :bar}
 n.save!
 ```
 
+You should also implement the [apns_certificate_will_expire](https://github.com/ileitch/rapns/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
+
 #### GCM
+
+```ruby
+app = Rapns::Gcm::App.new
+app.name = "android_app"
+app.auth_key = "..."
+app.connections = 1
+app.save!
+```
+
 ```ruby
 n = Rapns::Gcm::Notification.new
 n.app = Rapns::Gcm::App.find_by_name("android_app")
