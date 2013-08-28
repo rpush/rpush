@@ -14,8 +14,6 @@
 * Works with MRI, JRuby, Rubinius 1.8 and 1.9.
 * Built with love.
 
-#### 2.x users please read [upgrading from 2.x to 3.0](https://github.com/ileitch/rapns/wiki/Upgrading-from-version-2.x-to-3.0)
-
 ### Who uses Rapns?
 
 [GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
