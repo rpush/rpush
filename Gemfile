@@ -14,7 +14,6 @@ end
 platform :ruby do
   gem 'pg'
   gem 'mysql2'
-  gem 'mysql'
   gem 'yajl-ruby'
 end
 
