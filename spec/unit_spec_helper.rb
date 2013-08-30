@@ -6,12 +6,14 @@ Bundler.require(:default)
 require 'active_record'
 require 'database_cleaner'
 
-begin
-  require './spec/support/simplecov_helper'
-  include SimpleCovHelper
-  start_simple_cov("unit-#{RUBY_VERSION}")
-rescue LoadError
-  puts "Coverage disabled."
+unless Rails.version == '4.0.0' && ENV['TRAVIS']
+  begin
+    require './spec/support/simplecov_helper'
+    include SimpleCovHelper
+    start_simple_cov("unit-#{RUBY_VERSION}")
+  rescue LoadError
+    puts "Coverage disabled."
+  end
 end
 
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
