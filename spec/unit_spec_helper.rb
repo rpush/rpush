@@ -1,5 +1,11 @@
 ENV['RAILS_ENV'] = 'test'
 
+require 'bundler'
+Bundler.require(:default)
+
+require 'active_record'
+require 'database_cleaner'
+
 begin
   require './spec/support/simplecov_helper'
   include SimpleCovHelper
@@ -7,9 +13,6 @@ begin
 rescue LoadError
   puts "Coverage disabled."
 end
-
-require 'active_record'
-# require 'timecop'
 
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 
@@ -47,16 +50,6 @@ require 'generators/templates/add_gcm'
   migration.down rescue ActiveRecord::StatementInvalid
   migration.up
 end
-
-require 'bundler'
-Bundler.require(:default)
-
-require 'database_cleaner'
-
-# Ensure SQLite3Adapter is loaded before DatabaseCleaner so that DC
-# can detect the correct superclass.
-# SQLite3 is used by the acceptance tests.
-require 'active_record/connection_adapters/sqlite3_adapter'
 
 DatabaseCleaner.strategy = :truncation
 

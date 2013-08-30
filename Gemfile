@@ -16,8 +16,6 @@ platform :ruby do
   gem 'mysql2'
   gem 'mysql'
   gem 'yajl-ruby'
-  gem 'sqlite3'
-  #gem 'perftools.rb'
 end
 
 platform :jruby do
