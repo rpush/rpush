@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rapns (3.3.2)
+    rapns (3.4.1)
       multi_json (~> 1.0)
       net-http-persistent
 
@@ -50,7 +50,7 @@ GEM
     multi_json (1.7.7)
     mysql (2.9.1)
     mysql2 (0.3.11)
-    net-http-persistent (2.8)
+    net-http-persistent (2.9)
     parallel (0.7.1)
     pg (0.15.1)
     polyglot (0.3.3)
