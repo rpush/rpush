@@ -1,4 +1,8 @@
-### 3.4.0 (Aug 28, 2013)
+## 3.4.1 (Aug 30, 2013)
+  * Silence unintended airbrake_notify deprecation warning (#158).
+  * Add :dependent => :destroy to app notifications (#156).
+
+## 3.4.0 (Aug 28, 2013)
   * Rails 4 support.
   * Add apns_certificate_will_expire reflection.
   * Perform storage update in batches where possible, to increase throughput.
