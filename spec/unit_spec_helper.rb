@@ -6,7 +6,7 @@ Bundler.require(:default)
 require 'active_record'
 require 'database_cleaner'
 
-unless Rails.version == '4.0.0' && ENV['TRAVIS']
+unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
   begin
     require './spec/support/simplecov_helper'
     include SimpleCovHelper
