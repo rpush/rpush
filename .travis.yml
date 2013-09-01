@@ -9,6 +9,7 @@ rvm:
 gemfile:
   - Gemfile
   - Gemfile.rails-4.0
+env: QUALITY=true
 
 matrix:
   include:
@@ -19,13 +20,23 @@ matrix:
       gemfile: Gemfile.rails-4.0
       env: QUALITY=false
   exclude:
+    - rvm: 1.9.3
+      gemfile: Gemfile.rails-4.0
+      env: QUALITY=false
+    - rvm: 2.0.0
+      gemfile: Gemfile.rails-4.0
+      env: QUALITY=false
     - rvm: ree
       gemfile: Gemfile.rails-4.0
+      env: QUALITY=true
     - rvm: jruby-18mode
       gemfile: Gemfile.rails-4.0
+      env: QUALITY=true
     - rvm: jruby-19mode
       gemfile: Gemfile.rails-4.0
+      env: QUALITY=true
     - rvm: rbx-19mode
       gemfile: Gemfile.rails-4.0
+      env: QUALITY=true
   allow_failures:
     - rvm: rbx-19mode
