@@ -41,7 +41,6 @@ module Rapns
 
   def self.require_for_daemon
     require 'rapns/daemon'
-    require 'rapns/patches'
   end
 
   def self.logger
