@@ -125,7 +125,7 @@ module Rapns
         end
 
         def certificate_msg(msg)
-          time = @ssl_context.cert.not_after.utc.strftime("%Y-%m-%d %H:%M:%S %Z")
+          time = @ssl_context.cert.not_after.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
           "[#{@app.name}] Certificate #{msg} at #{time}."
         end
 
