@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'rspec', '>= 2.4'
 gem 'rails', '~> 3.2'
-gem 'database_cleaner'
+gem 'database_cleaner', '1.0.1'
 gem 'simplecov'
 gem 'timecop', '0.5.9.2'
 
@@ -15,6 +15,7 @@ platform :ruby do
   gem 'pg'
   gem 'mysql2'
   gem 'yajl-ruby'
+  gem 'sqlite3'
 end
 
 platform :jruby do

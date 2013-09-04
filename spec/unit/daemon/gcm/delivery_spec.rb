@@ -177,7 +177,7 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'error' => 'NotRegistered' },
           { 'error' => 'Unavailable' }
         ]}}
-      let(:error_description) { "Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification #{notification.id + 1}." }
+      let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'an notification with some delivery failures'
     end
   end
@@ -191,7 +191,7 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'message_id' => '1:000' },
           { 'error' => 'InternalServerError' }
         ]}}
-    let(:error_description) { "Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification #{notification.id + 1}." }
+    let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification")} [\d]+\./ }
     it_should_behave_like 'an notification with some delivery failures'
   end
 

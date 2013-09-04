@@ -19,6 +19,9 @@ matrix:
     - rvm: 2.0.0
       gemfile: Gemfile.rails-4.0
       env: QUALITY=false
+    - rvm: 2.0.0
+      gemfile: Gemfile
+      env: ADAPTER=sqlite3
   exclude:
     - rvm: 1.9.3
       gemfile: Gemfile.rails-4.0

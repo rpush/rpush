@@ -38,3 +38,7 @@ jdbch2:
   pool: 128
   timeout: 5000
   encoding: utf8
+
+sqlite3:
+  adapter: sqlite3
+  database: spec/tmp/rapns_test.sqlite3

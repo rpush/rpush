@@ -1,3 +1,6 @@
+## 3.4.2 (unreleased)
+  * Fix sqlite3 support (#160).
+
 ## 3.4.1 (Aug 30, 2013)
   * Silence unintended airbrake_notify deprecation warning (#158).
   * Add :dependent => :destroy to app notifications (#156).

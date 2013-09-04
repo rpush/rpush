@@ -43,7 +43,7 @@ module Rapns
         def mark_batch_delivered(notifications)
           ids = notifications.map(&:id)
           with_database_reconnect_and_retry do
-            Rapns::Notification.where(:id => ids).update_all(['delivered = true, delivered_at = ?', Time.now])
+            Rapns::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = ?', true, Time.now])
           end
         end
 
@@ -62,7 +62,7 @@ module Rapns
         def mark_batch_failed(notifications, code, description)
           ids = notifications.map(&:id)
           with_database_reconnect_and_retry do
-            Rapns::Notification.where(:id => ids).update_all(['delivered = false, delivered_at = NULL, failed = true, failed_at = ?, error_code = ?, error_description = ?', Time.now, code, description])
+            Rapns::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, Time.now, code, description])
           end
         end
 

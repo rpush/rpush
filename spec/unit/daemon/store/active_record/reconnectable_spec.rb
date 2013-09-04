@@ -35,6 +35,8 @@ describe Rapns::Daemon::Store::ActiveRecord::Reconnectable do
       ActiveRecord::JDBCError
     when 'jdbch2'
       ActiveRecord::JDBCError
+    when 'sqlite3'
+      SQLite3::Exception
     else
       raise "Please update #{__FILE__} for adapter #{$adapter}"
     end
