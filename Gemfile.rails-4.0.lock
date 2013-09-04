@@ -114,7 +114,7 @@ DEPENDENCIES
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
   cane
-  database_cleaner
+  database_cleaner (= 1.0.1)
   jdbc-postgres
   jruby-openssl
   mysql
