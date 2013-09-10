@@ -21,28 +21,31 @@ module Rapns
 
       def mark_retryable(notification, deliver_after)
         if Rapns.config.batch_storage_updates
-          @retryable[deliver_after] ||= []
-          @retryable[deliver_after] << notification
+          retryable[deliver_after] ||= []
+          retryable[deliver_after] << notification
         else
           Rapns::Daemon.store.mark_retryable(notification, deliver_after)
+          reflect(:notification_will_retry, notification)
         end
       end
 
       def mark_delivered(notification)
         if Rapns.config.batch_storage_updates
-          @delivered << notification
+          delivered << notification
         else
           Rapns::Daemon.store.mark_delivered(notification)
+          reflect(:notification_delivered, notification)
         end
       end
 
       def mark_failed(notification, code, description)
         if Rapns.config.batch_storage_updates
           key = [code, description]
-          @failed[key] ||= []
-          @failed[key] << notification
+          failed[key] ||= []
+          failed[key] << notification
         else
           Rapns::Daemon.store.mark_failed(notification, code, description)
+          reflect(:notification_failed, notification)
         end
       end
 
@@ -58,7 +61,7 @@ module Rapns
       end
 
       def describe
-        @notifications.map(&:id).join(', ')
+        notifications.map(&:id).join(', ')
       end
 
       private
@@ -73,27 +76,36 @@ module Rapns
           end
         end
 
-        @notifications.clear
+        notifications.clear
         @complete = true
       end
 
       def complete_delivered
-        Rapns::Daemon.store.mark_batch_delivered(@delivered)
-        @delivered.clear
+        Rapns::Daemon.store.mark_batch_delivered(delivered)
+        delivered.each do |notification|
+          reflect(:notification_delivered, notification)
+        end
+        delivered.clear
       end
 
       def complete_failed
-        @failed.each do |(code, description), notifications|
+        failed.each do |(code, description), notifications|
           Rapns::Daemon.store.mark_batch_failed(notifications, code, description)
+          notifications.each do |notification|
+            reflect(:notification_failed, notification)
+          end
         end
-        @failed.clear
+        failed.clear
       end
 
       def complete_retried
-        @retryable.each do |deliver_after, notifications|
+        retryable.each do |deliver_after, notifications|
           Rapns::Daemon.store.mark_batch_retryable(notifications, deliver_after)
+          notifications.each do |notification|
+            reflect(:notification_will_retry, notification)
+          end
         end
-        @retryable.clear
+        retryable.clear
       end
     end
   end

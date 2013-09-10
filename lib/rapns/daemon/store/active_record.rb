@@ -26,7 +26,13 @@ module Rapns
         end
 
         def mark_batch_retryable(notifications, deliver_after)
-          ids = notifications.map(&:id)
+          ids = []
+          notifications.each do |n|
+            # Update attrs for reflections, but don't save.
+            n.retries += 1
+            n.deliver_after = deliver_after
+            ids << n.id
+          end
           with_database_reconnect_and_retry do
             Rapns::Notification.where(:id => ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
           end
@@ -41,9 +47,16 @@ module Rapns
         end
 
         def mark_batch_delivered(notifications)
-          ids = notifications.map(&:id)
+          now = Time.now
+          ids = []
+          notifications.each do |n|
+            # Update attrs for reflections, but don't save.
+            n.delivered = true
+            n.delivered_at = now
+            ids << n.id
+          end
           with_database_reconnect_and_retry do
-            Rapns::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = ?', true, Time.now])
+            Rapns::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = ?', true, now])
           end
         end
 
@@ -60,9 +73,20 @@ module Rapns
         end
 
         def mark_batch_failed(notifications, code, description)
-          ids = notifications.map(&:id)
+          now = Time.now
+          ids = []
+          notifications.each do |n|
+            # Update attrs for reflections, but don't save.
+            n.delivered = false
+            n.delivered_at = nil
+            n.failed = true
+            n.failed_at = now
+            n.error_code = code
+            n.error_description = description
+            ids << n.id
+          end
           with_database_reconnect_and_retry do
-            Rapns::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, Time.now, code, description])
+            Rapns::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, now, code, description])
           end
         end
 

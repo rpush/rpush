@@ -37,11 +37,6 @@ describe Rapns::Daemon::Apns::Delivery do
     perform
   end
 
-  it 'reflects the notification was delivered' do
-    delivery.should_receive(:reflect).with(:notification_delivered, notification)
-    perform
-  end
-
   it 'does not check for errors if check_for_errors config option is false' do
     config.stub(:check_for_errors => false)
     delivery.should_not_receive(:check_for_error)
@@ -53,11 +48,6 @@ describe Rapns::Daemon::Apns::Delivery do
 
     it "marks the notification as failed" do
       batch.should_receive(:mark_failed).with(notification, 4, "Missing payload")
-      perform
-    end
-
-    it 'reflects the notification delivery failed' do
-      delivery.should_receive(:reflect).with(:notification_failed, notification)
       perform
     end
 

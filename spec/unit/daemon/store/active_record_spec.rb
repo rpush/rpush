@@ -89,15 +89,22 @@ describe Rapns::Daemon::Store::ActiveRecord do
   end
 
   describe 'mark_batch_retryable' do
+    let(:deliver_after) { now + 10.seconds }
+
+    it 'sets the attributes on the object for use in reflections' do
+      store.mark_batch_retryable([notification], deliver_after)
+      notification.deliver_after.should eq deliver_after
+      notification.retries.should eq 1
+    end
+
     it 'increments the retired count' do
       expect do
-        store.mark_batch_retryable([notification], now)
+        store.mark_batch_retryable([notification], deliver_after)
         notification.reload
       end.to change(notification, :retries).by(1)
     end
 
     it 'sets the deliver after timestamp' do
-      deliver_after = now + 10.seconds
       expect do
         store.mark_batch_retryable([notification], deliver_after)
         notification.reload
@@ -126,6 +133,12 @@ describe Rapns::Daemon::Store::ActiveRecord do
   end
 
   describe 'mark_batch_delivered' do
+    it 'sets the attributes on the object for use in reflections' do
+      store.mark_batch_delivered([notification])
+      notification.delivered_at.should eq now
+      notification.delivered.should be_true
+    end
+
     it 'marks the notifications as delivered' do
       expect do
         store.mark_batch_delivered([notification])
@@ -180,6 +193,16 @@ describe Rapns::Daemon::Store::ActiveRecord do
   end
 
   describe 'mark_batch_failed' do
+    it 'sets the attributes on the object for use in reflections' do
+      store.mark_batch_failed([notification], 123, 'an error')
+      notification.failed_at.should eq now
+      notification.delivered_at.should be_nil
+      notification.delivered.should be_false
+      notification.failed.should be_true
+      notification.error_code.should eq 123
+      notification.error_description.should eq 'an error'
+    end
+
     it 'marks the notification as not delivered' do
       store.mark_batch_failed([notification], nil, '')
       notification.reload

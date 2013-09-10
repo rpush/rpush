@@ -32,11 +32,6 @@ describe Rapns::Daemon::Gcm::Delivery do
       perform rescue Rapns::DeliveryError
     end
 
-    it 'reflects the notification delivery failed' do
-      delivery.should_receive(:reflect).with(:notification_failed, notification)
-      perform rescue Rapns::DeliveryError
-    end
-
     it 'creates a new notification for the unavailable devices' do
       notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
       response.stub(:header => { 'retry-after' => 10 })
@@ -61,12 +56,6 @@ describe Rapns::Daemon::Gcm::Delivery do
       batch.should_receive(:mark_delivered).with(notification)
       perform
     end
-
-    it 'reflects the notification was delivered' do
-      response.stub(:body => JSON.dump({ 'failure' => 0 }))
-      delivery.should_receive(:reflect).with(:notification_delivered, notification)
-      perform
-  end
 
     it 'logs that the notification was delivered' do
       response.stub(:body => JSON.dump({ 'failure' => 0 }))
@@ -149,11 +138,6 @@ describe Rapns::Daemon::Gcm::Delivery do
         perform rescue Rapns::DeliveryError
       end
 
-      it 'reflects the notification delivery failed' do
-        delivery.should_receive(:reflect).with(:notification_failed, notification)
-        perform rescue Rapns::DeliveryError
-      end
-
       it 'creates a new notification for the unavailable devices' do
         notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
         response.stub(:header => { 'retry-after' => 10 })
@@ -221,11 +205,6 @@ describe Rapns::Daemon::Gcm::Delivery do
       batch.should_receive(:mark_retryable).with(notification, now + 2 ** 1)
       perform
     end
-
-    it 'reflects the notification will be retried' do
-      delivery.should_receive(:reflect).with(:notification_will_retry, notification)
-      perform
-    end
   end
 
   describe 'an 500 response' do
@@ -245,11 +224,6 @@ describe Rapns::Daemon::Gcm::Delivery do
       batch.should_receive(:mark_retryable).with(notification, now + 2 ** 3)
       perform
     end
-
-    it 'reflects the notification will be retried' do
-      delivery.should_receive(:reflect).with(:notification_will_retry, notification)
-      perform
-    end
   end
 
   describe 'an 401 response' do
@@ -267,11 +241,6 @@ describe Rapns::Daemon::Gcm::Delivery do
       batch.should_receive(:mark_failed).with(notification, 400, 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
       perform rescue Rapns::DeliveryError
     end
-
-    it 'reflects the notification delivery failed' do
-      delivery.should_receive(:reflect).with(:notification_failed, notification)
-      perform rescue Rapns::DeliveryError
-    end
   end
 
   describe 'an un-handled response' do
@@ -279,11 +248,6 @@ describe Rapns::Daemon::Gcm::Delivery do
 
     it 'marks the notification as failed' do
       batch.should_receive(:mark_failed).with(notification, 418, "I'm a Teapot")
-      perform rescue Rapns::DeliveryError
-    end
-
-    it 'reflects the notification delivery failed' do
-      delivery.should_receive(:reflect).with(:notification_failed, notification)
       perform rescue Rapns::DeliveryError
     end
   end
