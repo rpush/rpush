@@ -1,6 +1,7 @@
 require "unit_spec_helper"
 
 describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
+
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
   let(:poll) { 60 }
@@ -72,13 +73,17 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'sleeps for the feedback poll period' do
     receiver.stub(:check_for_feedback)
-    receiver.should_receive(:interruptible_sleep).with(60).at_least(:once)
+    sleeper = double(Rapns::Daemon::InterruptibleSleep, :sleep => false)
+    sleeper.should_receive(:sleep).with(60).at_least(:once)
+    receiver.stub :interruptible_sleep => sleeper
     Thread.stub(:new).and_yield
     receiver.stub(:loop).and_yield
     receiver.start
   end
 
   it 'checks for feedback when started' do
+    sleeper = double(Rapns::Daemon::InterruptibleSleep, :sleep => false)
+    receiver.stub :interruptible_sleep => sleeper
     receiver.should_receive(:check_for_feedback).at_least(:once)
     Thread.stub(:new).and_yield
     receiver.stub(:loop).and_yield
@@ -86,8 +91,10 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'interrupts sleep when stopped' do
+    sleeper = double(Rapns::Daemon::InterruptibleSleep, :sleep => false)
+    receiver.stub :interruptible_sleep => sleeper
     receiver.stub(:check_for_feedback)
-    receiver.should_receive(:interrupt_sleep)
+    sleeper.should_receive(:interrupt_sleep)
     receiver.stop
   end
 
