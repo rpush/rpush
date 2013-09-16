@@ -5,8 +5,7 @@ describe Rapns::Daemon::Feeder do
                         :push_poll => 0,
                         :embedded => false,
                         :push => false,
-                        :udp_wake_host => nil,
-                        :udp_wake_port => nil) }
+                        :wakeup => nil) }
   let!(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:logger) { double }
@@ -78,4 +77,23 @@ describe Rapns::Daemon::Feeder do
     Rapns::Daemon::Feeder.stub(:loop).and_yield
     Rapns::Daemon::Feeder.start
   end
+
+  it "creates the wakeup socket" do
+    bind = '127.0.0.1'
+    port = 12345
+    config.stub(:wakeup => { :bind => bind, :port => port})
+    sleeper = double(:enable_wake_on_udp => [bind, port])
+    sleeper.should_receive(:enable_wake_on_udp).with(bind, port)
+    Rapns::Daemon::InterruptibleSleep.stub(:new => sleeper)
+    # kludgy, but the instance variable is already set in previous tests, and this test
+    # requires it to be *not* initialised from a previous test.
+    Rapns::Daemon::Feeder.class_eval <<-EOF
+      def self.reset_interruptible_sleeper
+        @interruptible_sleeper = nil
+      end
+    EOF
+    Rapns::Daemon::Feeder.reset_interruptible_sleeper
+    Rapns::Daemon::Feeder.interruptible_sleeper
+  end
+
 end
