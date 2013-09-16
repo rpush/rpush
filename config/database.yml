@@ -15,7 +15,7 @@ jdbcpostgresql:
   password: ""
 
 mysql2:
-  adapter: mysql
+  adapter: mysql2
   database: rapns_test
   host: localhost
   username: rapns_test
