@@ -1,7 +1,6 @@
 module Rapns
   module Daemon
     class Feeder
-      extend InterruptibleSleep
       extend Reflectable
 
       def self.start
@@ -21,12 +20,16 @@ module Rapns
         interrupt_sleep
       end
 
+      def self.interrupt_sleep
+        interruptible_sleeper.interrupt_sleep
+      end
+
       protected
 
       def self.feed_forever
         loop do
           enqueue_notifications
-          interruptible_sleep(Rapns.config.push_poll)
+          interruptible_sleeper.sleep(Rapns.config.push_poll)
           break if stop?
         end
       end
@@ -46,6 +49,17 @@ module Rapns
           reflect(:error, e)
         end
       end
+
+      def self.interruptible_sleeper
+        unless @interruptible_sleeper
+          @interruptible_sleeper = InterruptibleSleep.new
+          if Rapns.config.udp_wake_host && Rapns.config.udp_wake_port
+            @interruptible_sleeper.enable_wake_on_udp Rapns.config.udp_wake_host, Rapns.config.udp_wake_port
+          end
+        end
+        @interruptible_sleeper
+      end
+
     end
   end
 end

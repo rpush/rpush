@@ -1,8 +1,12 @@
 require "unit_spec_helper"
 
 describe Rapns::Daemon::Feeder do
-  let(:config) { double(:batch_size => 5000, :push_poll => 0, :embedded => false,
-    :push => false) }
+  let(:config) { double(:batch_size => 5000,
+                        :push_poll => 0,
+                        :embedded => false,
+                        :push => false,
+                        :udp_wake_host => nil,
+                        :udp_wake_port => nil) }
   let!(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:logger) { double }
@@ -68,7 +72,9 @@ describe Rapns::Daemon::Feeder do
 
   it "sleeps for the given period" do
     config.stub(:push_poll => 2)
-    Rapns::Daemon::Feeder.should_receive(:interruptible_sleep).with(2)
+    sleeper = double(:sleep => true)
+    sleeper.should_receive(:sleep).with(2)
+    Rapns::Daemon::Feeder.stub(:interruptible_sleeper => sleeper)
     Rapns::Daemon::Feeder.stub(:loop).and_yield
     Rapns::Daemon::Feeder.start
   end

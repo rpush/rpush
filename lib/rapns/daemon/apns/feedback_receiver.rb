@@ -3,7 +3,6 @@ module Rapns
     module Apns
       class FeedbackReceiver
         include Reflectable
-        include InterruptibleSleep
 
         FEEDBACK_TUPLE_BYTES = 38
         HOSTS = {
@@ -25,14 +24,14 @@ module Rapns
             loop do
               break if @stop
               check_for_feedback
-              interruptible_sleep @poll
+              interruptible_sleep.sleep @poll
             end
           end
         end
 
         def stop
           @stop = true
-          interrupt_sleep
+          interruptible_sleep.interrupt_sleep
           @thread.join if @thread
         end
 
@@ -51,6 +50,10 @@ module Rapns
           ensure
             connection.close if connection
           end
+        end
+
+        def interrupt_sleep
+          interruptible_sleep.interrupt_sleep
         end
 
         protected
@@ -74,6 +77,12 @@ module Rapns
             Rapns.logger.error(e)
           end
         end
+
+        def interruptible_sleep
+          @interruptible_sleep ||= InterruptibleSleep.new
+        end
+
+
       end
     end
   end
