@@ -1,9 +1,6 @@
-[![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
-[![Code Climate](https://codeclimate.com/github/ileitch/rapns.png)](https://codeclimate.com/github/ileitch/rapns)
-
 ### Rapns - Professional grade APNs and GCM for Ruby.
 
-* Supports both APNs (iOS) and GCM (Google Cloud Messaging, Android).
+* Supports both APNs (iOS), GCM (Google Cloud Messaging, Android), and ADM (Amazon Device Messaging).
 * Seamless Rails (3, 4) integration.
 * Scalable - choose the number of persistent connections for each app.
 * Designed for uptime - signal -HUP to add, update apps.
@@ -77,6 +74,28 @@ n.save!
 ```
 
 GCM also requires you to respond to [Canonical IDs](https://github.com/ileitch/rapns/wiki/Canonical-IDs).
+
+#### ADM
+
+```ruby
+app = Rapns::Adm::App.new
+app.name = "kindle_app"
+app.client_id = "..."
+app.client_secret = "..."
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rapns::m::Notification.new
+n.app = Rapns::Adm::App.find_by_name("kindle_app")
+n.registration_ids = ["..."]
+n.data = {:message => "hi mom!"}
+n.collapse_key = "Optional consolidationKey"
+n.save!
+```
+
+For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 
 ## Starting Rapns
 
