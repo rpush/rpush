@@ -44,7 +44,7 @@ module Rapns
 
         protected
 
-        def handle_response(response, current_registration_id)
+        def handle_response(response, current_registration_id)  
           case response.code.to_i
           when 200
             ok(response, current_registration_id)
@@ -66,6 +66,7 @@ module Rapns
         end
 
         def ok(response, current_registration_id)
+          Rapns.logger.warn("handle_response: #{current_registration_id}, #{response.inspect}")
           response_body = multi_json_load(response.body)
           
           if(response_body.has_key?('registrationID'))
@@ -88,7 +89,7 @@ module Rapns
                      
             # update the current notification so it only contains the sent reg ids 
             @notification.registration_ids.reject! { |reg_id| !@sent_registration_ids.include?(reg_id) }
-            update_notification(@notification)
+            Rapns::Daemon.store.update_notification(@notification)
           
             # create a new notification with the remaining unsent reg ids
             create_new_notification(error.response, unsent_registration_ids)
@@ -102,6 +103,7 @@ module Rapns
           response_body = multi_json_load(response.body)
           
           if(response_body.has_key?('reason'))
+            Rapns.logger.warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
             failed_registration_ids[current_registration_id] = response_body['reason']
           end
           # raise Rapns::DeliveryError.new(400, @notification.id, 'ADM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
@@ -195,7 +197,7 @@ module Rapns
               data = JSON.parse(response.body)
               @app.access_token = data['access_token']
               @app.access_token_expiration = Time.zone.now + data['expires_in'].to_i
-              update_app(@app)
+              Rapns::Daemon.store.update_app(@app)
             else
               Rapns.logger.warn("Could not retrieve access token from ADM: #{response.body}")
             end
