@@ -9,7 +9,7 @@ module Rapns
         AMAZON_TOKEN_URI = URI.parse('https://api.amazon.com/auth/O2/token')
 
         # ADM services endpoint. This endpoint is used to perform ADM requests.
-        AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations'
+        AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations/%{registration_id}/messages'
 
         # Data used to request authorization tokens.
         ACCESS_TOKEN_REQUEST_DATA = {"grant_type" => "client_credentials", "scope" => "messaging:push", "client_secret" => "", "client_id" => ""}
@@ -104,7 +104,7 @@ module Rapns
           
           if(response_body.has_key?('reason'))
             Rapns.logger.warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
-            failed_registration_ids[current_registration_id] = response_body['reason']
+            @failed_registration_ids[current_registration_id] = response_body['reason']
           end
           # raise Rapns::DeliveryError.new(400, @notification.id, 'ADM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
         end
@@ -157,11 +157,11 @@ module Rapns
 
         def describe_errors
           description = if @failed_registration_ids.size == @notification.registration_ids.size
-            "Failed to deliver to all recipients.}."
+            "Failed to deliver to all recipients."
           else
             error_msgs = []
             @failed_registration_ids.each_pair { |regId, reason| error_msgs.push("#{regId}: #{reason}") }
-            "Failed to deliver to recipients: \r\n#{error_msgs.join("\r\n")}"
+            "Failed to deliver to recipients: \n#{error_msgs.join("\n")}"
           end
         end
 
@@ -170,7 +170,7 @@ module Rapns
         end
 
         def do_post(registration_id)
-          adm_uri = URI.parse(AMAZON_ADM_URL + registration_id)
+          adm_uri = URI.parse(AMAZON_ADM_URL % { registration_id: registration_id })
           post = Net::HTTP::Post.new(adm_uri.path, initheader = {
             'Content-Type' => 'application/json', 
             'Accept' => 'application/json',
