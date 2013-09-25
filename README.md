@@ -1,4 +1,4 @@
-### Rapns - Professional grade APNs and GCM for Ruby.
+### Rapns - Professional grade APNs, GCM, ADM for Ruby.
 
 * Supports both APNs (iOS), GCM (Google Cloud Messaging, Android), and ADM (Amazon Device Messaging).
 * Seamless Rails (3, 4) integration.
