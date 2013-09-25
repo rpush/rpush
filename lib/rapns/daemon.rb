@@ -27,6 +27,10 @@ require 'rapns/daemon/gcm/delivery'
 require 'rapns/daemon/gcm/app_runner'
 require 'rapns/daemon/gcm/delivery_handler'
 
+require 'rapns/daemon/adm/delivery'
+require 'rapns/daemon/adm/app_runner'
+require 'rapns/daemon/adm/delivery_handler'
+
 module Rapns
   module Daemon
     class << self
