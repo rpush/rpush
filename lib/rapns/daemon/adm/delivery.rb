@@ -29,10 +29,15 @@ module Rapns
               handle_response(do_post(registration_id), registration_id)
             end
             
-            if(@failed_registration_ids.empty?)
-              mark_delivered
-            else
+            if(@sent_registration_ids.empty?)
               raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors)
+            else
+              unless(@failed_registration_ids.empty?)
+                @notification.error_description = describe_errors 
+                Rapns::Daemon.store.update_notification(@notification)
+              end
+              
+              mark_delivered
             end
           rescue Rapns::TooManyRequestsError => error
             handle_too_many_requests(error)
@@ -57,7 +62,7 @@ module Rapns
           when 429
             too_many_requests(response)
           when 500
-            internal_server_error(response)
+            internal_server_error(response, current_registration_id)
           when 503
             service_unavailable(response)
           else
@@ -66,7 +71,7 @@ module Rapns
         end
 
         def ok(response, current_registration_id)
-          Rapns.logger.warn("handle_response: #{current_registration_id}, #{response.inspect}")
+          Rapns.logger.warn("ok: #{current_registration_id}, #{response.inspect}")
           response_body = multi_json_load(response.body)
           
           if(response_body.has_key?('registrationID'))
@@ -122,9 +127,9 @@ module Rapns
           raise Rapns::TooManyRequestsError.new(429, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
         end
 
-        def internal_server_error(response)
-          retry_delivery(@notification, response)
-          Rapns.logger.warn("ADM responded with an Internal Error. " + retry_message)
+        def internal_server_error(response, current_registration_id)
+          @failed_registration_ids[current_registration_id] = "Internal Server Error"
+          Rapns.logger.warn("internal_server_error: #{current_registration_id} (Internal Server Error)")
         end
 
         def service_unavailable(response)
