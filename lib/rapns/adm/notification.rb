@@ -4,6 +4,7 @@ module Rapns
       validates :registration_ids, :presence => true
       validates_with Rapns::Adm::DataValidator
       validates_with Rapns::Adm::PayloadDataSizeValidator
+      validates_with Rapns::Adm::RegistrationIdsCountValidator
 
       def registration_ids=(ids)
         ids = [ids] if ids && !ids.is_a?(Array)

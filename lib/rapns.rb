@@ -35,6 +35,7 @@ require 'rapns/gcm/notification'
 require 'rapns/gcm/app'
 
 require 'rapns/adm/payload_data_size_validator'
+require 'rapns/adm/registration_ids_count_validator'
 require 'rapns/adm/data_validator'
 require 'rapns/adm/notification'
 require 'rapns/adm/app'
