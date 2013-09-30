@@ -39,6 +39,8 @@ module Rapns
               
               mark_delivered
             end
+          rescue Rapns::RetryableError => error
+            handle_retryable(error)
           rescue Rapns::TooManyRequestsError => error
             handle_too_many_requests(error)
           rescue Rapns::DeliveryError => error
@@ -49,7 +51,7 @@ module Rapns
 
         protected
 
-        def handle_response(response, current_registration_id)  
+        def handle_response(response, current_registration_id)
           case response.code.to_i
           when 200
             ok(response, current_registration_id)
@@ -57,8 +59,6 @@ module Rapns
             bad_request(response, current_registration_id)
           when 401
             unauthorized(response)
-          when 413
-            request_entity_too_large(response)
           when 429
             too_many_requests(response)
           when 500
@@ -71,7 +71,6 @@ module Rapns
         end
 
         def ok(response, current_registration_id)
-          Rapns.logger.warn("ok: #{current_registration_id}, #{response.inspect}")
           response_body = multi_json_load(response.body)
           
           if(response_body.has_key?('registrationID'))
@@ -84,16 +83,34 @@ module Rapns
           end
         end
         
-        def handle_too_many_requests
+        def handle_retryable(error)
+          case error.code
+          when 401
+            # clear app access_token so a new one is fetched
+            @notification.app.access_token = nil
+            get_access_token
+            mark_retryable(@notification, Time.now)
+          when 503
+            retry_delivery(@notification, error.response)
+            Rapns.logger.warn("[#{@app.name}] ADM responded with an Service Unavailable Error. " + retry_message)
+          else
+            mark_failed(error.code, error.description)
+            Rapns.logger.warn("[#{@app.name}] unknown retryable error (#{error.code}): #{error.description}")
+            raise
+          end
+        end
+        
+        def handle_too_many_requests(error)
           if(@sent_registration_ids.empty?)
             # none sent yet, just resend after the specified retry-after response.header
             retry_delivery(@notification, error.response)
           else
             # save unsent registration ids
-            unsent_registration_ids = @notification.registration_ids.collect { |reg_id| !@sent_registration_ids.include?(reg_id) } 
-                     
+            unsent_registration_ids = @notification.registration_ids.select { |reg_id| !@sent_registration_ids.include?(reg_id) } 
+                   
             # update the current notification so it only contains the sent reg ids 
             @notification.registration_ids.reject! { |reg_id| !@sent_registration_ids.include?(reg_id) }
+            
             Rapns::Daemon.store.update_notification(@notification)
           
             # create a new notification with the remaining unsent reg ids
@@ -108,33 +125,29 @@ module Rapns
           response_body = multi_json_load(response.body)
           
           if(response_body.has_key?('reason'))
-            Rapns.logger.warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
+            Rapns.logger.warn("[#{@app.name}] bad_request: #{current_registration_id} (#{response_body['reason']})")
             @failed_registration_ids[current_registration_id] = response_body['reason']
           end
-          # raise Rapns::DeliveryError.new(400, @notification.id, 'ADM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
         end
         
         def unauthorized(response)
-          # clear app access_token so a new one is fetched
-          @app.access_token = nil
-          get_access_token
-          
-          mark_retryable(@notification, Time.zone.now)
+          # Indicate a notification is retryable. Because ADM requires separate request for each push token, this will safely mark the entire notification to retry delivery.
+          raise Rapns::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Service Unavailable Error.', response)
         end
         
         def too_many_requests(response)
           # raise error so the current notification stops sending messages to remaining reg ids
-          raise Rapns::TooManyRequestsError.new(429, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
+          raise Rapns::TooManyRequestsError.new(response.code.to_i, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
         end
 
         def internal_server_error(response, current_registration_id)
           @failed_registration_ids[current_registration_id] = "Internal Server Error"
-          Rapns.logger.warn("internal_server_error: #{current_registration_id} (Internal Server Error)")
+          Rapns.logger.warn("[#{@app.name}] internal_server_error: #{current_registration_id} (Internal Server Error)")
         end
 
         def service_unavailable(response)
-          retry_delivery(@notification, response)
-          Rapns.logger.warn("ADM responded with an Service Unavailable Error. " + retry_message)
+          # Indicate a notification is retryable. Because ADM requires separate request for each push token, this will safely mark the entire notification to retry delivery.
+          raise Rapns::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Service Unavailable Error.', response)
         end
 
         def create_new_notification(response, registration_ids)
@@ -189,9 +202,9 @@ module Rapns
         end
         
         def get_access_token
-          if(@app.access_token.nil? || @app.access_token_expired?)
-            ACCESS_TOKEN_REQUEST_DATA['client_id'] = @app.client_id
-            ACCESS_TOKEN_REQUEST_DATA['client_secret'] = @app.client_secret
+          if(@notification.app.access_token.nil? || @notification.app.access_token_expired?)
+            ACCESS_TOKEN_REQUEST_DATA['client_id'] = @notification.app.client_id
+            ACCESS_TOKEN_REQUEST_DATA['client_secret'] = @notification.app.client_secret
             
             post = Net::HTTP::Post.new(AMAZON_TOKEN_URI.path, initheader = {'Content-Type' => 'application/x-www-form-urlencoded'})
             post.set_form_data(ACCESS_TOKEN_REQUEST_DATA)
@@ -200,15 +213,16 @@ module Rapns
             
             if(response.code.to_i == 200)
               data = JSON.parse(response.body)
-              @app.access_token = data['access_token']
-              @app.access_token_expiration = Time.zone.now + data['expires_in'].to_i
-              Rapns::Daemon.store.update_app(@app)
+              @notification.app.access_token = data['access_token']
+              @notification.app.access_token_expiration = Time.now + data['expires_in'].to_i
+              Rapns::Daemon.store.update_app(@notification.app)
+              Rapns.logger.info("ADM access token updated: token = #{@notification.app.access_token}, expires = #{@notification.app.access_token_expiration}")
             else
               Rapns.logger.warn("Could not retrieve access token from ADM: #{response.body}")
             end
           end
           
-          @app.access_token
+          @notification.app.access_token
         end
 
         HTTP_STATUS_CODES = {
