@@ -71,6 +71,11 @@ Rapns.reflect do |on|
   # on.gcm_canonical_id do |old_id, canonical_id|
   # end
 
+  # Called when the GCM returns a failure that indicates an invalid tegistration id.
+  # You will need to delete the registration_id from your records.
+  # on.gcm_invalid_registration_id do |app, error, registration_id|
+  # end
+
   # Called when an APNs certificate will expire within 1 month.
   # Implement on.error to catch errors raised when the certificate expires.
   # on.apns_certificate_will_expire do |app, expiration_time|

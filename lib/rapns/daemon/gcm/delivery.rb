@@ -7,6 +7,7 @@ module Rapns
 
         GCM_URI = URI.parse('https://android.googleapis.com/gcm/send')
         UNAVAILABLE_STATES = ['Unavailable', 'InternalServerError']
+        INVALID_REGISTRATION_ID_STATES = ['InvalidRegistration', 'MismatchSenderId', 'NotRegistered', 'InvalidPackageName']
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -45,11 +46,11 @@ module Rapns
 
         def ok(response)
           body = multi_json_load(response.body)
-
           if body['failure'].to_i == 0
             mark_delivered
             Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
           else
+            handle_invalid_registration_ids(response, body)
             handle_errors(response, body)
           end
 
@@ -60,8 +61,9 @@ module Rapns
           errors = {}
 
           body['results'].each_with_index do |result, i|
-            errors[i] = result['error'] if result['error']
+            errors[i] = result['error'] if result['error'] && ! INVALID_REGISTRATION_ID_STATES.include?(result['error'])
           end
+          return if errors.empty?
 
           if body['success'].to_i == 0 && errors.values.all? { |error| UNAVAILABLE_STATES.include?(error) }
             all_devices_unavailable(response)
@@ -69,6 +71,15 @@ module Rapns
             some_devices_unavailable(response, errors)
           else
             raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
+          end
+        end
+
+        def handle_invalid_registration_ids(response, body)
+          body['results'].each_with_index do |result, i|
+            next unless INVALID_REGISTRATION_ID_STATES.include?(result['error'])
+
+            registration_id = @notification.registration_ids[i]
+            reflect(:gcm_invalid_registration_id, @app, result['error'], registration_id)
           end
         end
 
@@ -147,7 +158,7 @@ module Rapns
         end
 
         def retry_message
-          "Notification #{@notification.id} will be retired after #{@notification.deliver_after.strftime("%Y-%m-%d %H:%M:%S")} (retry #{@notification.retries})."
+          "Notification #{@notification.id} will be retried after #{@notification.deliver_after.strftime("%Y-%m-%d %H:%M:%S")} (retry #{@notification.retries})."
         end
 
         def do_post
