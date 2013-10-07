@@ -125,6 +125,12 @@ See [Configuration](https://github.com/ileitch/rapns/wiki/Configuration) for a l
 
 After updating you should run `rails g rapns` to check for any new migrations.
 
+## Rake task
+
+To clean up completed (*delivered* or *failed*) notifications:
+
+    bundle exec rake rapns:notifications:clean DAYS=<Number of days greater than 0>
+
 ## Wiki
 
 ### General
