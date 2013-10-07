@@ -6,6 +6,8 @@ module Rapns
     require 'rails'
     ::Rails::VERSION::STRING < '4'
   end
+  
+  require 'rapns/railtie' if defined?(Rails)
 end
 
 require 'rapns/version'

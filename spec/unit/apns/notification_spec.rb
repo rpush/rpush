@@ -5,7 +5,8 @@ require 'unit/notification_shared.rb'
 
 describe Rapns::Apns::Notification do
   it_should_behave_like 'an Notification subclass'
-
+  
+  let(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
   let(:notification_class) { Rapns::Apns::Notification }
   let(:notification) { notification_class.new }
   let(:data_setter) { 'attributes_for_device=' }
