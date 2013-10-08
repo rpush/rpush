@@ -25,6 +25,18 @@ describe Rapns::Daemon::Adm::Delivery do
     Rapns.stub(:logger => logger)
   end
 
+  describe 'unknown error response' do
+    before do
+      response.stub(:code => 408)
+    end
+
+    it 'marks the notification as failed because no successful delivery was made' do
+      response.stub(:body => JSON.dump({ 'reason' => 'InvalidData' }))
+      batch.should_receive(:mark_failed).with(notification, 408, 'Request Timeout')
+      expect { perform }.to raise_error(Rapns::DeliveryError)
+    end
+  end
+
   describe 'a 200 (Ok) response' do
     before do
       response.stub(:code => 200)
@@ -78,12 +90,12 @@ describe Rapns::Daemon::Adm::Delivery do
       # first request to deliver message that returns unauthorized response
       adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { registration_id: notification.registration_ids.first })
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
-
-      # request for access token
-      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
     end
 
     it 'should retrieve a new access token and mark the notification for retry' do
+      # request for access token
+      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
+
       store.should_receive(:update_app).with(notification.app)
       batch.should_receive(:mark_retryable).with(notification, now)
 
@@ -91,11 +103,27 @@ describe Rapns::Daemon::Adm::Delivery do
     end
 
     it 'should update the app with the new access token' do
+      # request for access token
+      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
+
       store.should_receive(:update_app).with do |app|
         app.access_token.should == 'ACCESS_TOKEN'
         app.access_token_expiration.should == now + 60.seconds
       end
       batch.should_receive(:mark_retryable).with(notification, now)
+
+      perform
+    end
+
+    it 'should log the error and stop retrying if new access token can\'t be retrieved' do
+      token_response.stub(:code => 404, :body => "test")
+      # request for access token
+      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
+
+      store.should_not_receive(:update_app).with(notification.app)
+      batch.should_not_receive(:mark_retryable)
+
+      logger.should_receive(:warn).with("Could not retrieve access token from ADM: test")
 
       perform
     end
@@ -114,6 +142,17 @@ describe Rapns::Daemon::Adm::Delivery do
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       batch.should_receive(:mark_retryable).with(notification, now + 1.hour)
+      perform
+    end
+
+    it 'should retry the entire notification using exponential backoff' do
+      response.stub(:code => 429, :header => {})
+
+      # first request to deliver message that returns too many request response
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { registration_id: notification.registration_ids.first })
+      http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
+
+      batch.should_receive(:mark_retryable).with(notification, Time.now + 2 ** (notification.retries + 1))
       perform
     end
 

@@ -89,14 +89,10 @@ module Rapns
             # clear app access_token so a new one is fetched
             @notification.app.access_token = nil
             get_access_token
-            mark_retryable(@notification, Time.now)
+            mark_retryable(@notification, Time.now) if @notification.app.access_token
           when 503
             retry_delivery(@notification, error.response)
             Rapns.logger.warn("[#{@app.name}] ADM responded with an Service Unavailable Error. " + retry_message)
-          else
-            mark_failed(error.code, error.description)
-            Rapns.logger.warn("[#{@app.name}] unknown retryable error (#{error.code}): #{error.description}")
-            raise
           end
         end
 
@@ -132,7 +128,7 @@ module Rapns
 
         def unauthorized(response)
           # Indicate a notification is retryable. Because ADM requires separate request for each push token, this will safely mark the entire notification to retry delivery.
-          raise Rapns::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Service Unavailable Error.', response)
+          raise Rapns::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Unauthorized Error.', response)
         end
 
         def too_many_requests(response)
