@@ -28,8 +28,6 @@ module Rapns
     }
 
     scope :completed, lambda { where("delivered = ? OR failed = ?", true, true) }
-    scope :created_before, ->(dt) { where("created_at < ?", dt) }
-    scope :completed_and_older_than, ->(dt) { completed.created_before(dt) }
 
     def initialize(*args)
       attributes = args.first
@@ -56,6 +54,16 @@ module Rapns
 
     def payload_size
       payload.bytesize
+    end
+
+    class << self
+      def created_before(dt)
+        where("created_at < ?", dt)
+      end
+
+      def completed_and_older_than(dt)
+        completed.created_before(dt)
+      end
     end
   end
 end
