@@ -13,7 +13,7 @@ describe Rapns::Adm::App do
     subject.should_not be_valid
     subject.errors[:name].should == ["can't be blank"]
   end
-  
+
   it 'should be invalid if name is not unique within scope' do
     subject.name = existing_app.name
     subject.should_not be_valid
@@ -25,13 +25,13 @@ describe Rapns::Adm::App do
     subject.should_not be_valid
     subject.errors[:client_id].should == ["can't be blank"]
   end
-  
+
   it 'should be invalid if missing client_secret' do
     subject.client_secret = nil
     subject.should_not be_valid
     subject.errors[:client_secret].should == ["can't be blank"]
   end
-  
+
   describe '#access_token_expired?' do
     before(:each) do
       Timecop.freeze(Time.now)
@@ -40,20 +40,19 @@ describe Rapns::Adm::App do
     after do
       Timecop.return
     end
-    
+
     it 'should return true if access_token_expiration is nil' do
       subject.access_token_expired?.should be_true
     end
-    
+
     it 'should return true if expired' do
       subject.access_token_expiration = Time.now - 5.minutes
       subject.access_token_expired?.should be_true
     end
-    
+
     it 'should return false if not expired' do
       subject.access_token_expiration = Time.now + 5.minutes
       subject.access_token_expired?.should be_false
     end
   end
-  
 end

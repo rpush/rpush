@@ -4,7 +4,7 @@ module Rapns
       # https://developer.amazon.com/sdk/adm/sending-message.html
       class Delivery < Rapns::Daemon::Delivery
         include Rapns::MultiJsonHelper
-        
+
         # Oauth2.0 token endpoint. This endpoint is used to request authorization tokens.
         AMAZON_TOKEN_URI = URI.parse('https://api.amazon.com/auth/O2/token')
 
@@ -12,7 +12,7 @@ module Rapns
         AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations/%{registration_id}/messages'
 
         # Data used to request authorization tokens.
-        ACCESS_TOKEN_REQUEST_DATA = {"grant_type" => "client_credentials", "scope" => "messaging:push", "client_secret" => "", "client_id" => ""}
+        ACCESS_TOKEN_REQUEST_DATA = {"grant_type" => "client_credentials", "scope" => "messaging:push"}
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -28,15 +28,15 @@ module Rapns
             @notification.registration_ids.each do |registration_id|
               handle_response(do_post(registration_id), registration_id)
             end
-            
+
             if(@sent_registration_ids.empty?)
               raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors)
             else
               unless(@failed_registration_ids.empty?)
-                @notification.error_description = describe_errors 
+                @notification.error_description = describe_errors
                 Rapns::Daemon.store.update_notification(@notification)
               end
-              
+
               mark_delivered
             end
           rescue Rapns::RetryableError => error
@@ -72,17 +72,17 @@ module Rapns
 
         def ok(response, current_registration_id)
           response_body = multi_json_load(response.body)
-          
+
           if(response_body.has_key?('registrationID'))
             @sent_registration_ids << response_body['registrationID']
             Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{response_body['registrationID']}")
           end
-          
+
           if(current_registration_id != response_body['registrationID'])
             reflect(:adm_canonical_id, current_registration_id, response_body['registrationID'])
           end
         end
-        
+
         def handle_retryable(error)
           case error.code
           when 401
@@ -99,23 +99,23 @@ module Rapns
             raise
           end
         end
-        
+
         def handle_too_many_requests(error)
           if(@sent_registration_ids.empty?)
             # none sent yet, just resend after the specified retry-after response.header
             retry_delivery(@notification, error.response)
           else
             # save unsent registration ids
-            unsent_registration_ids = @notification.registration_ids.select { |reg_id| !@sent_registration_ids.include?(reg_id) } 
-                   
-            # update the current notification so it only contains the sent reg ids 
+            unsent_registration_ids = @notification.registration_ids.select { |reg_id| !@sent_registration_ids.include?(reg_id) }
+
+            # update the current notification so it only contains the sent reg ids
             @notification.registration_ids.reject! { |reg_id| !@sent_registration_ids.include?(reg_id) }
-            
+
             Rapns::Daemon.store.update_notification(@notification)
-          
+
             # create a new notification with the remaining unsent reg ids
             create_new_notification(error.response, unsent_registration_ids)
-          
+
             # mark the current notification as sent
             mark_delivered
           end
@@ -123,18 +123,18 @@ module Rapns
 
         def bad_request(response, current_registration_id)
           response_body = multi_json_load(response.body)
-          
+
           if(response_body.has_key?('reason'))
             Rapns.logger.warn("[#{@app.name}] bad_request: #{current_registration_id} (#{response_body['reason']})")
             @failed_registration_ids[current_registration_id] = response_body['reason']
           end
         end
-        
+
         def unauthorized(response)
           # Indicate a notification is retryable. Because ADM requires separate request for each push token, this will safely mark the entire notification to retry delivery.
           raise Rapns::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Service Unavailable Error.', response)
         end
-        
+
         def too_many_requests(response)
           # raise error so the current notification stops sending messages to remaining reg ids
           raise Rapns::TooManyRequestsError.new(response.code.to_i, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
@@ -164,7 +164,7 @@ module Rapns
             end
           end
         end
-        
+
         def retry_delivery(notification, response)
           if time = deliver_after_header(response)
             mark_retryable(notification, time)
@@ -190,39 +190,41 @@ module Rapns
         def do_post(registration_id)
           adm_uri = URI.parse(AMAZON_ADM_URL % { registration_id: registration_id })
           post = Net::HTTP::Post.new(adm_uri.path, initheader = {
-            'Content-Type' => 'application/json', 
+            'Content-Type' => 'application/json',
             'Accept' => 'application/json',
             'x-amzn-type-version' => 'com.amazon.device.messaging.ADMMessage@1.0',
             'x-amzn-accept-type' => 'com.amazon.device.messaging.ADMSendResult@1.0',
             'Authorization' => "Bearer #{get_access_token}"
           })
           post.body = @notification.as_json.to_json
-        
+
           @http.request(adm_uri, post)
         end
-        
+
         def get_access_token
           if(@notification.app.access_token.nil? || @notification.app.access_token_expired?)
-            ACCESS_TOKEN_REQUEST_DATA['client_id'] = @notification.app.client_id
-            ACCESS_TOKEN_REQUEST_DATA['client_secret'] = @notification.app.client_secret
-            
             post = Net::HTTP::Post.new(AMAZON_TOKEN_URI.path, initheader = {'Content-Type' => 'application/x-www-form-urlencoded'})
-            post.set_form_data(ACCESS_TOKEN_REQUEST_DATA)
-            
-            response = @http.request(AMAZON_TOKEN_URI, post)
-            
-            if(response.code.to_i == 200)
-              data = JSON.parse(response.body)
-              @notification.app.access_token = data['access_token']
-              @notification.app.access_token_expiration = Time.now + data['expires_in'].to_i
-              Rapns::Daemon.store.update_app(@notification.app)
-              Rapns.logger.info("ADM access token updated: token = #{@notification.app.access_token}, expires = #{@notification.app.access_token_expiration}")
-            else
-              Rapns.logger.warn("Could not retrieve access token from ADM: #{response.body}")
-            end
+            post.set_form_data(ACCESS_TOKEN_REQUEST_DATA.merge({'client_id' => @notification.app.client_id, 'client_secret' => @notification.app.client_secret}))
+
+            handle_access_token(@http.request(AMAZON_TOKEN_URI, post))
           end
-          
+
           @notification.app.access_token
+        end
+
+        def handle_access_token(response)
+          if(response.code.to_i == 200)
+            update_access_token(JSON.parse(response.body))
+            Rapns::Daemon.store.update_app(@notification.app)
+            Rapns.logger.info("ADM access token updated: token = #{@notification.app.access_token}, expires = #{@notification.app.access_token_expiration}")
+          else
+            Rapns.logger.warn("Could not retrieve access token from ADM: #{response.body}")
+          end
+        end
+
+        def update_access_token(data)
+          @notification.app.access_token = data['access_token']
+          @notification.app.access_token_expiration = Time.now + data['expires_in'].to_i
         end
 
         HTTP_STATUS_CODES = {
@@ -278,7 +280,7 @@ module Rapns
           505  => 'HTTP Version Not Supported',
           506  => 'Variant Also Negotiates',
           507  => 'Insufficient Storage',
-          510  => 'Not Extended',
+          510  => 'Not Extended'
         }
       end
     end

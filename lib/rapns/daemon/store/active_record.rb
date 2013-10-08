@@ -109,7 +109,7 @@ module Rapns
             notification
           end
         end
-        
+
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
           with_database_reconnect_and_retry do
             notification = Rapns::Adm::Notification.new
@@ -122,13 +122,13 @@ module Rapns
             notification
           end
         end
-        
+
         def update_app(app)
           with_database_reconnect_and_retry do
             app.save!
           end
         end
-        
+
         def update_notification(notification)
           with_database_reconnect_and_retry do
             notification.save!
