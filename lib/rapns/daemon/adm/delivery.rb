@@ -9,7 +9,7 @@ module Rapns
         AMAZON_TOKEN_URI = URI.parse('https://api.amazon.com/auth/O2/token')
 
         # ADM services endpoint. This endpoint is used to perform ADM requests.
-        AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations/%{registration_id}/messages'
+        AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations/%s/messages'
 
         # Data used to request authorization tokens.
         ACCESS_TOKEN_REQUEST_DATA = {"grant_type" => "client_credentials", "scope" => "messaging:push"}
@@ -184,7 +184,7 @@ module Rapns
         end
 
         def do_post(registration_id)
-          adm_uri = URI.parse(AMAZON_ADM_URL % { :registration_id => registration_id })
+          adm_uri = URI.parse(AMAZON_ADM_URL % [registration_id])
           post = Net::HTTP::Post.new(adm_uri.path, initheader = {
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',

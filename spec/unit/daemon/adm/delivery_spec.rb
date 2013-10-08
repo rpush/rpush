@@ -88,7 +88,7 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 401, :header => { 'retry-after' => 10 })
 
       # first request to deliver message that returns unauthorized response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => notification.registration_ids.first })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
     end
 
@@ -138,7 +138,7 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 429, :header => { 'retry-after' => 3600 })
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => notification.registration_ids.first })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       batch.should_receive(:mark_retryable).with(notification, now + 1.hour)
@@ -149,7 +149,7 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 429, :header => {})
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => notification.registration_ids.first })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       batch.should_receive(:mark_retryable).with(notification, Time.now + 2 ** (notification.retries + 1))
@@ -160,11 +160,11 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 200, :body => JSON.dump({ 'registrationID' => 'abc' }))
 
       # first request to deliver message succeeds
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => 'abc' })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => 'xyz' })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(too_many_request_response)
 
       store.should_receive(:update_notification).with do |notif|
@@ -224,11 +224,11 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 200, :body => JSON.dump({ 'registrationID' => 'abc' }))
 
       # first request to deliver message succeeds
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => 'abc' })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % { :registration_id => 'xyz' })
+      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(bad_request_response)
 
       store.should_receive(:update_notification).with do |notif|
