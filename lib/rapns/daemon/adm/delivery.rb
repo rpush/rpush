@@ -184,7 +184,7 @@ module Rapns
         end
 
         def do_post(registration_id)
-          adm_uri = URI.parse(AMAZON_ADM_URL % { registration_id: registration_id })
+          adm_uri = URI.parse(AMAZON_ADM_URL % { :registration_id => registration_id })
           post = Net::HTTP::Post.new(adm_uri.path, initheader = {
             'Content-Type' => 'application/json',
             'Accept' => 'application/json',
