@@ -43,9 +43,9 @@ shared_examples_for "an Notification subclass" do
       before do
         Timecop.freeze(Time.now)
 
-        (@delivered_notification = notification_class.new(app: app, delivered: true, failed: false)).save!(validate: false)
-        (@failed_notification = notification_class.new(app: app, delivered: false, failed: true)).save!(validate: false)
-        (@new_notification = notification_class.new(app: app, delivered: false, failed: false)).save!(validate: false)
+        (@delivered_notification = notification_class.new(:app => app, :delivered => true, :failed => false)).save!(:validate => false)
+        (@failed_notification = notification_class.new(:app => app, :delivered => false, :failed => true)).save!(:validate => false)
+        (@new_notification = notification_class.new(:app => app, :delivered => false, :failed => false)).save!(:validate => false)
       end
 
       after do
@@ -65,7 +65,7 @@ shared_examples_for "an Notification subclass" do
       describe '.created_before' do
         it 'should return notifications that were created before the specified date' do
           @delivered_notification.created_at = Time.now - 30.days - 1.second
-          @delivered_notification.save!(validate: false)
+          @delivered_notification.save!(:validate => false)
 
           notification_ids = Rapns::Notification.created_before(Time.now - 30.days).map(&:id)
 
@@ -77,13 +77,13 @@ shared_examples_for "an Notification subclass" do
       describe '.completed_and_older_than' do
         before do
           @delivered_notification.created_at = Time.now - 30.days - 1.second
-          @delivered_notification.save!(validate: false)
+          @delivered_notification.save!(:validate => false)
 
           @failed_notification.created_at = Time.now - 20.days - 1.second
-          @failed_notification.save!(validate: false)
+          @failed_notification.save!(:validate => false)
 
           @new_notification.created_at = Time.now - 30.days - 1.second
-          @new_notification.save!(validate: false)
+          @new_notification.save!(:validate => false)
         end
 
         it 'should only include completed notifications' do
