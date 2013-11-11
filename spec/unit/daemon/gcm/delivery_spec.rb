@@ -69,10 +69,10 @@ describe Rapns::Daemon::Gcm::Delivery do
         'success' => 1,
         'results' => [
           { 'message_id' => '1:000' },
-          { 'error' => 'NotRegistered' }
+          { 'error' => 'InvalidDataKey' }
       ]}
       response.stub(:body => JSON.dump(body))
-      batch.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: NotRegistered.")
+      batch.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
       perform rescue Rapns::DeliveryError
     end
 
@@ -90,6 +90,41 @@ describe Rapns::Daemon::Gcm::Delivery do
       response.stub(:body => JSON.dump(body))
       notification.stub(:registration_ids => ['1', '2', '3'])
       delivery.should_receive(:reflect).with(:gcm_canonical_id, '2', 'canonical123')
+      perform
+    end
+
+    it 'reflects on invalid IDs' do
+      body = {
+          'failure' => 1,
+          'success' => 2,
+          'canonical_ids' => 0,
+          'results' => [
+              { 'message_id' => '1:000' },
+              { 'error' => 'NotRegistered' },
+              { 'message_id' => '1:000' },
+          ]}
+
+      response.stub(:body => JSON.dump(body))
+      notification.stub(:registration_ids => ['1', '2', '3'])
+      delivery.should_receive(:reflect).with(:gcm_invalid_registration_id, app, 'NotRegistered', '2')
+      perform
+    end
+
+    it 'does not retry, raise or marks a notification as failed for invalid ids.' do
+      body = {
+          'failure' => 1,
+          'success' => 2,
+          'canonical_ids' => 0,
+          'results' => [
+              { 'message_id' => '1:000' },
+              { 'error' => 'NotRegistered' },
+              { 'message_id' => '1:000' },
+          ]}
+
+      response.stub(:body => JSON.dump(body))
+      batch.should_not_receive(:mark_failed)
+      batch.should_not_receive(:mark_retryable)
+      store.should_not_receive(:create_gcm_notification)
       perform
     end
 
@@ -123,7 +158,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       it 'logs that the notification will be retried' do
         notification.retries = 1
         notification.deliver_after = now + 2
-        Rapns.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
+        Rapns.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
         perform
       end
     end
@@ -158,10 +193,10 @@ describe Rapns::Daemon::Gcm::Delivery do
         'success' => 0,
         'results' => [
           { 'error' => 'Unavailable' },
-          { 'error' => 'NotRegistered' },
+          { 'error' => 'InvalidDataKey' },
           { 'error' => 'Unavailable' }
         ]}}
-      let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, NotRegistered, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
+      let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, InvalidDataKey, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'an notification with some delivery failures'
     end
   end
@@ -185,7 +220,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     it 'logs a warning that the notification will be retried.' do
       notification.retries = 1
       notification.deliver_after = now + 2
-      logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification #{notification.id} will be retired after 2012-10-14 00:00:02 (retry 1).")
+      logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
       perform
     end
 
@@ -216,7 +251,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
       notification.deliver_after = now + 2 ** 3
-      Rapns.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retired after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
+      Rapns.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
       perform
     end
 
