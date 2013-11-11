@@ -9,7 +9,7 @@ module Rapns
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
     :airbrake_notify, :check_for_errors, :pid_file, :batch_size,
-    :push, :store, :logger, :batch_storage_updates, :udp_wake_host, :udp_wake_port]
+    :push, :store, :logger, :batch_storage_updates, :wakeup]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end

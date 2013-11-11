@@ -53,8 +53,8 @@ module Rapns
       def self.interruptible_sleeper
         unless @interruptible_sleeper
           @interruptible_sleeper = InterruptibleSleep.new
-          if Rapns.config.udp_wake_host && Rapns.config.udp_wake_port
-            @interruptible_sleeper.enable_wake_on_udp Rapns.config.udp_wake_host, Rapns.config.udp_wake_port
+          if Rapns.config.wakeup
+            @interruptible_sleeper.enable_wake_on_udp Rapns.config.wakeup[:bind], Rapns.config.wakeup[:port]
           end
         end
         @interruptible_sleeper

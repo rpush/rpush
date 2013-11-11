@@ -26,4 +26,24 @@ describe Rapns::Notifier do
       end
     end
   end
+
+  describe "default notifier" do
+    it "creates using :connect first" do
+      Rapns.config.stub :wakeup => { :connect => '127.0.0.1', :port => 1234 }
+      Rapns::Notifier.should_receive(:new).with('127.0.0.1', 1234)
+      Rapns.notifier
+    end
+
+    it "creates using :host next" do
+      Rapns.config.stub :wakeup => { :host => '127.0.0.1', :port => 1234 }
+      Rapns::Notifier.should_receive(:new).with('127.0.0.1', 1234)
+      Rapns.notifier
+    end
+
+    it "returns nil when wakeup is not specified" do
+      Rapns.config.stub :wakeup => nil
+      Rapns::Notifier.should_not_receive(:new)
+      expect(Rapns.notifier).to be_nil
+    end
+  end
 end
