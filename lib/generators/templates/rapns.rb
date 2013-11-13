@@ -71,7 +71,7 @@ Rapns.reflect do |on|
   # on.gcm_canonical_id do |old_id, canonical_id|
   # end
 
-  # Called when the GCM returns a failure that indicates an invalid tegistration id.
+  # Called when the GCM returns a failure that indicates an invalid registration id.
   # You will need to delete the registration_id from your records.
   # on.gcm_invalid_registration_id do |app, error, registration_id|
   # end
