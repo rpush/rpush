@@ -4,7 +4,6 @@ require 'bundler'
 Bundler.require(:default)
 
 require 'active_record'
-require 'database_cleaner'
 
 unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
   begin
@@ -53,6 +52,7 @@ require 'generators/templates/add_gcm'
   migration.up
 end
 
+require 'database_cleaner'
 DatabaseCleaner.strategy = :truncation
 
 require 'rapns'
