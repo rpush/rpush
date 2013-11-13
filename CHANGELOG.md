@@ -1,5 +1,6 @@
-## 3.4.2 (unreleased)
+## 3.5.0 (unreleased)
   * Fix sqlite3 support (#160).
+  * Drop support for Ruby 1.8.
 
 ## 3.4.1 (Aug 30, 2013)
   * Silence unintended airbrake_notify deprecation warning (#158).

@@ -11,7 +11,7 @@
 * Run as a daemon or inside an [existing processs](https://github.com/ileitch/rapns/wiki/Embedding-API).
 * Use in a scheduler for low-workload deployments ([Push API](https://github.com/ileitch/rapns/wiki/Push-API)).
 * Reflection API for fine-grained instrumentation and error handling ([Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)).
-* Works with MRI, JRuby, Rubinius 1.8 and 1.9.
+* Works with MRI, JRuby, Rubinius 1.9, 2.0.
 * Built with love.
 
 ### Who uses Rapns?
