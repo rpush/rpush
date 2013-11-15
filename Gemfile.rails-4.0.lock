@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rapns (3.4.1)
+    rapns (3.5.0)
       multi_json (~> 1.0)
       net-http-persistent
 
