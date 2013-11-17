@@ -43,23 +43,25 @@ describe Rapns::Daemon::InterruptibleSleep do
       expect(subject.sleep(0.01)).to be_false
     end
 
-    it 'wakes on UDPSocket' do
-      waker = UDPSocket.new
-      waker.connect(@host, @port)
-      waker.write('x')
-      expect(subject.sleep(0.01)).to be_true
-    end
+    unless defined? JRUBY_VERSION
+      it 'wakes on UDPSocket' do
+        waker = UDPSocket.new
+        waker.connect(@host, @port)
+        waker.write('x')
+        expect(subject.sleep(0.01)).to be_true
+      end
 
-    it 'consumes all data on udp socket' do
-      waker = UDPSocket.new
-      waker.connect(@host, @port)
-      waker.sendmsg('x')
-      waker.sendmsg('x')
-      waker.sendmsg('x')
-      # true since there is data to be read => no timeout
-      expect(subject.sleep(0.01)).to be_true
-      # false since data is consumed => wait for full timeout
-      expect(subject.sleep(0.01)).to be_false
+      it 'consumes all data on udp socket' do
+        waker = UDPSocket.new
+        waker.connect(@host, @port)
+        waker.sendmsg('x')
+        waker.sendmsg('x')
+        waker.sendmsg('x')
+        # true since there is data to be read => no timeout
+        expect(subject.sleep(0.01)).to be_true
+        # false since data is consumed => wait for full timeout
+        expect(subject.sleep(0.01)).to be_false
+      end
     end
   end
 

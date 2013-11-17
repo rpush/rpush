@@ -22,7 +22,7 @@ describe Rapns::Notifier do
 
       it "writes data that can be read from socket" do
         subject.notify
-        expect(@reader.recvmsg).to be_an(Array)
+        expect(@reader.recv(1)).to eq 'x'
       end
     end
   end

@@ -38,7 +38,7 @@ module Rapns
         if rs && rs.include?(@udp_wakeup)
           while true
             begin
-              @udp_wakeup.recvmsg_nonblock
+              @udp_wakeup.recv_nonblock(1)
             rescue IO::WaitReadable
               break
             end
