@@ -54,9 +54,9 @@ describe Rapns::Daemon::InterruptibleSleep do
       it 'consumes all data on udp socket' do
         waker = UDPSocket.new
         waker.connect(@host, @port)
-        waker.sendmsg('x')
-        waker.sendmsg('x')
-        waker.sendmsg('x')
+        waker.send('x', 0)
+        waker.send('x', 0)
+        waker.send('x', 0)
         # true since there is data to be read => no timeout
         expect(subject.sleep(0.01)).to be_true
         # false since data is consumed => wait for full timeout
