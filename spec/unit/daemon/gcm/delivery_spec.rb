@@ -110,7 +110,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       perform
     end
 
-    it 'does not retry, raise or marks a notification as failed for invalid ids.' do
+    it 'does marks a notification as failed if any ids are invalid.' do
       body = {
           'failure' => 1,
           'success' => 2,
@@ -122,7 +122,7 @@ describe Rapns::Daemon::Gcm::Delivery do
           ]}
 
       response.stub(:body => JSON.dump(body))
-      batch.should_not_receive(:mark_failed)
+      batch.should_receive(:mark_failed)
       batch.should_not_receive(:mark_retryable)
       store.should_not_receive(:create_gcm_notification)
       perform
