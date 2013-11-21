@@ -15,7 +15,7 @@
   # config.check_for_errors = true
 
   # ActiveRecord notifications batch size.
-  # config.batch_size = 5000
+  # config.batch_size = 100
 
   # Perform updates to the storage backend in batches to reduce IO.
   # config.batch_storage_updates = true

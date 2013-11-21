@@ -74,7 +74,7 @@ module Rapns
       self.feedback_poll = 60
       Rapns::Deprecation.muted { self.airbrake_notify = true }
       self.check_for_errors = true
-      self.batch_size = 5000
+      self.batch_size = 100
       self.pid_file = nil
       self.apns_feedback_callback = nil
       self.store = :active_record
