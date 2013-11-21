@@ -28,8 +28,8 @@ describe Rapns::Configuration do
   it 'can be updated' do
     Rapns::Deprecation.muted do
       new_config = Rapns::Configuration.new
-      new_config.batch_size = 100
-      expect { config.update(new_config) }.to change(config, :batch_size).to(100)
+      new_config.batch_size = 200
+      expect { config.update(new_config) }.to change(config, :batch_size).to(200)
     end
   end
 
