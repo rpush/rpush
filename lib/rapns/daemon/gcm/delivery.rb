@@ -47,13 +47,14 @@ module Rapns
         def ok(response)
           body = multi_json_load(response.body)
 
-          handle_canonical_ids(response, body)
+          handle_canonical_ids(body)
+          handle_successes(body)
 
           if body['failure'].to_i == 0
             mark_delivered
             Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
           else
-            handle_invalid_registration_ids(response, body)
+            handle_invalid_registration_ids(body)
             handle_errors(response, body)
           end
 
@@ -67,7 +68,7 @@ module Rapns
           end
 
           if errors.empty?
-            all_errors_were_invalid_registration_ids(response)
+            all_errors_were_invalid_registration_ids
           elsif body['success'].to_i == 0 && errors.values.all? { |error| UNAVAILABLE_STATES.include?(error) }
             all_devices_unavailable(response)
           elsif errors.values.any? { |error| UNAVAILABLE_STATES.include?(error) }
@@ -77,7 +78,7 @@ module Rapns
           end
         end
 
-        def handle_invalid_registration_ids(response, body)
+        def handle_invalid_registration_ids(body)
           body['results'].each_with_index do |result, i|
             next unless INVALID_REGISTRATION_ID_STATES.include?(result['error'])
 
@@ -86,7 +87,15 @@ module Rapns
           end
         end
 
-        def handle_canonical_ids(response, body)
+        def handle_successes(body)
+          body['results'].each_with_index do |result, i|
+            next unless result['message_id']
+            registration_id = @notification.registration_ids[i]
+            reflect(:gcm_delivered_to_recipient, @notification, registration_id)
+          end
+        end
+
+        def handle_canonical_ids(body)
           if body['canonical_ids'] && body['canonical_ids'].to_i > 0
             body['results'].each_with_index do |result, i|
               if result['message_id'] && result['registration_id']
@@ -120,7 +129,7 @@ module Rapns
           Rapns.logger.warn("All recipients unavailable. " + retry_message)
         end
 
-        def all_errors_were_invalid_registration_ids(response)
+        def all_errors_were_invalid_registration_ids
           mark_failed(nil, "All registration IDs were invalid.")
         end
 
