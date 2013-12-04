@@ -70,7 +70,7 @@ module Rapns
           if failures[:unavailable].count == @notification.registration_ids.count
             Rapns.logger.warn("All recipients unavailable. #{retry_message}")
             retry_delivery(@notification, response)
-          elsif failures[:all].count > 0
+          elsif failures[:all].any?
             handle_failures(failures, response)
           else
             mark_delivered
@@ -84,11 +84,28 @@ module Rapns
         end
 
         def handle_failures(failures, response)
+          failures[:all].each do |index, error|
+            registration_id = @notification.registration_ids[index]
+            reflect(:gcm_failed_to_recipient, @notification, error, registration_id)
+          end
+
           failures[:invalid].each do |index, error|
             registration_id = @notification.registration_ids[index]
             reflect(:gcm_invalid_registration_id, @app, error, registration_id)
           end
 
+          error_description = error_description(failures)
+
+          if failures[:unavailable].any?
+            unavailable_idxs = failures[:unavailable].map(&:first)
+            new_notification = create_new_notification(response, unavailable_idxs)
+            error_description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
+          end
+
+          raise Rapns::DeliveryError.new(nil, @notification.id, error_description)
+        end
+
+        def error_description(failures)
           if failures[:all].count == @notification.registration_ids.size
             error_description = "Failed to deliver to all recipients."
           else
@@ -97,15 +114,7 @@ module Rapns
           end
 
           error_list = failures[:all].map(&:last)
-          error_description += " Errors: #{error_list.join(', ')}."
-
-          if failures[:unavailable].count > 0
-            unavailable_idxs = failures[:unavailable].map(&:first)
-            new_notification = create_new_notification(response, unavailable_idxs)
-            error_description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
-          end
-
-          raise Rapns::DeliveryError.new(nil, @notification.id, error_description)
+          error_description + " Errors: #{error_list.join(', ')}."
         end
 
         def create_new_notification(response, unavailable_idxs)

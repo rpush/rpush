@@ -54,7 +54,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     it 'reflects on any IDs which successfully received the notification' do
       body = {
         'failure' => 1,
-        'success' => 2,
+        'success' => 1,
         'results' => [
           { 'message_id' => '1:000' },
           { 'error' => 'Err' }
@@ -65,6 +65,23 @@ describe Rapns::Daemon::Gcm::Delivery do
       notification.stub(:registration_ids => ['1', '2'])
       delivery.should_receive(:reflect).with(:gcm_delivered_to_recipient, notification, '1')
       delivery.should_not_receive(:reflect).with(:gcm_delivered_to_recipient, notification, '2')
+      perform rescue Rapns::DeliveryError
+    end
+
+    it 'reflects on any IDs which failed to receive the notification' do
+      body = {
+        'failure' => 1,
+        'success' => 1,
+        'results' => [
+          { 'error' => 'Err' },
+          { 'message_id' => '1:000' }
+        ]
+      }
+
+      response.stub(:body => JSON.dump(body))
+      notification.stub(:registration_ids => ['1', '2'])
+      delivery.should_receive(:reflect).with(:gcm_failed_to_recipient, notification, 'Err', '1')
+      delivery.should_not_receive(:reflect).with(:gcm_failed_to_recipient, notification, anything, '2')
       perform rescue Rapns::DeliveryError
     end
 
