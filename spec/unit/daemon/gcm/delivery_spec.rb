@@ -22,7 +22,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     Rapns.stub(:logger => logger)
   end
 
-  shared_examples_for 'an notification with some delivery failures' do
+  shared_examples_for 'a notification with some delivery failures' do
     let(:new_notification) { Rapns::Gcm::Notification.where('id != ?', notification.id).first }
 
     before { response.stub(:body => JSON.dump(body)) }
@@ -46,42 +46,9 @@ describe Rapns::Daemon::Gcm::Delivery do
     end
   end
 
-  describe 'an 200 response' do
+  describe 'a 200 response' do
     before do
       response.stub(:code => 200)
-    end
-
-    describe 'when delivered successfully to all devices' do
-      let(:body) {{
-        'failure' => 0,
-        'success' => 1,
-        'results' => [{ 'message_id' => '1:000'}]
-      }}
-
-      before { response.stub(:body => JSON.dump(body)) }
-
-      it 'marks the notification as delivered' do
-        batch.should_receive(:mark_delivered).with(notification)
-        perform
-      end
-
-      it 'logs that the notification was delivered' do
-        logger.should_receive(:info).with("[MyApp] #{notification.id} sent to xyz")
-        perform
-      end
-    end
-
-    it 'marks a notification as failed if any deliveries failed that cannot be retried.' do
-      body = {
-        'failure' => 1,
-        'success' => 1,
-        'results' => [
-          { 'message_id' => '1:000' },
-          { 'error' => 'InvalidDataKey' }
-      ]}
-      response.stub(:body => JSON.dump(body))
-      batch.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
-      perform rescue Rapns::DeliveryError
     end
 
     it 'reflects on any IDs which successfully received the notification' do
@@ -132,10 +99,30 @@ describe Rapns::Daemon::Gcm::Delivery do
       response.stub(:body => JSON.dump(body))
       notification.stub(:registration_ids => ['1', '2', '3'])
       delivery.should_receive(:reflect).with(:gcm_invalid_registration_id, app, 'NotRegistered', '2')
-      perform
+      perform rescue Rapns::DeliveryError
     end
 
-    it 'does marks a notification as failed if any ids are invalid.' do
+    describe 'when delivered successfully to all devices' do
+      let(:body) {{
+        'failure' => 0,
+        'success' => 1,
+        'results' => [{ 'message_id' => '1:000'}]
+      }}
+
+      before { response.stub(:body => JSON.dump(body)) }
+
+      it 'marks the notification as delivered' do
+        batch.should_receive(:mark_delivered).with(notification)
+        perform
+      end
+
+      it 'logs that the notification was delivered' do
+        logger.should_receive(:info).with("[MyApp] #{notification.id} sent to xyz")
+        perform
+      end
+    end
+
+    it 'marks a notification as failed if any ids are invalid' do
       body = {
           'failure' => 1,
           'success' => 2,
@@ -150,10 +137,23 @@ describe Rapns::Daemon::Gcm::Delivery do
       batch.should_receive(:mark_failed)
       batch.should_not_receive(:mark_retryable)
       store.should_not_receive(:create_gcm_notification)
-      perform
+      perform rescue Rapns::DeliveryError
     end
 
-    describe 'all deliveries returned Unavailable or InternalServerError' do
+    it 'marks a notification as failed if any deliveries failed that cannot be retried' do
+      body = {
+        'failure' => 1,
+        'success' => 1,
+        'results' => [
+          { 'message_id' => '1:000' },
+          { 'error' => 'InvalidDataKey' }
+        ]}
+      response.stub(:body => JSON.dump(body))
+      batch.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
+      perform rescue Rapns::DeliveryError
+    end
+
+    describe 'all deliveries failed with Unavailable or InternalServerError' do
       let(:body) {{
         'failure' => 2,
         'success' => 0,
@@ -162,7 +162,10 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'error' => 'Unavailable' }
         ]}}
 
-      before { response.stub(:body => JSON.dump(body)) }
+      before do
+        response.stub(:body => JSON.dump(body))
+        notification.stub(:registration_ids => ['1', '2'])
+      end
 
       it 'retries the notification respecting the Retry-After header' do
         response.stub(:header => { 'retry-after' => 10 })
@@ -188,30 +191,6 @@ describe Rapns::Daemon::Gcm::Delivery do
       end
     end
 
-    shared_examples_for 'an notification with some delivery failures' do
-      let(:new_notification) { Rapns::Gcm::Notification.where('id != ?', notification.id).first }
-
-      before { response.stub(:body => JSON.dump(body)) }
-
-      it 'marks the original notification as failed' do
-        batch.should_receive(:mark_failed).with(notification, nil, error_description)
-        perform rescue Rapns::DeliveryError
-      end
-
-      it 'creates a new notification for the unavailable devices' do
-        notification.update_attributes(:registration_ids => ['id_0', 'id_1', 'id_2'], :data => {'one' => 1}, :collapse_key => 'thing', :delay_while_idle => true)
-        response.stub(:header => { 'retry-after' => 10 })
-        attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
-        store.should_receive(:create_gcm_notification).with(attrs, notification.data,
-            ['id_0', 'id_2'], now + 10.seconds, notification.app)
-        perform rescue Rapns::DeliveryError
-      end
-
-      it 'raises a DeliveryError' do
-        expect { perform }.to raise_error(Rapns::DeliveryError)
-      end
-    end
-
     describe 'all deliveries failed with some as Unavailable or InternalServerError' do
       let(:body) {{
         'failure' => 3,
@@ -222,12 +201,11 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'error' => 'Unavailable' }
         ]}}
       let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, InvalidDataKey, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
-      it_should_behave_like 'an notification with some delivery failures'
+      it_should_behave_like 'a notification with some delivery failures'
     end
-  end
 
-  describe 'some deliveries failed with Unavailable or InternalServerError' do
-    let(:body) {{
+    describe 'some deliveries failed with Unavailable or InternalServerError' do
+      let(:body) {{
         'failure' => 2,
         'success' => 1,
         'results' => [
@@ -235,11 +213,12 @@ describe Rapns::Daemon::Gcm::Delivery do
           { 'message_id' => '1:000' },
           { 'error' => 'InternalServerError' }
         ]}}
-    let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification")} [\d]+\./ }
-    it_should_behave_like 'an notification with some delivery failures'
+      let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification")} [\d]+\./ }
+      it_should_behave_like 'a notification with some delivery failures'
+    end
   end
 
-  describe 'an 503 response' do
+  describe 'a 503 response' do
     before { response.stub(:code => 503) }
 
     it 'logs a warning that the notification will be retried.' do
@@ -267,7 +246,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     end
   end
 
-  describe 'an 500 response' do
+  describe 'a 500 response' do
     before do
       notification.update_attribute(:retries, 2)
       response.stub(:code => 500)
@@ -286,7 +265,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     end
   end
 
-  describe 'an 401 response' do
+  describe 'a 401 response' do
     before { response.stub(:code => 401) }
 
     it 'raises an error' do
@@ -294,7 +273,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     end
   end
 
-  describe 'an 400 response' do
+  describe 'a 400 response' do
     before { response.stub(:code => 400) }
 
     it 'marks the notification as failed' do

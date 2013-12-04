@@ -32,9 +32,9 @@ module Rapns
           when 200
             ok(response)
           when 400
-            bad_request(response)
+            bad_request
           when 401
-            unauthorized(response)
+            unauthorized
           when 500
             internal_server_error(response)
           when 503
@@ -47,70 +47,79 @@ module Rapns
         def ok(response)
           body = multi_json_load(response.body)
 
-          handle_canonical_ids(body)
-          handle_successes(body)
+          failures = {
+            invalid: [],
+            unavailable: [],
+            all: []
+          }
 
-          if body['failure'].to_i == 0
-            mark_delivered
-            Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
-          else
-            handle_invalid_registration_ids(body)
-            handle_errors(response, body)
-          end
-
-        end
-
-        def handle_errors(response, body)
-          errors = {}
-
-          body['results'].each_with_index do |result, i|
-            errors[i] = result['error'] if result['error'] && ! INVALID_REGISTRATION_ID_STATES.include?(result['error'])
-          end
-
-          if errors.empty?
-            all_errors_were_invalid_registration_ids
-          elsif body['success'].to_i == 0 && errors.values.all? { |error| UNAVAILABLE_STATES.include?(error) }
-            all_devices_unavailable(response)
-          elsif errors.values.any? { |error| UNAVAILABLE_STATES.include?(error) }
-            some_devices_unavailable(response, errors)
-          else
-            raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
-          end
-        end
-
-        def handle_invalid_registration_ids(body)
-          body['results'].each_with_index do |result, i|
-            next unless INVALID_REGISTRATION_ID_STATES.include?(result['error'])
-
-            registration_id = @notification.registration_ids[i]
-            reflect(:gcm_invalid_registration_id, @app, result['error'], registration_id)
-          end
-        end
-
-        def handle_successes(body)
-          body['results'].each_with_index do |result, i|
-            next unless result['message_id']
-            registration_id = @notification.registration_ids[i]
-            reflect(:gcm_delivered_to_recipient, @notification, registration_id)
-          end
-        end
-
-        def handle_canonical_ids(body)
-          if body['canonical_ids'] && body['canonical_ids'].to_i > 0
-            body['results'].each_with_index do |result, i|
-              if result['message_id'] && result['registration_id']
-                old_id = @notification.registration_ids[i]
-                reflect(:gcm_canonical_id, old_id, result['registration_id'])
+          body['results'].zip(@notification.registration_ids).each_with_index do |(result, registration_id), index|
+            if result['message_id']
+              handle_success(registration_id, result['registration_id'])
+            elsif error = result['error']
+              case error
+              when *INVALID_REGISTRATION_ID_STATES
+                failures[:invalid] << [index, error]
+              when *UNAVAILABLE_STATES
+                failures[:unavailable] << [index, error]
               end
+              failures[:all] << [index, error]
             end
           end
+
+          if failures[:unavailable].count == @notification.registration_ids.count
+            Rapns.logger.warn("All recipients unavailable. #{retry_message}")
+            retry_delivery(@notification, response)
+          elsif failures[:all].count > 0
+            handle_failures(failures, response)
+          else
+            mark_delivered
+            Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
+          end
         end
 
-        def bad_request(response)
+        def handle_success(registration_id, canonical_id)
+          reflect(:gcm_delivered_to_recipient, @notification, registration_id)
+          reflect(:gcm_canonical_id, registration_id, canonical_id) unless canonical_id.nil?
+        end
+
+        def handle_failures(failures, response)
+          failures[:invalid].each do |index, error|
+            registration_id = @notification.registration_ids[index]
+            reflect(:gcm_invalid_registration_id, @app, error, registration_id)
+          end
+
+          if failures[:all].count == @notification.registration_ids.size
+            error_description = "Failed to deliver to all recipients."
+          else
+            index_list = failures[:all].map(&:first)
+            error_description = "Failed to deliver to recipients #{index_list.join(', ')}."
+          end
+
+          error_list = failures[:all].map(&:last)
+          error_description += " Errors: #{error_list.join(', ')}."
+
+          if failures[:unavailable].count > 0
+            unavailable_idxs = failures[:unavailable].map(&:first)
+            new_notification = create_new_notification(response, unavailable_idxs)
+            error_description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
+          end
+
+          raise Rapns::DeliveryError.new(nil, @notification.id, error_description)
+        end
+
+        def create_new_notification(response, unavailable_idxs)
+          attrs = @notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle')
+          registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
+          Rapns::Daemon.store.create_gcm_notification(attrs, @notification.data,
+            registration_ids, deliver_after_header(response), @notification.app)
+        end
+
+        def bad_request
           raise Rapns::DeliveryError.new(400, @notification.id, 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
         end
 
-        def unauthorized(response)
+        def unauthorized
           raise Rapns::DeliveryError.new(401, @notification.id, 'Unauthorized, check your App auth_key.')
         end
 
@@ -122,29 +131,6 @@ module Rapns
         def service_unavailable(response)
           retry_delivery(@notification, response)
           Rapns.logger.warn("GCM responded with an Service Unavailable Error. " + retry_message)
-        end
-
-        def all_devices_unavailable(response)
-          retry_delivery(@notification, response)
-          Rapns.logger.warn("All recipients unavailable. " + retry_message)
-        end
-
-        def all_errors_were_invalid_registration_ids
-          mark_failed(nil, "All registration IDs were invalid.")
-        end
-
-        def some_devices_unavailable(response, errors)
-          unavailable_idxs = errors.find_all { |i, error| UNAVAILABLE_STATES.include?(error) }.map(&:first)
-          new_notification = create_new_notification(response, unavailable_idxs)
-          raise Rapns::DeliveryError.new(nil, @notification.id,
-            describe_errors(errors) + " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}.")
-        end
-
-        def create_new_notification(response, unavailable_idxs)
-          attrs = @notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle')
-          registration_ids = unavailable_idxs.map { |i| @notification.registration_ids[i] }
-          Rapns::Daemon.store.create_gcm_notification(attrs, @notification.data,
-            registration_ids, deliver_after_header(response), @notification.app)
         end
 
         def deliver_after_header(response)
@@ -162,14 +148,6 @@ module Rapns
             mark_retryable(notification, time)
           else
             mark_retryable_exponential(notification)
-          end
-        end
-
-        def describe_errors(errors)
-          description = if errors.size == @notification.registration_ids.size
-            "Failed to deliver to all recipients. Errors: #{errors.values.join(', ')}."
-          else
-            "Failed to deliver to recipients #{errors.keys.join(', ')}. Errors: #{errors.values.join(', ')}."
           end
         end
 
