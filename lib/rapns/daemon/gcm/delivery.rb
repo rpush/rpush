@@ -222,9 +222,9 @@ module Rapns
             failures[category] = []
           end
 
-          @results_data.zip(@registration_ids).each_with_index do |(result, registration_id), index|
+          @results_data.each_with_index do |result, index|
             entry = {
-              registration_id: registration_id,
+              registration_id: @registration_ids[index],
               index: index
             }
             if result['message_id']
