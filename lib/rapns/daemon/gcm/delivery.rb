@@ -45,23 +45,23 @@ module Rapns
         end
 
         def ok(response)
-          body = multi_json_load(response.body)
-
-          results = Results.new(body['results'], @notification.registration_ids)
-          results.process(invalid: INVALID_REGISTRATION_ID_STATES, unavailable: UNAVAILABLE_STATES)
+          results = process_response(response)
 
           handle_successes(results.successes)
 
-          if results.failures[:unavailable].count == @notification.registration_ids.count
-            Rapns.logger.warn("All recipients unavailable. #{retry_message}")
-            retry_delivery(@notification, response)
-          elsif results.failures.any?
+          if results.failures.any?
             handle_failures(results.failures, response)
-            raise Rapns::DeliveryError.new(nil, @notification.id, results.failures.description)
           else
             mark_delivered
             Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
           end
+        end
+
+        def process_response(response)
+          body = multi_json_load(response.body)
+          results = Results.new(body['results'], @notification.registration_ids)
+          results.process(invalid: INVALID_REGISTRATION_ID_STATES, unavailable: UNAVAILABLE_STATES)
+          results
         end
 
         def handle_successes(successes)
@@ -74,6 +74,16 @@ module Rapns
         end
 
         def handle_failures(failures, response)
+          if failures[:unavailable].count == @notification.registration_ids.count
+            retry_delivery(@notification, response)
+            Rapns.logger.warn("All recipients unavailable. #{retry_message}")
+          else
+            handle_errors(failures, response)
+            raise Rapns::DeliveryError.new(nil, @notification.id, failures.description)
+          end
+        end
+
+        def handle_errors(failures, response)
           failures.each do |result|
             reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
           end
