@@ -78,24 +78,22 @@ module Rapns
             retry_delivery(@notification, response)
             Rapns.logger.warn("All recipients unavailable. #{retry_message}")
           else
-            handle_errors(failures, response)
+            if failures[:unavailable].any?
+              unavailable_idxs = failures[:unavailable].map { |result| result[:index] }
+              new_notification = create_new_notification(response, unavailable_idxs)
+              failures.description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
+            end
+            handle_errors(failures)
             raise Rapns::DeliveryError.new(nil, @notification.id, failures.description)
           end
         end
 
-        def handle_errors(failures, response)
+        def handle_errors(failures)
           failures.each do |result|
             reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
           end
-
           failures[:invalid].each do |result|
             reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id])
-          end
-
-          if failures[:unavailable].any?
-            unavailable_idxs = failures[:unavailable].map { |result| result[:index] }
-            new_notification = create_new_notification(response, unavailable_idxs)
-            failures.description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
           end
         end
 
