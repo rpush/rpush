@@ -66,6 +66,18 @@ Rapns.reflect do |on|
   # on.apns_connection_lost do |app, error|
   # end
 
+  # Called for each recipient which successfully receives a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients.
+  # on.gcm_delivered_to_recipient do |notification, registration_id|
+  # end
+
+  # Called for each recipient which fails to receive a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients. (do not handle invalid registration IDs here)
+  # on.gcm_failed_to_recipient do |notification, error, registration_id|
+  # end
+
   # Called when the GCM returns a canonical registration ID.
   # You will need to replace old_id with canonical_id in your records.
   # on.gcm_canonical_id do |old_id, canonical_id|
