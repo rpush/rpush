@@ -1,0 +1,199 @@
+module Rapns
+  module Daemon
+    module Wpns
+      class Delivery < Rapns::Daemon::Delivery
+        def initialize(app, http, notification, batch)
+          @app = app
+          @http = http
+          @notification = notification
+          @batch = batch
+          @end_safe_mode = nil
+          @safe_mode_time = nil
+        end
+
+        def perform
+          if @end_safe_mode = nil
+            perform_unsafe
+          else
+            if Time.now() < @safe_mode_time
+              Rapns.logger.warn "Safe mode! you need to wait #{@safe_mode_time - Time.now()}"
+            else
+              if @safe_mode_time > @end_safe_mode
+                @safe_mode_time = nil
+                @end_safe_mode = nil
+              else
+                perform_unsafe
+              end
+            end
+          end
+        end
+
+        protected
+        # Status codes.
+        # http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff941100%28v=vs.105%29.aspx
+        def handle_response(res)
+          case res.code.to_i
+          when 200
+            ok res
+          when 400
+            bad_request res
+          when 401
+            unauthorized res
+          when 404
+            not_found res
+          when 405
+            method_not_allowed res
+          when 406
+            not_acceptable res
+          when 412
+            precondition_failed res
+          when 503
+            service_unavailable res
+          end
+        end
+
+        def ok(res)
+          status = status_from_response res
+
+          case status[:notification]
+          when "Received"
+            mark_delivered
+            Rapns.logger.info "[#{@app.name}] #{@notification.id} sent successfully"
+          when "QueueFull"
+            Rapns.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
+          when "Supressed"
+            Rapns.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
+          end
+
+        end
+
+        def bad_request(res)
+          raise Rapns::DeliveryError.new(400, @notification.id,
+                                         'Bad XML or malformed notification URI')
+        end
+
+        def unauthorized(res)
+          raise Rapns::DeliveryError.new(401, @notification.id,
+                                         "Unauthorized to send a notification to this app")
+        end
+
+        def not_found(res)
+          # in this case we need to drop the notification since it's
+          # not in the notification service
+          raise Rapns::DeliveryError.new(404, @notification.id,
+                                         "Not found!")
+        end
+
+        def method_not_allowed(res)
+          raise Rapns::DeliveryError.new(405, @notification.id,
+                                         "No method allowed. This should be considered as a Rapns bug")
+        end
+
+        def not_acceptable(res)
+          # Now we can send notifications over an hour until tomorrow.
+          Rapns.logger.warn "[#{@app.name}] #{@notification.id} Reached the per-day throttling limit for a suscription."
+          @safe_mode_time = Time.now() + (60*60*24)
+          raise Rapns::DeliveryError.new(406, @notification.id,
+                                         "Reached the per-day throttling limit for a suscription.")
+        end
+
+        def precondition_failed(res)
+          raise Rapns::DeliveryError.new(412, @notification.id,
+                                         "Precondition Failed. Device is Disconnected for now.")
+        end
+
+        def service_unavailable(res)
+          raise Rapns::DeliveryError.new(412, @notification.id,
+                                         "Service unavailable.")
+        end
+
+        def do_post
+          header = {
+            "Content-Length" => notif_to_xml.length,
+            "Content-Type" => "text/xml",
+            "X-WindowsPhone-Target" => "toast",
+            "X-NotificationClass" => '2'
+          }
+          post = Net::HTTP::Post.new(URI.parse(@notification.uri).path,initheader=header)
+          post.body = notif_to_xml()
+          @http.request(URI.parse(@notification.uri), post)
+        end
+
+        HTTP_STATUS_CODES = {
+          100  => 'Continue',
+          101  => 'Switching Protocols',
+          102  => 'Processing',
+          200  => 'OK',
+          201  => 'Created',
+          202  => 'Accepted',
+          203  => 'Non-Authoritative Information',
+          204  => 'No Content',
+          205  => 'Reset Content',
+          206  => 'Partial Content',
+          207  => 'Multi-Status',
+          226  => 'IM Used',
+          300  => 'Multiple Choices',
+          301  => 'Moved Permanently',
+          302  => 'Found',
+          303  => 'See Other',
+          304  => 'Not Modified',
+          305  => 'Use Proxy',
+          306  => 'Reserved',
+          307  => 'Temporary Redirect',
+          400  => 'Bad Request',
+          401  => 'Unauthorized',
+          402  => 'Payment Required',
+          403  => 'Forbidden',
+          404  => 'Not Found',
+          405  => 'Method Not Allowed',
+          406  => 'Not Acceptable',
+          407  => 'Proxy Authentication Required',
+          408  => 'Request Timeout',
+          409  => 'Conflict',
+          410  => 'Gone',
+          411  => 'Length Required',
+          412  => 'Precondition Failed',
+          413  => 'Request Entity Too Large',
+          414  => 'Request-URI Too Long',
+          415  => 'Unsupported Media Type',
+          416  => 'Requested Range Not Satisfiable',
+          417  => 'Expectation Failed',
+          418  => "I'm a Teapot",
+          422  => 'Unprocessable Entity',
+          423  => 'Locked',
+          424  => 'Failed Dependency',
+          426  => 'Upgrade Required',
+          500  => 'Internal Server Error',
+          501  => 'Not Implemented',
+          502  => 'Bad Gateway',
+          503  => 'Service Unavailable',
+          504  => 'Gateway Timeout',
+          505  => 'HTTP Version Not Supported',
+          506  => 'Variant Also Negotiates',
+          507  => 'Insufficient Storage',
+          510  => 'Not Extended',
+        }
+
+        private
+
+        def status_from_response(res)
+          {
+            :notification         => res.to_hash["X-NotificationStatus"],
+            :notification_channel => res.to_hash["X-SubscriptionStatus"],
+            :device_connection    => res.to_hash["X-DeviceConnectionStatus"]
+          }
+        end
+
+        def perform_unsafe
+          begin
+            handle_response (do_post)
+          rescue Rapns::DeliveryError => error
+            mark_failed(error.code, error.description)
+            raise
+          end
+        end
+
+      end
+    end
+  end
+end
