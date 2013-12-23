@@ -12,7 +12,7 @@ module Rapns
         end
 
         def perform
-          if @end_safe_mode = nil
+          if @end_safe_mode == nil
             perform_unsafe
           else
             if Time.now() < @safe_mode_time
@@ -56,12 +56,12 @@ module Rapns
           status = status_from_response res
 
           case status[:notification]
-          when "Received"
+          when ["Received"]
             mark_delivered
             Rapns.logger.info "[#{@app.name}] #{@notification.id} sent successfully"
-          when "QueueFull"
+          when ["QueueFull"]
             Rapns.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
-          when "Supressed"
+          when ["Supressed"]
             Rapns.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
           end
 
@@ -109,7 +109,7 @@ module Rapns
 
         def do_post
           header = {
-            "Content-Length" => notif_to_xml.length,
+            "Content-Length" => notif_to_xml.length.to_s,
             "Content-Type" => "text/xml",
             "X-WindowsPhone-Target" => "toast",
             "X-NotificationClass" => '2'
@@ -178,9 +178,9 @@ module Rapns
 
         def status_from_response(res)
           {
-            :notification         => res.to_hash["X-NotificationStatus"],
-            :notification_channel => res.to_hash["X-SubscriptionStatus"],
-            :device_connection    => res.to_hash["X-DeviceConnectionStatus"]
+            :notification         => res.to_hash["x-notificationstatus"],
+            :notification_channel => res.to_hash["x-subscriptionstatus"],
+            :device_connection    => res.to_hash["x-deviceconnectionstatus"]
           }
         end
 
@@ -191,6 +191,22 @@ module Rapns
             mark_failed(error.code, error.description)
             raise
           end
+        end
+        
+        def notif_to_xml
+          @message = @notification.alert.gsub(/&/, "&amp;")
+          @message = @notification.alert.gsub(/</, "&lt;")
+          @message = @notification.alert.gsub(/>/, "&gt;")
+          @message = @notification.alert.gsub(/'/, "&apos;")
+          @message = @notification.alert.gsub(/"/, "&quot;")
+          <<-EOF 
+<?xml version="1.0" encoding="utf-8"?>
+    <wp:Notification xmlns:wp="WPNotification">
+      <wp:Toast>
+        <wp:Text1>#{@message}</wp:Text1>
+      </wp:Toast>
+    </wp:Notification>
+          EOF
         end
 
       end

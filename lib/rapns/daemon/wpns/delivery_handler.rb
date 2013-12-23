@@ -4,7 +4,7 @@ module Rapns
       class DeliveryHandler < Rapns::Daemon::DeliveryHandler
         def initialize(app)
           @app = app
-          @http = Net::Http::Persistent.new('rapns')
+          @http = Net::HTTP::Persistent.new('rapns')
         end
         
         def deliver(notification, batch)
