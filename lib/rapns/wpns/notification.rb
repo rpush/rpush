@@ -4,14 +4,16 @@ module Rapns
       validates :uri, :presence => true
       validates_with Rapns::Wpns::DataValidator
       
-      def registration_ids=(ids)
-        ids = [ids] if ids && !ids.is_a(Array)
-        super
+      def data=(attrs)
+        return unless attrs
+        raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
+        super attrs.merge(data || {})
       end
 
       def as_json
         json = {
-          'data' => data
+          'message' => alert,
+          'uri'     => uri
         }
 
         if collapse_key
@@ -21,6 +23,9 @@ module Rapns
         json
       end
 
+      def uri_is_valid?()
+        return (/https?:\/\/[\S]+/.match(uri) != nil)
+      end
     end
   end
 end

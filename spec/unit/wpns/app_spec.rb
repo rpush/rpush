@@ -24,7 +24,7 @@ describe Rapns::Wpns::App do
 
   it 'should be invalid if name nil' do
     subject.name = nil
-    subject.should_nos be_valid
+    subject.should_not be_valid
     subject.errors[:name].should == ["can't be blank"]
   end
 
