@@ -192,14 +192,14 @@ module Rapns
             raise
           end
         end
-        
+
         def notif_to_xml
           @message = @notification.alert.gsub(/&/, "&amp;")
           @message = @notification.alert.gsub(/</, "&lt;")
           @message = @notification.alert.gsub(/>/, "&gt;")
           @message = @notification.alert.gsub(/'/, "&apos;")
           @message = @notification.alert.gsub(/"/, "&quot;")
-          <<-EOF 
+          <<-EOF
 <?xml version="1.0" encoding="utf-8"?>
     <wp:Notification xmlns:wp="WPNotification">
       <wp:Toast>

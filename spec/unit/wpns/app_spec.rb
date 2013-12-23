@@ -9,7 +9,7 @@ describe Rapns::Wpns::App do
       :client_secret => 'CLIENT_SECRET'
     )
   }
-  let(:existing_app) { 
+  let(:existing_app) {
     Rapns::Wpns::App.create!(
       :name => 'existing',
       :environment => 'development',

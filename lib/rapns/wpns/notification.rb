@@ -3,7 +3,7 @@ module Rapns
     class Notification < Rapns::Notification
       validates :uri, :presence => true
       validates_with Rapns::Wpns::DataValidator
-      
+
       def data=(attrs)
         return unless attrs
         raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)

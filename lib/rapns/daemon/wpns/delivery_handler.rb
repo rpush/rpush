@@ -6,7 +6,7 @@ module Rapns
           @app = app
           @http = Net::HTTP::Persistent.new('rapns')
         end
-        
+
         def deliver(notification, batch)
           Rapns::Daemon::Wpns::Delivery.new(@app, @http, notification, batch).perform
         end
