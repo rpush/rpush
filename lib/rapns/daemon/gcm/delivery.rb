@@ -32,9 +32,9 @@ module Rapns
           when 200
             ok(response)
           when 400
-            bad_request(response)
+            bad_request
           when 401
-            unauthorized(response)
+            unauthorized
           when 500
             internal_server_error(response)
           when 503
@@ -45,63 +45,70 @@ module Rapns
         end
 
         def ok(response)
-          body = multi_json_load(response.body)
+          results = process_response(response)
 
-          handle_canonical_ids(response, body)
+          handle_successes(results.successes)
 
-          if body['failure'].to_i == 0
+          if results.failures.any?
+            handle_failures(results.failures, response)
+          else
             mark_delivered
             Rapns.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
-          else
-            handle_invalid_registration_ids(response, body)
-            handle_errors(response, body)
-          end
-
-        end
-
-        def handle_errors(response, body)
-          errors = {}
-
-          body['results'].each_with_index do |result, i|
-            errors[i] = result['error'] if result['error'] && ! INVALID_REGISTRATION_ID_STATES.include?(result['error'])
-          end
-
-          if errors.empty?
-            all_errors_were_invalid_registration_ids(response)
-          elsif body['success'].to_i == 0 && errors.values.all? { |error| UNAVAILABLE_STATES.include?(error) }
-            all_devices_unavailable(response)
-          elsif errors.values.any? { |error| UNAVAILABLE_STATES.include?(error) }
-            some_devices_unavailable(response, errors)
-          else
-            raise Rapns::DeliveryError.new(nil, @notification.id, describe_errors(errors))
           end
         end
 
-        def handle_invalid_registration_ids(response, body)
-          body['results'].each_with_index do |result, i|
-            next unless INVALID_REGISTRATION_ID_STATES.include?(result['error'])
-
-            registration_id = @notification.registration_ids[i]
-            reflect(:gcm_invalid_registration_id, @app, result['error'], registration_id)
-          end
+        def process_response(response)
+          body = multi_json_load(response.body)
+          results = Results.new(body['results'], @notification.registration_ids)
+          results.process(invalid: INVALID_REGISTRATION_ID_STATES, unavailable: UNAVAILABLE_STATES)
+          results
         end
 
-        def handle_canonical_ids(response, body)
-          if body['canonical_ids'] && body['canonical_ids'].to_i > 0
-            body['results'].each_with_index do |result, i|
-              if result['message_id'] && result['registration_id']
-                old_id = @notification.registration_ids[i]
-                reflect(:gcm_canonical_id, old_id, result['registration_id'])
-              end
+        def handle_successes(successes)
+          successes.each do |result|
+            reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
+            if result.has_key?(:canonical_id)
+              reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
             end
           end
         end
 
-        def bad_request(response)
+        def handle_failures(failures, response)
+          if failures[:unavailable].count == @notification.registration_ids.count
+            retry_delivery(@notification, response)
+            Rapns.logger.warn("All recipients unavailable. #{retry_message}")
+          else
+            if failures[:unavailable].any?
+              unavailable_idxs = failures[:unavailable].map { |result| result[:index] }
+              new_notification = create_new_notification(response, unavailable_idxs)
+              failures.description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
+            end
+            handle_errors(failures)
+            raise Rapns::DeliveryError.new(nil, @notification.id, failures.description)
+          end
+        end
+
+        def handle_errors(failures)
+          failures.each do |result|
+            reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
+          end
+          failures[:invalid].each do |result|
+            reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id])
+          end
+        end
+
+        def create_new_notification(response, unavailable_idxs)
+          attrs = @notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle')
+          registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
+          Rapns::Daemon.store.create_gcm_notification(attrs, @notification.data,
+            registration_ids, deliver_after_header(response), @notification.app)
+        end
+
+        def bad_request
           raise Rapns::DeliveryError.new(400, @notification.id, 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
         end
 
-        def unauthorized(response)
+        def unauthorized
           raise Rapns::DeliveryError.new(401, @notification.id, 'Unauthorized, check your App auth_key.')
         end
 
@@ -113,29 +120,6 @@ module Rapns
         def service_unavailable(response)
           retry_delivery(@notification, response)
           Rapns.logger.warn("GCM responded with an Service Unavailable Error. " + retry_message)
-        end
-
-        def all_devices_unavailable(response)
-          retry_delivery(@notification, response)
-          Rapns.logger.warn("All recipients unavailable. " + retry_message)
-        end
-
-        def all_errors_were_invalid_registration_ids(response)
-          mark_failed(nil, "All registration IDs were invalid.")
-        end
-
-        def some_devices_unavailable(response, errors)
-          unavailable_idxs = errors.find_all { |i, error| UNAVAILABLE_STATES.include?(error) }.map(&:first)
-          new_notification = create_new_notification(response, unavailable_idxs)
-          raise Rapns::DeliveryError.new(nil, @notification.id,
-            describe_errors(errors) + " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}.")
-        end
-
-        def create_new_notification(response, unavailable_idxs)
-          attrs = @notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle')
-          registration_ids = unavailable_idxs.map { |i| @notification.registration_ids[i] }
-          Rapns::Daemon.store.create_gcm_notification(attrs, @notification.data,
-            registration_ids, deliver_after_header(response), @notification.app)
         end
 
         def deliver_after_header(response)
@@ -153,14 +137,6 @@ module Rapns
             mark_retryable(notification, time)
           else
             mark_retryable_exponential(notification)
-          end
-        end
-
-        def describe_errors(errors)
-          description = if errors.size == @notification.registration_ids.size
-            "Failed to deliver to all recipients. Errors: #{errors.values.join(', ')}."
-          else
-            "Failed to deliver to recipients #{errors.keys.join(', ')}. Errors: #{errors.values.join(', ')}."
           end
         end
 
@@ -229,6 +205,76 @@ module Rapns
           507  => 'Insufficient Storage',
           510  => 'Not Extended',
         }
+      end
+
+      class Results
+        attr_reader :successes, :failures
+
+        def initialize(results_data, registration_ids)
+          @results_data = results_data
+          @registration_ids = registration_ids
+        end
+
+        def process(failure_partitions = {})
+          @successes = []
+          @failures = Failures.new
+          failure_partitions.each_key do |category|
+            failures[category] = []
+          end
+
+          @results_data.each_with_index do |result, index|
+            entry = {
+              registration_id: @registration_ids[index],
+              index: index
+            }
+            if result['message_id']
+              entry[:canonical_id] = result['registration_id'] if result['registration_id'].present?
+              successes << entry
+            elsif result['error']
+              entry[:error] = result['error']
+              failures << entry
+              failure_partitions.each do |category, error_states|
+                failures[category] << entry if error_states.include?(result['error'])
+              end
+            end
+          end
+          failures.total_fail = failures.count == @registration_ids.count
+        end
+      end
+
+      class Failures < Hash
+        include Enumerable
+        attr_writer :total_fail, :description
+
+        def initialize
+          super[:all] = []
+        end
+
+        def each
+          self[:all].each { |x| yield x }
+        end
+
+        def <<(item)
+          self[:all] << item
+        end
+
+        def description
+          @description ||= describe
+        end
+
+        private
+
+        def describe
+          if @total_fail
+            error_description = "Failed to deliver to all recipients."
+          else
+            index_list = map { |item| item[:index] }
+            error_description = "Failed to deliver to recipients #{index_list.join(', ')}."
+          end
+
+          error_list = map { |item| item[:error] }
+          error_description + " Errors: #{error_list.join(', ')}."
+        end
       end
     end
   end
