@@ -45,7 +45,6 @@ describe Rapns::Daemon::Wpns::Delivery do
     end
 
     it "marks the notification as delivered if delivered successfully to all devices" do
-      
       response.stub(:body => JSON.dump({ "failure" => 0 }))
       response.stub(:to_hash => {"x-notificationstatus" => ["Received"]})
       batch.should_receive(:mark_delivered).with(notification)
@@ -71,7 +70,7 @@ describe Rapns::Daemon::Wpns::Delivery do
   describe "an 400 response" do
     before { response.stub(:code => 400) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 400, 
+      batch.should_receive(:mark_failed).with(notification, 400,
                                               "Bad XML or malformed notification URI")
       perform rescue Rapns::DeliveryError
     end
@@ -80,7 +79,7 @@ describe Rapns::Daemon::Wpns::Delivery do
   describe "an 401 response" do
     before { response.stub(:code => 401) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 401, 
+      batch.should_receive(:mark_failed).with(notification, 401,
                                               "Unauthorized to send a notification to this app")
       perform rescue Rapns::DeliveryError
     end
@@ -89,7 +88,7 @@ describe Rapns::Daemon::Wpns::Delivery do
   describe "an 404 response" do
     before { response.stub(:code => 404) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 404, 
+      batch.should_receive(:mark_failed).with(notification, 404,
                                               "Not found!")
       perform rescue Rapns::DeliveryError
     end
@@ -119,7 +118,7 @@ describe Rapns::Daemon::Wpns::Delivery do
   describe "an 412 response" do
     before { response.stub(:code => 412) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 412, 
+      batch.should_receive(:mark_failed).with(notification, 412,
                                               "Precondition Failed. Device is Disconnected for now.")
       perform rescue Rapns::DeliveryError
     end
@@ -128,7 +127,7 @@ describe Rapns::Daemon::Wpns::Delivery do
   describe "an 503 response" do
     before { response.stub(:code => 503) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 503, 
+      batch.should_receive(:mark_failed).with(notification, 503,
                                               "Service unavailable.")
       perform rescue Rapns::DeliveryError
     end

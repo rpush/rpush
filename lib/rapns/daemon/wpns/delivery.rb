@@ -22,7 +22,6 @@ module Rapns
             else
               @safe_mode_time = nil
               @end_safe_mode = nil
-            
               perform_unsafe
             end
           end
