@@ -2,6 +2,8 @@ module Rapns
   module Daemon
     module Wpns
       class Delivery < Rapns::Daemon::Delivery
+        attr_accessor :safe_mode_time, :end_safe_mode
+
         def initialize(app, http, notification, batch)
           @app = app
           @http = http
@@ -12,18 +14,16 @@ module Rapns
         end
 
         def perform
-          if @end_safe_mode == nil
+          if @safe_mode_time == nil
             perform_unsafe
           else
             if Time.now() < @safe_mode_time
               Rapns.logger.warn "Safe mode! you need to wait #{@safe_mode_time - Time.now()}"
             else
-              if @safe_mode_time > @end_safe_mode
-                @safe_mode_time = nil
-                @end_safe_mode = nil
-              else
-                perform_unsafe
-              end
+              @safe_mode_time = nil
+              @end_safe_mode = nil
+            
+              perform_unsafe
             end
           end
         end
@@ -54,25 +54,28 @@ module Rapns
 
         def ok(res)
           status = status_from_response res
-
           case status[:notification]
           when ["Received"]
             mark_delivered
             Rapns.logger.info "[#{@app.name}] #{@notification.id} sent successfully"
           when ["QueueFull"]
+            mark_retryable @notification, Time.now + (60*10)
             Rapns.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
           when ["Supressed"]
+            mark_retryable @notification, Time.now + (60*10)
             Rapns.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
           end
 
         end
 
         def bad_request(res)
+          mark_failed 400, 'Bad XML or malformed notification URI'
           raise Rapns::DeliveryError.new(400, @notification.id,
                                          'Bad XML or malformed notification URI')
         end
 
         def unauthorized(res)
+          mark_failed 401, "Unauthorized to send a notification to this app"
           raise Rapns::DeliveryError.new(401, @notification.id,
                                          "Unauthorized to send a notification to this app")
         end
@@ -80,11 +83,13 @@ module Rapns
         def not_found(res)
           # in this case we need to drop the notification since it's
           # not in the notification service
+          mark_failed 404, 'Not found!'
           raise Rapns::DeliveryError.new(404, @notification.id,
                                          "Not found!")
         end
 
         def method_not_allowed(res)
+          mark_failed 405, "No method allowed. This should be considered as a Rapns bug"
           raise Rapns::DeliveryError.new(405, @notification.id,
                                          "No method allowed. This should be considered as a Rapns bug")
         end
@@ -93,17 +98,20 @@ module Rapns
           # Now we can send notifications over an hour until tomorrow.
           Rapns.logger.warn "[#{@app.name}] #{@notification.id} Reached the per-day throttling limit for a suscription."
           @safe_mode_time = Time.now() + (60*60*24)
+          mark_failed 406, "Reached the per-day throttling limit for a suscription."
           raise Rapns::DeliveryError.new(406, @notification.id,
                                          "Reached the per-day throttling limit for a suscription.")
         end
 
         def precondition_failed(res)
+          mark_failed 412, "Precondition Failed. Device is Disconnected for now."
           raise Rapns::DeliveryError.new(412, @notification.id,
                                          "Precondition Failed. Device is Disconnected for now.")
         end
 
         def service_unavailable(res)
-          raise Rapns::DeliveryError.new(412, @notification.id,
+          mark_failed 503, "Service unavailable."
+          raise Rapns::DeliveryError.new(503, @notification.id,
                                          "Service unavailable.")
         end
 
