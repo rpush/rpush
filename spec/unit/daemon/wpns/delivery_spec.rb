@@ -62,7 +62,7 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks the notification retryable if the notification is supressed" do
       response.stub(:body => JSON.dump({ "faliure" => 0 }))
       response.stub(:to_hash => { "x-notificationstatus" => ["Supressed"] })
-      batch.should_receive(:mark_retryable).with(notification, Time.now + (60*10))
+      batch.should_receive(:mark_delivered).with(notification)
       perform
     end
   end
