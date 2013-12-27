@@ -61,7 +61,7 @@ module Rapns
             mark_retryable @notification, Time.now + (60*10)
             Rapns.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
           when ["Supressed"]
-            mark_retryable @notification, Time.now + (60*10)
+            mark_delivered
             Rapns.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
           end
 
