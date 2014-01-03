@@ -16,6 +16,7 @@ class RapnsGenerator < Rails::Generators::Base
     add_rapns_migration('add_app_to_rapns')
     add_rapns_migration('create_rapns_apps')
     add_rapns_migration('add_gcm')
+    add_rapns_migration('add_wpns')
   end
 
    def copy_config

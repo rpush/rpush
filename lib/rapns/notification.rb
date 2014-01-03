@@ -12,7 +12,7 @@ module Rapns
     if Rapns.attr_accessible_available?
       attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry,:delivered,
         :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
-        :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids
+        :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids, :uri
     end
 
     validates :expiry, :numericality => true, :allow_nil => true
