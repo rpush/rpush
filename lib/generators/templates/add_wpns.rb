@@ -4,7 +4,7 @@ class AddWpns < ActiveRecord::Migration
   end
 
   def self.down
-    AddWpns::Rapns::Notification.where(:type => 'Rapns::Wpns::Notification').delete_all
+    ::Rapns::Notification.where(:type => 'Rapns::Wpns::Notification').delete_all
     remove_column :rapns_notifications, :uri
   end
 end
