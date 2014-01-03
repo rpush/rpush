@@ -142,27 +142,3 @@ Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
 Note that the database username is changed at runtime to be the currently logged in user's name. So if you're testing
 with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rapns_test'
 mysql database.
-
-### Contributors
-
-Thank you to the following wonderful people for contributing:
-
-* [@blakewatters](https://github.com/blakewatters)
-* [@forresty](https://github.com/forresty)
-* [@sjmadsen](https://github.com/sjmadsen)
-* [@ivanyv](https://github.com/ivanyv)
-* [@taybenlor](https://github.com/taybenlor)
-* [@tompesman](https://github.com/tompesman)
-* [@EpicDraws](https://github.com/EpicDraws)
-* [@dei79](https://github.com/dei79)
-* [@adorr](https://github.com/adorr)
-* [@mattconnolly](https://github.com/mattconnolly)
-* [@emeitch](https://github.com/emeitch)
-* [@jeffarena](https://github.com/jeffarena)
-* [@DianthuDia](https://github.com/DianthuDia)
-* [@dup2](https://github.com/dup2)
-* [@maxsz](https://github.com/maxsz)
-* [@wilg](https://github.com/wilg)
-* [@perezda](https://github.com/perezda)
-* [@alexperto](https://github.com/alexperto)
-* [@yoppi](https://github.com/yoppi)
