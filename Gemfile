@@ -7,7 +7,7 @@ gem 'database_cleaner', '1.0.1'
 gem 'simplecov'
 gem 'timecop', '0.5.9.2'
 
-platform :mri_19, :mri_20 do
+platform :mri_19, :mri_20, :mri_21 do
   gem 'cane'
 end
 
