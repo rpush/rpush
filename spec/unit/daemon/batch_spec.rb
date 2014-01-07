@@ -5,8 +5,10 @@ describe Rapns::Daemon::Batch do
   let(:notification2) { double(:notification2, :id => 2) }
   let(:batch) { Rapns::Daemon::Batch.new([notification1, notification2]) }
   let(:store) { double.as_null_object }
+  let(:time) { Time.now }
 
   before do
+    Time.stub(:now => time)
     Rapns::Daemon.stub(:store => store)
   end
 
@@ -40,7 +42,7 @@ describe Rapns::Daemon::Batch do
       before { Rapns.config.batch_storage_updates = false }
 
       it 'marks the notification as delivered immediately' do
-        store.should_receive(:mark_delivered).with(notification1)
+        store.should_receive(:mark_delivered).with(notification1, time)
         batch.mark_delivered(notification1)
       end
 
@@ -53,7 +55,12 @@ describe Rapns::Daemon::Batch do
     describe 'batching is enabled' do
       before { Rapns.config.batch_storage_updates = true }
 
-      it 'defers marking the notification as delivered until the batch is complete' do
+      it 'marks the notification as delivered immediately without persisting' do
+        store.should_receive(:mark_delivered).with(notification1, time, :persist => false)
+        batch.mark_delivered(notification1)
+      end
+
+      it 'defers persisting' do
         batch.mark_delivered(notification1)
         batch.delivered.should eq [notification1]
       end
@@ -65,7 +72,7 @@ describe Rapns::Daemon::Batch do
       before { Rapns.config.batch_storage_updates = false }
 
       it 'marks the notification as failed' do
-        store.should_receive(:mark_failed).with(notification1, 1, 'an error')
+        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time)
         batch.mark_failed(notification1, 1, 'an error')
       end
 
@@ -78,7 +85,12 @@ describe Rapns::Daemon::Batch do
     describe 'batching is enabled' do
       before { Rapns.config.batch_storage_updates = true }
 
-      it 'defers marking the notification as failed' do
+      it 'marks the notification as failed without persisting' do
+        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, :persist => false)
+        batch.mark_failed(notification1, 1, 'an error')
+      end
+
+      it 'defers persisting' do
         Rapns.config.batch_storage_updates = true
         batch.mark_failed(notification1, 1, 'an error')
         batch.failed.should eq({[1, 'an error'] => [notification1]})
@@ -87,8 +99,6 @@ describe Rapns::Daemon::Batch do
   end
 
   describe 'mark_retryable' do
-    let(:time) { Time.now }
-
     describe 'batching is disabled' do
       before { Rapns.config.batch_storage_updates = false }
 
@@ -106,7 +116,12 @@ describe Rapns::Daemon::Batch do
     describe 'batching is enabled' do
       before { Rapns.config.batch_storage_updates = true }
 
-      it 'defers marking the notification as retryable' do
+      it 'marks the notification as retryable without persisting' do
+        store.should_receive(:mark_retryable).with(notification1, time, :persist => false)
+        batch.mark_retryable(notification1, time)
+      end
+
+      it 'defers persisting' do
         batch.mark_retryable(notification1, time)
         batch.retryable.should eq({time => [notification1]})
       end
@@ -190,8 +205,6 @@ describe Rapns::Daemon::Batch do
     end
 
     describe 'retryable' do
-      let(:time) { Time.now }
-
       def complete
         [notification1, notification2].each do |n|
           batch.mark_retryable(n, time)

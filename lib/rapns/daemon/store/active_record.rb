@@ -17,20 +17,21 @@ module Rapns
           end
         end
 
-        def mark_retryable(notification, deliver_after)
-          with_database_reconnect_and_retry do
-            notification.retries += 1
-            notification.deliver_after = deliver_after
-            notification.save!(:validate => false)
+        def mark_retryable(notification, deliver_after, opts = {:persist => true})
+          notification.retries += 1
+          notification.deliver_after = deliver_after
+
+          if opts[:persist]
+            with_database_reconnect_and_retry do
+              notification.save!(:validate => false)
+            end
           end
         end
 
         def mark_batch_retryable(notifications, deliver_after)
           ids = []
           notifications.each do |n|
-            # Update attrs for reflections, but don't save.
-            n.retries += 1
-            n.deliver_after = deliver_after
+            mark_retryable(n, deliver_after, :persist => false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
@@ -38,11 +39,14 @@ module Rapns
           end
         end
 
-        def mark_delivered(notification)
-          with_database_reconnect_and_retry do
-            notification.delivered = true
-            notification.delivered_at = Time.now
-            notification.save!(:validate => false)
+        def mark_delivered(notification, time, opts = {:persist => true})
+          notification.delivered = true
+          notification.delivered_at = time
+
+          if opts[:persist]
+            with_database_reconnect_and_retry do
+              notification.save!(:validate => false)
+            end
           end
         end
 
@@ -50,9 +54,7 @@ module Rapns
           now = Time.now
           ids = []
           notifications.each do |n|
-            # Update attrs for reflections, but don't save.
-            n.delivered = true
-            n.delivered_at = now
+            mark_delivered(n, now, :persist => false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
@@ -60,15 +62,18 @@ module Rapns
           end
         end
 
-        def mark_failed(notification, code, description)
-          with_database_reconnect_and_retry do
-            notification.delivered = false
-            notification.delivered_at = nil
-            notification.failed = true
-            notification.failed_at = Time.now
-            notification.error_code = code
-            notification.error_description = description
-            notification.save!(:validate => false)
+        def mark_failed(notification, code, description, time, opts = {:persist => true})
+          notification.delivered = false
+          notification.delivered_at = nil
+          notification.failed = true
+          notification.failed_at = time
+          notification.error_code = code
+          notification.error_description = description
+
+          if opts[:persist]
+            with_database_reconnect_and_retry do
+              notification.save!(:validate => false)
+            end
           end
         end
 
@@ -76,13 +81,7 @@ module Rapns
           now = Time.now
           ids = []
           notifications.each do |n|
-            # Update attrs for reflections, but don't save.
-            n.delivered = false
-            n.delivered_at = nil
-            n.failed = true
-            n.failed_at = now
-            n.error_code = code
-            n.error_description = description
+            mark_failed(n, code, description, now, :persist => false)
             ids << n.id
           end
           with_database_reconnect_and_retry do

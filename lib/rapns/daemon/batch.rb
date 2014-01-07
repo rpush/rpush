@@ -23,6 +23,7 @@ module Rapns
         if Rapns.config.batch_storage_updates
           retryable[deliver_after] ||= []
           retryable[deliver_after] << notification
+          Rapns::Daemon.store.mark_retryable(notification, deliver_after, :persist => false)
         else
           Rapns::Daemon.store.mark_retryable(notification, deliver_after)
           reflect(:notification_will_retry, notification)
@@ -32,8 +33,9 @@ module Rapns
       def mark_delivered(notification)
         if Rapns.config.batch_storage_updates
           delivered << notification
+          Rapns::Daemon.store.mark_delivered(notification, Time.now, :persist => false)
         else
-          Rapns::Daemon.store.mark_delivered(notification)
+          Rapns::Daemon.store.mark_delivered(notification, Time.now)
           reflect(:notification_delivered, notification)
         end
       end
@@ -43,8 +45,9 @@ module Rapns
           key = [code, description]
           failed[key] ||= []
           failed[key] << notification
+          Rapns::Daemon.store.mark_failed(notification, code, description, Time.now, :persist => false)
         else
-          Rapns::Daemon.store.mark_failed(notification, code, description)
+          Rapns::Daemon.store.mark_failed(notification, code, description, Time.now)
           reflect(:notification_failed, notification)
         end
       end
