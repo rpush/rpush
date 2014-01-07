@@ -1,6 +1,15 @@
 ## 3.5.0 (unreleased)
+  * Reduce default batch size to 100.
   * Fix sqlite3 support (#160).
   * Drop support for Ruby 1.8.
+  * Improve APNs certificate validation errors (#192) @mattconnolly).
+  * Initial support for Windows Phone notifications (#191) (@matiaslina).
+  * Add two new GCM reflections: gcm_delivered_to_recipient, gcm_failed_to_recipient (#184) (@jakeonfire).
+  * Fix migration issues (#181) (@jcoleman).
+  * Add GCM gcm_invalid_registration_id reflection (#171) (@marcrohloff).
+  * Feature: wakeup feeder via UDP socket (#164) (@mattconnolly).
+  * Fix reflections when using batches (#161).
+  * Only perform APNs certificate validation for APNs apps (#133).
 
 ## 3.4.1 (Aug 30, 2013)
   * Silence unintended airbrake_notify deprecation warning (#158).
