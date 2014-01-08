@@ -1,3 +1,4 @@
+require 'coveralls'
 require 'simplecov'
 require './spec/support/simplecov_quality_formatter'
 
@@ -7,7 +8,8 @@ module SimpleCovHelper
       add_filter '/spec/'
       add_filter '/lib/generators'
       command_name name
-      formatter SimpleCov::Formatter::QualityFormatter
+      formatter [SimpleCov::Formatter::QualityFormatter,
+                 Coveralls::SimpleCov::Formatter]
     end
   end
 end
