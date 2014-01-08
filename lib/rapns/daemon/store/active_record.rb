@@ -8,6 +8,8 @@ module Rapns
       class ActiveRecord
         include Reconnectable
 
+        DEFAULT_MARK_OPTIONS = {:persist => true}
+
         def deliverable_notifications(apps)
           with_database_reconnect_and_retry do
             batch_size = Rapns.config.batch_size
@@ -17,7 +19,8 @@ module Rapns
           end
         end
 
-        def mark_retryable(notification, deliver_after, opts = {:persist => true})
+        def mark_retryable(notification, deliver_after, opts = {})
+          opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.retries += 1
           notification.deliver_after = deliver_after
 
@@ -39,7 +42,8 @@ module Rapns
           end
         end
 
-        def mark_delivered(notification, time, opts = {:persist => true})
+        def mark_delivered(notification, time, opts = {})
+          opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.delivered = true
           notification.delivered_at = time
 
@@ -62,7 +66,8 @@ module Rapns
           end
         end
 
-        def mark_failed(notification, code, description, time, opts = {:persist => true})
+        def mark_failed(notification, code, description, time, opts = {})
+          opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.delivered = false
           notification.delivered_at = nil
           notification.failed = true
