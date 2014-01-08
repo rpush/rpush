@@ -27,6 +27,8 @@ module Rapns
       where('app_id IN (?)', apps.map(&:id))
     }
 
+    scope :completed, lambda { where("delivered = ? OR failed = ?", true, true) }
+
     def initialize(*args)
       attributes = args.first
       if attributes.is_a?(Hash) && attributes.keys.include?(:attributes_for_device)
@@ -52,6 +54,16 @@ module Rapns
 
     def payload_size
       payload.bytesize
+    end
+
+    class << self
+      def created_before(dt)
+        where("created_at < ?", dt)
+      end
+
+      def completed_and_older_than(dt)
+        completed.created_before(dt)
+      end
     end
   end
 end

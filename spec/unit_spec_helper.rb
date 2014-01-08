@@ -46,9 +46,10 @@ require 'generators/templates/add_app_to_rapns'
 require 'generators/templates/create_rapns_apps'
 require 'generators/templates/add_gcm'
 require 'generators/templates/add_wpns'
+require 'generators/templates/add_adm'
 
 [CreateRapnsNotifications, CreateRapnsFeedback,
- AddAlertIsJsonToRapnsNotifications, AddAppToRapns, CreateRapnsApps, AddGcm, AddWpns].each do |migration|
+ AddAlertIsJsonToRapnsNotifications, AddAppToRapns, CreateRapnsApps, AddGcm, AddWpns, AddAdm].each do |migration|
   migration.down rescue ActiveRecord::StatementInvalid
   migration.up
 end

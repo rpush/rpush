@@ -6,6 +6,8 @@ module Rapns
     require 'rails'
     ::Rails::VERSION::STRING < '4'
   end
+
+  require 'rapns/railtie' if defined?(Rails)
 end
 
 require 'rapns/version'
@@ -39,6 +41,11 @@ require 'rapns/wpns/data_validator'
 require 'rapns/wpns/notification'
 require 'rapns/wpns/app'
 
+require 'rapns/adm/payload_data_size_validator'
+require 'rapns/adm/registration_ids_count_validator'
+require 'rapns/adm/data_validator'
+require 'rapns/adm/notification'
+require 'rapns/adm/app'
 
 module Rapns
   def self.jruby?

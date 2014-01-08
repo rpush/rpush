@@ -293,4 +293,39 @@ describe Rapns::Daemon::Store::ActiveRecord do
       new_notification.new_record?.should be_false
     end
   end
+
+  describe 'create_adm_notification' do
+    let(:data) { { :data => true } }
+    let(:attributes) { {:app_id => app.id, :collapse_key => 'ckey', :delay_while_idle => true} }
+    let(:registration_ids) { ['123', '456'] }
+    let(:deliver_after) { time + 10.seconds }
+    let(:args) { [attributes, data, registration_ids, deliver_after, app] }
+
+    it 'sets the given attributes' do
+      new_notification = store.create_adm_notification(*args)
+      new_notification.app_id.should == app.id
+      new_notification.collapse_key.should == 'ckey'
+      new_notification.delay_while_idle.should be_true
+    end
+
+    it 'sets the given data' do
+      new_notification = store.create_adm_notification(*args)
+      new_notification.data['data'].should be_true
+    end
+
+    it 'sets the given registration IDs' do
+      new_notification = store.create_adm_notification(*args)
+      new_notification.registration_ids.should == registration_ids
+    end
+
+    it 'sets the deliver_after timestamp' do
+      new_notification = store.create_adm_notification(*args)
+      new_notification.deliver_after.to_s.should == deliver_after.to_s
+    end
+
+    it 'saves the new notification' do
+      new_notification = store.create_adm_notification(*args)
+      new_notification.new_record?.should be_false
+    end
+  end
 end
