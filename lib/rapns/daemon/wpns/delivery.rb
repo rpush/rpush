@@ -17,8 +17,8 @@ module Rapns
           if @safe_mode_time == nil
             perform_unsafe
           else
-            if Time.now() < @safe_mode_time
-              Rapns.logger.warn "Safe mode! you need to wait #{@safe_mode_time - Time.now()}"
+            if Time.now < @safe_mode_time
+              Rapns.logger.warn "Safe mode! you need to wait #{@safe_mode_time - Time.now}"
             else
               @safe_mode_time = nil
               @end_safe_mode = nil
@@ -95,11 +95,11 @@ module Rapns
 
         def not_acceptable(res)
           # Now we can send notifications over an hour until tomorrow.
-          Rapns.logger.warn "[#{@app.name}] #{@notification.id} Reached the per-day throttling limit for a suscription."
-          @safe_mode_time = Time.now() + (60*60*24)
-          mark_failed 406, "Reached the per-day throttling limit for a suscription."
+          Rapns.logger.warn "[#{@app.name}] #{@notification.id} Reached the per-day throttling limit for a subscription."
+          @safe_mode_time = Time.now + (60*60*24)
+          mark_failed 406, "Reached the per-day throttling limit for a subscription."
           raise Rapns::DeliveryError.new(406, @notification.id,
-                                         "Reached the per-day throttling limit for a suscription.")
+                                         "Reached the per-day throttling limit for a subscription.")
         end
 
         def precondition_failed(res)
@@ -122,7 +122,7 @@ module Rapns
             "X-NotificationClass" => '2'
           }
           post = Net::HTTP::Post.new(URI.parse(@notification.uri).path,initheader=header)
-          post.body = notif_to_xml()
+          post.body = notif_to_xml
           @http.request(URI.parse(@notification.uri), post)
         end
 

@@ -23,7 +23,7 @@ module Rapns
         json
       end
 
-      def uri_is_valid?()
+      def uri_is_valid?
         return (/https?:\/\/[\S]+/.match(uri) != nil)
       end
     end

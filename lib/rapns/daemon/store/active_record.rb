@@ -114,18 +114,6 @@ module Rapns
           end
         end
 
-        def create_wpns_notification(attrs, data, uri, app)
-          with_database_reconnect_and_retry do
-            notification = Rapns::Wpns::Notification.new
-            notification.assign_attributes(attrs)
-            notification.data = data
-            notification.uri = uri
-            notification.app = app
-            notification.save!
-            notification
-          end
-        end
-
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
           with_database_reconnect_and_retry do
             notification = Rapns::Adm::Notification.new
