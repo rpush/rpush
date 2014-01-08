@@ -9,6 +9,7 @@ gem 'timecop', '0.5.9.2'
 
 platform :mri_19, :mri_20, :mri_21 do
   gem 'cane'
+  gem 'coveralls', :require => false
 end
 
 platform :ruby do
