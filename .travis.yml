@@ -43,6 +43,4 @@ matrix:
       env: QUALITY=true
   allow_failures:
     - rvm: rbx-19mode
-      env: QUALITY=false
     - rvm: jruby-19mode
-      env: QUALITY=false
