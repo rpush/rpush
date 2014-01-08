@@ -93,6 +93,11 @@ Rapns.reflect do |on|
   # on.apns_certificate_will_expire do |app, expiration_time|
   # end
 
+  # Called when the ADM returns a canonical registration ID.
+  # You will need to replace old_id with canonical_id in your records.
+  # on.adm_canonical_id do |old_id, canonical_id|
+  # end
+
   # Called when an exception is raised.
   # on.error do |error|
   # end
