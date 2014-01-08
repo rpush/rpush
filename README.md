@@ -1,5 +1,6 @@
 [![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
 [![Code Climate](https://codeclimate.com/github/ileitch/rapns.png)](https://codeclimate.com/github/ileitch/rapns)
+[![Coverage Status](https://coveralls.io/repos/ileitch/rapns/badge.png?branch=master)](https://coveralls.io/r/ileitch/rapns?branch=master)
 
 ### Rapns - Professional grade APNs and GCM for Ruby.
 
