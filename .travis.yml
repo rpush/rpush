@@ -4,8 +4,8 @@ rvm:
   - 1.9.3
   - 2.0.0
   - 2.1.0
-  - jruby-19mode
-  - rbx-19mode
+  - jruby
+  - rbx
 gemfile:
   - Gemfile
   - Gemfile.rails-4.0
@@ -35,12 +35,12 @@ matrix:
     - rvm: 2.1.0
       gemfile: Gemfile.rails-4.0
       env: QUALITY=true
-    - rvm: jruby-19mode
+    - rvm: jruby
       gemfile: Gemfile.rails-4.0
       env: QUALITY=true
-    - rvm: rbx-19mode
+    - rvm: rbx
       gemfile: Gemfile.rails-4.0
       env: QUALITY=true
   allow_failures:
-    - rvm: rbx-19mode
-    - rvm: jruby-19mode
+    - rvm: rbx
+    - rvm: jruby
