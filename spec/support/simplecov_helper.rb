@@ -8,8 +8,8 @@ module SimpleCovHelper
       add_filter '/spec/'
       add_filter '/lib/generators'
       command_name name
-      formatter [SimpleCov::Formatter::QualityFormatter,
-                 Coveralls::SimpleCov::Formatter]
+      formatter SimpleCov::Formatter::MultiFormatter[SimpleCov::Formatter::QualityFormatter,
+                                                     Coveralls::SimpleCov::Formatter]
     end
   end
 end
