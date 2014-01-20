@@ -66,18 +66,18 @@ module Rapns
 
       def initialize(app)
         @app = app
-        @services = []
+        @loops = []
       end
 
       def start
         app.connections.times { dispatchers.push(new_dispatcher_loop) }
-        start_services
+        start_loops
         Rapns.logger.info("[#{app.name}] Started, #{dispatchers_str}.")
       end
 
       def stop
         dispatchers.stop
-        stop_services
+        stop_loops
       end
 
       def enqueue(batch)
@@ -143,31 +143,29 @@ module Rapns
 
       protected
 
-      def start_services
-        app_module.services.each do |service|
-          instance = service.new
+      def start_loops
+        service_module.loops.each do |loop_class|
+          instance = loop_class.new(@app)
           instance.start
-          @services << instance
+          @loops << instance
         end
       end
 
-      def stop_services
-        @services.map(&:stop)
-        @services = []
+      def stop_loops
+        @loops.map(&:stop)
+        @loops = []
       end
 
       def new_dispatcher_loop
-        dispatcher = app_module.new_dispatcher(@app)
+        dispatcher = service_module.new_dispatcher(@app)
         dispatcher_loop = Rapns::Daemon::DispatcherLoop.new(queue, dispatcher)
         dispatcher_loop.start
         dispatcher_loop
       end
 
-      # TODO: rename this.
-      def app_module
-        return @app_module if defined? @app_module
-        type = @app.class.parent.name.demodulize
-        @app_module = "Rapns::Daemon::#{type}".constantize
+      def service_module
+        return @service_module if defined? @service_module
+        @service_module = "Rapns::Daemon::#{@app.service_name.classify}".constantize
       end
 
       def queue

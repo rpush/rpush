@@ -1,5 +1,35 @@
 require 'unit_spec_helper'
 
+module Rapns
+  module AppRunnerSpecService
+    class App < Rapns::App
+    end
+  end
+
+  module Daemon
+    module AppRunnerSpecService
+      extend ServiceConfigMethods
+
+      class ServiceLoop
+        def initialize(app)
+        end
+
+        def start
+        end
+
+        def stop
+        end
+      end
+
+      dispatcher :http
+      loops ServiceLoop
+
+      class Delivery
+      end
+    end
+  end
+end
+
 describe Rapns::Daemon::AppRunner, 'stop' do
   let(:runner) { double }
   before { Rapns::Daemon::AppRunner.runners['app'] = runner }
@@ -15,7 +45,7 @@ describe Rapns::Daemon::AppRunner, 'enqueue' do
   let(:runner) { double(:enqueue => nil) }
   let(:notification1) { double(:app_id => 1) }
   let(:notification2) { double(:app_id => 2) }
-  let(:logger) { double(:error => nil) }
+  let(:logger) { double(Rapns::Logger, :error => nil) }
 
   before do
     Rapns.stub(:logger => logger)
@@ -46,10 +76,10 @@ describe Rapns::Daemon::AppRunner, 'enqueue' do
 end
 
 describe Rapns::Daemon::AppRunner, 'sync' do
-  let(:app) { Rapns::Apns::App.new }
-  let(:new_app) { Rapns::Apns::App.new }
+  let(:app) { double(Rapns::AppRunnerSpecService::App, :name => 'test') }
+  let(:new_app) { double(Rapns::AppRunnerSpecService::App, :name => 'new_test') }
   let(:runner) { double(:sync => nil, :stop => nil, :start => nil) }
-  let(:logger) { double(:error => nil, :warn => nil) }
+  let(:logger) { double(Rapns::Logger, :error => nil, :warn => nil) }
   let(:queue) { Queue.new }
 
   before do
@@ -81,13 +111,13 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     Rapns::Daemon::AppRunner.sync
   end
 
-  it 'deletes old apps' do
+  it 'deletes old runners' do
     Rapns::App.stub(:all => [])
     runner.should_receive(:stop)
     Rapns::Daemon::AppRunner.sync
   end
 
-  it 'logs an error if the app could not be started' do
+  it 'logs an error if the runner could not be started' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = double
     Rapns::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
@@ -96,7 +126,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
     Rapns::Daemon::AppRunner.sync
   end
 
-  it 'reflects errors if the app could not be started' do
+  it 'reflects errors if the runner could not be started' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = double
     Rapns::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
@@ -108,11 +138,12 @@ describe Rapns::Daemon::AppRunner, 'sync' do
 end
 
 describe Rapns::Daemon::AppRunner, 'debug' do
-  let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
-    :environment => 'development', :certificate => TEST_CERT) }
-  let(:logger) { double(:info => nil) }
+  let(:app) { double(Rapns::AppRunnerSpecService::App, :id => 1, :name => 'test', :connections => 1,
+    :environment => 'development', :certificate => TEST_CERT, :service_name => 'app_runner_spec_service') }
+  let(:logger) { double(Rapns::Logger, :info => nil) }
 
   before do
+    Rapns::App.stub(:all => [app])
     Rapns::Daemon.stub(:config => {})
     Rapns.stub(:logger => logger)
     Rapns::Daemon::AppRunner.sync
@@ -127,11 +158,13 @@ describe Rapns::Daemon::AppRunner, 'debug' do
 end
 
 describe Rapns::Daemon::AppRunner, 'idle' do
-  let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
-    :environment => 'development', :certificate => TEST_CERT) }
-  let(:logger) { double(:info => nil) }
+  let(:app) { double(Rapns::AppRunnerSpecService::App, :name => 'test', :connections => 1,
+    :environment => 'development', :certificate => TEST_CERT, :id => 1,
+    :service_name => 'app_runner_spec_service') }
+  let(:logger) { double(Rapns::Logger, :info => nil) }
 
   before do
+    Rapns::App.stub(:all => [app])
     Rapns.stub(:logger => logger)
     Rapns::Daemon::AppRunner.sync
   end
@@ -145,11 +178,13 @@ describe Rapns::Daemon::AppRunner, 'idle' do
 end
 
 describe Rapns::Daemon::AppRunner, 'wait' do
-  let!(:app) { Rapns::Apns::App.create!(:name => 'test', :connections => 1,
-    :environment => 'development', :certificate => TEST_CERT) }
-  let(:logger) { double(:info => nil) }
+  let(:app) { double(Rapns::AppRunnerSpecService::App, :id => 1, :name => 'test',
+    :connections => 1, :environment => 'development', :certificate => TEST_CERT,
+    :service_name => 'app_runner_spec_service') }
+  let(:logger) { double(Rapns::Logger, :info => nil) }
 
   before do
+    Rapns::App.stub(:all => [app])
     Rapns.stub(:logger => logger)
     Rapns::Daemon::AppRunner.sync
   end
@@ -163,13 +198,18 @@ describe Rapns::Daemon::AppRunner, 'wait' do
 end
 
 describe Rapns::Daemon::AppRunner do
-  let(:app) { Rapns::Apns::App.new }
+  let(:app) { double(Rapns::AppRunnerSpecService::App, :environment => :sandbox,
+    :connections => 1, :service_name => 'app_runner_spec_service',
+    :name => 'test') }
   let(:runner) { Rapns::Daemon::AppRunner.new(app) }
-  let(:logger) { double(:info => nil) }
+  let(:logger) { double(Rapns::Logger, :info => nil) }
   let(:queue) { Queue.new }
   let(:dispatcher_loop_collection) { Rapns::Daemon::DispatcherLoopCollection.new }
+  let(:service_loop) { double(Rapns::Daemon::AppRunnerSpecService::ServiceLoop,
+    :start => nil, :stop => nil) }
 
   before do
+    Rapns::Daemon::AppRunnerSpecService::ServiceLoop.stub(:new => service_loop)
     Queue.stub(:new => queue)
     Rapns.stub(:logger => logger)
     Rapns::Daemon::DispatcherLoopCollection.stub(:new => dispatcher_loop_collection)
@@ -177,12 +217,15 @@ describe Rapns::Daemon::AppRunner do
 
   describe 'start' do
     it 'starts a delivery dispatcher for each connection' do
-      app.connections = 2
+      app.stub(:connections => 2)
       runner.start
       runner.num_dispatchers.should eq 2
     end
 
-    it 'starts the services'
+    it 'starts the loops' do
+      service_loop.should_receive(:start)
+      runner.start
+    end
   end
 
   describe 'enqueue' do
@@ -208,7 +251,10 @@ describe Rapns::Daemon::AppRunner do
       runner.stop
     end
 
-    it 'stop the services'
+    it 'stop the loops' do
+      service_loop.should_receive(:stop)
+      runner.stop
+    end
   end
 
   describe 'idle?' do
@@ -232,12 +278,12 @@ describe Rapns::Daemon::AppRunner do
     before { runner.start }
 
     it 'reduces the number of dispatchers if needed' do
-      app.connections = 0
+      app.stub(:connections => 0)
       expect { runner.sync(app) }.to change(runner, :num_dispatchers).to(0)
     end
 
     it 'increases the number of dispatchers if needed' do
-      app.connections = 2
+      app.stub(:connections => 2)
       expect { runner.sync(app) }.to change(runner, :num_dispatchers).to(2)
     end
   end

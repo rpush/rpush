@@ -25,8 +25,10 @@ module Rapns
         dispatcher_class.new(app, delivery_class, @dispatcher_options)
       end
 
-      def services(*services)
-        @services = services
+      def loops(*loops)
+        @loops ||= []
+        @loops = loops if loops.any?
+        @loops
       end
     end
   end

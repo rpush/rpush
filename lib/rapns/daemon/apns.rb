@@ -10,7 +10,7 @@ module Rapns
       }
 
       dispatcher :tcp, :host => Proc.new { |app| HOSTS[app.environment.to_s] }
-      services Rapns::Daemon::Apns::FeedbackReceiver
+      loops Rapns::Daemon::Apns::FeedbackReceiver
     end
   end
 end
