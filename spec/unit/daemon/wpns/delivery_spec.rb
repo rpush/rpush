@@ -24,6 +24,10 @@ describe Rapns::Daemon::Wpns::Delivery do
     Rapns.stub(:logger => logger)
   end
 
+  it 'handles an unknown response' do
+    # Also factor out the HTTP codes list.
+  end
+
   shared_examples_for "an notification with some delivery faliures" do
     let(:new_notification) { Rapns::Wpns::Notification.where('id != ?', notification.id).first }
 

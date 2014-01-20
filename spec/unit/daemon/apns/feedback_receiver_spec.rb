@@ -99,32 +99,4 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     receiver.should_receive(:reflect).with(:apns_feedback, feedback)
     receiver.check_for_feedback
   end
-
-  it 'calls the apns_feedback_callback when feedback is received and the callback is set' do
-    double_connection_read_with_tuple
-    Rapns.config.apns_feedback_callback = Proc.new {}
-    Rapns.config.apns_feedback_callback.should_receive(:call).with(feedback)
-    receiver.check_for_feedback
-  end
-
-  it 'catches exceptions in the apns_feedback_callback' do
-    error = StandardError.new('bork!')
-    double_connection_read_with_tuple
-    callback = Proc.new { raise error }
-    Rapns::Deprecation.muted do
-      Rapns.config.on_apns_feedback &callback
-    end
-    expect { receiver.check_for_feedback }.not_to raise_error
-  end
-
-  it 'logs an exception from the apns_feedback_callback' do
-    error = StandardError.new('bork!')
-    double_connection_read_with_tuple
-    callback = Proc.new { raise error }
-    Rapns.logger.should_receive(:error).with(error)
-    Rapns::Deprecation.muted do
-      Rapns.config.on_apns_feedback &callback
-    end
-    receiver.check_for_feedback
-  end
 end

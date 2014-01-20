@@ -32,13 +32,6 @@ shared_examples_for "an Notification subclass" do
       notification.send(data_getter).should == {"hi" => "mom"}
     end
 
-    if Rails::VERSION::STRING < '4'
-      it 'warns if attributes_for_device is assigned via mass-assignment' do
-        Rapns::Deprecation.should_receive(:warn).with(':attributes_for_device via mass-assignment is deprecated. Use :data or the attributes_for_device= instance method.')
-        notification_class.new(:attributes_for_device => {:hi => 'mom'})
-      end
-    end
-
     describe 'scopes' do
       before do
         Timecop.freeze(Time.now)

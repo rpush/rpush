@@ -15,14 +15,8 @@ module HoptoadNotifier
   end
 end
 
-module Airbrake
-  def self.notify_or_ignore(e)
-  end
-end
-
 describe Rapns::Logger do
   let(:log) { double(:sync= => true) }
-  let(:config) { double(:airbrake_notify => true) }
 
   before do
     Rails.stub(:root).and_return("/rails_root")
@@ -117,57 +111,6 @@ describe Rapns::Logger do
     logger = Rapns::Logger.new(:foreground => false)
     @logger.should_receive(:error).with(/RuntimeError, hi mom/)
     logger.error(e)
-  end
-
-  it "should notify Airbrake of the exception" do
-    e = RuntimeError.new("hi mom")
-    e.stub(:backtrace => [])
-    logger = Rapns::Logger.new(:foreground => false, :airbrake_notify => true)
-    Airbrake.should_receive(:notify_or_ignore).with(e)
-    logger.error(e)
-  end
-
-  context "without Airbrake defined" do
-    before do
-      Object.send(:remove_const, :Airbrake)
-    end
-
-    after do
-      module Airbrake
-        def self.notify_or_ignore(e)
-        end
-      end
-    end
-
-    it "should notify using HoptoadNotifier" do
-      e = RuntimeError.new("hi mom")
-      e.stub(:backtrace => [])
-      logger = Rapns::Logger.new(:foreground => false, :airbrake_notify => true)
-      HoptoadNotifier.should_receive(:notify_or_ignore).with(e)
-      logger.error(e)
-    end
-  end
-
-  it "should not notify Airbrake of the exception if the airbrake_notify option is false" do
-    e = RuntimeError.new("hi mom")
-    e.stub(:backtrace => [])
-    logger = Rapns::Logger.new(:foreground => false, :airbrake_notify => false)
-    Airbrake.should_not_receive(:notify_or_ignore).with(e)
-    logger.error(e)
-  end
-
-  it "should not notify Airbrake if explicitly disabled in the call to error" do
-    e = RuntimeError.new("hi mom")
-    e.stub(:backtrace => [])
-    logger = Rapns::Logger.new(:foreground => false, :airbrake_notify => true)
-    Airbrake.should_not_receive(:notify_or_ignore).with(e)
-    logger.error(e, :airbrake_notify => false)
-  end
-
-  it "should not attempt to notify Airbrake of the error is not an Exception" do
-    logger = Rapns::Logger.new(:foreground => false)
-    Airbrake.should_not_receive(:notify_or_ignore)
-    logger.error("string error message")
   end
 
   it 'defaults auto_flushing to true if the Rails logger does not respond to auto_flushing' do

@@ -39,7 +39,7 @@ module Rapns
                 check_database_is_connected
                 break
               rescue *ADAPTER_ERRORS => e
-                Rapns.logger.error(e, :airbrake_notify => false)
+                Rapns.logger.error(e)
                 sleep_to_avoid_thrashing
               end
             end

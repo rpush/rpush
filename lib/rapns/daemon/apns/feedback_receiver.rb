@@ -67,13 +67,6 @@ module Rapns
 
           feedback = Rapns::Daemon.store.create_apns_feedback(failed_at, device_token, @app)
           reflect(:apns_feedback, feedback)
-
-          # Deprecated.
-          begin
-            Rapns.config.apns_feedback_callback.call(feedback) if Rapns.config.apns_feedback_callback
-          rescue StandardError => e
-            Rapns.logger.error(e)
-          end
         end
 
         def interruptible_sleep

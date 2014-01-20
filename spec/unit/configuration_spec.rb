@@ -17,14 +17,6 @@ describe Rapns::Configuration do
     end
   end
 
-  it 'configures a feedback callback' do
-    b = Proc.new {}
-    Rapns::Deprecation.muted do
-      config.on_apns_feedback(&b)
-    end
-    config.apns_feedback_callback.should == b
-  end
-
   it 'can be updated' do
     Rapns::Deprecation.muted do
       new_config = Rapns::Configuration.new

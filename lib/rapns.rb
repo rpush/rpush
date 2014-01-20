@@ -57,8 +57,7 @@ module Rapns
   end
 
   def self.logger
-    @logger ||= Logger.new(:foreground => Rapns.config.foreground,
-                           :airbrake_notify => Rapns.config.airbrake_notify)
+    @logger ||= Logger.new(:foreground => Rapns.config.foreground)
   end
 
   def self.logger=(logger)

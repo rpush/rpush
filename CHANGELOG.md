@@ -1,4 +1,4 @@
-## 3.5.0 (unreleased)
+## 4.0.0 (unreleased)
   * Reduce default batch size to 100.
   * Fix sqlite3 support (#160).
   * Drop support for Ruby 1.8.
@@ -10,6 +10,9 @@
   * Feature: wakeup feeder via UDP socket (#164) (@mattconnolly).
   * Fix reflections when using batches (#161).
   * Only perform APNs certificate validation for APNs apps (#133).
+  * The deprecated on_apns_feedback has now been removed.
+  * The deprecated airbrake_notify config option has been removed.
+  * Removed the deprecated ability to set attributes_for_device using mass-assignment.
 
 ## 3.4.1 (Aug 30, 2013)
   * Silence unintended airbrake_notify deprecation warning (#158).

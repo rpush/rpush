@@ -6,9 +6,9 @@ describe Rapns::Daemon, "when starting" do
 
   let(:certificate) { double }
   let(:password) { double }
-  let(:config) { double(:pid_file => nil, :airbrake_notify => false,
-    :foreground => true, :embedded => false, :push => false,
-    :store => :active_record, :logger => nil) }
+  let(:config) { double(:pid_file => nil, :foreground => true,
+    :embedded => false, :push => false, :store => :active_record,
+    :logger => nil) }
   let(:logger) { double(:logger, :info => nil, :error => nil, :warn => nil) }
 
   before do
