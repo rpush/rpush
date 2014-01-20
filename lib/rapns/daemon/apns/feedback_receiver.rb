@@ -11,15 +11,17 @@ module Rapns
           :sandbox     => ['feedback.sandbox.push.apple.com', 2196]
         }
 
-        def initialize(app, poll)
+        def initialize(app)
           @app = app
           @host, @port = HOSTS[@app.environment.to_sym]
-          @poll = poll
+          @poll = Rapns.config.feedback_poll
           @certificate = app.certificate
           @password = app.password
         end
 
         def start
+          return if Rapns.config.push
+
           @thread = Thread.new do
             loop do
               break if @stop
@@ -38,7 +40,7 @@ module Rapns
         def check_for_feedback
           connection = nil
           begin
-            connection = Connection.new(@app, @host, @port)
+            connection = Rapns::Daemon::TcpConnection.new(@app, @host, @port)
             connection.connect
 
             while tuple = connection.read(FEEDBACK_TUPLE_BYTES)
@@ -50,10 +52,6 @@ module Rapns
           ensure
             connection.close if connection
           end
-        end
-
-        def interrupt_sleep
-          interruptible_sleep.interrupt_sleep
         end
 
         protected
@@ -81,8 +79,6 @@ module Rapns
         def interruptible_sleep
           @interruptible_sleep ||= InterruptibleSleep.new
         end
-
-
       end
     end
   end

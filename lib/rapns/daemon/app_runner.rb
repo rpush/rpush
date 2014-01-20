@@ -32,7 +32,7 @@ module Rapns
         if runners[app.id]
           runners[app.id].sync(app)
         else
-          runner = new_runner(app)
+          runner = new(app)
           begin
             runner.start
             runners[app.id] = runner
@@ -42,11 +42,6 @@ module Rapns
             reflect(:error, e)
           end
         end
-      end
-
-      def self.new_runner(app)
-        type = app.class.parent.name.demodulize
-        "Rapns::Daemon::#{type}::AppRunner".constantize.new(app)
       end
 
       def self.stop
@@ -71,24 +66,18 @@ module Rapns
 
       def initialize(app)
         @app = app
+        @services = []
       end
 
-      def before_start; end
-      def after_start; end
-      def before_stop; end
-      def after_stop; end
-
       def start
-        before_start
-        app.connections.times { handlers.push(start_handler) }
-        after_start
-        Rapns.logger.info("[#{app.name}] Started, #{handlers_str}.")
+        app.connections.times { dispatchers.push(new_dispatcher_loop) }
+        start_services
+        Rapns.logger.info("[#{app.name}] Started, #{dispatchers_str}.")
       end
 
       def stop
-        before_stop
-        handlers.stop
-        after_stop
+        dispatchers.stop
+        stop_services
       end
 
       def enqueue(batch)
@@ -101,30 +90,30 @@ module Rapns
 
       def sync(app)
         @app = app
-        diff = handlers.size - app.connections
+        diff = dispatchers.size - app.connections
         return if diff == 0
         if diff > 0
-          decrement_handlers(diff)
-          Rapns.logger.info("[#{app.name}] Stopped #{handlers_str(diff)}. #{handlers_str} running.")
+          decrement_dispatchers(diff)
+          Rapns.logger.info("[#{app.name}] Stopped #{dispatchers_str(diff)}. #{dispatchers_str} running.")
         else
-          increment_handlers(diff.abs)
-          Rapns.logger.info("[#{app.name}] Started #{handlers_str(diff)}. #{handlers_str} running.")
+          increment_dispatchers(diff.abs)
+          Rapns.logger.info("[#{app.name}] Started #{dispatchers_str(diff)}. #{dispatchers_str} running.")
         end
       end
 
-      def decrement_handlers(num)
-        num.times { handlers.pop }
+      def decrement_dispatchers(num)
+        num.times { dispatchers.pop }
       end
 
-      def increment_handlers(num)
-        num.times { handlers.push(start_handler) }
+      def increment_dispatchers(num)
+        num.times { dispatchers.push(new_dispatcher_loop) }
       end
 
       def debug
         Rapns.logger.info <<-EOS
 
 #{@app.name}:
-  handlers: #{num_handlers}
+  dispatchers: #{num_dispatchers}
   queued: #{queue_size}
   batch size: #{batch_size}
   batch processed: #{batch_processed}
@@ -148,30 +137,50 @@ module Rapns
         batch ? batch.num_processed : 0
       end
 
-      def num_handlers
-        handlers.size
+      def num_dispatchers
+        dispatchers.size
       end
 
       protected
 
-      def start_handler
-        handler = new_delivery_handler
-        handler.queue = queue
-        handler.start
-        handler
+      def start_services
+        app_module.services.each do |service|
+          instance = service.new
+          instance.start
+          @services << instance
+        end
+      end
+
+      def stop_services
+        @services.map(&:stop)
+        @services = []
+      end
+
+      def new_dispatcher_loop
+        dispatcher = app_module.new_dispatcher(@app)
+        dispatcher_loop = Rapns::Daemon::DispatcherLoop.new(queue, dispatcher)
+        dispatcher_loop.start
+        dispatcher_loop
+      end
+
+      # TODO: rename this.
+      def app_module
+        return @app_module if defined? @app_module
+        type = @app.class.parent.name.demodulize
+        @app_module = "Rapns::Daemon::#{type}".constantize
       end
 
       def queue
         @queue ||= Queue.new
       end
 
-      def handlers
-        @handlers ||= Rapns::Daemon::DeliveryHandlerCollection.new
+      def dispatchers
+        @dispatchers ||= Rapns::Daemon::DispatcherLoopCollection.new
       end
 
-      def handlers_str(count = app.connections)
+      def dispatchers_str(count = app.connections)
         count = count.abs
-        str = count == 1 ? 'handler' : 'handlers'
+        str = count == 1 ? 'dispatcher' : 'dispatchers'
         "#{count} #{str}"
       end
     end

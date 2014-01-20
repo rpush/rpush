@@ -1,16 +1,19 @@
 module Rapns
   module Daemon
-    class DeliveryHandler
+    class DispatcherLoop
       include Reflectable
 
       WAKEUP = :wakeup
 
-      attr_accessor :queue
+      def initialize(queue, dispatcher)
+        @queue = queue
+        @dispatcher = dispatcher
+      end
 
       def start
         @thread = Thread.new do
           loop do
-            handle_next_notification
+            dispatch
             break if @stop
           end
         end
@@ -21,30 +24,27 @@ module Rapns
       end
 
       def wakeup
-        queue.push(WAKEUP) if @thread
+        @queue.push(WAKEUP) if @thread
       end
 
       def wait
         @thread.join if @thread
-        stopped
+        @dispatcher.cleanup
       end
 
       protected
 
-      def stopped
-      end
-
-      def handle_next_notification
-        notification, batch = queue.pop
+      def dispatch
+        notification, batch = @queue.pop
         return if notification == WAKEUP
 
         begin
-          deliver(notification, batch)
+          @dispatcher.dispatch(notification, batch)
         rescue StandardError => e
           Rapns.logger.error(e)
           reflect(:error, e)
         ensure
-          batch.notification_processed
+          batch.notification_dispatched
         end
       end
     end

@@ -25,12 +25,12 @@ describe Rapns::Daemon::Batch do
   end
 
   it 'increments the processed notifications count' do
-    expect { batch.notification_processed }.to change(batch, :num_processed).to(1)
+    expect { batch.notification_dispatched }.to change(batch, :num_processed).to(1)
   end
 
   it 'completes the batch when all notifications have been processed' do
     batch.should_receive(:complete)
-    2.times { batch.notification_processed }
+    2.times { batch.notification_dispatched }
   end
 
   it 'can be described' do
@@ -137,13 +137,13 @@ describe Rapns::Daemon::Batch do
 
     it 'clears the notifications' do
       expect do
-        2.times { batch.notification_processed }
+        2.times { batch.notification_dispatched }
       end.to change(batch, :notifications).to([])
     end
 
     it 'identifies as complete' do
       expect do
-        2.times { batch.notification_processed }
+        2.times { batch.notification_dispatched }
       end.to change(batch, :complete?).to(be_true)
     end
 
@@ -151,14 +151,14 @@ describe Rapns::Daemon::Batch do
       e = StandardError.new
       batch.stub(:complete_delivered).and_raise(e)
       batch.should_receive(:reflect).with(:error, e)
-      2.times { batch.notification_processed }
+      2.times { batch.notification_dispatched }
     end
 
     describe 'delivered' do
       def complete
         [notification1, notification2].each do |n|
           batch.mark_delivered(n)
-          batch.notification_processed
+          batch.notification_dispatched
         end
       end
 
@@ -183,7 +183,7 @@ describe Rapns::Daemon::Batch do
       def complete
         [notification1, notification2].each do |n|
           batch.mark_failed(n, 1, 'an error')
-          batch.notification_processed
+          batch.notification_dispatched
         end
       end
 
@@ -208,7 +208,7 @@ describe Rapns::Daemon::Batch do
       def complete
         [notification1, notification2].each do |n|
           batch.mark_retryable(n, time)
-          batch.notification_processed
+          batch.notification_dispatched
         end
       end
 

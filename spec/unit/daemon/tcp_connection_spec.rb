@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::Apns::Connection do
+describe Rapns::Daemon::TcpConnection do
   let(:rsa_key) { double }
   let(:certificate) { double }
   let(:password) { double }

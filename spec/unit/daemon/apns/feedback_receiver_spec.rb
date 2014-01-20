@@ -10,13 +10,15 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:app) { double(:name => 'my_app', :password => password, :certificate => certificate, :environment => 'production') }
   let(:connection) { double(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { double(:error => nil, :info => nil) }
-  let(:receiver) { Rapns::Daemon::Apns::FeedbackReceiver.new(app, poll) }
+  let(:receiver) { Rapns::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
+  let(:sleeper) { double(Rapns::Daemon::InterruptibleSleep, :sleep => nil, :interrupt_sleep => nil) }
 
   before do
-    receiver.stub(:interruptible_sleep)
+    Rapns.config.feedback_poll = poll
+    Rapns::Daemon::InterruptibleSleep.stub(:new => sleeper)
     Rapns.stub(:logger => logger)
-    Rapns::Daemon::Apns::Connection.stub(:new => connection)
+    Rapns::Daemon::TcpConnection.stub(:new => connection)
     receiver.instance_variable_set("@stop", false)
     Rapns::Daemon.stub(:store => double(:create_apns_feedback => feedback))
   end
@@ -33,7 +35,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do
-    Rapns::Daemon::Apns::Connection.should_receive(:new).with(app, host, port)
+    Rapns::Daemon::TcpConnection.should_receive(:new).with(app, host, port)
     receiver.check_for_feedback
   end
 
@@ -73,17 +75,13 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'sleeps for the feedback poll period' do
     receiver.stub(:check_for_feedback)
-    sleeper = double(Rapns::Daemon::InterruptibleSleep, :sleep => false)
     sleeper.should_receive(:sleep).with(60).at_least(:once)
-    receiver.stub :interruptible_sleep => sleeper
     Thread.stub(:new).and_yield
     receiver.stub(:loop).and_yield
     receiver.start
   end
 
   it 'checks for feedback when started' do
-    sleeper = double(Rapns::Daemon::InterruptibleSleep, :sleep => false)
-    receiver.stub :interruptible_sleep => sleeper
     receiver.should_receive(:check_for_feedback).at_least(:once)
     Thread.stub(:new).and_yield
     receiver.stub(:loop).and_yield
@@ -91,8 +89,6 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'interrupts sleep when stopped' do
-    sleeper = double(Rapns::Daemon::InterruptibleSleep, :sleep => false)
-    receiver.stub :interruptible_sleep => sleeper
     receiver.stub(:check_for_feedback)
     sleeper.should_receive(:interrupt_sleep)
     receiver.stop

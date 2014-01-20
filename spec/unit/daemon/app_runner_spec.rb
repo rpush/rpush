@@ -76,7 +76,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   it 'starts a runner for a new app' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = double
-    Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
+    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.should_receive(:start)
     Rapns::Daemon::AppRunner.sync
   end
@@ -90,7 +90,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   it 'logs an error if the app could not be started' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = double
-    Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
+    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.stub(:start).and_raise(StandardError)
     Rapns.logger.should_receive(:error)
     Rapns::Daemon::AppRunner.sync
@@ -99,7 +99,7 @@ describe Rapns::Daemon::AppRunner, 'sync' do
   it 'reflects errors if the app could not be started' do
     Rapns::App.stub(:all => [app, new_app])
     new_runner = double
-    Rapns::Daemon::Apns::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
+    Rapns::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     e = StandardError.new
     new_runner.stub(:start).and_raise(e)
     Rapns::Daemon::AppRunner.should_receive(:reflect).with(:error, e)
@@ -114,8 +114,6 @@ describe Rapns::Daemon::AppRunner, 'debug' do
 
   before do
     Rapns::Daemon.stub(:config => {})
-    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
-    Rapns::Daemon::Apns::Connection.stub(:new => double.as_null_object)
     Rapns.stub(:logger => logger)
     Rapns::Daemon::AppRunner.sync
   end
@@ -123,7 +121,7 @@ describe Rapns::Daemon::AppRunner, 'debug' do
   after { Rapns::Daemon::AppRunner.runners.clear }
 
   it 'prints debug app states to the log' do
-    Rapns.logger.should_receive(:info).with("\ntest:\n  handlers: 1\n  queued: 0\n  batch size: 0\n  batch processed: 0\n  idle: true\n")
+    Rapns.logger.should_receive(:info).with("\ntest:\n  dispatchers: 1\n  queued: 0\n  batch size: 0\n  batch processed: 0\n  idle: true\n")
     Rapns::Daemon::AppRunner.debug
   end
 end
@@ -135,8 +133,6 @@ describe Rapns::Daemon::AppRunner, 'idle' do
 
   before do
     Rapns.stub(:logger => logger)
-    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
-    Rapns::Daemon::Apns::Connection.stub(:new => double.as_null_object)
     Rapns::Daemon::AppRunner.sync
   end
 
@@ -155,8 +151,6 @@ describe Rapns::Daemon::AppRunner, 'wait' do
 
   before do
     Rapns.stub(:logger => logger)
-    Rapns::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
-    Rapns::Daemon::Apns::Connection.stub(:new => double.as_null_object)
     Rapns::Daemon::AppRunner.sync
   end
 
@@ -165,5 +159,86 @@ describe Rapns::Daemon::AppRunner, 'wait' do
   it 'waits until all runners are idle' do
     Rapns::Daemon::AppRunner.runners.count.should == 1
     Timeout.timeout(5) { Rapns::Daemon::AppRunner.wait }
+  end
+end
+
+describe Rapns::Daemon::AppRunner do
+  let(:app) { Rapns::Apns::App.new }
+  let(:runner) { Rapns::Daemon::AppRunner.new(app) }
+  let(:logger) { double(:info => nil) }
+  let(:queue) { Queue.new }
+  let(:dispatcher_loop_collection) { Rapns::Daemon::DispatcherLoopCollection.new }
+
+  before do
+    Queue.stub(:new => queue)
+    Rapns.stub(:logger => logger)
+    Rapns::Daemon::DispatcherLoopCollection.stub(:new => dispatcher_loop_collection)
+  end
+
+  describe 'start' do
+    it 'starts a delivery dispatcher for each connection' do
+      app.connections = 2
+      runner.start
+      runner.num_dispatchers.should eq 2
+    end
+
+    it 'starts the services'
+  end
+
+  describe 'enqueue' do
+    let(:notification) { double }
+    let(:batch) { double(:notifications => [notification]) }
+
+    it 'enqueues the batch' do
+      queue.should_receive(:push).with([notification, batch])
+      runner.enqueue(batch)
+    end
+
+    it 'reflects the notification has been enqueued' do
+      runner.should_receive(:reflect).with(:notification_enqueued, notification)
+      runner.enqueue(batch)
+    end
+  end
+
+  describe 'stop' do
+    before { runner.start }
+
+    it 'stops the delivery dispatchers' do
+      dispatcher_loop_collection.should_receive(:stop)
+      runner.stop
+    end
+
+    it 'stop the services'
+  end
+
+  describe 'idle?' do
+    it 'is idle if all notifications have been processed' do
+      runner.batch = double(:complete? => true)
+      runner.idle?.should be_true
+    end
+
+    it 'is idle if the runner has no associated batch' do
+      runner.batch = nil
+      runner.idle?.should be_true
+    end
+
+    it 'is not idle if not all notifications have been processed' do
+      runner.batch = double(:complete? => false)
+      runner.idle?.should be_false
+    end
+  end
+
+  describe 'sync' do
+    before { runner.start }
+
+    it 'reduces the number of dispatchers if needed' do
+      app.connections = 0
+      expect { runner.sync(app) }.to change(runner, :num_dispatchers).to(0)
+    end
+
+    it 'increases the number of dispatchers if needed' do
+      app.connections = 2
+      expect { runner.sync(app) }.to change(runner, :num_dispatchers).to(2)
+    end
   end
 end
