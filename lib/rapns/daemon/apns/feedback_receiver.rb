@@ -41,7 +41,6 @@ module Rapns
         def check_for_feedback
           connection = nil
           begin
-            p ("!" * 10) + " " + caller.first
             connection = Rapns::Daemon::TcpConnection.new(@app, @host, @port)
             connection.connect
 

@@ -14,6 +14,16 @@ describe Rapns::Daemon::Store::ActiveRecord do
     store.after_daemonize
   end
 
+  it 'can update a notification' do
+    notification.should_receive(:save!)
+    store.update_notification(notification)
+  end
+
+  it 'can update a app' do
+    app.should_receive(:save!)
+    store.update_app(app)
+  end
+
   describe 'deliverable_notifications' do
     it 'checks for new notifications with the ability to reconnect the database' do
       store.should_receive(:with_database_reconnect_and_retry)

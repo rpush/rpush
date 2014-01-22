@@ -34,6 +34,7 @@ module Rapns
         end
       end
 
+      # :nocov:
       def self.stop?
         @stop
       end
