@@ -13,7 +13,7 @@ describe Rapns::Adm::Notification do
   it "has a 'data' payload limit of 6144 bytes" do
     notification.data = { :key => "a" * 6144 }
     notification.valid?.should be_false
-    notification.errors[:base].should eq ["ADM notification payload data cannot be larger than 6144 bytes."]
+    notification.errors[:base].should eq ["Notification payload data cannot be larger than 6144 bytes."]
   end
 
   it 'limits the number of registration ids to 100' do

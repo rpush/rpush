@@ -13,7 +13,7 @@ describe Rapns::Gcm::Notification do
   it "has a 'data' payload limit of 4096 bytes" do
     notification.data = { :key => "a" * 4096 }
     notification.valid?.should be_false
-    notification.errors[:base].should eq ["GCM notification payload data cannot be larger than 4096 bytes."]
+    notification.errors[:base].should eq ["Notification payload data cannot be larger than 4096 bytes."]
   end
 
   it 'limits the number of registration ids to 1000' do
