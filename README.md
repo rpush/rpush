@@ -58,7 +58,7 @@ n.attributes_for_device = {:foo => :bar}
 n.save!
 ```
 
-You should also implement the [apns_certificate_will_expire](https://github.com/ileitch/rapns/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
+You should also implement the [ssl_certificate_will_expire](https://github.com/ileitch/rapns/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
 #### GCM
 

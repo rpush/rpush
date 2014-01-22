@@ -62,8 +62,8 @@ Rapns.reflect do |on|
   # on.notification_will_retry do |notification|
   # end
 
-  # Called when an APNs connection is lost and will be reconnected.
-  # on.apns_connection_lost do |app, error|
+  # Called when a TCP connection is lost and will be reconnected.
+  # on.tcp_connection_lost do |app, error|
   # end
 
   # Called for each recipient which successfully receives a notification. This
@@ -88,9 +88,9 @@ Rapns.reflect do |on|
   # on.gcm_invalid_registration_id do |app, error, registration_id|
   # end
 
-  # Called when an APNs certificate will expire within 1 month.
+  # Called when an SSL certificate will expire within 1 month.
   # Implement on.error to catch errors raised when the certificate expires.
-  # on.apns_certificate_will_expire do |app, expiration_time|
+  # on.ssl_certificate_will_expire do |app, expiration_time|
   # end
 
   # Called when the ADM returns a canonical registration ID.

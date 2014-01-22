@@ -1,7 +1,7 @@
 module Rapns
   module Daemon
     # TODO: rename?
-    class ConnectionError < StandardError; end
+    class TcpConnectionError < StandardError; end
 
     class TcpConnection
       include Reflectable
@@ -54,7 +54,8 @@ module Rapns
 
           if retry_count == 1
             Rapns.logger.error("[#{@app.name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
-            reflect(:apns_connection_lost, @app, e)
+            reflect(:apns_connection_lost, @app, e) # deprecated
+            reflect(:tcp_connection_lost, @app, e)
           end
 
           if retry_count <= 3
@@ -62,7 +63,7 @@ module Rapns
             sleep 1
             retry
           else
-            raise ConnectionError, "#{@app.name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
+            raise TcpConnectionError, "#{@app.name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
           end
         end
       end
@@ -120,7 +121,8 @@ module Rapns
           raise Rapns::Apns::CertificateExpiredError.new(@app, cert.not_after)
         elsif certificate_expires_soon?
           Rapns.logger.warn(certificate_msg('will expire'))
-          reflect(:apns_certificate_will_expire, @app, cert.not_after)
+          reflect(:apns_certificate_will_expire, @app, cert.not_after) # deprecated
+          reflect(:ssl_certificate_will_expire, @app, cert.not_after)
         end
       end
 

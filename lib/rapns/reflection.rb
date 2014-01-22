@@ -15,8 +15,13 @@ module Rapns
       :notification_failed, :notification_will_retry, :apns_connection_lost,
       :gcm_delivered_to_recipient, :gcm_failed_to_recipient, :gcm_canonical_id,
       :gcm_invalid_registration_id, :error, :apns_certificate_will_expire,
-      :adm_canonical_id
+      :adm_canonical_id, :tcp_connection_lost, :ssl_certificate_will_expire
     ]
+
+    DEPRECATIONS = {
+      :apns_connection_lost => [:tcp_connection_lost, '4.1'],
+      :apns_certificate_will_expire => [:ssl_certificate_will_expire, '4.1']
+    }
 
     REFLECTIONS.each do |reflection|
       class_eval(<<-RUBY, __FILE__, __LINE__)
@@ -28,8 +33,15 @@ module Rapns
     end
 
     def __dispatch(reflection, *args)
-      unless REFLECTIONS.include?(reflection.to_sym)
+      reflection = reflection.to_sym
+
+      unless REFLECTIONS.include?(reflection)
         raise NoSuchReflectionError, reflection
+      end
+
+      if DEPRECATIONS.key?(reflection)
+        replacement, removal_version = DEPRECATIONS[reflection]
+        Rapns::Deprecation.warn("#{reflection} is deprecated and will be removed in version #{removal_version}. Use #{replacement} instead.")
       end
 
       if reflections[reflection]
