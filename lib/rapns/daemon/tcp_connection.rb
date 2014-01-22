@@ -1,6 +1,5 @@
 module Rapns
   module Daemon
-    # TODO: rename?
     class TcpConnectionError < StandardError; end
 
     class TcpConnection

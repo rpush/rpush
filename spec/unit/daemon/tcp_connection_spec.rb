@@ -259,8 +259,8 @@ describe Rapns::Daemon::TcpConnection do
     before { connection.connect }
 
     it 'reconnects if the connection has been idle for more than the defined period' do
-      Rapns::Daemon::TcpConnection.stub(:idle_period => 0.1)
-      sleep 0.2
+      Rapns::Daemon::TcpConnection.stub(:idle_period => 60)
+      Time.stub(:now => Time.now + 61)
       connection.should_receive(:reconnect)
       connection.write('blah')
     end
@@ -269,7 +269,7 @@ describe Rapns::Daemon::TcpConnection do
       now = Time.now
       Time.stub(:now => now)
       connection.write('blah')
-      connection.last_write.should == now
+      connection.last_write.should eq now
     end
 
     it 'does not reconnect if the connection has not been idle for more than the defined period' do
@@ -278,8 +278,8 @@ describe Rapns::Daemon::TcpConnection do
     end
 
     it 'logs the the connection is idle' do
-      Rapns::Daemon::TcpConnection.stub(:idle_period => 0.1)
-      sleep 0.2
+      Rapns::Daemon::TcpConnection.stub(:idle_period => 60)
+      Time.stub(:now => Time.now + 61)
       Rapns.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
       connection.write('blah')
     end

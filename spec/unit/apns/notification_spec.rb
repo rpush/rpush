@@ -30,26 +30,26 @@ describe Rapns::Apns::Notification do
   end
 
   it "should default the expiry to 1 day" do
-    notification.expiry.should == 1.day.to_i
+    notification.expiry.should eq 1.day.to_i
   end
 end
 
 describe Rapns::Apns::Notification, "when assigning the device token" do
   it "should strip spaces from the given string" do
     notification = Rapns::Apns::Notification.new(:device_token => "o m g")
-    notification.device_token.should == "omg"
+    notification.device_token.should eq "omg"
   end
 
   it "should strip chevrons from the given string" do
     notification = Rapns::Apns::Notification.new(:device_token => "<omg>")
-    notification.device_token.should == "omg"
+    notification.device_token.should eq "omg"
   end
 end
 
 describe Rapns::Apns::Notification, "as_json" do
   it "should include the alert if present" do
     notification = Rapns::Apns::Notification.new(:alert => "hi mom")
-    notification.as_json["aps"]["alert"].should == "hi mom"
+    notification.as_json["aps"]["alert"].should eq "hi mom"
   end
 
   it "should not include the alert key if the alert is not present" do
@@ -59,12 +59,12 @@ describe Rapns::Apns::Notification, "as_json" do
 
   it "should encode the alert as JSON if it is a Hash" do
     notification = Rapns::Apns::Notification.new(:alert => { 'body' => "hi mom", 'alert-loc-key' => "View" })
-    notification.as_json["aps"]["alert"].should == { 'body' => "hi mom", 'alert-loc-key' => "View" }
+    notification.as_json["aps"]["alert"].should eq ({ 'body' => "hi mom", 'alert-loc-key' => "View" })
   end
 
   it "should include the badge if present" do
     notification = Rapns::Apns::Notification.new(:badge => 6)
-    notification.as_json["aps"]["badge"].should == 6
+    notification.as_json["aps"]["badge"].should eq 6
   end
 
   it "should not include the badge key if the badge is not present" do
@@ -74,7 +74,7 @@ describe Rapns::Apns::Notification, "as_json" do
 
   it "should include the sound if present" do
     notification = Rapns::Apns::Notification.new(:alert => "my_sound.aiff")
-    notification.as_json["aps"]["alert"].should == "my_sound.aiff"
+    notification.as_json["aps"]["alert"].should eq "my_sound.aiff"
   end
 
   it "should not include the sound key if the sound is not present" do
@@ -85,14 +85,14 @@ describe Rapns::Apns::Notification, "as_json" do
   it "should include attributes for the device" do
     notification = Rapns::Apns::Notification.new
     notification.attributes_for_device = {:omg => :lol, :wtf => :dunno}
-    notification.as_json["omg"].should == "lol"
-    notification.as_json["wtf"].should == "dunno"
+    notification.as_json["omg"].should eq "lol"
+    notification.as_json["wtf"].should eq "dunno"
   end
 
   it "should allow attributes to include a hash" do
     notification = Rapns::Apns::Notification.new
     notification.attributes_for_device = {:omg => {:ilike => :hashes}}
-    notification.as_json["omg"]["ilike"].should == "hashes"
+    notification.as_json["omg"]["ilike"].should eq "hashes"
   end
 
 end
@@ -103,7 +103,7 @@ describe Rapns::Apns::Notification, 'MDM' do
 
   it 'includes the mdm magic in the payload' do
     notification.mdm = magic
-    notification.as_json.should == {'mdm' => magic}
+    notification.as_json.should eq ({'mdm' => magic})
   end
 
   it 'does not include aps attribute' do
@@ -118,7 +118,7 @@ describe Rapns::Apns::Notification, 'content-available' do
 
   it 'includes content-available in the payload' do
     notification.content_available = true
-    notification.as_json['aps']['content-available'].should == 1
+    notification.as_json['aps']['content-available'].should eq 1
   end
 
   it 'does not include content-available in the payload if not set' do
@@ -133,17 +133,16 @@ describe Rapns::Apns::Notification, 'content-available' do
   it 'does not overwrite existing attributes for the device' do
     notification.data = {:hi => :mom}
     notification.content_available = true
-    notification.as_json['aps']['content-available'].should == 1
-    notification.as_json['hi'].should == 'mom'
+    notification.as_json['aps']['content-available'].should eq 1
+    notification.as_json['hi'].should eq 'mom'
   end
 
   it 'does not overwrite the content-available flag when setting attributes for the device' do
     notification.content_available = true
     notification.data = {:hi => :mom}
-    notification.as_json['aps']['content-available'].should == 1
-    notification.as_json['hi'].should == 'mom'
+    notification.as_json['aps']['content-available'].should eq 1
+    notification.as_json['hi'].should eq 'mom'
   end
-
 end
 
 describe Rapns::Apns::Notification, "to_binary" do
@@ -155,10 +154,9 @@ describe Rapns::Apns::Notification, "to_binary" do
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.attributes_for_device = {:hi => :mom}
     notification.expiry = 86400 # 1 day, \x00\x01Q\x80
-    notification.app = Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT)
-    notification.save!
+    notification.app = Rapns::Apns::App.new(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT)
     notification.stub(:id).and_return(1234)
-    notification.to_binary.should == "\x01\x00\x00\x04\xD2\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}"
+    notification.to_binary.should eq "\x01\x00\x00\x04\xD2\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}"
   end
 end
 
@@ -166,14 +164,14 @@ describe Rapns::Apns::Notification, "bug #31" do
   it 'does not confuse a JSON looking string as JSON' do
     notification = Rapns::Apns::Notification.new
     notification.alert = "{\"one\":2}"
-    notification.alert.should == "{\"one\":2}"
+    notification.alert.should eq "{\"one\":2}"
   end
 
   it 'does confuse a JSON looking string as JSON if the alert_is_json attribute is not present' do
     notification = Rapns::Apns::Notification.new
     notification.stub(:has_attribute? => false)
     notification.alert = "{\"one\":2}"
-    notification.alert.should == {"one" => 2}
+    notification.alert.should eq ({"one" => 2})
   end
 end
 

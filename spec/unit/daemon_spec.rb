@@ -118,14 +118,14 @@ describe Rapns::Daemon, "when being shutdown" do
       Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)
       Process.kill("SIGINT", Process.pid)
-      sleep 0.1
+      sleep 0.01
     end
 
     it "shuts down when signaled signaled SIGTERM" do
       Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)
       Process.kill("SIGTERM", Process.pid)
-      sleep 0.1
+      sleep 0.01
     end
   end
 

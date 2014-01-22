@@ -28,12 +28,12 @@ describe Rapns::Configuration do
   it 'sets the pid_file relative if not absolute' do
     Rails.stub(:root => '/rails')
     config.pid_file = 'tmp/rapns.pid'
-    config.pid_file.should == '/rails/tmp/rapns.pid'
+    config.pid_file.should eq '/rails/tmp/rapns.pid'
   end
 
   it 'does not alter an absolute pid_file path' do
     config.pid_file = '/tmp/rapns.pid'
-    config.pid_file.should == '/tmp/rapns.pid'
+    config.pid_file.should eq '/tmp/rapns.pid'
   end
 
   it 'does not allow foreground to be set to false if the platform is JRuby' do

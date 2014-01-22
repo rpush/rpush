@@ -1,4 +1,3 @@
-require 'rapns'
 require 'rails'
 
 module MyPlugin

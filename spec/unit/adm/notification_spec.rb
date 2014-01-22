@@ -13,7 +13,7 @@ describe Rapns::Adm::Notification do
   it "has a 'data' payload limit of 6144 bytes" do
     notification.data = { :key => "a" * 6144 }
     notification.valid?.should be_false
-    notification.errors[:base].should == ["ADM notification payload data cannot be larger than 6144 bytes."]
+    notification.errors[:base].should eq ["ADM notification payload data cannot be larger than 6144 bytes."]
   end
 
   it 'allows assignment of many registration IDs' do
@@ -22,13 +22,13 @@ describe Rapns::Adm::Notification do
     notification.data = {:message => "message"}
     notification.save!
     reloaded_notification = notification_class.find(notification.id)
-    reloaded_notification.registration_ids.should == ['a', 'b']
+    reloaded_notification.registration_ids.should eq ['a', 'b']
   end
 
   it 'num of registration Ids limit of 100' do
     notification.registration_ids = ['a']*(100+1)
     notification.valid?.should be_false
-    notification.errors[:base].should == ["ADM notification number of registration_ids cannot be larger than 100."]
+    notification.errors[:base].should eq ["ADM notification number of registration_ids cannot be larger than 100."]
   end
 
   it 'allows assignment of a single registration ID' do
@@ -37,7 +37,7 @@ describe Rapns::Adm::Notification do
     notification.data = {:message => "message"}
     notification.save!
     reloaded_notification = notification_class.find(notification.id)
-    reloaded_notification.registration_ids.should == ['a']
+    reloaded_notification.registration_ids.should eq ['a']
   end
 
   it 'validates data can be blank if collapse_key is set' do
@@ -53,11 +53,11 @@ describe Rapns::Adm::Notification do
     notification.collapse_key = nil
     notification.data = nil
     notification.valid?.should be_false
-    notification.errors[:data].should == ['must be set unless collapse_key is specified']
+    notification.errors[:data].should eq ['must be set unless collapse_key is specified']
   end
 
   it 'includes expiresAfter in the payload' do
     notification.expiry = 100
-    notification.as_json['expiresAfter'].should == 100
+    notification.as_json['expiresAfter'].should eq 100
   end
 end

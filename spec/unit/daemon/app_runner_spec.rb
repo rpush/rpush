@@ -173,7 +173,7 @@ describe Rapns::Daemon::AppRunner, 'idle' do
 
   it 'returns idle runners' do
     runner = Rapns::Daemon::AppRunner.runners[app.id]
-    Rapns::Daemon::AppRunner.idle.should == [runner]
+    Rapns::Daemon::AppRunner.idle.should eq [runner]
   end
 end
 
@@ -192,7 +192,7 @@ describe Rapns::Daemon::AppRunner, 'wait' do
   after { Rapns::Daemon::AppRunner.runners.clear }
 
   it 'waits until all runners are idle' do
-    Rapns::Daemon::AppRunner.runners.count.should == 1
+    Rapns::Daemon::AppRunner.runners.count.should eq 1
     Timeout.timeout(5) { Rapns::Daemon::AppRunner.wait }
   end
 end

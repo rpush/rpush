@@ -42,7 +42,7 @@ module Rapns
             error = nil
 
             if tuple = @connection.read(ERROR_TUPLE_BYTES)
-              cmd, code, notification_id = tuple.unpack("ccN")
+              _, code, notification_id = tuple.unpack("ccN")
 
               description = APN_ERRORS[code.to_i] || "Unknown error. Possible rapns bug?"
               error = Rapns::DeliveryError.new(code, notification_id, description)

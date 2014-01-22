@@ -170,7 +170,7 @@ module Rapns
         end
 
         def describe_errors
-          description = if @failed_registration_ids.size == @notification.registration_ids.size
+          if @failed_registration_ids.size == @notification.registration_ids.size
             "Failed to deliver to all recipients."
           else
             error_msgs = []

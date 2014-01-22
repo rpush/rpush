@@ -107,8 +107,8 @@ describe Rapns::Daemon::Adm::Delivery do
       http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
       store.should_receive(:update_app).with do |app|
-        app.access_token.should == 'ACCESS_TOKEN'
-        app.access_token_expiration.should == now + 60.seconds
+        app.access_token.should eq 'ACCESS_TOKEN'
+        app.access_token_expiration.should eq now + 60.seconds
       end
       batch.should_receive(:mark_retryable).with(notification, now)
 
@@ -177,9 +177,9 @@ describe Rapns::Daemon::Adm::Delivery do
         attrs.has_key?('delay_while_idle').should be_true
         attrs.has_key?('app_id').should be_true
 
-        reg_ids.should == ['xyz']
-        deliver_after.should == now + 1.hour
-        notification_app.should == notification.app
+        reg_ids.should eq ['xyz']
+        deliver_after.should eq now + 1.hour
+        notification_app.should eq notification.app
       end
 
       batch.should_receive(:mark_delivered).with(notification)
@@ -232,7 +232,7 @@ describe Rapns::Daemon::Adm::Delivery do
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(bad_request_response)
 
       store.should_receive(:update_notification).with do |notif|
-        notif.error_description.should == "Failed to deliver to recipients: \nxyz: InvalidData"
+        notif.error_description.should eq "Failed to deliver to recipients: \nxyz: InvalidData"
       end
 
       batch.should_receive(:mark_delivered).with(notification)

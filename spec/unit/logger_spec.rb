@@ -116,7 +116,6 @@ describe Rapns::Logger do
   it 'defaults auto_flushing to true if the Rails logger does not respond to auto_flushing' do
     rails_logger = double(:info => nil, :error => nil, :level => 0)
     Rails.logger = rails_logger
-    logger = Rapns::Logger.new({})
     @logger.auto_flushing.should be_true
   end
 end
