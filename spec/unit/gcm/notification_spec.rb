@@ -16,26 +16,10 @@ describe Rapns::Gcm::Notification do
     notification.errors[:base].should eq ["GCM notification payload data cannot be larger than 4096 bytes."]
   end
 
-  it 'allows assignment of many registration IDs' do
-    notification.app = app
-    notification.registration_ids = ['a', 'b']
-    notification.save!
-    reloaded_notification = notification_class.find(notification.id)
-    reloaded_notification.registration_ids.should eq ['a', 'b']
-  end
-
-  it 'num of registration Ids limit of 1000' do
+  it 'limits the number of registration ids to 1000' do
     notification.registration_ids = ['a']*(1000+1)
     notification.valid?.should be_false
     notification.errors[:base].should eq ["GCM notification number of registration_ids cannot be larger than 1000."]
-  end
-
-  it 'allows assignment of a single registration ID' do
-    notification.app = app
-    notification.registration_ids = 'a'
-    notification.save!
-    reloaded_notification = notification_class.find(notification.id)
-    reloaded_notification.registration_ids.should eq ['a']
   end
 
   it 'validates expiry is present if collapse_key is set' do

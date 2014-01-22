@@ -35,6 +35,11 @@ module Rapns
       write_attribute(:data, multi_json_dump(attrs))
     end
 
+    def registration_ids=(ids)
+      ids = [ids] if ids && !ids.is_a?(Array)
+      super
+    end
+
     def data
       multi_json_load(read_attribute(:data)) if read_attribute(:data)
     end
@@ -45,6 +50,10 @@ module Rapns
 
     def payload_size
       payload.bytesize
+    end
+
+    def payload_data_size
+      multi_json_dump(as_json['data']).bytesize
     end
 
     class << self

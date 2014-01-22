@@ -6,11 +6,6 @@ module Rapns
       validates_with Rapns::Gcm::PayloadDataSizeValidator
       validates_with Rapns::Gcm::RegistrationIdsCountValidator
 
-      def registration_ids=(ids)
-        ids = [ids] if ids && !ids.is_a?(Array)
-        super
-      end
-
       def as_json
         json = {
           'registration_ids' => registration_ids,
@@ -27,10 +22,6 @@ module Rapns
         end
 
         json
-      end
-
-      def payload_data_size
-        multi_json_dump(as_json['data']).bytesize
       end
     end
   end
