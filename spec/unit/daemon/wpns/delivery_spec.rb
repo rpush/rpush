@@ -98,6 +98,15 @@ describe Rapns::Daemon::Wpns::Delivery do
     end
   end
 
+  describe "an 405 response" do
+    before { response.stub(:code => 405) }
+    it "marks notifications as failed" do
+      batch.should_receive(:mark_failed).with(notification, 405,
+        "No method allowed. This should be considered as a Rapns bug")
+      perform rescue Rapns::DeliveryError
+    end
+  end
+
   describe "an 406 response" do
     before { response.stub(:code => 406) }
 
