@@ -1,20 +1,18 @@
 module Rapns
   module Daemon
     module ServiceConfigMethods
+      DISPATCHERS = {
+        :http => Rapns::Daemon::Dispatcher::Http,
+        :tcp => Rapns::Daemon::Dispatcher::Tcp
+      }
+
       def dispatcher(name = nil, options = {})
         @dispatcher_name = name
         @dispatcher_options = options
       end
 
       def dispatcher_class
-        case @dispatcher_name
-        when :http
-          Rapns::Daemon::Dispatcher::Http
-        when :tcp
-          Rapns::Daemon::Dispatcher::Tcp
-        else
-          raise NotImplementedError
-        end
+        DISPATCHERS[@dispatcher_name] || (raise NotImplementedError)
       end
 
       def delivery_class
