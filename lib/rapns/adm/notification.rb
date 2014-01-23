@@ -4,9 +4,9 @@ module Rapns
       validates :registration_ids, :presence => true
 
       validates_with Rapns::PayloadDataSizeValidator, limit: 6144
+      validates_with Rapns::RegistrationIdsCountValidator, limit: 100
 
       validates_with Rapns::Adm::DataValidator
-      validates_with Rapns::Adm::RegistrationIdsCountValidator
 
       def as_json
         json = {

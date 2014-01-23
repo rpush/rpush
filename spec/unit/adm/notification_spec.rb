@@ -19,7 +19,7 @@ describe Rapns::Adm::Notification do
   it 'limits the number of registration ids to 100' do
     notification.registration_ids = ['a']*(100+1)
     notification.valid?.should be_false
-    notification.errors[:base].should eq ["ADM notification number of registration_ids cannot be larger than 100."]
+    notification.errors[:base].should eq ["Number of registration_ids cannot be larger than 100."]
   end
 
   it 'validates data can be blank if collapse_key is set' do

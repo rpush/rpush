@@ -19,7 +19,7 @@ describe Rapns::Gcm::Notification do
   it 'limits the number of registration ids to 1000' do
     notification.registration_ids = ['a']*(1000+1)
     notification.valid?.should be_false
-    notification.errors[:base].should eq ["GCM notification number of registration_ids cannot be larger than 1000."]
+    notification.errors[:base].should eq ["Number of registration_ids cannot be larger than 1000."]
   end
 
   it 'validates expiry is present if collapse_key is set' do

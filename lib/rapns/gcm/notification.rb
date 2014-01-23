@@ -4,9 +4,9 @@ module Rapns
       validates :registration_ids, :presence => true
 
       validates_with Rapns::PayloadDataSizeValidator, limit: 4096
+      validates_with Rapns::RegistrationIdsCountValidator, limit: 1000
 
       validates_with Rapns::Gcm::ExpiryCollapseKeyMutualInclusionValidator
-      validates_with Rapns::Gcm::RegistrationIdsCountValidator
 
       def as_json
         json = {
