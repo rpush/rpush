@@ -21,6 +21,7 @@ require 'rapns/daemon/dispatcher_loop_collection'
 require 'rapns/daemon/dispatcher/http'
 require 'rapns/daemon/dispatcher/tcp'
 require 'rapns/daemon/service_config_methods'
+require 'rapns/daemon/retry_header_parser'
 
 require 'rapns/daemon/apns/delivery'
 require 'rapns/daemon/apns/disconnection_error'

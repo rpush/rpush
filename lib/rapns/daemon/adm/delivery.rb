@@ -152,13 +152,7 @@ module Rapns
         end
 
         def deliver_after_header(response)
-          if response.header['retry-after']
-            if response.header['retry-after'].to_s =~ /^[0-9]+$/
-              Time.now + response.header['retry-after'].to_i
-            else
-              Time.httpdate(response.header['retry-after'])
-            end
-          end
+          Rapns::Daemon::RetryHeaderParser.parse(response.header['retry-after'])
         end
 
         def retry_delivery(notification, response)
