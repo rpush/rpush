@@ -10,15 +10,15 @@ describe Rapns::Wpns::Notification do
   let(:data_getter) { 'data' }
 
   it "should have an url in the uri parameter" do
-    notification = Rapns::Wpns::Notification.new(:alert =>"abc", :uri => "somthing")
-    notification.valid?.should be_false
+    notification = Rapns::Wpns::Notification.new(:uri => "somthing")
+    notification.valid?
     notification.errors[:uri].include?("is invalid").should be_true
   end
 
   it "should be invalid if there's no message" do
-    notification = Rapns::Wpns::Notification.new(:alert => "", :uri => "http://meh.com/something/else")
-    notification.valid?.should be_false
-    notification.errors[:base].include?("WP notification cannot have an empty body").should be_true
+    notification = Rapns::Wpns::Notification.new(:alert => "")
+    notification.valid?
+    notification.errors[:alert].include?("can't be blank").should be_true
   end
 end
 

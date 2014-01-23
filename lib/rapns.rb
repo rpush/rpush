@@ -37,7 +37,6 @@ require 'rapns/gcm/expiry_collapse_key_mutual_inclusion_validator'
 require 'rapns/gcm/notification'
 require 'rapns/gcm/app'
 
-require 'rapns/wpns/data_validator'
 require 'rapns/wpns/notification'
 require 'rapns/wpns/app'
 

@@ -1,8 +1,9 @@
 module Rapns
   module Wpns
     class Notification < Rapns::Notification
-      validates :uri, :presence => true
-      validates_with Rapns::Wpns::DataValidator
+      validates :uri, presence: true
+      validates :uri, format: { with: /https?:\/\/[\S]+/ }
+      validates :alert, presence: true
 
       def data=(attrs)
         return unless attrs
