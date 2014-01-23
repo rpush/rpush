@@ -52,7 +52,7 @@ module Rapns
         end
       end
 
-      def notification_processed
+      def notification_dispatched
         @mutex.synchronize do
           @num_processed += 1
           complete if @num_processed >= @notifications.size

@@ -11,25 +11,25 @@ describe Rapns::Adm::App do
   it 'should be invalid if name' do
     subject.name = nil
     subject.should_not be_valid
-    subject.errors[:name].should == ["can't be blank"]
+    subject.errors[:name].should eq ["can't be blank"]
   end
 
   it 'should be invalid if name is not unique within scope' do
     subject.name = existing_app.name
     subject.should_not be_valid
-    subject.errors[:name].should == ["has already been taken"]
+    subject.errors[:name].should eq ["has already been taken"]
   end
 
   it 'should be invalid if missing client_id' do
     subject.client_id = nil
     subject.should_not be_valid
-    subject.errors[:client_id].should == ["can't be blank"]
+    subject.errors[:client_id].should eq ["can't be blank"]
   end
 
   it 'should be invalid if missing client_secret' do
     subject.client_secret = nil
     subject.should_not be_valid
-    subject.errors[:client_secret].should == ["can't be blank"]
+    subject.errors[:client_secret].should eq ["can't be blank"]
   end
 
   describe '#access_token_expired?' do

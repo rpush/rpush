@@ -10,5 +10,9 @@ module Rapns
 
     validates :name, :presence => true, :uniqueness => { :scope => [:type, :environment] }
     validates_numericality_of :connections, :greater_than => 0, :only_integer => true
+
+    def service_name
+      raise NotImplementedError
+    end
   end
 end

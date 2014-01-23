@@ -4,6 +4,7 @@ module Rapns
 
       def initialize
         @sleep_reader, @wake_writer = IO.pipe
+        @udp_wakeup = nil
       end
 
       # enable wake on receiving udp packets at the given address and port

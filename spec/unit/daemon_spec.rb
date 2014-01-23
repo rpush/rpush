@@ -6,9 +6,9 @@ describe Rapns::Daemon, "when starting" do
 
   let(:certificate) { double }
   let(:password) { double }
-  let(:config) { double(:pid_file => nil, :airbrake_notify => false,
-    :foreground => true, :embedded => false, :push => false,
-    :store => :active_record, :logger => nil) }
+  let(:config) { double(:pid_file => nil, :foreground => true,
+    :embedded => false, :push => false, :store => :active_record,
+    :logger => nil) }
   let(:logger) { double(:logger, :info => nil, :error => nil, :warn => nil) }
 
   before do
@@ -118,14 +118,14 @@ describe Rapns::Daemon, "when being shutdown" do
       Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)
       Process.kill("SIGINT", Process.pid)
-      sleep 0.1
+      sleep 0.01
     end
 
     it "shuts down when signaled signaled SIGTERM" do
       Rapns::Daemon.setup_signal_traps
       Rapns::Daemon.should_receive(:shutdown)
       Process.kill("SIGTERM", Process.pid)
-      sleep 0.1
+      sleep 0.01
     end
   end
 

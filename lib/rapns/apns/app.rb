@@ -5,6 +5,10 @@ module Rapns
       validates :certificate, :presence => true
       validate :certificate_has_matching_private_key
 
+      def service_name
+        'apns'
+      end
+
       private
 
       def certificate_has_matching_private_key

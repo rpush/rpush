@@ -24,6 +24,8 @@ require 'rapns/push'
 require 'rapns/apns_feedback'
 require 'rapns/upgraded'
 require 'rapns/notifier'
+require 'rapns/payload_data_size_validator'
+require 'rapns/registration_ids_count_validator'
 
 require 'rapns/apns/binary_notification_validator'
 require 'rapns/apns/device_token_format_validator'
@@ -32,17 +34,12 @@ require 'rapns/apns/feedback'
 require 'rapns/apns/app'
 
 require 'rapns/gcm/expiry_collapse_key_mutual_inclusion_validator'
-require 'rapns/gcm/payload_data_size_validator'
-require 'rapns/gcm/registration_ids_count_validator'
 require 'rapns/gcm/notification'
 require 'rapns/gcm/app'
 
-require 'rapns/wpns/data_validator'
 require 'rapns/wpns/notification'
 require 'rapns/wpns/app'
 
-require 'rapns/adm/payload_data_size_validator'
-require 'rapns/adm/registration_ids_count_validator'
 require 'rapns/adm/data_validator'
 require 'rapns/adm/notification'
 require 'rapns/adm/app'
@@ -57,8 +54,7 @@ module Rapns
   end
 
   def self.logger
-    @logger ||= Logger.new(:foreground => Rapns.config.foreground,
-                           :airbrake_notify => Rapns.config.airbrake_notify)
+    @logger ||= Logger.new(:foreground => Rapns.config.foreground)
   end
 
   def self.logger=(logger)

@@ -3,6 +3,8 @@ class Mysql; class Error < StandardError; end; end if !defined?(Mysql)
 module Mysql2; class Error < StandardError; end; end if !defined?(Mysql2)
 module ActiveRecord; end
 class ActiveRecord::JDBCError < StandardError; end if !defined?(::ActiveRecord::JDBCError)
+
+# :nocov:
 if !defined?(::SQLite3::Exception)
   module SQLite3
     class Exception < StandardError; end
@@ -39,7 +41,7 @@ module Rapns
                 check_database_is_connected
                 break
               rescue *ADAPTER_ERRORS => e
-                Rapns.logger.error(e, :airbrake_notify => false)
+                Rapns.logger.error(e)
                 sleep_to_avoid_thrashing
               end
             end

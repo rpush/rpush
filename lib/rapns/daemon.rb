@@ -5,6 +5,7 @@ require 'openssl'
 
 require 'net/http/persistent'
 
+require 'rapns/daemon/constants'
 require 'rapns/daemon/reflectable'
 require 'rapns/daemon/interruptible_sleep'
 require 'rapns/daemon/delivery_error'
@@ -14,28 +15,27 @@ require 'rapns/daemon/delivery'
 require 'rapns/daemon/feeder'
 require 'rapns/daemon/batch'
 require 'rapns/daemon/app_runner'
-require 'rapns/daemon/delivery_handler'
-require 'rapns/daemon/delivery_handler_collection'
+require 'rapns/daemon/tcp_connection'
+require 'rapns/daemon/dispatcher_loop'
+require 'rapns/daemon/dispatcher_loop_collection'
+require 'rapns/daemon/dispatcher/http'
+require 'rapns/daemon/dispatcher/tcp'
+require 'rapns/daemon/service_config_methods'
 
 require 'rapns/daemon/apns/delivery'
 require 'rapns/daemon/apns/disconnection_error'
 require 'rapns/daemon/apns/certificate_expired_error'
-require 'rapns/daemon/apns/connection'
-require 'rapns/daemon/apns/app_runner'
-require 'rapns/daemon/apns/delivery_handler'
 require 'rapns/daemon/apns/feedback_receiver'
+require 'rapns/daemon/apns'
 
 require 'rapns/daemon/gcm/delivery'
-require 'rapns/daemon/gcm/app_runner'
-require 'rapns/daemon/gcm/delivery_handler'
+require 'rapns/daemon/gcm'
 
-require 'rapns/daemon/wpns/app_runner'
-require 'rapns/daemon/wpns/delivery_handler'
 require 'rapns/daemon/wpns/delivery'
+require 'rapns/daemon/wpns'
 
 require 'rapns/daemon/adm/delivery'
-require 'rapns/daemon/adm/app_runner'
-require 'rapns/daemon/adm/delivery_handler'
+require 'rapns/daemon/adm'
 
 module Rapns
   module Daemon
@@ -70,9 +70,9 @@ module Rapns
     def self.initialize_store
       return if store
       begin
-        require "rapns/daemon/store/#{Rapns.config.store}"
-        klass = "Rapns::Daemon::Store::#{Rapns.config.store.to_s.camelcase}".constantize
-        self.store = klass.new
+        name = Rapns.config.store.to_s
+        require "rapns/daemon/store/#{name}"
+        self.store = Rapns::Daemon::Store.const_get(name.camelcase).new
       rescue StandardError, LoadError => e
         Rapns.logger.error("Failed to load '#{Rapns.config.store}' storage backend.")
         Rapns.logger.error(e)

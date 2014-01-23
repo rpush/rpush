@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::Apns::Connection do
+describe Rapns::Daemon::TcpConnection do
   let(:rsa_key) { double }
   let(:certificate) { double }
   let(:password) { double }
@@ -12,7 +12,7 @@ describe Rapns::Daemon::Apns::Connection do
   let(:ssl_socket) { double(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
   let(:logger) { double(:info => nil, :error => nil, :warn => nil) }
   let(:app) { double(:name => 'Connection 0', :certificate => certificate, :password => password)}
-  let(:connection) { Rapns::Daemon::Apns::Connection.new(app, host, port) }
+  let(:connection) { Rapns::Daemon::TcpConnection.new(app, host, port) }
 
   before do
     OpenSSL::SSL::SSLContext.stub(:new => ssl_context)
@@ -84,7 +84,7 @@ describe Rapns::Daemon::Apns::Connection do
     describe 'certificate expiry' do
       it 'reflects if the certificate will expire soon' do
         cert = OpenSSL::X509::Certificate.new(app.certificate)
-        connection.should_receive(:reflect).with(:apns_certificate_will_expire, app, cert.not_after)
+        connection.should_receive(:reflect).with(:ssl_certificate_will_expire, app, cert.not_after)
         Timecop.freeze(cert.not_after - 3.days) { connection.connect }
       end
 
@@ -96,7 +96,7 @@ describe Rapns::Daemon::Apns::Connection do
 
       it 'does not reflect if the certificate will not expire soon' do
         cert = OpenSSL::X509::Certificate.new(app.certificate)
-        connection.should_not_receive(:reflect).with(:apns_certificate_will_expire, app, kind_of(Time))
+        connection.should_not_receive(:reflect).with(:ssl_certificate_will_expire, app, kind_of(Time))
         Timecop.freeze(cert.not_after - 2.months) { connection.connect }
       end
 
@@ -157,10 +157,10 @@ describe Rapns::Daemon::Apns::Connection do
     end
 
     it 'reflects the connection has been lost' do
-      connection.should_receive(:reflect).with(:apns_connection_lost, app, kind_of(error_type))
+      connection.should_receive(:reflect).with(:tcp_connection_lost, app, kind_of(error_type))
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::Apns::ConnectionError
+      rescue Rapns::Daemon::TcpConnectionError
       end
     end
 
@@ -168,7 +168,7 @@ describe Rapns::Daemon::Apns::Connection do
       logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error_type.name}), reconnecting...").once
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::Apns::ConnectionError
+      rescue Rapns::Daemon::TcpConnectionError
       end
     end
 
@@ -176,21 +176,21 @@ describe Rapns::Daemon::Apns::Connection do
       connection.should_receive(:reconnect).exactly(3).times
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::Apns::ConnectionError
+      rescue Rapns::Daemon::TcpConnectionError
       end
     end
 
-    it "raises a ConnectionError after 3 attempts at reconnecting" do
+    it "raises a TcpConnectionError after 3 attempts at reconnecting" do
       expect do
         connection.write(nil)
-      end.to raise_error(Rapns::Daemon::Apns::ConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
+      end.to raise_error(Rapns::Daemon::TcpConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
     end
 
     it "sleeps 1 second before retrying the connection" do
       connection.should_receive(:sleep).with(1)
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::Apns::ConnectionError
+      rescue Rapns::Daemon::TcpConnectionError
       end
     end
   end
@@ -259,8 +259,8 @@ describe Rapns::Daemon::Apns::Connection do
     before { connection.connect }
 
     it 'reconnects if the connection has been idle for more than the defined period' do
-      Rapns::Daemon::Apns::Connection.stub(:idle_period => 0.1)
-      sleep 0.2
+      Rapns::Daemon::TcpConnection.stub(:idle_period => 60)
+      Time.stub(:now => Time.now + 61)
       connection.should_receive(:reconnect)
       connection.write('blah')
     end
@@ -269,7 +269,7 @@ describe Rapns::Daemon::Apns::Connection do
       now = Time.now
       Time.stub(:now => now)
       connection.write('blah')
-      connection.last_write.should == now
+      connection.last_write.should eq now
     end
 
     it 'does not reconnect if the connection has not been idle for more than the defined period' do
@@ -278,8 +278,8 @@ describe Rapns::Daemon::Apns::Connection do
     end
 
     it 'logs the the connection is idle' do
-      Rapns::Daemon::Apns::Connection.stub(:idle_period => 0.1)
-      sleep 0.2
+      Rapns::Daemon::TcpConnection.stub(:idle_period => 60)
+      Time.stub(:now => Time.now + 61)
       Rapns.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
       connection.write('blah')
     end

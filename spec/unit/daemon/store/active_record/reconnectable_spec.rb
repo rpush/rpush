@@ -101,8 +101,8 @@ describe Rapns::Daemon::Store::ActiveRecord::Reconnectable do
       test_double.perform
     end
 
-    it "should log errors raised when the reconnection is not successful without notifying airbrake" do
-      Rapns.logger.should_receive(:error).with(error, :airbrake_notify => false)
+    it "should log errors raised when the reconnection is not successful" do
+      Rapns.logger.should_receive(:error).with(error)
       test_double.perform
     end
 

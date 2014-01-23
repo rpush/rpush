@@ -2,14 +2,11 @@ module Rapns
   module Gcm
     class Notification < Rapns::Notification
       validates :registration_ids, :presence => true
-      validates_with Rapns::Gcm::ExpiryCollapseKeyMutualInclusionValidator
-      validates_with Rapns::Gcm::PayloadDataSizeValidator
-      validates_with Rapns::Gcm::RegistrationIdsCountValidator
 
-      def registration_ids=(ids)
-        ids = [ids] if ids && !ids.is_a?(Array)
-        super
-      end
+      validates_with Rapns::PayloadDataSizeValidator, limit: 4096
+      validates_with Rapns::RegistrationIdsCountValidator, limit: 1000
+
+      validates_with Rapns::Gcm::ExpiryCollapseKeyMutualInclusionValidator
 
       def as_json
         json = {
@@ -27,10 +24,6 @@ module Rapns
         end
 
         json
-      end
-
-      def payload_data_size
-        multi_json_dump(as_json['data']).bytesize
       end
     end
   end

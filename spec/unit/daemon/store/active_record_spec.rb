@@ -14,6 +14,16 @@ describe Rapns::Daemon::Store::ActiveRecord do
     store.after_daemonize
   end
 
+  it 'can update a notification' do
+    notification.should_receive(:save!)
+    store.update_notification(notification)
+  end
+
+  it 'can update a app' do
+    app.should_receive(:save!)
+    store.update_app(app)
+  end
+
   describe 'deliverable_notifications' do
     it 'checks for new notifications with the ability to reconnect the database' do
       store.should_receive(:with_database_reconnect_and_retry)
@@ -39,12 +49,12 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'loads an undelivered notification without deliver_after set' do
       notification.update_attributes!(:delivered => false, :deliver_after => nil)
-      store.deliverable_notifications([app]).should == [notification]
+      store.deliverable_notifications([app]).should eq [notification]
     end
 
     it 'loads an notification with a deliver_after time in the past' do
       notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.ago)
-      store.deliverable_notifications([app]).should == [notification]
+      store.deliverable_notifications([app]).should eq [notification]
     end
 
     it 'does not load an notification with a deliver_after time in the future' do
@@ -270,7 +280,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'sets the given attributes' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.device_token.should == 'ab' * 32
+      new_notification.device_token.should eq 'ab' * 32
     end
 
     it 'sets the given data' do
@@ -280,12 +290,12 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'sets the given registration IDs' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.registration_ids.should == registration_ids
+      new_notification.registration_ids.should eq registration_ids
     end
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.deliver_after.to_s.should == deliver_after.to_s
+      new_notification.deliver_after.to_s.should eq deliver_after.to_s
     end
 
     it 'saves the new notification' do
@@ -303,8 +313,8 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'sets the given attributes' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.app_id.should == app.id
-      new_notification.collapse_key.should == 'ckey'
+      new_notification.app_id.should eq app.id
+      new_notification.collapse_key.should eq 'ckey'
       new_notification.delay_while_idle.should be_true
     end
 
@@ -315,12 +325,12 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
     it 'sets the given registration IDs' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.registration_ids.should == registration_ids
+      new_notification.registration_ids.should eq registration_ids
     end
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.deliver_after.to_s.should == deliver_after.to_s
+      new_notification.deliver_after.to_s.should eq deliver_after.to_s
     end
 
     it 'saves the new notification' do

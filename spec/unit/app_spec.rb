@@ -5,7 +5,7 @@ describe Rapns::App do
     Rapns::Apns::App.create!(:name => 'test', :environment => 'production', :certificate => TEST_CERT)
     app = Rapns::Apns::App.new(:name => 'test', :environment => 'production', :certificate => TEST_CERT)
     app.valid?.should be_false
-    app.errors[:name].should == ['has already been taken']
+    app.errors[:name].should eq ['has already been taken']
 
     app = Rapns::Apns::App.new(:name => 'test', :environment => 'development', :certificate => TEST_CERT)
     app.valid?.should be_true

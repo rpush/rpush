@@ -29,19 +29,15 @@ module Rapns
 
     scope :completed, lambda { where("delivered = ? OR failed = ?", true, true) }
 
-    def initialize(*args)
-      attributes = args.first
-      if attributes.is_a?(Hash) && attributes.keys.include?(:attributes_for_device)
-        msg = ":attributes_for_device via mass-assignment is deprecated. Use :data or the attributes_for_device= instance method."
-        Rapns::Deprecation.warn(msg)
-      end
-      super
-    end
-
     def data=(attrs)
       return unless attrs
       raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
       write_attribute(:data, multi_json_dump(attrs))
+    end
+
+    def registration_ids=(ids)
+      ids = [ids] if ids && !ids.is_a?(Array)
+      super
     end
 
     def data
@@ -54,6 +50,10 @@ module Rapns
 
     def payload_size
       payload.bytesize
+    end
+
+    def payload_data_size
+      multi_json_dump(as_json['data']).bytesize
     end
 
     class << self

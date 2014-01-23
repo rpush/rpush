@@ -2,14 +2,11 @@ module Rapns
   module Adm
     class Notification < Rapns::Notification
       validates :registration_ids, :presence => true
-      validates_with Rapns::Adm::DataValidator
-      validates_with Rapns::Adm::PayloadDataSizeValidator
-      validates_with Rapns::Adm::RegistrationIdsCountValidator
 
-      def registration_ids=(ids)
-        ids = [ids] if ids && !ids.is_a?(Array)
-        super
-      end
+      validates_with Rapns::PayloadDataSizeValidator, limit: 6144
+      validates_with Rapns::RegistrationIdsCountValidator, limit: 100
+
+      validates_with Rapns::Adm::DataValidator
 
       def as_json
         json = {
@@ -26,10 +23,6 @@ module Rapns
         end
 
         json
-      end
-
-      def payload_data_size
-        multi_json_dump(as_json['data']).bytesize
       end
     end
   end
