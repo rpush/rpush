@@ -10,6 +10,9 @@ class CreateRapnsFeedback < ActiveRecord::Migration
   end
 
   def self.down
+    if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token, true)
+      remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
+    end
     drop_table :rapns_feedback
   end
 end

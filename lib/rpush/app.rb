@@ -1,6 +1,6 @@
 module Rpush
   class App < ActiveRecord::Base
-    self.table_name = 'rapns_apps'
+    self.table_name = 'rpush_apps'
 
     if Rpush.attr_accessible_available?
       attr_accessible :name, :environment, :certificate, :password, :connections, :auth_key, :client_id, :client_secret

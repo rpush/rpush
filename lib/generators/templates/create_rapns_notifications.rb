@@ -17,10 +17,13 @@ class CreateRapnsNotifications < ActiveRecord::Migration
       t.timestamps
     end
 
-    add_index :rapns_notifications, [:delivered, :failed, :deliver_after], :name => "index_rapns_notifications_multi"
+    add_index :rapns_notifications, [:delivered, :failed, :deliver_after], :name => 'index_rapns_notifications_multi'
   end
 
   def self.down
+    if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi', true)
+      remove_index :rapns_notifications, :name => 'index_rapns_notifications_multi'
+    end
     drop_table :rapns_notifications
   end
 end

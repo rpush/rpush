@@ -2,7 +2,7 @@ module Rpush
   class Notification < ActiveRecord::Base
     include Rpush::MultiJsonHelper
 
-    self.table_name = 'rapns_notifications'
+    self.table_name = 'rpush_notifications'
 
     # TODO: Dump using multi json.
     serialize :registration_ids

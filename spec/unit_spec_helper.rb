@@ -47,12 +47,21 @@ require 'generators/templates/create_rapns_apps'
 require 'generators/templates/add_gcm'
 require 'generators/templates/add_wpns'
 require 'generators/templates/add_adm'
+require 'generators/templates/rename_rapns_to_rpush'
 
-[CreateRapnsNotifications, CreateRapnsFeedback,
- AddAlertIsJsonToRapnsNotifications, AddAppToRapns, CreateRapnsApps, AddGcm, AddWpns, AddAdm].each do |migration|
-  migration.down rescue ActiveRecord::StatementInvalid
-  migration.up
+migrations = [CreateRapnsNotifications, CreateRapnsFeedback,
+ AddAlertIsJsonToRapnsNotifications, AddAppToRapns, CreateRapnsApps, AddGcm,
+ AddWpns, AddAdm, RenameRapnsToRpush]
+
+migrations.reverse.each do |m|
+  begin
+    m.down
+  rescue ActiveRecord::StatementInvalid => e
+    p e
+  end
 end
+
+migrations.each(&:up)
 
 require 'database_cleaner'
 DatabaseCleaner.strategy = :truncation

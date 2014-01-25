@@ -1,7 +1,7 @@
 module Rpush
   module Apns
     class Feedback < ActiveRecord::Base
-      self.table_name = 'rapns_feedback'
+      self.table_name = 'rpush_feedback'
 
       if Rpush.attr_accessible_available?
         attr_accessible :device_token, :failed_at, :app

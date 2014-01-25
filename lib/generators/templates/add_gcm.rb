@@ -1,5 +1,5 @@
 class AddGcm < ActiveRecord::Migration
-  module Rpush
+  module Rapns
     class App < ActiveRecord::Base
       self.table_name = 'rapns_apps'
     end
@@ -14,8 +14,8 @@ class AddGcm < ActiveRecord::Migration
     add_column :rapns_notifications, :type, :string, :null => true
     add_column :rapns_apps, :type, :string, :null => true
 
-    AddGcm::Rpush::Notification.update_all :type => 'Rpush::Apns::Notification'
-    AddGcm::Rpush::App.update_all :type => 'Rpush::Apns::App'
+    AddGcm::Rapns::Notification.update_all :type => 'Rapns::Apns::Notification'
+    AddGcm::Rapns::App.update_all :type => 'Rapns::Apns::App'
 
     change_column :rapns_notifications, :type, :string, :null => false
     change_column :rapns_apps, :type, :string, :null => false
@@ -40,11 +40,11 @@ class AddGcm < ActiveRecord::Migration
     add_column :rapns_notifications, :app_id, :integer, :null => true
     add_column :rapns_notifications, :retries, :integer, :null => true, :default => 0
 
-    Rpush::Notification.reset_column_information
-    Rpush::App.reset_column_information
+    AddGcm::Rapns::Notification.reset_column_information
+    AddGcm::Rapns::App.reset_column_information
 
-    Rpush::App.all.each do |app|
-      Rpush::Notification.update_all(['app_id = ?', app.id], ['app = ?', app.name])
+    AddGcm::Rapns::App.all.each do |app|
+      AddGcm::Rapns::Notification.update_all(['app_id = ?', app.id], ['app = ?', app.name])
     end
 
     change_column :rapns_notifications, :app_id, :integer, :null => false
@@ -59,7 +59,7 @@ class AddGcm < ActiveRecord::Migration
   end
 
   def self.down
-    AddGcm::Rpush::Notification.where(:type => 'Rpush::Gcm::Notification').delete_all
+    AddGcm::Rapns::Notification.where(:type => 'Rapns::Gcm::Notification').delete_all
 
     remove_column :rapns_notifications, :type
     remove_column :rapns_apps, :type
@@ -84,11 +84,11 @@ class AddGcm < ActiveRecord::Migration
 
     add_column :rapns_notifications, :app, :string, :null => true
 
-    Rpush::Notification.reset_column_information
-    Rpush::App.reset_column_information
+    AddGcm::Rapns::Notification.reset_column_information
+    AddGcm::Rapns::App.reset_column_information
 
-    Rpush::App.all.each do |app|
-      Rpush::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
+    AddGcm::Rapns::App.all.each do |app|
+      AddGcm::Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
     end
 
     remove_index :rapns_notifications, :name => "index_rapns_notifications_multi"

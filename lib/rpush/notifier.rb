@@ -33,14 +33,14 @@ module Rpush
 
   end
 
-  # Call this from a client application after saving a Notification to the database to wakeup the Rapns
+  # Call this from a client application after saving a Notification to the database to wakeup the Rpush
   # Daemon to deliver the notification immediately.
   def self.wakeup
     notifier.notify
   end
 
   # Default notifier instance. This uses the :connect, :port values in Rpush.config.wakeup to connect to the
-  # wakeup socket in the Rapns Daemon. It will fall back to :host, :port if :connect is not specified.
+  # wakeup socket in the Rpush Daemon. It will fall back to :host, :port if :connect is not specified.
   def self.notifier
     unless @notifier
       if Rpush.config.wakeup

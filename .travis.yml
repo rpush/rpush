@@ -1,4 +1,4 @@
-before_script: "psql -c 'create database rapns_test;' -U postgres >/dev/null"
+before_script: "psql -c 'create database rpush_test;' -U postgres >/dev/null"
 language: ruby
 rvm:
   - 1.9.3

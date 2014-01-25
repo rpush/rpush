@@ -2,38 +2,38 @@
 
 postgresql:
   adapter: postgresql
-  database: rapns_test
+  database: rpush_test
   host: localhost
   username: postgres
   password: ""
 
 jdbcpostgresql:
   adapter: jdbcpostgresql
-  database: rapns_test
+  database: rpush_test
   host: localhost
   username: postgres
   password: ""
 
 mysql2:
   adapter: mysql2
-  database: rapns_test
+  database: rpush_test
   host: localhost
-  username: rapns_test
+  username: rpush_test
   password: ""
   encoding: utf8
 
 jdbcmysql:
   adapter: jdbcmysql
-  database: rapns_test
+  database: rpush_test
   host: localhost
-  username: rapns_test
+  username: rpush_test
   password: ""
   encoding: utf8
 
 jdbch2:
   adapter: h2
-  url: jdbc:h2:file:/tmp/rapns_test;AUTO_SERVER=TRUE
-  username: rapns_test
+  url: jdbc:h2:file:/tmp/rpush_test;AUTO_SERVER=TRUE
+  username: rpush_test
   password: ""
   pool: 128
   timeout: 5000
@@ -41,4 +41,4 @@ jdbch2:
 
 sqlite3:
   adapter: sqlite3
-  database: spec/tmp/rapns_test.sqlite3
+  database: spec/tmp/rpush_test.sqlite3

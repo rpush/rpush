@@ -1,4 +1,10 @@
 class AddAdm < ActiveRecord::Migration
+  module Rapns
+    class Notification < ActiveRecord::Base
+      self.table_name = 'rapns_notifications'
+    end
+  end
+
   def self.up
     add_column :rapns_apps, :client_id, :string, :null => true
     add_column :rapns_apps, :client_secret, :string, :null => true
@@ -7,7 +13,7 @@ class AddAdm < ActiveRecord::Migration
   end
 
   def self.down
-    ::Rpush::Notification.where(:type => 'Rpush::Adm::Notification').delete_all
+    AddAdm::Rapns::Notification.where(:type => 'Rapns::Adm::Notification').delete_all
 
     remove_column :rapns_apps, :client_id
     remove_column :rapns_apps, :client_secret
