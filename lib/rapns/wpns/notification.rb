@@ -5,12 +5,6 @@ module Rapns
       validates :uri, format: { with: /https?:\/\/[\S]+/ }
       validates :alert, presence: true
 
-      def data=(attrs)
-        return unless attrs
-        raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
-        super attrs.merge(data || {})
-      end
-
       def as_json
         json = {
           'message' => alert,

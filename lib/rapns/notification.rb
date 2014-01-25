@@ -32,7 +32,7 @@ module Rapns
     def data=(attrs)
       return unless attrs
       raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
-      write_attribute(:data, multi_json_dump(attrs))
+      write_attribute(:data, multi_json_dump(attrs.merge(data || {})))
     end
 
     def registration_ids=(ids)

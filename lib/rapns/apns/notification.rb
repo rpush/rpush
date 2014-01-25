@@ -79,13 +79,6 @@ module Rapns
         id_for_pack = options[:for_validation] ? 0 : id
         [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
       end
-
-      def data=(attrs)
-        return unless attrs
-        raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
-        super attrs.merge(data || {})
-      end
-
     end
   end
 end
