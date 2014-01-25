@@ -7,7 +7,6 @@ module Rpush
     config.push = true
     Rpush.config.update(config)
 
-    Upgraded.check(:exit => false)
     Rpush::Daemon.initialize_store
     Rpush::Daemon::AppRunner.sync
     Rpush::Daemon::Feeder.start

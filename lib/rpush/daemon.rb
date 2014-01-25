@@ -56,7 +56,6 @@ module Rpush
       end
 
       write_pid_file
-      Upgraded.check(:exit => true)
       AppRunner.sync
       Feeder.start
     end

@@ -2,7 +2,6 @@ require 'unit_spec_helper'
 
 describe Rpush, 'push' do
   before do
-    Rpush::Upgraded.stub(:check => nil)
     Rpush::Daemon::AppRunner.stub(:sync => nil, :wait => nil)
     Rpush::Daemon::Feeder.stub(:start => nil)
   end
