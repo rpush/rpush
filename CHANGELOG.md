@@ -1,4 +1,5 @@
 ## 4.0.0 (unreleased)
+  * Renamed to Rpush (from Rapns).
   * Reduce default batch size to 100.
   * Fix sqlite3 support (#160).
   * Drop support for Ruby 1.8.
