@@ -1,43 +1,43 @@
-[![Build Status](https://secure.travis-ci.org/ileitch/rapns.png?branch=master)](http://travis-ci.org/ileitch/rapns)
-[![Code Climate](https://codeclimate.com/github/ileitch/rapns.png)](https://codeclimate.com/github/ileitch/rapns)
-[![Coverage Status](https://coveralls.io/repos/ileitch/rapns/badge.png?branch=master)](https://coveralls.io/r/ileitch/rapns?branch=master)
-[![Gem Version](https://badge.fury.io/rb/rapns.png)](http://badge.fury.io/rb/rapns)
+[![Build Status](https://secure.travis-ci.org/rpush/rpush.png?branch=master)](http://travis-ci.org/rpush/rpush)
+[![Code Climate](https://codeclimate.com/github/rpush/rpush.png)](https://codeclimate.com/github/rpush/rpush)
+[![Coverage Status](https://coveralls.io/repos/rpush/rpush/badge.png?branch=master)](https://coveralls.io/r/rpush/rpush?branch=master)
+[![Gem Version](https://badge.fury.io/rb/rpush.png)](http://badge.fury.io/rb/rpush)
 
-### Rapns - Professional grade APNs, GCM, ADM and WPNs for Ruby.
+### Rpush - Professional grade APNs, GCM, ADM and WPNs for Ruby.
 
 * Supports both APNs (iOS), GCM (Google Cloud Messaging, Android), ADM (Amazon Device Messaging) and WPNs (Windows Phone).
 * Seamless Rails (3, 4) integration.
 * Scalable - choose the number of persistent connections for each app.
 * Designed for uptime - signal -HUP to add, update apps.
 * Stable - reconnects database and network connections when lost.
-* Run as a daemon or inside an [existing processs](https://github.com/ileitch/rapns/wiki/Embedding-API).
-* Use in a scheduler for low-workload deployments ([Push API](https://github.com/ileitch/rapns/wiki/Push-API)).
-* Reflection API for fine-grained instrumentation and error handling ([Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)).
+* Run as a daemon or inside an [existing processs](https://github.com/rpush/rpush/wiki/Embedding-API).
+* Use in a scheduler for low-workload deployments ([Push API](https://github.com/rpush/rpush/wiki/Push-API)).
+* Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
 * Works with MRI, JRuby, Rubinius 1.9, 2.0, 2.1.
 * Built with love.
 
-### Who uses Rapns?
+### Who uses Rpush?
 
 [GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
 
-*I'd love to hear if you use Rapns - @ileitch on twitter.*
+*I'd love to hear if you use Rpush - @ileitch on twitter.*
 
 ## Getting Started
 
-Add Rapns to your Gemfile:
+Add Rpush to your Gemfile:
 
-    gem 'rapns'
+    gem 'rpush'
 
-Generate the migrations, rapns.yml and migrate:
+Generate the migrations, rpush.yml and migrate:
 
-    rails g rapns
+    rails g rpush
     rake db:migrate
 
 ## Create an App & Notification
 
 #### APNs
 
-If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/ileitch/rapns/wiki/Generating-Certificates) for instructions.
+If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
 ```ruby
 app = Rpush::Apns::App.new
@@ -58,7 +58,7 @@ n.attributes_for_device = {:foo => :bar}
 n.save!
 ```
 
-You should also implement the [ssl_certificate_will_expire](https://github.com/ileitch/rapns/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
+You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
 #### GCM
 
@@ -78,7 +78,7 @@ n.data = {:message => "hi mom!"}
 n.save!
 ```
 
-GCM also requires you to respond to [Canonical IDs](https://github.com/ileitch/rapns/wiki/Canonical-IDs).
+GCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
 
 #### ADM
 
@@ -102,64 +102,64 @@ n.save!
 
 For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 
-## Starting Rapns
+## Starting Rpush
 
 As a daemon:
 
     cd /path/to/rails/app
-    rapns <Rails environment> [options]
+    rpush <Rails environment> [options]
 
-Inside an existing process (see [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)):
+Inside an existing process (see [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API)):
 
 ```ruby
 Rpush.embed
 ```
 
-*Please note that only ever a single instance of Rapns should be running.*
+*Please note that only ever a single instance of Rpush should be running.*
 
-In a scheduler (see [Push API](https://github.com/ileitch/rapns/wiki/Push-API)):
+In a scheduler (see [Push API](https://github.com/rpush/rpush/wiki/Push-API)):
 
 ```ruby
 Rpush.push
 Rpush.apns_feedback
 ```
 
-See [Configuration](https://github.com/ileitch/rapns/wiki/Configuration) for a list of options, or run `rapns --help`.
+See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options, or run `rpush --help`.
 
-## Updating Rapns
+## Updating Rpush
 
-After updating you should run `rails g rapns` to check for any new migrations.
+After updating you should run `rails g rpush` to check for any new migrations.
 
 ## Rake task
 
 To clean up completed (*delivered* or *failed*) notifications:
 
-    bundle exec rake rapns:notifications:clean DAYS=<Number of days greater than 0>
+    bundle exec rake rpush:notifications:clean DAYS=<Number of days greater than 0>
 
 ## Wiki
 
 ### General
-* [Configuration](https://github.com/ileitch/rapns/wiki/Configuration)
-* [Upgrading from 2.x to 3.0](https://github.com/ileitch/rapns/wiki/Upgrading-from-version-2.x-to-3.0)
-* [Deploying to Heroku](https://github.com/ileitch/rapns/wiki/Heroku)
-* [Hot App Updates](https://github.com/ileitch/rapns/wiki/Hot-App-Updates)
-* [Signals](https://github.com/ileitch/rapns/wiki/Signals)
-* [Reflection API](https://github.com/ileitch/rapns/wiki/Reflection-API)
-* [Push API](https://github.com/ileitch/rapns/wiki/Push-API)
-* [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)
-* [Implementing your own storage backend](https://github.com/ileitch/rapns/wiki/Implementing-your-own-storage-backend)
+* [Configuration](https://github.com/rpush/rpush/wiki/Configuration)
+* [Upgrading from 2.x to 3.0](https://github.com/rpush/rpush/wiki/Upgrading-from-version-2.x-to-3.0)
+* [Deploying to Heroku](https://github.com/rpush/rpush/wiki/Heroku)
+* [Hot App Updates](https://github.com/rpush/rpush/wiki/Hot-App-Updates)
+* [Signals](https://github.com/rpush/rpush/wiki/Signals)
+* [Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)
+* [Push API](https://github.com/rpush/rpush/wiki/Push-API)
+* [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API)
+* [Implementing your own storage backend](https://github.com/rpush/rpush/wiki/Implementing-your-own-storage-backend)
 
 ### APNs
-* [Generating Certificates](https://github.com/ileitch/rapns/wiki/Generating-Certificates)
-* [Advanced APNs Features](https://github.com/ileitch/rapns/wiki/Advanced-APNs-Features)
-* [APNs Delivery Failure Handling](https://github.com/ileitch/rapns/wiki/APNs-Delivery-Failure-Handling)
-* [Why open multiple connections to the APNs?](https://github.com/ileitch/rapns/wiki/Why-open-multiple-connections-to-the-APNs%3F)
-* [Silent failures might be dropped connections](https://github.com/ileitch/rapns/wiki/Dropped-connections)
+* [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates)
+* [Advanced APNs Features](https://github.com/rpush/rpush/wiki/Advanced-APNs-Features)
+* [APNs Delivery Failure Handling](https://github.com/rpush/rpush/wiki/APNs-Delivery-Failure-Handling)
+* [Why open multiple connections to the APNs?](https://github.com/rpush/rpush/wiki/Why-open-multiple-connections-to-the-APNs%3F)
+* [Silent failures might be dropped connections](https://github.com/rpush/rpush/wiki/Dropped-connections)
 
 ### GCM
-* [Notification Options](https://github.com/ileitch/rapns/wiki//GCM-Notification-Options)
-* [Canonical IDs](https://github.com/ileitch/rapns/wiki/Canonical-IDs)
-* [Delivery Failures & Retries](https://github.com/ileitch/rapns/wiki/Delivery-Failures-&-Retries)
+* [Notification Options](https://github.com/rpush/rpush/wiki//GCM-Notification-Options)
+* [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
+* [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
 
 ## Contributing
 
@@ -170,5 +170,5 @@ When running specs, please note that the ActiveRecord adapter can be changed by 
 Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
 
 Note that the database username is changed at runtime to be the currently logged in user's name. So if you're testing
-with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rapns_test'
+with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rpush_test'
 mysql database.

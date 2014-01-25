@@ -51,8 +51,8 @@
 
 ## 3.1.0 (Jan 26, 2013)
   * Rpush.reflect API for fine-grained introspection.
-  * Rpush.embed API for embedding Rapns into an existing process.
-  * Rpush.push API for using Rapns in scheduled jobs.
+  * Rpush.embed API for embedding Rpush into an existing process.
+  * Rpush.push API for using Rpush in scheduled jobs.
   * Fix issue with integration with ActiveScaffold (#98) (@jeffarena).
   * Fix content-available setter for APNs (#95) (@dup2).
   * GCM validation fixes (#96) (@DianthuDia).
@@ -93,5 +93,5 @@
   * Support for multiple apps.
   * Hot Updates - add/remove apps without restart.
   * MDM support.
-  * Removed rapns.yml in favour of command line options.
+  * Removed rpush.yml in favour of command line options.
   * Started the changelog!
