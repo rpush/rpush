@@ -102,7 +102,7 @@ describe Rpush::Daemon::Wpns::Delivery do
     before { response.stub(:code => 405) }
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 405,
-        "No method allowed. This should be considered as a Rapns bug")
+        "No method allowed. This should be considered as a Rpush bug")
       perform rescue Rpush::DeliveryError
     end
   end

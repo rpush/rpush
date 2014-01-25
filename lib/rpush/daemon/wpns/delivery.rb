@@ -88,9 +88,9 @@ module Rpush
         end
 
         def method_not_allowed(res)
-          mark_failed 405, "No method allowed. This should be considered as a Rapns bug"
+          mark_failed 405, "No method allowed. This should be considered as a Rpush bug"
           raise Rpush::DeliveryError.new(405, @notification.id,
-                                         "No method allowed. This should be considered as a Rapns bug")
+                                         "No method allowed. This should be considered as a Rpush bug")
         end
 
         def not_acceptable(res)

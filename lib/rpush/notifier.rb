@@ -1,7 +1,7 @@
 require 'socket'
 
 module Rpush
-  # This class notifies the sleeping Rapns Daemon that there are new Notifications to send,
+  # This class notifies the sleeping Rpush Daemon that there are new Notifications to send,
   # and to interrupt its sleep to send them immediately. The purpose of this is to allow
   # much higher sleep times to reduce database polling activity.
   class Notifier
