@@ -102,29 +102,13 @@ module Rapns
         end
 
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
-          with_database_reconnect_and_retry do
-            notification = Rapns::Gcm::Notification.new
-            notification.assign_attributes(attrs)
-            notification.data = data
-            notification.registration_ids = registration_ids
-            notification.deliver_after = deliver_after
-            notification.app = app
-            notification.save!
-            notification
-          end
+          notification = Rapns::Gcm::Notification.new
+          create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
-          with_database_reconnect_and_retry do
-            notification = Rapns::Adm::Notification.new
-            notification.assign_attributes(attrs)
-            notification.data = data
-            notification.registration_ids = registration_ids
-            notification.deliver_after = deliver_after
-            notification.app = app
-            notification.save!
-            notification
-          end
+          notification = Rapns::Adm::Notification.new
+          create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def update_app(app)
@@ -141,6 +125,20 @@ module Rapns
 
         def after_daemonize
           reconnect_database
+        end
+
+        private
+
+        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
+          with_database_reconnect_and_retry do
+            notification.assign_attributes(attrs)
+            notification.data = data
+            notification.registration_ids = registration_ids
+            notification.deliver_after = deliver_after
+            notification.app = app
+            notification.save!
+            notification
+          end
         end
       end
     end
