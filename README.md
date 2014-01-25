@@ -40,7 +40,7 @@ Generate the migrations, rapns.yml and migrate:
 If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/ileitch/rapns/wiki/Generating-Certificates) for instructions.
 
 ```ruby
-app = Rapns::Apns::App.new
+app = Rpush::Apns::App.new
 app.name = "ios_app"
 app.certificate = File.read("/path/to/sandbox.pem")
 app.environment = "sandbox" # APNs environment.
@@ -50,8 +50,8 @@ app.save!
 ```
 
 ```ruby
-n = Rapns::Apns::Notification.new
-n.app = Rapns::Apns::App.find_by_name("ios_app")
+n = Rpush::Apns::Notification.new
+n.app = Rpush::Apns::App.find_by_name("ios_app")
 n.device_token = "..."
 n.alert = "hi mom!"
 n.attributes_for_device = {:foo => :bar}
@@ -63,7 +63,7 @@ You should also implement the [ssl_certificate_will_expire](https://github.com/i
 #### GCM
 
 ```ruby
-app = Rapns::Gcm::App.new
+app = Rpush::Gcm::App.new
 app.name = "android_app"
 app.auth_key = "..."
 app.connections = 1
@@ -71,8 +71,8 @@ app.save!
 ```
 
 ```ruby
-n = Rapns::Gcm::Notification.new
-n.app = Rapns::Gcm::App.find_by_name("android_app")
+n = Rpush::Gcm::Notification.new
+n.app = Rpush::Gcm::App.find_by_name("android_app")
 n.registration_ids = ["..."]
 n.data = {:message => "hi mom!"}
 n.save!
@@ -83,7 +83,7 @@ GCM also requires you to respond to [Canonical IDs](https://github.com/ileitch/r
 #### ADM
 
 ```ruby
-app = Rapns::Adm::App.new
+app = Rpush::Adm::App.new
 app.name = "kindle_app"
 app.client_id = "..."
 app.client_secret = "..."
@@ -92,8 +92,8 @@ app.save!
 ```
 
 ```ruby
-n = Rapns::Adm::Notification.new
-n.app = Rapns::Adm::App.find_by_name("kindle_app")
+n = Rpush::Adm::Notification.new
+n.app = Rpush::Adm::App.find_by_name("kindle_app")
 n.registration_ids = ["..."]
 n.data = {:message => "hi mom!"}
 n.collapse_key = "Optional consolidationKey"
@@ -112,7 +112,7 @@ As a daemon:
 Inside an existing process (see [Embedding API](https://github.com/ileitch/rapns/wiki/Embedding-API)):
 
 ```ruby
-Rapns.embed
+Rpush.embed
 ```
 
 *Please note that only ever a single instance of Rapns should be running.*
@@ -120,8 +120,8 @@ Rapns.embed
 In a scheduler (see [Push API](https://github.com/ileitch/rapns/wiki/Push-API)):
 
 ```ruby
-Rapns.push
-Rapns.apns_feedback
+Rpush.push
+Rpush.apns_feedback
 ```
 
 See [Configuration](https://github.com/ileitch/rapns/wiki/Configuration) for a list of options, or run `rapns --help`.

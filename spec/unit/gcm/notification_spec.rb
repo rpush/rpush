@@ -1,11 +1,11 @@
 require 'unit_spec_helper'
 require 'unit/notification_shared.rb'
 
-describe Rapns::Gcm::Notification do
+describe Rpush::Gcm::Notification do
   it_should_behave_like 'an Notification subclass'
 
-  let(:app) { Rapns::Gcm::App.create!(:name => 'test', :auth_key => 'abc') }
-  let(:notification_class) { Rapns::Gcm::Notification }
+  let(:app) { Rpush::Gcm::App.create!(:name => 'test', :auth_key => 'abc') }
+  let(:notification_class) { Rpush::Gcm::Notification }
   let(:notification) { notification_class.new }
   let(:data_setter) { 'data=' }
   let(:data_getter) { 'data' }

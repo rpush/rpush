@@ -1,14 +1,14 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::Adm::Delivery do
-  let(:app) { Rapns::Adm::App.new(:name => 'MyApp', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
-  let(:notification) { Rapns::Adm::Notification.create!(:app => app, :registration_ids => ['xyz'], :deliver_after => Time.now, :data => {'message' => 'test'}) }
+describe Rpush::Daemon::Adm::Delivery do
+  let(:app) { Rpush::Adm::App.new(:name => 'MyApp', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
+  let(:notification) { Rpush::Adm::Notification.create!(:app => app, :registration_ids => ['xyz'], :deliver_after => Time.now, :data => {'message' => 'test'}) }
   let(:logger) { double(:error => nil, :info => nil, :warn => nil) }
   let(:response) { double(:code => 200, :header => {}) }
   let(:http) { double(:shutdown => nil, :request => response)}
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:batch) { double(:mark_failed => nil, :mark_delivered => nil, :mark_retryable => nil) }
-  let(:delivery) { Rapns::Daemon::Adm::Delivery.new(app, http, notification, batch) }
+  let(:delivery) { Rpush::Daemon::Adm::Delivery.new(app, http, notification, batch) }
   let(:store) { double(:create_adm_notification => double(:id => 2)) }
 
   def perform
@@ -20,9 +20,9 @@ describe Rapns::Daemon::Adm::Delivery do
     app.access_token_expiration = Time.now + 1.month
 
     delivery.stub(:reflect => nil)
-    Rapns::Daemon.stub(:store => store)
+    Rpush::Daemon.stub(:store => store)
     Time.stub(:now => now)
-    Rapns.stub(:logger => logger)
+    Rpush.stub(:logger => logger)
   end
 
   describe 'unknown error response' do
@@ -33,7 +33,7 @@ describe Rapns::Daemon::Adm::Delivery do
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(:body => JSON.dump({ 'reason' => 'InvalidData' }))
       batch.should_receive(:mark_failed).with(notification, 408, 'Request Timeout')
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 
@@ -70,13 +70,13 @@ describe Rapns::Daemon::Adm::Delivery do
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(:body => JSON.dump({ 'reason' => 'InvalidData' }))
       batch.should_receive(:mark_failed).with(notification, nil, 'Failed to deliver to all recipients.')
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 
     it 'logs that the notification was not delivered' do
       response.stub(:body => JSON.dump({ 'reason' => 'InvalidRegistrationId' }))
       logger.should_receive(:warn).with("[MyApp] bad_request: xyz (InvalidRegistrationId)")
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 
@@ -88,13 +88,13 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 401, :header => { 'retry-after' => 10 })
 
       # first request to deliver message that returns unauthorized response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
     end
 
     it 'should retrieve a new access token and mark the notification for retry' do
       # request for access token
-      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
+      http.should_receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
       store.should_receive(:update_app).with(notification.app)
       batch.should_receive(:mark_retryable).with(notification, now)
@@ -104,7 +104,7 @@ describe Rapns::Daemon::Adm::Delivery do
 
     it 'should update the app with the new access token' do
       # request for access token
-      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
+      http.should_receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
       store.should_receive(:update_app).with do |app|
         app.access_token.should eq 'ACCESS_TOKEN'
@@ -118,7 +118,7 @@ describe Rapns::Daemon::Adm::Delivery do
     it 'should log the error and stop retrying if new access token can\'t be retrieved' do
       token_response.stub(:code => 404, :body => "test")
       # request for access token
-      http.should_receive(:request).with(Rapns::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
+      http.should_receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
       store.should_not_receive(:update_app).with(notification.app)
       batch.should_not_receive(:mark_retryable)
@@ -131,14 +131,14 @@ describe Rapns::Daemon::Adm::Delivery do
 
   describe 'a 429 (Too Many Request) response' do
     let(:http) { double(:shutdown => nil) }
-    let(:notification) { Rapns::Adm::Notification.create!(:app => app, :registration_ids => ['abc','xyz'], :deliver_after => Time.now, :collapse_key => 'sync', :data => {'message' => 'test'}) }
+    let(:notification) { Rpush::Adm::Notification.create!(:app => app, :registration_ids => ['abc','xyz'], :deliver_after => Time.now, :collapse_key => 'sync', :data => {'message' => 'test'}) }
     let(:too_many_request_response) { double(:code => 429, :header => { 'retry-after' => 3600 }) }
 
     it 'should retry the entire notification respecting the Retry-After header if none sent out yet' do
       response.stub(:code => 429, :header => { 'retry-after' => 3600 })
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       batch.should_receive(:mark_retryable).with(notification, now + 1.hour)
@@ -149,7 +149,7 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 429, :header => {})
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       batch.should_receive(:mark_retryable).with(notification, Time.now + 2 ** (notification.retries + 1))
@@ -160,11 +160,11 @@ describe Rapns::Daemon::Adm::Delivery do
       response.stub(:code => 200, :body => JSON.dump({ 'registrationID' => 'abc' }))
 
       # first request to deliver message succeeds
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(too_many_request_response)
 
       store.should_receive(:update_notification).with do |notif|
@@ -195,12 +195,12 @@ describe Rapns::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       batch.should_receive(:mark_failed).with(notification, nil, 'Failed to deliver to all recipients.')
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 
     it 'logs that the notification was not delivered' do
       logger.should_receive(:warn).with("[MyApp] internal_server_error: xyz (Internal Server Error)")
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 
@@ -217,18 +217,18 @@ describe Rapns::Daemon::Adm::Delivery do
 
   describe 'some registration ids succeeding and some failing' do
     let(:http) { double(:shutdown => nil) }
-    let(:notification) { Rapns::Adm::Notification.create!(:app => app, :registration_ids => ['abc','xyz'], :deliver_after => Time.now, :collapse_key => 'sync', :data => {'message' => 'test'}) }
+    let(:notification) { Rpush::Adm::Notification.create!(:app => app, :registration_ids => ['abc','xyz'], :deliver_after => Time.now, :collapse_key => 'sync', :data => {'message' => 'test'}) }
     let(:bad_request_response) { double(:code => 400, :body => JSON.dump({ 'reason' => 'InvalidData' })) }
 
     it 'should keep sent reg ids in original notification and create new notification with remaining reg ids for retry' do
       response.stub(:code => 200, :body => JSON.dump({ 'registrationID' => 'abc' }))
 
       # first request to deliver message succeeds
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rapns::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
+      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(bad_request_response)
 
       store.should_receive(:update_notification).with do |notif|

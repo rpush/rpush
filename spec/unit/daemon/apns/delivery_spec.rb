@@ -1,23 +1,23 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::Apns::Delivery do
+describe Rpush::Daemon::Apns::Delivery do
   let(:app) { double(:name => 'MyApp') }
   let(:notification) { double.as_null_object }
   let(:batch) { double(:mark_failed => nil, :mark_delivered => nil) }
   let(:logger) { double(:error => nil, :info => nil) }
   let(:config) { double(:check_for_errors => true) }
   let(:connection) { double(:select => false, :write => nil, :reconnect => nil, :close => nil, :connect => nil) }
-  let(:delivery) { Rapns::Daemon::Apns::Delivery.new(app, connection, notification, batch) }
+  let(:delivery) { Rpush::Daemon::Apns::Delivery.new(app, connection, notification, batch) }
 
   def perform
     begin
       delivery.perform
-    rescue Rapns::DeliveryError, Rapns::Apns::DisconnectionError
+    rescue Rpush::DeliveryError, Rpush::Apns::DisconnectionError
     end
   end
 
   before do
-    Rapns.stub(:config => config, :logger => logger)
+    Rpush.stub(:config => config, :logger => logger)
   end
 
   it "sends the binary version of the notification" do
@@ -55,11 +55,11 @@ describe Rapns::Daemon::Apns::Delivery do
       # checking for the doublebed error doesn't work in jruby, but checking
       # for the exception by class does.
 
-      #error = Rapns::DeliveryError.new(4, 12, "Missing payload")
-      #Rapns::DeliveryError.stub(:new => error)
+      #error = Rpush::DeliveryError.new(4, 12, "Missing payload")
+      #Rpush::DeliveryError.stub(:new => error)
       #expect { delivery.perform }.to raise_error(error)
 
-      expect { delivery.perform }.to raise_error(Rapns::DeliveryError)
+      expect { delivery.perform }.to raise_error(Rpush::DeliveryError)
     end
 
     it "reads 6 bytes from the socket" do
@@ -79,7 +79,7 @@ describe Rapns::Daemon::Apns::Delivery do
     end
 
     it "logs that the connection is being reconnected" do
-      Rapns.logger.should_receive(:error).with("[MyApp] Error received, reconnecting...")
+      Rpush.logger.should_receive(:error).with("[MyApp] Error received, reconnecting...")
       perform
     end
 
@@ -89,7 +89,7 @@ describe Rapns::Daemon::Apns::Delivery do
       end
 
       it 'raises a DisconnectError error if the connection is closed without an error being returned' do
-        expect { delivery.perform }.to raise_error(Rapns::Apns::DisconnectionError)
+        expect { delivery.perform }.to raise_error(Rpush::Apns::DisconnectionError)
       end
 
       it 'marks the notification as failed' do

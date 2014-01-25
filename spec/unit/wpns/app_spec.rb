@@ -1,4 +1,4 @@
 require 'unit_spec_helper'
 
-describe Rapns::Wpns::App do
+describe Rpush::Wpns::App do
 end

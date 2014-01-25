@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::TcpConnection do
+describe Rpush::Daemon::TcpConnection do
   let(:rsa_key) { double }
   let(:certificate) { double }
   let(:password) { double }
@@ -12,7 +12,7 @@ describe Rapns::Daemon::TcpConnection do
   let(:ssl_socket) { double(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
   let(:logger) { double(:info => nil, :error => nil, :warn => nil) }
   let(:app) { double(:name => 'Connection 0', :certificate => certificate, :password => password)}
-  let(:connection) { Rapns::Daemon::TcpConnection.new(app, host, port) }
+  let(:connection) { Rpush::Daemon::TcpConnection.new(app, host, port) }
 
   before do
     OpenSSL::SSL::SSLContext.stub(:new => ssl_context)
@@ -20,7 +20,7 @@ describe Rapns::Daemon::TcpConnection do
     OpenSSL::X509::Certificate.stub(:new => x509_certificate)
     TCPSocket.stub(:new => tcp_socket)
     OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    Rapns.stub(:logger => logger)
+    Rpush.stub(:logger => logger)
     connection.stub(:reflect)
   end
 
@@ -103,13 +103,13 @@ describe Rapns::Daemon::TcpConnection do
       it 'logs that the certificate has expired' do
         cert = OpenSSL::X509::Certificate.new(app.certificate)
         logger.should_receive(:error).with("[#{app.name}] Certificate expired at 2022-09-07 03:18:32 UTC.")
-        Timecop.freeze(cert.not_after + 1.day) { connection.connect rescue Rapns::Apns::CertificateExpiredError }
+        Timecop.freeze(cert.not_after + 1.day) { connection.connect rescue Rpush::Apns::CertificateExpiredError }
       end
 
       it 'raises an error if the certificate has expired' do
         cert = OpenSSL::X509::Certificate.new(app.certificate)
         Timecop.freeze(cert.not_after + 1.day) do
-          expect { connection.connect }.to raise_error(Rapns::Apns::CertificateExpiredError)
+          expect { connection.connect }.to raise_error(Rpush::Apns::CertificateExpiredError)
         end
       end
     end
@@ -160,7 +160,7 @@ describe Rapns::Daemon::TcpConnection do
       connection.should_receive(:reflect).with(:tcp_connection_lost, app, kind_of(error_type))
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::TcpConnectionError
+      rescue Rpush::Daemon::TcpConnectionError
       end
     end
 
@@ -168,7 +168,7 @@ describe Rapns::Daemon::TcpConnection do
       logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error_type.name}), reconnecting...").once
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::TcpConnectionError
+      rescue Rpush::Daemon::TcpConnectionError
       end
     end
 
@@ -176,21 +176,21 @@ describe Rapns::Daemon::TcpConnection do
       connection.should_receive(:reconnect).exactly(3).times
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::TcpConnectionError
+      rescue Rpush::Daemon::TcpConnectionError
       end
     end
 
     it "raises a TcpConnectionError after 3 attempts at reconnecting" do
       expect do
         connection.write(nil)
-      end.to raise_error(Rapns::Daemon::TcpConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
+      end.to raise_error(Rpush::Daemon::TcpConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
     end
 
     it "sleeps 1 second before retrying the connection" do
       connection.should_receive(:sleep).with(1)
       begin
         connection.write(nil)
-      rescue Rapns::Daemon::TcpConnectionError
+      rescue Rpush::Daemon::TcpConnectionError
       end
     end
   end
@@ -259,7 +259,7 @@ describe Rapns::Daemon::TcpConnection do
     before { connection.connect }
 
     it 'reconnects if the connection has been idle for more than the defined period' do
-      Rapns::Daemon::TcpConnection.stub(:idle_period => 60)
+      Rpush::Daemon::TcpConnection.stub(:idle_period => 60)
       Time.stub(:now => Time.now + 61)
       connection.should_receive(:reconnect)
       connection.write('blah')
@@ -278,9 +278,9 @@ describe Rapns::Daemon::TcpConnection do
     end
 
     it 'logs the the connection is idle' do
-      Rapns::Daemon::TcpConnection.stub(:idle_period => 60)
+      Rpush::Daemon::TcpConnection.stub(:idle_period => 60)
       Time.stub(:now => Time.now + 61)
-      Rapns.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
+      Rpush.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
       connection.write('blah')
     end
   end

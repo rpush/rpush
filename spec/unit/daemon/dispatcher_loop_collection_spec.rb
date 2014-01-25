@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::DispatcherLoopCollection do
+describe Rpush::Daemon::DispatcherLoopCollection do
   let(:dispatcher_loop) { double.as_null_object }
-  let(:collection) { Rapns::Daemon::DispatcherLoopCollection.new }
+  let(:collection) { Rpush::Daemon::DispatcherLoopCollection.new }
 
   it 'returns the size of the collection' do
     collection.push(dispatcher_loop)

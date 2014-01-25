@@ -1,6 +1,6 @@
 shared_examples_for "an Notification subclass" do
   describe "when assigning data for the device" do
-    before { Rapns::Deprecation.stub(:warn) }
+    before { Rpush::Deprecation.stub(:warn) }
 
     it "calls MultiJson.dump when multi_json responds to :dump" do
       notification = notification_class.new
@@ -47,7 +47,7 @@ shared_examples_for "an Notification subclass" do
 
       describe '.completed' do
         it 'should return notifications that have been delivered or failed' do
-          completed_notification_ids = Rapns::Notification.completed.map(&:id)
+          completed_notification_ids = Rpush::Notification.completed.map(&:id)
 
           completed_notification_ids.size.should eq 2
           completed_notification_ids.should include(@delivered_notification.id, @failed_notification.id)
@@ -60,7 +60,7 @@ shared_examples_for "an Notification subclass" do
           @delivered_notification.created_at = Time.now - 30.days - 1.second
           @delivered_notification.save!(:validate => false)
 
-          notification_ids = Rapns::Notification.created_before(Time.now - 30.days).map(&:id)
+          notification_ids = Rpush::Notification.created_before(Time.now - 30.days).map(&:id)
 
           notification_ids.size.should eq 1
           notification_ids.should include(@delivered_notification.id)
@@ -80,21 +80,21 @@ shared_examples_for "an Notification subclass" do
         end
 
         it 'should only include completed notifications' do
-          notification_ids = Rapns::Notification.completed_and_older_than(Time.now - 30.days).map(&:id)
+          notification_ids = Rpush::Notification.completed_and_older_than(Time.now - 30.days).map(&:id)
 
           notification_ids.size.should eq 1
           notification_ids.should include(@delivered_notification.id)
         end
 
         it 'should not include completed notifications if not older than specified date' do
-          notification_ids = Rapns::Notification.completed_and_older_than(Time.now - 30.days).map(&:id)
+          notification_ids = Rpush::Notification.completed_and_older_than(Time.now - 30.days).map(&:id)
 
           notification_ids.size.should eq 1
           notification_ids.should_not include(@failed_notification.id)
         end
 
         it 'should return notifications that are completed and created before the specified date' do
-          notification_ids = Rapns::Notification.completed_and_older_than(Time.now - 20.days).map(&:id)
+          notification_ids = Rpush::Notification.completed_and_older_than(Time.now - 20.days).map(&:id)
 
           notification_ids.size.should eq 2
           notification_ids.should include(@delivered_notification.id, @failed_notification.id)

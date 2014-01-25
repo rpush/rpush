@@ -57,16 +57,16 @@ end
 require 'database_cleaner'
 DatabaseCleaner.strategy = :truncation
 
-require 'rapns'
-require 'rapns/daemon'
+require 'rpush'
+require 'rpush/daemon'
 
-Rapns::Notification.reset_column_information
-Rapns::App.reset_column_information
-Rapns::Apns::Feedback.reset_column_information
+Rpush::Notification.reset_column_information
+Rpush::App.reset_column_information
+Rpush::Apns::Feedback.reset_column_information
 
 RSpec.configure do |config|
   # config.before :suite do
-  #   PerfTools::CpuProfiler.start('/tmp/rapns_profile')
+  #   PerfTools::CpuProfiler.start('/tmp/rpush_profile')
   # end
   # config.after :suite do
   #   PerfTools::CpuProfiler.stop
@@ -77,10 +77,10 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    Rapns.logger = nil
-    Rapns::Daemon.store = nil
-    Rapns::Deprecation.muted do
-      Rapns.config.set_defaults if Rapns.config.kind_of?(Rapns::Configuration)
+    Rpush.logger = nil
+    Rpush::Daemon.store = nil
+    Rpush::Deprecation.muted do
+      Rpush.config.set_defaults if Rpush.config.kind_of?(Rpush::Configuration)
     end
   end
 end

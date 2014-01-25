@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
-describe Rapns::Apns::DisconnectionError do
-  let(:error) { Rapns::Apns::DisconnectionError.new }
+describe Rpush::Apns::DisconnectionError do
+  let(:error) { Rpush::Apns::DisconnectionError.new }
 
   it 'returns a nil error code' do
     error.code.should be_nil

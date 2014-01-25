@@ -1,11 +1,11 @@
 require 'unit_spec_helper'
 require 'unit/notification_shared.rb'
 
-describe Rapns::Adm::Notification do
+describe Rpush::Adm::Notification do
   it_should_behave_like 'an Notification subclass'
 
-  let(:app) { Rapns::Adm::App.create!(:name => 'test', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
-  let(:notification_class) { Rapns::Adm::Notification }
+  let(:app) { Rpush::Adm::App.create!(:name => 'test', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
+  let(:notification_class) { Rpush::Adm::Notification }
   let(:notification) { notification_class.new }
   let(:data_setter) { 'data=' }
   let(:data_getter) { 'data' }

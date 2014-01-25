@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
+describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
@@ -10,17 +10,17 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:app) { double(:name => 'my_app', :password => password, :certificate => certificate, :environment => 'production') }
   let(:connection) { double(:connect => nil, :read => nil, :close => nil) }
   let(:logger) { double(:error => nil, :info => nil) }
-  let(:receiver) { Rapns::Daemon::Apns::FeedbackReceiver.new(app) }
+  let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
-  let(:sleeper) { double(Rapns::Daemon::InterruptibleSleep, :sleep => nil, :interrupt_sleep => nil) }
+  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, :sleep => nil, :interrupt_sleep => nil) }
 
   before do
-    Rapns.config.feedback_poll = poll
-    Rapns::Daemon::InterruptibleSleep.stub(:new => sleeper)
-    Rapns.stub(:logger => logger)
-    Rapns::Daemon::TcpConnection.stub(:new => connection)
+    Rpush.config.feedback_poll = poll
+    Rpush::Daemon::InterruptibleSleep.stub(:new => sleeper)
+    Rpush.stub(:logger => logger)
+    Rpush::Daemon::TcpConnection.stub(:new => connection)
     receiver.instance_variable_set("@stop", false)
-    Rapns::Daemon.stub(:store => double(:create_apns_feedback => feedback))
+    Rpush::Daemon.stub(:store => double(:create_apns_feedback => feedback))
   end
 
   def double_connection_read_with_tuple
@@ -35,7 +35,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'instantiates a new connection' do
-    Rapns::Daemon::TcpConnection.should_receive(:new).with(app, host, port)
+    Rpush::Daemon::TcpConnection.should_receive(:new).with(app, host, port)
     receiver.check_for_feedback
   end
 
@@ -56,12 +56,12 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'logs the feedback' do
     double_connection_read_with_tuple
-    Rapns.logger.should_receive(:info).with("[my_app] [FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17.")
+    Rpush.logger.should_receive(:info).with("[my_app] [FeedbackReceiver] Delivery failed at 2011-12-10 16:08:45 UTC for 834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17.")
     receiver.check_for_feedback
   end
 
   it 'creates the feedback' do
-    Rapns::Daemon.store.should_receive(:create_apns_feedback).with(Time.at(1323533325), '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', app)
+    Rpush::Daemon.store.should_receive(:create_apns_feedback).with(Time.at(1323533325), '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', app)
     double_connection_read_with_tuple
     receiver.check_for_feedback
   end
@@ -69,7 +69,7 @@ describe Rapns::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   it 'logs errors' do
     error = StandardError.new('bork!')
     connection.stub(:read).and_raise(error)
-    Rapns.logger.should_receive(:error).with(error)
+    Rpush.logger.should_receive(:error).with(error)
     receiver.check_for_feedback
   end
 

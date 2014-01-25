@@ -40,18 +40,18 @@
 ## 3.3.0 (April 21, 2013)
   * GCM: collapse_key is no longer required to set expiry (time_to_live).
   * Add reflection for GCM canonical IDs.
-  * Add Rapns::Daemon.store to decouple storage backend.
+  * Add Rpush::Daemon.store to decouple storage backend.
 
 ## 3.2.0 (Apr 1, 2013)
-  * Rapns.apns_feedback for one time feedback retrieval. Rapns.push no longer checks for feedback (#117, #105).
+  * Rpush.apns_feedback for one time feedback retrieval. Rpush.push no longer checks for feedback (#117, #105).
   * Lazily connect to the APNs only when a notification is to be delivered (#111).
-  * Ensure all notifications are sent when using Rapns.push (#107).
-  * Fix issue with running Rapns.push more than once in the same process (#106).
+  * Ensure all notifications are sent when using Rpush.push (#107).
+  * Fix issue with running Rpush.push more than once in the same process (#106).
 
 ## 3.1.0 (Jan 26, 2013)
-  * Rapns.reflect API for fine-grained introspection.
-  * Rapns.embed API for embedding Rapns into an existing process.
-  * Rapns.push API for using Rapns in scheduled jobs.
+  * Rpush.reflect API for fine-grained introspection.
+  * Rpush.embed API for embedding Rapns into an existing process.
+  * Rpush.push API for using Rapns in scheduled jobs.
   * Fix issue with integration with ActiveScaffold (#98) (@jeffarena).
   * Fix content-available setter for APNs (#95) (@dup2).
   * GCM validation fixes (#96) (@DianthuDia).
@@ -73,7 +73,7 @@
   * Continue to start daemon if a connection cannot be made during startup (#62) (@mattconnolly).
 
 ## 2.0.4 (Aug 6, 2012) ##
-  * Don't exit when there aren't any Rapns::App instances, just warn (#55).
+  * Don't exit when there aren't any Rpush::App instances, just warn (#55).
 
 ## 2.0.3 (July 26, 2012) ##
   * JRuby support.

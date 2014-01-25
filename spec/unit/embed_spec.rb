@@ -1,50 +1,50 @@
 require 'unit_spec_helper'
 
-describe Rapns, 'embed' do
+describe Rpush, 'embed' do
   before do
-    Rapns::Daemon.stub(:start)
+    Rpush::Daemon.stub(:start)
     Kernel.stub(:at_exit)
   end
 
   it 'sets the embedded config option to true' do
-    Rapns.embed
-    Rapns.config.embedded.should be_true
+    Rpush.embed
+    Rpush.config.embedded.should be_true
   end
 
   it 'starts the daemon' do
-    Rapns::Daemon.should_receive(:start)
-    Rapns.embed
+    Rpush::Daemon.should_receive(:start)
+    Rpush.embed
   end
 
   it 'overrides the default config options with those given as a hash' do
-    Rapns.config.push_poll = 4
-    expect { Rapns.embed(:push_poll => 2) }.to change(Rapns.config, :push_poll).to(2)
+    Rpush.config.push_poll = 4
+    expect { Rpush.embed(:push_poll => 2) }.to change(Rpush.config, :push_poll).to(2)
   end
 end
 
-describe Rapns, 'shutdown' do
-  before { Rapns.config.embedded = true }
+describe Rpush, 'shutdown' do
+  before { Rpush.config.embedded = true }
 
   it 'shuts down the daemon' do
-    Rapns::Daemon.should_receive(:shutdown)
-    Rapns.shutdown
+    Rpush::Daemon.should_receive(:shutdown)
+    Rpush.shutdown
   end
 end
 
-describe Rapns, 'sync' do
-  before { Rapns.config.embedded = true }
+describe Rpush, 'sync' do
+  before { Rpush.config.embedded = true }
 
   it 'syncs the AppRunner' do
-    Rapns::Daemon::AppRunner.should_receive(:sync)
-    Rapns.sync
+    Rpush::Daemon::AppRunner.should_receive(:sync)
+    Rpush.sync
   end
 end
 
-describe Rapns, 'debug' do
-  before { Rapns.config.embedded = true }
+describe Rpush, 'debug' do
+  before { Rpush.config.embedded = true }
 
   it 'debugs the AppRunner' do
-    Rapns::Daemon::AppRunner.should_receive(:debug)
-    Rapns.debug
+    Rpush::Daemon::AppRunner.should_receive(:debug)
+    Rpush.debug
   end
 end

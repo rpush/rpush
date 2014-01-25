@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::Wpns::Delivery do
-  let(:app) { Rapns::Wpns::App.new(:name => "MyApp") }
-  let(:notification) { Rapns::Wpns::Notification.create!(:app => app,:alert => "test",
+describe Rpush::Daemon::Wpns::Delivery do
+  let(:app) { Rpush::Wpns::App.new(:name => "MyApp") }
+  let(:notification) { Rpush::Wpns::Notification.create!(:app => app,:alert => "test",
                                                          :uri => "http://some.example/",
                                                          :deliver_after => Time.now) }
   let(:logger) { double(:error => nil, :info => nil, :warn => nil) }
@@ -10,7 +10,7 @@ describe Rapns::Daemon::Wpns::Delivery do
   let(:http) { double(:shutdown => nil, :request => response) }
   let(:now) { Time.now }
   let(:batch) { double(:mark_failed => nil, :mark_delivered => nil) }
-  let(:delivery) { Rapns::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
+  let(:delivery) { Rpush::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(:create_wpns_notification => double(:id => 2)) }
 
   def perform
@@ -19,9 +19,9 @@ describe Rapns::Daemon::Wpns::Delivery do
 
   before do
     delivery.stub(:reflect => nil)
-    Rapns::Daemon.stub(:store => store)
+    Rpush::Daemon.stub(:store => store)
     Time.stub(:now => now)
-    Rapns.stub(:logger => logger)
+    Rpush.stub(:logger => logger)
   end
 
   it 'handles an unknown response' do
@@ -29,17 +29,17 @@ describe Rapns::Daemon::Wpns::Delivery do
   end
 
   shared_examples_for "an notification with some delivery faliures" do
-    let(:new_notification) { Rapns::Wpns::Notification.where('id != ?', notification.id).first }
+    let(:new_notification) { Rpush::Wpns::Notification.where('id != ?', notification.id).first }
 
     before { response.stub(:body => JSON.dump(body)) }
 
     it "marks the original notification falied" do
       batch.should_receive(:mark_failed).with(notification, nil, error_description)
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it "raises a DeliveryError" do
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 
@@ -76,7 +76,7 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 400,
                                               "Bad XML or malformed notification URI")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -85,7 +85,7 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 401,
                                               "Unauthorized to send a notification to this app")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -94,7 +94,7 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 404,
                                               "Not found!")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -103,7 +103,7 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 405,
         "No method allowed. This should be considered as a Rapns bug")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -111,20 +111,20 @@ describe Rapns::Daemon::Wpns::Delivery do
     before { response.stub(:code => 406) }
 
     it "enable the safe mode time" do
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
       delivery.safe_mode_time.should_not be_nil
     end
 
     it "warns about the safe model after this response." do
       logger.should_receive(:warn)
-      perform rescue Rapns::DeliveryError
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it "does not perform the notifications when are in safe mode" do
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
       delivery.should_not_receive(:perform_unsafe)
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -133,7 +133,7 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 412,
                                               "Precondition Failed. Device is Disconnected for now.")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -142,22 +142,22 @@ describe Rapns::Daemon::Wpns::Delivery do
     it "marks notifications as failed" do
       batch.should_receive(:mark_failed).with(notification, 503,
                                               "Service unavailable.")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 
   describe "Safe Mode" do
     # NOTE: Don't know how to compare the dates here.
-    # See lib/rapns/daemon/wpns/delivery.rb @ line 21
+    # See lib/rpush/daemon/wpns/delivery.rb @ line 21
     before {
       response.stub(:code => 400)
       delivery.stub(:safe_mode_time => now - 10)
     }
 
-    it "has to set safe_mode_time to nil when it's finished" do
-      delivery.safe_mode_time=now-10.seconds
-      perform rescue Rapns::DeliveryError
-      # delivery.safe_mode_time.should be_nil
-    end
+    it "has to set safe_mode_time to nil when it's finished"
+    #   delivery.safe_mode_time=now-10.seconds
+    #   perform rescue Rpush::DeliveryError
+    #   # delivery.safe_mode_time.should be_nil
+    # end
   end
 end

@@ -13,7 +13,7 @@ namespace :test do
       retval
     end
 
-    rapns_root = Dir.pwd
+    rpush_root = Dir.pwd
     path = '/tmp/rails_test'
     cmd("rm -rf #{path}")
     FileUtils.mkdir_p(path)
@@ -25,9 +25,9 @@ namespace :test do
     begin
       Dir.chdir(path)
       cmd('echo "gem \'rake\'" >> Gemfile')
-      cmd("echo \"gem 'rapns', :path => '#{rapns_root}'\" >> Gemfile")
+      cmd("echo \"gem 'rpush', :path => '#{rpush_root}'\" >> Gemfile")
       cmd('bundle install')
-      cmd('bundle exec rails g rapns')
+      cmd('bundle exec rails g rpush')
       cmd('bundle exec rake db:migrate')
     ensure
       Dir.chdir(pwd)

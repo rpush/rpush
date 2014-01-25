@@ -1,10 +1,10 @@
 require 'unit_spec_helper'
-require 'rapns/notifier'
+require 'rpush/notifier'
 
-describe Rapns::Notifier do
+describe Rpush::Notifier do
 
   before(:each) { @port = 5000 }
-  subject { Rapns::Notifier.new('127.0.0.1', @port) }
+  subject { Rpush::Notifier.new('127.0.0.1', @port) }
   its(:socket) { should_not be_nil }
 
   context "when connected" do
@@ -29,21 +29,21 @@ describe Rapns::Notifier do
 
   describe "default notifier" do
     it "creates using :connect first" do
-      Rapns.config.stub :wakeup => { :connect => '127.0.0.1', :port => 1234 }
-      Rapns::Notifier.should_receive(:new).with('127.0.0.1', 1234)
-      Rapns.notifier
+      Rpush.config.stub :wakeup => { :connect => '127.0.0.1', :port => 1234 }
+      Rpush::Notifier.should_receive(:new).with('127.0.0.1', 1234)
+      Rpush.notifier
     end
 
     it "creates using :host next" do
-      Rapns.config.stub :wakeup => { :host => '127.0.0.1', :port => 1234 }
-      Rapns::Notifier.should_receive(:new).with('127.0.0.1', 1234)
-      Rapns.notifier
+      Rpush.config.stub :wakeup => { :host => '127.0.0.1', :port => 1234 }
+      Rpush::Notifier.should_receive(:new).with('127.0.0.1', 1234)
+      Rpush.notifier
     end
 
     it "returns nil when wakeup is not specified" do
-      Rapns.config.stub :wakeup => nil
-      Rapns::Notifier.should_not_receive(:new)
-      expect(Rapns.notifier).to be_nil
+      Rpush.config.stub :wakeup => nil
+      Rpush::Notifier.should_not_receive(:new)
+      expect(Rpush.notifier).to be_nil
     end
   end
 end

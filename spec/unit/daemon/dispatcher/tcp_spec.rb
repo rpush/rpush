@@ -1,22 +1,22 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::Dispatcher::Tcp do
+describe Rpush::Daemon::Dispatcher::Tcp do
   let(:app) { double }
   let(:delivery) { double(:perform => nil) }
   let(:delivery_class) { double(:new => delivery) }
   let(:notification) { double }
   let(:batch) { double }
-  let(:connection) { double(Rapns::Daemon::TcpConnection, :connect => nil) }
+  let(:connection) { double(Rpush::Daemon::TcpConnection, :connect => nil) }
   let(:host) { 'localhost' }
   let(:port) { 1234 }
   let(:host_proc) { Proc.new { |app| [host, port] } }
-  let(:dispatcher) { Rapns::Daemon::Dispatcher::Tcp.new(app, delivery_class, :host => host_proc) }
+  let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, :host => host_proc) }
 
-  before { Rapns::Daemon::TcpConnection.stub(:new => connection) }
+  before { Rpush::Daemon::TcpConnection.stub(:new => connection) }
 
   describe 'dispatch' do
     it 'lazily connects the socket' do
-      Rapns::Daemon::TcpConnection.should_receive(:new).with(app, host, port).and_return(connection)
+      Rpush::Daemon::TcpConnection.should_receive(:new).with(app, host, port).and_return(connection)
       connection.should_receive(:connect)
       dispatcher.dispatch(notification, batch)
     end

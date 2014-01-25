@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
-describe Rapns::Deprecatable do
+describe Rpush::Deprecatable do
   class HasDeprecatedMethod
-    include Rapns::Deprecatable
+    include Rpush::Deprecatable
 
     def original_called?
       @called == true
@@ -17,11 +17,11 @@ describe Rapns::Deprecatable do
   let(:klass) { HasDeprecatedMethod.new }
 
   before do
-    Rapns::Deprecation.stub(:warn)
+    Rpush::Deprecation.stub(:warn)
   end
 
   it 'warns the method is deprecated when called' do
-    Rapns::Deprecation.should_receive(:warn).with("deprecated_method is deprecated and will be removed from Rapns 4.0.")
+    Rpush::Deprecation.should_receive(:warn).with("deprecated_method is deprecated and will be removed from Rapns 4.0.")
     klass.deprecated_method
   end
 

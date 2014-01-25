@@ -1,9 +1,9 @@
 require 'unit_spec_helper'
-require 'rapns/daemon/store/active_record/reconnectable'
+require 'rpush/daemon/store/active_record/reconnectable'
 
-describe Rapns::Daemon::Store::ActiveRecord::Reconnectable do
+describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   class TestDouble
-    include Rapns::Daemon::Store::ActiveRecord::Reconnectable
+    include Rpush::Daemon::Store::ActiveRecord::Reconnectable
 
     attr_reader :name
 
@@ -46,7 +46,7 @@ describe Rapns::Daemon::Store::ActiveRecord::Reconnectable do
 
   before do
     @logger = double("Logger", :info => nil, :error => nil, :warn => nil)
-    Rapns.stub(:logger).and_return(@logger)
+    Rpush.stub(:logger).and_return(@logger)
 
     ActiveRecord::Base.stub(:clear_all_connections!)
     ActiveRecord::Base.stub(:establish_connection)
@@ -54,17 +54,17 @@ describe Rapns::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   it "should log the error raised" do
-    Rapns.logger.should_receive(:error).with(error)
+    Rpush.logger.should_receive(:error).with(error)
     test_double.perform
   end
 
   it "should log that the database is being reconnected" do
-    Rapns.logger.should_receive(:warn).with("Lost connection to database, reconnecting...")
+    Rpush.logger.should_receive(:warn).with("Lost connection to database, reconnecting...")
     test_double.perform
   end
 
   it "should log the reconnection attempt" do
-    Rapns.logger.should_receive(:warn).with("Attempt 1")
+    Rpush.logger.should_receive(:warn).with("Attempt 1")
     test_double.perform
   end
 
@@ -79,30 +79,30 @@ describe Rapns::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   it "should test out the new connection by performing a count" do
-    Rapns::Notification.should_receive(:count)
+    Rpush::Notification.should_receive(:count)
     test_double.perform
   end
 
   context "when the reconnection attempt is not successful" do
     before do
-      class << Rapns::Notification
+      class << Rpush::Notification
         def count
           @count_calls += 1
           return if @count_calls == 2
           raise @error
         end
       end
-      Rapns::Notification.instance_variable_set("@count_calls", 0)
-      Rapns::Notification.instance_variable_set("@error", error)
+      Rpush::Notification.instance_variable_set("@count_calls", 0)
+      Rpush::Notification.instance_variable_set("@error", error)
     end
 
     it "should log the 2nd attempt" do
-      Rapns.logger.should_receive(:warn).with("Attempt 2")
+      Rpush.logger.should_receive(:warn).with("Attempt 2")
       test_double.perform
     end
 
     it "should log errors raised when the reconnection is not successful" do
-      Rapns.logger.should_receive(:error).with(error)
+      Rpush.logger.should_receive(:error).with(error)
       test_double.perform
     end
 

@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::ServiceConfigMethods do
+describe Rpush::Daemon::ServiceConfigMethods do
   module ServiceConfigMethodsSpec
-    extend Rapns::Daemon::ServiceConfigMethods
+    extend Rpush::Daemon::ServiceConfigMethods
     class Delivery; end
   end
 
@@ -20,7 +20,7 @@ describe Rapns::Daemon::ServiceConfigMethods do
     ServiceConfigMethodsSpec.dispatcher :http, an: :option
     app = double
     dispatcher = double
-    Rapns::Daemon::Dispatcher::Http.should_receive(:new).with(app, ServiceConfigMethodsSpec::Delivery, an: :option).and_return(dispatcher)
+    Rpush::Daemon::Dispatcher::Http.should_receive(:new).with(app, ServiceConfigMethodsSpec::Delivery, an: :option).and_return(dispatcher)
     ServiceConfigMethodsSpec.new_dispatcher(app).should eq dispatcher
   end
 

@@ -1,7 +1,7 @@
 require "unit_spec_helper"
 
-describe Rapns::Notification do
-  let(:notification) { Rapns::Notification.new }
+describe Rpush::Notification do
+  let(:notification) { Rpush::Notification.new }
 
   it 'allows assignment of many registration IDs' do
     notification.registration_ids = ['a', 'b']

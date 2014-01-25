@@ -1,14 +1,14 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::Gcm::Delivery do
-  let(:app) { Rapns::Gcm::App.new(:name => 'MyApp', :auth_key => 'abc123') }
-  let(:notification) { Rapns::Gcm::Notification.create!(:app => app, :registration_ids => ['xyz'], :deliver_after => Time.now) }
+describe Rpush::Daemon::Gcm::Delivery do
+  let(:app) { Rpush::Gcm::App.new(:name => 'MyApp', :auth_key => 'abc123') }
+  let(:notification) { Rpush::Gcm::Notification.create!(:app => app, :registration_ids => ['xyz'], :deliver_after => Time.now) }
   let(:logger) { double(:error => nil, :info => nil, :warn => nil) }
   let(:response) { double(:code => 200, :header => {}) }
   let(:http) { double(:shutdown => nil, :request => response)}
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:batch) { double(:mark_failed => nil, :mark_delivered => nil, :mark_retryable => nil) }
-  let(:delivery) { Rapns::Daemon::Gcm::Delivery.new(app, http, notification, batch) }
+  let(:delivery) { Rpush::Daemon::Gcm::Delivery.new(app, http, notification, batch) }
   let(:store) { double(:create_gcm_notification => double(:id => 2)) }
 
   def perform
@@ -17,19 +17,19 @@ describe Rapns::Daemon::Gcm::Delivery do
 
   before do
     delivery.stub(:reflect => nil)
-    Rapns::Daemon.stub(:store => store)
+    Rpush::Daemon.stub(:store => store)
     Time.stub(:now => now)
-    Rapns.stub(:logger => logger)
+    Rpush.stub(:logger => logger)
   end
 
   shared_examples_for 'a notification with some delivery failures' do
-    let(:new_notification) { Rapns::Gcm::Notification.where('id != ?', notification.id).first }
+    let(:new_notification) { Rpush::Gcm::Notification.where('id != ?', notification.id).first }
 
     before { response.stub(:body => JSON.dump(body)) }
 
     it 'marks the original notification as failed' do
       batch.should_receive(:mark_failed).with(notification, nil, error_description)
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it 'creates a new notification for the unavailable devices' do
@@ -38,11 +38,11 @@ describe Rapns::Daemon::Gcm::Delivery do
       attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
       store.should_receive(:create_gcm_notification).with(attrs, notification.data,
           ['id_0', 'id_2'], now + 10.seconds, notification.app)
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it 'raises a DeliveryError' do
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 
@@ -65,7 +65,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       notification.stub(:registration_ids => ['1', '2'])
       delivery.should_receive(:reflect).with(:gcm_delivered_to_recipient, notification, '1')
       delivery.should_not_receive(:reflect).with(:gcm_delivered_to_recipient, notification, '2')
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it 'reflects on any IDs which failed to receive the notification' do
@@ -82,7 +82,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       notification.stub(:registration_ids => ['1', '2'])
       delivery.should_receive(:reflect).with(:gcm_failed_to_recipient, notification, 'Err', '1')
       delivery.should_not_receive(:reflect).with(:gcm_failed_to_recipient, notification, anything, '2')
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it 'reflects on canonical IDs' do
@@ -116,7 +116,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       response.stub(:body => JSON.dump(body))
       notification.stub(:registration_ids => ['1', '2', '3'])
       delivery.should_receive(:reflect).with(:gcm_invalid_registration_id, app, 'NotRegistered', '2')
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     describe 'when delivered successfully to all devices' do
@@ -154,7 +154,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       batch.should_receive(:mark_failed)
       batch.should_not_receive(:mark_retryable)
       store.should_not_receive(:create_gcm_notification)
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     it 'marks a notification as failed if any deliveries failed that cannot be retried' do
@@ -167,7 +167,7 @@ describe Rapns::Daemon::Gcm::Delivery do
         ]}
       response.stub(:body => JSON.dump(body))
       batch.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
 
     describe 'all deliveries failed with Unavailable or InternalServerError' do
@@ -203,7 +203,7 @@ describe Rapns::Daemon::Gcm::Delivery do
       it 'logs that the notification will be retried' do
         notification.retries = 1
         notification.deliver_after = now + 2
-        Rapns.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
+        Rpush.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
         perform
       end
     end
@@ -272,7 +272,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
       notification.deliver_after = now + 2 ** 3
-      Rapns.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
+      Rpush.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
       perform
     end
 
@@ -286,7 +286,7 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 401) }
 
     it 'raises an error' do
-      expect { perform }.to raise_error(Rapns::DeliveryError)
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 
@@ -294,8 +294,8 @@ describe Rapns::Daemon::Gcm::Delivery do
     before { response.stub(:code => 400) }
 
     it 'marks the notification as failed' do
-      batch.should_receive(:mark_failed).with(notification, 400, 'GCM failed to parse the JSON request. Possibly an rapns bug, please open an issue.')
-      perform rescue Rapns::DeliveryError
+      batch.should_receive(:mark_failed).with(notification, 400, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -304,7 +304,7 @@ describe Rapns::Daemon::Gcm::Delivery do
 
     it 'marks the notification as failed' do
       batch.should_receive(:mark_failed).with(notification, 418, "I'm a Teapot")
-      perform rescue Rapns::DeliveryError
+      perform rescue Rpush::DeliveryError
     end
   end
 end

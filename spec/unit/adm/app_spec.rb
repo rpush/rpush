@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
-describe Rapns::Adm::App do
-  subject { Rapns::Adm::App.new(:name => 'test', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
-  let(:existing_app) { Rapns::Adm::App.create!(:name => 'existing', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
+describe Rpush::Adm::App do
+  subject { Rpush::Adm::App.new(:name => 'test', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
+  let(:existing_app) { Rpush::Adm::App.create!(:name => 'existing', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
 
   it 'should be valid if properly instantiated' do
     subject.should be_valid

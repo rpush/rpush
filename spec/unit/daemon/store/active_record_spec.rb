@@ -1,10 +1,10 @@
 require 'unit_spec_helper'
-require 'rapns/daemon/store/active_record'
+require 'rpush/daemon/store/active_record'
 
-describe Rapns::Daemon::Store::ActiveRecord do
-  let(:app) { Rapns::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
-  let(:notification) { Rapns::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
-  let(:store) { Rapns::Daemon::Store::ActiveRecord.new }
+describe Rpush::Daemon::Store::ActiveRecord do
+  let(:app) { Rpush::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
+  let(:notification) { Rpush::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
+  let(:store) { Rpush::Daemon::Store::ActiveRecord.new }
   let(:time) { Time.now.utc }
 
   before { Time.stub(:now => time) }
@@ -31,19 +31,19 @@ describe Rapns::Daemon::Store::ActiveRecord do
     end
 
     it 'loads notifications in batches' do
-      Rapns.config.batch_size = 5000
-      Rapns.config.push = false
+      Rpush.config.batch_size = 5000
+      Rpush.config.push = false
       relation = double.as_null_object
       relation.should_receive(:limit).with(5000)
-      Rapns::Notification.stub(:ready_for_delivery => relation)
+      Rpush::Notification.stub(:ready_for_delivery => relation)
       store.deliverable_notifications([app])
     end
 
     it 'does not load notification in batches if in push mode' do
-      Rapns.config.push = true
+      Rpush.config.push = true
       relation = double.as_null_object
       relation.should_not_receive(:limit)
-      Rapns::Notification.stub(:ready_for_delivery => relation)
+      Rpush::Notification.stub(:ready_for_delivery => relation)
       store.deliverable_notifications([app])
     end
 
@@ -265,7 +265,7 @@ describe Rapns::Daemon::Store::ActiveRecord do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      Rapns::Apns::Feedback.should_receive(:create!).with(
+      Rpush::Apns::Feedback.should_receive(:create!).with(
         :failed_at => time, :device_token => 'ab' * 32, :app => app)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end

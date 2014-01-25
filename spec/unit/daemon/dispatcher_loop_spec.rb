@@ -1,6 +1,6 @@
 require 'unit_spec_helper'
 
-describe Rapns::Daemon::DispatcherLoop do
+describe Rpush::Daemon::DispatcherLoop do
   def run_dispatcher_loop
     dispatcher_loop.start
     dispatcher_loop.stop
@@ -12,21 +12,21 @@ describe Rapns::Daemon::DispatcherLoop do
   let(:batch) { double(:notification_dispatched => nil) }
   let(:queue) { Queue.new }
   let(:dispatcher) { double(:dispatch => nil, :cleanup => nil) }
-  let(:dispatcher_loop) { Rapns::Daemon::DispatcherLoop.new(queue, dispatcher) }
+  let(:dispatcher_loop) { Rpush::Daemon::DispatcherLoop.new(queue, dispatcher) }
 
   before { queue.push([notification, batch])}
 
   it 'logs errors' do
     logger = double
-    Rapns.stub(:logger => logger)
+    Rpush.stub(:logger => logger)
     error = StandardError.new
     dispatcher.stub(:dispatch).and_raise(error)
-    Rapns.logger.should_receive(:error).with(error)
+    Rpush.logger.should_receive(:error).with(error)
     run_dispatcher_loop
   end
 
   it 'reflects an exception' do
-    Rapns.stub(:logger => double(:error => nil))
+    Rpush.stub(:logger => double(:error => nil))
     error = StandardError.new
     dispatcher.stub(:dispatch).and_raise(error)
     dispatcher_loop.should_receive(:reflect).with(:error, error)
@@ -39,14 +39,14 @@ describe Rapns::Daemon::DispatcherLoop do
   end
 
   it "instructs the queue to wakeup the thread when told to stop" do
-    queue.should_receive(:push).with(Rapns::Daemon::DispatcherLoop::WAKEUP).and_call_original
+    queue.should_receive(:push).with(Rpush::Daemon::DispatcherLoop::WAKEUP).and_call_original
     run_dispatcher_loop
   end
 
   describe "when being stopped" do
     before do
       queue.clear
-      queue.push(Rapns::Daemon::DispatcherLoop::WAKEUP)
+      queue.push(Rpush::Daemon::DispatcherLoop::WAKEUP)
     end
 
     it "does not attempt to dispatch when a WAKEUP is dequeued" do

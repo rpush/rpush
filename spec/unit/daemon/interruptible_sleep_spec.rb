@@ -1,11 +1,11 @@
 require "unit_spec_helper"
 
-describe Rapns::Daemon::InterruptibleSleep do
+describe Rpush::Daemon::InterruptibleSleep do
 
   let(:rd) { double(:close => nil) }
   let(:wr) { double(:close => nil) }
 
-  subject { Rapns::Daemon::InterruptibleSleep.new }
+  subject { Rpush::Daemon::InterruptibleSleep.new }
 
   it 'creates a new pipe' do
     IO.should_receive(:pipe)
