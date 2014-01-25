@@ -12,6 +12,7 @@ gemfile:
 env: QUALITY=true
 
 matrix:
+  fast_finish: true
   include:
     - rvm: 1.9.3
       gemfile: Gemfile.rails-4.0
