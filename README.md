@@ -102,6 +102,23 @@ n.save!
 
 For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 
+#### WPNS
+
+```ruby
+app = Rpush::Wpns::App.new
+app.name = "windows_phone_app"
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Wpns::Notification.new
+n.app = Rpush::Wpns::App.find_by_name("windows_phone_app")
+n.uri = "http://..."
+n.alert = "..."
+n.save!
+```
+
 ## Starting Rpush
 
 As a daemon:
