@@ -30,7 +30,7 @@ module Rpush
           while true
             begin
               @sleep_reader.read_nonblock(1)
-            rescue IO::WaitReadable
+            rescue Errno::EAGAIN, IO::WaitReadable
               break
             end
           end
@@ -40,7 +40,7 @@ module Rpush
           while true
             begin
               @udp_wakeup.recv_nonblock(1)
-            rescue IO::WaitReadable
+            rescue Errno::EAGAIN, IO::WaitReadable
               break
             end
           end
