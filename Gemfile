@@ -3,9 +3,9 @@ source 'https://rubygems.org'
 gem 'rake'
 gem 'rspec', '>= 2.14.1'
 gem 'rails', '~> 3.2'
-gem 'database_cleaner', '1.0.1'
+gem 'database_cleaner'
 gem 'simplecov'
-gem 'timecop', '0.5.9.2'
+gem 'timecop'
 
 platform :mri do
   gem 'cane'
