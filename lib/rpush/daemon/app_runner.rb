@@ -165,7 +165,7 @@ module Rpush
 
       def service_module
         return @service_module if defined? @service_module
-        @service_module = "Rpush::Daemon::#{@app.service_name.classify}".constantize
+        @service_module = "Rpush::Daemon::#{@app.service_name.camelize}".constantize
       end
 
       def queue
