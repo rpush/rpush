@@ -18,8 +18,13 @@ class RenameRapnsToRpush < ActiveRecord::Migration
     rename_table :rapns_apps, :rpush_apps
     rename_table :rapns_feedback, :rpush_feedback
 
-    rename_index :rpush_notifications, :index_rapns_notifications_multi, :index_rpush_notifications_multi
-    rename_index :rpush_feedback, :index_rapns_feedback_on_device_token, :index_rpush_feedback_on_device_token
+    if index_name_exists?(:rpush_notifications, :index_rapns_notifications_multi, true)
+      rename_index :rpush_notifications, :index_rapns_notifications_multi, :index_rpush_notifications_multi
+    end
+
+    if index_name_exists?(:rpush_feedback, :index_rapns_feedback_on_device_token, true)
+      rename_index :rpush_feedback, :index_rapns_feedback_on_device_token, :index_rpush_feedback_on_device_token
+    end
 
     update_type(RenameRapnsToRpush::Rpush::Notification, 'Rapns::Apns::Notification', 'Rpush::Apns::Notification')
     update_type(RenameRapnsToRpush::Rpush::Notification, 'Rapns::Gcm::Notification', 'Rpush::Gcm::Notification')
@@ -43,8 +48,13 @@ class RenameRapnsToRpush < ActiveRecord::Migration
     update_type(RenameRapnsToRpush::Rpush::App, 'Rpush::Adm::App', 'Rapns::Adm::App')
     update_type(RenameRapnsToRpush::Rpush::App, 'Rpush::Wpns::App', 'Rapns::Wpns::App')
 
-    rename_index :rpush_notifications, :index_rpush_notifications_multi, :index_rapns_notifications_multi
-    rename_index :rpush_feedback, :index_rpush_feedback_on_device_token, :index_rapns_feedback_on_device_token
+    if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi, true)
+      rename_index :rpush_notifications, :index_rpush_notifications_multi, :index_rapns_notifications_multi
+    end
+
+    if index_name_exists?(:rpush_feedback, :index_rpush_feedback_on_device_token, true)
+      rename_index :rpush_feedback, :index_rpush_feedback_on_device_token, :index_rapns_feedback_on_device_token
+    end
 
     rename_table :rpush_notifications, :rapns_notifications
     rename_table :rpush_apps, :rapns_apps
