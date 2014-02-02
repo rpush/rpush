@@ -31,6 +31,7 @@ describe Rpush::Logger do
     @logger_class.stub(:new).and_return(@logger)
     Rails.logger = @logger
     File.stub(:open => log)
+    FileUtils.stub(:mkdir_p => nil)
     STDERR.stub(:puts)
   end
 
@@ -38,6 +39,11 @@ describe Rpush::Logger do
     File.stub(:open).and_raise(Errno::ENOENT)
     STDERR.should_receive(:puts).with(/No such file or directory/)
     STDERR.should_receive(:puts).with(/Logging disabled/)
+    Rpush::Logger.new(:foreground => true)
+  end
+
+  it 'creates the log directory' do
+    FileUtils.should_receive(:mkdir_p).with('/rails_root/log')
     Rpush::Logger.new(:foreground => true)
   end
 
