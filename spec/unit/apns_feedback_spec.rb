@@ -14,7 +14,7 @@ describe Rpush, 'apns_feedback' do
   end
 
   it 'checks feedback for each app' do
-    Rpush::Daemon::Apns::FeedbackReceiver.should_receive(:new).with(app, 0).and_return(receiver)
+    Rpush::Daemon::Apns::FeedbackReceiver.should_receive(:new).with(app).and_return(receiver)
     receiver.should_receive(:check_for_feedback)
     Rpush.apns_feedback
   end

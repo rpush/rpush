@@ -46,4 +46,13 @@ describe 'APNs' do
       notification.reload
     end.to_not change(notification, :delivered).to(true)
   end
+
+  it 'receives feedback' do
+    tuple = "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
+    allow(ssl_socket).to receive(:read).and_return(tuple, nil)
+
+    expect do
+      Rpush.apns_feedback
+    end.to change(Rpush::Apns::Feedback, :count).to(1)
+  end
 end
