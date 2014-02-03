@@ -13,8 +13,12 @@ describe Rpush::Daemon::DispatcherLoop do
   let(:queue) { Queue.new }
   let(:dispatcher) { double(:dispatch => nil, :cleanup => nil) }
   let(:dispatcher_loop) { Rpush::Daemon::DispatcherLoop.new(queue, dispatcher) }
+  let(:store) { double(Rpush::Daemon::Store::ActiveRecord, release_connection: nil)}
 
-  before { queue.push([notification, batch])}
+  before do
+    Rpush::Daemon.stub(:store => store)
+    queue.push([notification, batch])
+  end
 
   it 'logs errors' do
     logger = double
@@ -43,19 +47,24 @@ describe Rpush::Daemon::DispatcherLoop do
     run_dispatcher_loop
   end
 
-  describe "when being stopped" do
+  describe 'stop' do
     before do
       queue.clear
       queue.push(Rpush::Daemon::DispatcherLoop::WAKEUP)
     end
 
-    it "does not attempt to dispatch when a WAKEUP is dequeued" do
+    it 'does not attempt to dispatch when a WAKEUP is dequeued' do
       dispatcher.should_not_receive(:dispatch)
       run_dispatcher_loop
     end
 
     it 'instructs the dispatcher to cleanup' do
       dispatcher.should_receive(:cleanup)
+      run_dispatcher_loop
+    end
+
+    it 'releases the store connection' do
+      Rpush::Daemon.store.should_receive(:release_connection)
       run_dispatcher_loop
     end
   end

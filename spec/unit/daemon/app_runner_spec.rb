@@ -207,8 +207,10 @@ describe Rpush::Daemon::AppRunner do
   let(:dispatcher_loop_collection) { Rpush::Daemon::DispatcherLoopCollection.new }
   let(:service_loop) { double(Rpush::Daemon::AppRunnerSpecService::ServiceLoop,
     :start => nil, :stop => nil) }
+  let(:store) { double(Rpush::Daemon::Store::ActiveRecord, release_connection: nil) }
 
   before do
+    Rpush::Daemon.stub(store: store)
     Rpush::Daemon::AppRunnerSpecService::ServiceLoop.stub(:new => service_loop)
     Queue.stub(:new => queue)
     Rpush.stub(:logger => logger)

@@ -69,6 +69,7 @@ DatabaseCleaner.strategy = :truncation
 require 'rpush'
 require 'rpush/daemon'
 
+Rpush::Daemon.initialize_store
 Rpush::Notification.reset_column_information
 Rpush::App.reset_column_information
 Rpush::Apns::Feedback.reset_column_information

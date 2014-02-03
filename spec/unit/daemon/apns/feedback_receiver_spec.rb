@@ -13,6 +13,8 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
   let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, :sleep => nil, :interrupt_sleep => nil) }
+  let(:store) { double(Rpush::Daemon::Store::ActiveRecord,
+    create_apns_feedback: feedback, release_connection: nil) }
 
   before do
     Rpush.config.feedback_poll = poll
@@ -20,7 +22,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     Rpush.stub(:logger => logger)
     Rpush::Daemon::TcpConnection.stub(:new => connection)
     receiver.instance_variable_set("@stop", false)
-    Rpush::Daemon.stub(:store => double(:create_apns_feedback => feedback))
+    Rpush::Daemon.stub(:store => store)
   end
 
   def double_connection_read_with_tuple
@@ -73,25 +75,38 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     receiver.check_for_feedback
   end
 
-  it 'sleeps for the feedback poll period' do
-    receiver.stub(:check_for_feedback)
-    sleeper.should_receive(:sleep).with(60).at_least(:once)
-    Thread.stub(:new).and_yield
-    receiver.stub(:loop).and_yield
-    receiver.start
+  describe 'start' do
+    before do
+      Thread.stub(:new).and_yield
+      receiver.stub(:loop).and_yield
+    end
+
+    it 'sleeps for the feedback poll period' do
+      receiver.stub(:check_for_feedback)
+      sleeper.should_receive(:sleep).with(60).at_least(:once)
+      receiver.start
+    end
+
+    it 'checks for feedback when started' do
+      receiver.should_receive(:check_for_feedback).at_least(:once)
+      receiver.start
+    end
   end
 
-  it 'checks for feedback when started' do
-    receiver.should_receive(:check_for_feedback).at_least(:once)
-    Thread.stub(:new).and_yield
-    receiver.stub(:loop).and_yield
-    receiver.start
-  end
+  describe 'stop' do
+    it 'interrupts sleep when stopped' do
+      receiver.stub(:check_for_feedback)
+      sleeper.should_receive(:interrupt_sleep)
+      receiver.stop
+    end
 
-  it 'interrupts sleep when stopped' do
-    receiver.stub(:check_for_feedback)
-    sleeper.should_receive(:interrupt_sleep)
-    receiver.stop
+    it 'releases the store connection' do
+      Thread.stub(:new).and_yield
+      receiver.stub(:loop).and_yield
+      Rpush::Daemon.store.should_receive(:release_connection)
+      receiver.start
+      receiver.stop
+    end
   end
 
   it 'reflects feedback was received' do

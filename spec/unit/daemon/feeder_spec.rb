@@ -10,10 +10,12 @@ describe Rpush::Daemon::Feeder do
   let(:notification) { Rpush::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:logger) { double }
   let(:interruptible_sleep) { double(:sleep => nil, :interrupt_sleep => nil) }
+  let(:store) { double(Rpush::Daemon::Store::ActiveRecord,
+      deliverable_notifications: [notification], release_connection: nil) }
 
   before do
     Rpush.stub(:config => config,:logger => logger)
-    Rpush::Daemon.stub(:store => double(:deliverable_notifications => [notification]))
+    Rpush::Daemon.stub(:store => store)
     Rpush::Daemon::Feeder.stub(:stop? => true)
     Rpush::Daemon::AppRunner.stub(:enqueue => nil, :idle => [double(:app => app)])
     Rpush::Daemon::InterruptibleSleep.stub(:new => interruptible_sleep)
@@ -25,7 +27,7 @@ describe Rpush::Daemon::Feeder do
     Rpush::Daemon::Feeder.stop
   end
 
-  it "starts the loop in a new thread if embedded" do
+  it 'starts the loop in a new thread if embedded' do
     config.stub(:embedded => true)
     Thread.should_receive(:new).and_yield
     Rpush::Daemon::Feeder.should_receive(:feed_forever)
@@ -62,9 +64,16 @@ describe Rpush::Daemon::Feeder do
     start_and_stop
   end
 
-  it "interrupts sleep when stopped" do
-    Rpush::Daemon::Feeder.should_receive(:interrupt_sleep)
-    start_and_stop
+  describe 'stop' do
+    it 'interrupts sleep when stopped' do
+      Rpush::Daemon::Feeder.should_receive(:interrupt_sleep)
+      start_and_stop
+    end
+
+    it 'releases the store connection when stopped' do
+      Rpush::Daemon.store.should_receive(:release_connection)
+      start_and_stop
+    end
   end
 
   it "enqueues notifications when started" do

@@ -127,6 +127,14 @@ module Rpush
           reconnect_database
         end
 
+        def release_connection
+          begin
+            ::ActiveRecord::Base.connection_pool.release_connection
+          rescue StandardError => e
+            Rpush.logger.error(e)
+          end
+        end
+
         private
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)

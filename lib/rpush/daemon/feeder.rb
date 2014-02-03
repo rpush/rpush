@@ -32,6 +32,8 @@ module Rpush
           interruptible_sleeper.sleep(Rpush.config.push_poll)
           break if stop?
         end
+
+        Rpush::Daemon.store.release_connection
       end
 
       # :nocov:

@@ -6,8 +6,12 @@ describe Rpush::Daemon::Store::ActiveRecord do
   let(:notification) { Rpush::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:store) { Rpush::Daemon::Store::ActiveRecord.new }
   let(:time) { Time.now.utc }
+  let(:logger) { double(Rpush::Logger, error: nil) }
 
-  before { Time.stub(:now => time) }
+  before do
+    Rpush.stub(logger: logger)
+    Time.stub(:now => time)
+  end
 
   it 'reconnects after daemonize' do
     store.should_receive(:reconnect_database)
@@ -22,6 +26,18 @@ describe Rpush::Daemon::Store::ActiveRecord do
   it 'can update a app' do
     app.should_receive(:save!)
     store.update_app(app)
+  end
+
+  it 'can release a connection' do
+    ActiveRecord::Base.connection_pool.should_receive(:release_connection)
+    store.release_connection
+  end
+
+  it 'logs errors raised when trying to release the connection' do
+    e = StandardError.new
+    ActiveRecord::Base.connection_pool.stub(:release_connection).and_raise(e)
+    Rpush.logger.should_receive(:error).with(e)
+    store.release_connection
   end
 
   describe 'deliverable_notifications' do

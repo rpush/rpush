@@ -16,6 +16,8 @@ module Rpush
             dispatch
             break if @stop
           end
+
+          Rpush::Daemon.store.release_connection
         end
       end
 

@@ -29,6 +29,8 @@ module Rpush
               check_for_feedback
               @interruptible_sleep.sleep @poll
             end
+
+            Rpush::Daemon.store.release_connection
           end
         end
 
