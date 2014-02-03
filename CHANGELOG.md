@@ -1,10 +1,11 @@
-## 4.0.0 (unreleased)
-  * Renamed to Rpush (from Rapns).
+## 1.0.0 (unreleased)
+  * Renamed to Rpush (from Rapns). Version number reset to 1.0.0.
   * Reduce default batch size to 100.
   * Fix sqlite3 support (#160).
   * Drop support for Ruby 1.8.
   * Improve APNs certificate validation errors (#192) @mattconnolly).
-  * Initial support for Windows Phone notifications (#191) (@matiaslina).
+  * Support for Windows Phone notifications (#191) (@matiaslina).
+  * Support for Amazon device messaging (#173) (@darrylyip).
   * Add two new GCM reflections: gcm_delivered_to_recipient, gcm_failed_to_recipient (#184) (@jakeonfire).
   * Fix migration issues (#181) (@jcoleman).
   * Add GCM gcm_invalid_registration_id reflection (#171) (@marcrohloff).
@@ -14,6 +15,7 @@
   * The deprecated on_apns_feedback has now been removed.
   * The deprecated airbrake_notify config option has been removed.
   * Removed the deprecated ability to set attributes_for_device using mass-assignment.
+  * Fixed issue where database connections may not be released from the connection pool.
 
 ## 3.4.1 (Aug 30, 2013)
   * Silence unintended airbrake_notify deprecation warning (#158).
