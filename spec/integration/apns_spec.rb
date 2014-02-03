@@ -1,10 +1,11 @@
-require "unit_spec_helper"
+require 'unit_spec_helper'
 
-describe "APNs" do
+describe 'APNs' do
   let(:app) { Rpush::Apns::App.new }
   let(:notification) { Rpush::Apns::Notification.new }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
-  let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil, write: nil, flush: nil, read: nil, close: nil) }
+  let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
+    write: nil, flush: nil, read: nil, close: nil) }
 
   before do
     app.certificate = TEST_CERT
@@ -38,7 +39,7 @@ describe "APNs" do
 
   it 'fails to deliver a notification successfully' do
     IO.stub(:select => true)
-    ssl_socket.stub(:read => [8, 4, 69].pack("ccN"))
+    ssl_socket.stub(:read => [8, 4, 69].pack('ccN'))
 
     expect do
       Rpush.push
