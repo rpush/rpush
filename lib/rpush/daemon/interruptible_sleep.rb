@@ -26,25 +26,8 @@ module Rpush
         rs, = IO.select(read_ports, nil, nil, timeout) rescue nil
 
         # consume all data on the readable io's so that our next call will wait for more data
-        if rs && rs.include?(@sleep_reader)
-          while true
-            begin
-              @sleep_reader.read_nonblock(1)
-            rescue Errno::EAGAIN, IO::WaitReadable
-              break
-            end
-          end
-        end
-
-        if rs && rs.include?(@udp_wakeup)
-          while true
-            begin
-              @udp_wakeup.recv_nonblock(1)
-            rescue Errno::EAGAIN, IO::WaitReadable
-              break
-            end
-          end
-        end
+        perform_io(rs, @sleep_reader, :read_nonblock)
+        perform_io(rs, @udp_wakeup, :recv_nonblock)
 
         !rs.nil? && rs.any?
       end
@@ -58,6 +41,20 @@ module Rpush
         @sleep_reader.close rescue nil
         @wake_writer.close rescue nil
         @udp_wakeup.close if @udp_wakeup rescue nil
+      end
+
+      private
+
+      def perform_io(selected, io, meth)
+        if selected && selected.include?(io)
+          while true
+            begin
+              io.__send__(meth, 1)
+            rescue Errno::EAGAIN, IO::WaitReadable
+              break
+            end
+          end
+        end
       end
     end
   end
