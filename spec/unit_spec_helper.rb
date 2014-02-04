@@ -39,19 +39,21 @@ puts "Using #{$adapter} adapter."
 
 ActiveRecord::Base.establish_connection(DATABASE_CONFIG[$adapter])
 
-require 'generators/templates/create_rapns_notifications'
-require 'generators/templates/create_rapns_feedback'
-require 'generators/templates/add_alert_is_json_to_rapns_notifications'
-require 'generators/templates/add_app_to_rapns'
-require 'generators/templates/create_rapns_apps'
-require 'generators/templates/add_gcm'
-require 'generators/templates/add_wpns'
-require 'generators/templates/add_adm'
-require 'generators/templates/rename_rapns_to_rpush'
+# require 'generators/templates/create_rapns_notifications'
+# require 'generators/templates/create_rapns_feedback'
+# require 'generators/templates/add_alert_is_json_to_rapns_notifications'
+# require 'generators/templates/add_app_to_rapns'
+# require 'generators/templates/create_rapns_apps'
+# require 'generators/templates/add_gcm'
+# require 'generators/templates/add_wpns'
+# require 'generators/templates/add_adm'
+# require 'generators/templates/rename_rapns_to_rpush'
+require 'generators/templates/add_rpush'
 
-migrations = [CreateRapnsNotifications, CreateRapnsFeedback,
- AddAlertIsJsonToRapnsNotifications, AddAppToRapns, CreateRapnsApps, AddGcm,
- AddWpns, AddAdm, RenameRapnsToRpush]
+# migrations = [CreateRapnsNotifications, CreateRapnsFeedback,
+#  AddAlertIsJsonToRapnsNotifications, AddAppToRapns, CreateRapnsApps, AddGcm,
+#  AddWpns, AddAdm, RenameRapnsToRpush]
+migrations = [AddRpush]
 
 migrations.reverse.each do |m|
   begin
