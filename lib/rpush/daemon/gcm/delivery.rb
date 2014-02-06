@@ -1,6 +1,7 @@
 module Rpush
   module Daemon
     module Gcm
+
       # http://developer.android.com/guide/google/gcm/gcm.html#response
       class Delivery < Rpush::Daemon::Delivery
         include Rpush::MultiJsonHelper

@@ -31,7 +31,13 @@ class AddRpush < ActiveRecord::Migration
   end
 
   def self.down
-    migrations.reverse.map(&:down)
+    migrations.reverse.each do |m|
+      begin
+        m.down
+      rescue ActiveRecord::StatementInvalid => e
+        p e
+      end
+    end
   end
 
   class CreateRapnsNotifications < ActiveRecord::Migration

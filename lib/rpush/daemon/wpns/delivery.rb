@@ -1,166 +1,127 @@
 module Rpush
   module Daemon
     module Wpns
+
+      # http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff941100%28v=vs.105%29.aspx
       class Delivery < Rpush::Daemon::Delivery
-        attr_accessor :safe_mode_time, :end_safe_mode
+
+        FAILURE_MESSAGES = {
+          400 => 'Bad XML or malformed notification URI.',
+          401 => 'Unauthorized to send a notification to this app.'
+        }
 
         def initialize(app, http, notification, batch)
           @app = app
           @http = http
           @notification = notification
           @batch = batch
-          @end_safe_mode = nil
-          @safe_mode_time = nil
         end
 
         def perform
-          if @safe_mode_time == nil
-            perform_unsafe
-          else
-            if Time.now < @safe_mode_time
-              Rpush.logger.warn "Safe mode! you need to wait #{@safe_mode_time - Time.now}"
-            else
-              @safe_mode_time = nil
-              @end_safe_mode = nil
-              perform_unsafe
-            end
-          end
-        end
-
-        protected
-        # Status codes.
-        # http://msdn.microsoft.com/en-us/library/windowsphone/develop/ff941100%28v=vs.105%29.aspx
-        def handle_response(res)
-          case res.code.to_i
-          when 200
-            ok res
-          when 400
-            bad_request res
-          when 401
-            unauthorized res
-          when 404
-            not_found res
-          when 405
-            method_not_allowed res
-          when 406
-            not_acceptable res
-          when 412
-            precondition_failed res
-          when 503
-            service_unavailable res
-          end
-        end
-
-        def ok(res)
-          status = status_from_response res
-          case status[:notification]
-          when ["Received"]
-            mark_delivered
-            Rpush.logger.info "[#{@app.name}] #{@notification.id} sent successfully"
-          when ["QueueFull"]
-            mark_retryable @notification, Time.now + (60*10)
-            Rpush.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
-          when ["Supressed"]
-            mark_delivered
-            Rpush.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
-          end
-
-        end
-
-        def bad_request(res)
-          mark_failed 400, 'Bad XML or malformed notification URI'
-          raise Rpush::DeliveryError.new(400, @notification.id,
-                                         'Bad XML or malformed notification URI')
-        end
-
-        def unauthorized(res)
-          mark_failed 401, "Unauthorized to send a notification to this app"
-          raise Rpush::DeliveryError.new(401, @notification.id,
-                                         "Unauthorized to send a notification to this app")
-        end
-
-        def not_found(res)
-          # in this case we need to drop the notification since it's
-          # not in the notification service
-          mark_failed 404, 'Not found!'
-          raise Rpush::DeliveryError.new(404, @notification.id,
-                                         "Not found!")
-        end
-
-        def method_not_allowed(res)
-          mark_failed 405, "No method allowed. This should be considered as a Rpush bug"
-          raise Rpush::DeliveryError.new(405, @notification.id,
-                                         "No method allowed. This should be considered as a Rpush bug")
-        end
-
-        def not_acceptable(res)
-          # Now we can send notifications over an hour until tomorrow.
-          Rpush.logger.warn "[#{@app.name}] #{@notification.id} Reached the per-day throttling limit for a subscription."
-          @safe_mode_time = Time.now + (60*60*24)
-          mark_failed 406, "Reached the per-day throttling limit for a subscription."
-          raise Rpush::DeliveryError.new(406, @notification.id,
-                                         "Reached the per-day throttling limit for a subscription.")
-        end
-
-        def precondition_failed(res)
-          mark_failed 412, "Precondition Failed. Device is Disconnected for now."
-          raise Rpush::DeliveryError.new(412, @notification.id,
-                                         "Precondition Failed. Device is Disconnected for now.")
-        end
-
-        def service_unavailable(res)
-          mark_failed 503, "Service unavailable."
-          raise Rpush::DeliveryError.new(503, @notification.id,
-                                         "Service unavailable.")
-        end
-
-        def do_post
-          header = {
-            "Content-Length" => notif_to_xml.length.to_s,
-            "Content-Type" => "text/xml",
-            "X-WindowsPhone-Target" => "toast",
-            "X-NotificationClass" => '2'
-          }
-          post = Net::HTTP::Post.new(URI.parse(@notification.uri).path,initheader=header)
-          post.body = notif_to_xml
-          @http.request(URI.parse(@notification.uri), post)
-        end
-
-        private
-
-        def status_from_response(res)
-          {
-            :notification         => res.to_hash["x-notificationstatus"],
-            :notification_channel => res.to_hash["x-subscriptionstatus"],
-            :device_connection    => res.to_hash["x-deviceconnectionstatus"]
-          }
-        end
-
-        def perform_unsafe
           begin
-            handle_response (do_post)
+            handle_response(do_post)
           rescue Rpush::DeliveryError => error
             mark_failed(error.code, error.description)
             raise
           end
         end
 
-        def notif_to_xml
-          @message = @notification.alert.gsub(/&/, "&amp;")
-          @message = @notification.alert.gsub(/</, "&lt;")
-          @message = @notification.alert.gsub(/>/, "&gt;")
-          @message = @notification.alert.gsub(/'/, "&apos;")
-          @message = @notification.alert.gsub(/"/, "&quot;")
-          <<-EOF
-<?xml version="1.0" encoding="utf-8"?>
-    <wp:Notification xmlns:wp="WPNotification">
-      <wp:Toast>
-        <wp:Text1>#{@message}</wp:Text1>
-      </wp:Toast>
-    </wp:Notification>
-          EOF
+        private
+
+        def handle_response(response)
+          code = response.code.to_i
+          case code
+          when 200
+            ok(response)
+          when 406
+            not_acceptable(response)
+          when 412
+            precondition_failed(response)
+          when 503
+            service_unavailable(response)
+          else
+            handle_failure(code)
+          end
         end
 
+        def handle_failure(code)
+          msg = if FAILURE_MESSAGES.key?(code)
+            FAILURE_MESSAGES[code]
+          else
+            Rpush::Daemon::HTTP_STATUS_CODES[code]
+          end
+          raise Rpush::DeliveryError.new(code, @notification.id, msg)
+        end
+
+        def ok(response)
+          status = status_from_response(response)
+          case status[:notification]
+          when ["Received"]
+            mark_delivered
+            Rpush.logger.info "[#{@app.name}] #{@notification.id} sent successfully"
+          when ["QueueFull"]
+            mark_retryable(@notification, Time.now + (60*10))
+            Rpush.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
+          when ["Suppressed"]
+            mark_delivered
+            # TODO: Dropped by device or server?
+            Rpush.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
+          end
+        end
+
+        def not_acceptable(response)
+          # Per-day throttling limit reached. Retry the notification in 1 hour.
+          deliver_after = Time.now + (60*60)
+          mark_retryable(@notification, deliver_after)
+          Rpush.logger.warn("[#{@app.name}] #{@notification.id} Reached the per-day throttling limit. Notification will be retried after #{deliver_after.strftime("%Y-%m-%d %H:%M:%S")}.")
+        end
+
+        def precondition_failed(response)
+          # TODO: Retry after 1 hour. Fail after 24 hours.
+          deliver_after = Time.now + (60*60)
+          mark_retryable(@notification, deliver_after)
+          Rpush.logger.warn("[#{@app.name}] #{@notification.id} Device unreachable. Notification will be retried after #{deliver_after.strftime("%Y-%m-%d %H:%M:%S")}.")
+        end
+
+        def service_unavailable(response)
+          mark_retryable_exponential(@notification)
+          Rpush.logger.warn("...")
+        end
+
+        def do_post
+          body = notification_to_xml
+          header = {
+            "Content-Length" => body.length.to_s,
+            "Content-Type" => "text/xml",
+            "X-WindowsPhone-Target" => "toast",
+            "X-NotificationClass" => '2'
+          }
+          post = Net::HTTP::Post.new(URI.parse(@notification.uri).path, initheader=header)
+          post.body = body
+          @http.request(URI.parse(@notification.uri), post)
+        end
+
+        def status_from_response(response)
+          headers = response.to_hash
+          {
+            notification:         headers["x-notificationstatus"],
+            notification_channel: headers["x-subscriptionstatus"],
+            device_connection:    headers["x-deviceconnectionstatus"]
+          }
+        end
+
+        def notification_to_xml
+          msg = @notification.alert.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          <<-EOF
+<?xml version="1.0" encoding="utf-8"?>
+<wp:Notification xmlns:wp="WPNotification">
+  <wp:Toast>
+    <wp:Text1>#{msg}</wp:Text1>
+  </wp:Toast>
+</wp:Notification>
+          EOF
+        end
       end
     end
   end

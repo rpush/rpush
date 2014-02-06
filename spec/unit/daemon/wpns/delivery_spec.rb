@@ -9,7 +9,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   let(:response) { double(:code => 200, :header => {}) }
   let(:http) { double(:shutdown => nil, :request => response) }
   let(:now) { Time.now }
-  let(:batch) { double(:mark_failed => nil, :mark_delivered => nil) }
+  let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil) }
   let(:delivery) { Rpush::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(:create_wpns_notification => double(:id => 2)) }
 
@@ -24,16 +24,13 @@ describe Rpush::Daemon::Wpns::Delivery do
     Rpush.stub(:logger => logger)
   end
 
-  it 'handles an unknown response'
-  it 'uses data instead of alert'
-
   shared_examples_for "an notification with some delivery faliures" do
     let(:new_notification) { Rpush::Wpns::Notification.where('id != ?', notification.id).first }
 
     before { response.stub(:body => JSON.dump(body)) }
 
     it "marks the original notification falied" do
-      batch.should_receive(:mark_failed).with(notification, nil, error_description)
+      delivery.should_receive(:mark_failed).with(notification, nil, error_description)
       perform rescue Rpush::DeliveryError
     end
 
@@ -54,18 +51,17 @@ describe Rpush::Daemon::Wpns::Delivery do
       perform
     end
 
-    it "does not mark notification as delivered if the queue is full" do
+    it "retries the notification when the queue is full" do
       response.stub(:body => JSON.dump({ "failure" => 0 }))
       response.stub(:to_hash => { "x-notificationstatus" => ["QueueFull"] })
-      # Ten minutes
       batch.should_receive(:mark_retryable).with(notification, Time.now + (60*10))
       perform
     end
 
-    it "marks the notification retryable if the notification is supressed" do
+    it "marks the notification retryable if the notification is suppressed" do
       response.stub(:body => JSON.dump({ "faliure" => 0 }))
-      response.stub(:to_hash => { "x-notificationstatus" => ["Supressed"] })
-      batch.should_receive(:mark_delivered).with(notification)
+      response.stub(:to_hash => { "x-notificationstatus" => ["Suppressed"] })
+      batch.should_receive(:mark_delivered)
       perform
     end
   end
@@ -73,8 +69,8 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 400 response" do
     before { response.stub(:code => 400) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 400,
-                                              "Bad XML or malformed notification URI")
+      delivery.should_receive(:mark_failed).with(400,
+        "Bad XML or malformed notification URI.")
       perform rescue Rpush::DeliveryError
     end
   end
@@ -82,8 +78,8 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 401 response" do
     before { response.stub(:code => 401) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 401,
-                                              "Unauthorized to send a notification to this app")
+      delivery.should_receive(:mark_failed).with(401,
+        "Unauthorized to send a notification to this app.")
       perform rescue Rpush::DeliveryError
     end
   end
@@ -91,8 +87,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 404 response" do
     before { response.stub(:code => 404) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 404,
-                                              "Not found!")
+      delivery.should_receive(:mark_failed).with(404, "Not Found")
       perform rescue Rpush::DeliveryError
     end
   end
@@ -100,8 +95,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 405 response" do
     before { response.stub(:code => 405) }
     it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 405,
-        "No method allowed. This should be considered as a Rpush bug")
+      delivery.should_receive(:mark_failed).with(405, "Method Not Allowed")
       perform rescue Rpush::DeliveryError
     end
   end
@@ -109,54 +103,44 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 406 response" do
     before { response.stub(:code => 406) }
 
-    it "enable the safe mode time" do
-      perform rescue Rpush::DeliveryError
-      delivery.safe_mode_time.should_not be_nil
+    it "retries the notification" do
+      batch.should_receive(:mark_retryable).with(notification, Time.now + (60*60))
+      perform
     end
 
-    it "warns about the safe model after this response." do
-      logger.should_receive(:warn)
-      perform rescue Rpush::DeliveryError
-      perform rescue Rpush::DeliveryError
-    end
-
-    it "does not perform the notifications when are in safe mode" do
-      perform rescue Rpush::DeliveryError
-      delivery.should_not_receive(:perform_unsafe)
-      perform rescue Rpush::DeliveryError
-    end
+    it "logs a warning that the notification will be retried"
+    it "does not retry a notification that first failed over 24 hours ago"
   end
 
   describe "an 412 response" do
     before { response.stub(:code => 412) }
-    it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 412,
-                                              "Precondition Failed. Device is Disconnected for now.")
-      perform rescue Rpush::DeliveryError
+
+    it "retries the notification" do
+      batch.should_receive(:mark_retryable).with(notification, Time.now + (60*60))
+      perform
     end
+
+    it "logs a warning that the notification will be retried"
+    it "does not retry a notification that first failed over 24 hours ago"
   end
 
   describe "an 503 response" do
     before { response.stub(:code => 503) }
-    it "marks notifications as failed" do
-      batch.should_receive(:mark_failed).with(notification, 503,
-                                              "Service unavailable.")
-      perform rescue Rpush::DeliveryError
+
+    it "retries the notification exponentially" do
+      delivery.should_receive(:mark_retryable_exponential).with(notification)
+      perform
     end
+
+    it 'logs a message'
   end
 
-  describe "Safe Mode" do
-    # NOTE: Don't know how to compare the dates here.
-    # See lib/rpush/daemon/wpns/delivery.rb @ line 21
-    before {
-      response.stub(:code => 400)
-      delivery.stub(:safe_mode_time => now - 10)
-    }
+  describe 'an un-handled response' do
+    before { response.stub(:code => 418) }
 
-    it "has to set safe_mode_time to nil when it's finished"
-    #   delivery.safe_mode_time=now-10.seconds
-    #   perform rescue Rpush::DeliveryError
-    #   # delivery.safe_mode_time.should be_nil
-    # end
+    it 'marks the notification as failed' do
+      delivery.should_receive(:mark_failed).with(418, "I'm a Teapot")
+      perform rescue Rpush::DeliveryError
+    end
   end
 end
