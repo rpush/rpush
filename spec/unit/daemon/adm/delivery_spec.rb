@@ -32,7 +32,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(:body => JSON.dump({ 'reason' => 'InvalidData' }))
-      batch.should_receive(:mark_failed).with(notification, 408, 'Request Timeout')
+      delivery.should_receive(:mark_failed).with(408, 'Request Timeout')
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
@@ -44,7 +44,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as delivered if delivered successfully to all devices' do
       response.stub(:body => JSON.dump({ 'registrationID' => 'xyz' }))
-      batch.should_receive(:mark_delivered).with(notification)
+      delivery.should_receive(:mark_delivered)
       perform
     end
 
@@ -69,7 +69,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(:body => JSON.dump({ 'reason' => 'InvalidData' }))
-      batch.should_receive(:mark_failed).with(notification, nil, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:mark_failed).with(nil, 'Failed to deliver to all recipients.')
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 
@@ -97,7 +97,7 @@ describe Rpush::Daemon::Adm::Delivery do
       http.should_receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
       store.should_receive(:update_app).with(notification.app)
-      batch.should_receive(:mark_retryable).with(notification, now)
+      delivery.should_receive(:mark_retryable).with(notification, now)
 
       perform
     end
@@ -110,7 +110,7 @@ describe Rpush::Daemon::Adm::Delivery do
         app.access_token.should eq 'ACCESS_TOKEN'
         app.access_token_expiration.should eq now + 60.seconds
       end
-      batch.should_receive(:mark_retryable).with(notification, now)
+      delivery.should_receive(:mark_retryable).with(notification, now)
 
       perform
     end
@@ -121,7 +121,7 @@ describe Rpush::Daemon::Adm::Delivery do
       http.should_receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
       store.should_not_receive(:update_app).with(notification.app)
-      batch.should_not_receive(:mark_retryable)
+      delivery.should_not_receive(:mark_retryable)
 
       logger.should_receive(:warn).with("Could not retrieve access token from ADM: test")
 
@@ -141,7 +141,7 @@ describe Rpush::Daemon::Adm::Delivery do
       adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
-      batch.should_receive(:mark_retryable).with(notification, now + 1.hour)
+      delivery.should_receive(:mark_retryable).with(notification, now + 1.hour)
       perform
     end
 
@@ -152,7 +152,7 @@ describe Rpush::Daemon::Adm::Delivery do
       adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
-      batch.should_receive(:mark_retryable).with(notification, Time.now + 2 ** (notification.retries + 1))
+      delivery.should_receive(:mark_retryable).with(notification, Time.now + 2 ** (notification.retries + 1))
       perform
     end
 
@@ -182,7 +182,7 @@ describe Rpush::Daemon::Adm::Delivery do
         notification_app.should eq notification.app
       end
 
-      batch.should_receive(:mark_delivered).with(notification)
+      delivery.should_receive(:mark_delivered)
 
       perform
     end
@@ -194,7 +194,7 @@ describe Rpush::Daemon::Adm::Delivery do
     end
 
     it 'marks the notification as failed because no successful delivery was made' do
-      batch.should_receive(:mark_failed).with(notification, nil, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:mark_failed).with(nil, 'Failed to deliver to all recipients.')
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 
@@ -210,7 +210,7 @@ describe Rpush::Daemon::Adm::Delivery do
     end
 
     it 'should retry the notification respecting the Retry-After header' do
-      batch.should_receive(:mark_retryable).with(notification, now + 10.seconds)
+      delivery.should_receive(:mark_retryable).with(notification, now + 10.seconds)
       perform
     end
   end
@@ -235,7 +235,7 @@ describe Rpush::Daemon::Adm::Delivery do
         notif.error_description.should eq "Failed to deliver to recipients: \nxyz: InvalidData"
       end
 
-      batch.should_receive(:mark_delivered).with(notification)
+      delivery.should_receive(:mark_delivered)
 
       perform
     end

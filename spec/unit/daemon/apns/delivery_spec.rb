@@ -33,7 +33,7 @@ describe Rpush::Daemon::Apns::Delivery do
   end
 
   it "marks the notification as delivered" do
-    batch.should_receive(:mark_delivered).with(notification)
+    delivery.should_receive(:mark_delivered)
     perform
   end
 
@@ -47,7 +47,7 @@ describe Rpush::Daemon::Apns::Delivery do
     before { connection.stub(:select => true, :read => [8, 4, 69].pack("ccN")) }
 
     it "marks the notification as failed" do
-      batch.should_receive(:mark_failed).with(notification, 4, "Missing payload")
+      delivery.should_receive(:mark_failed).with(4, "Missing payload")
       perform
     end
 
@@ -93,7 +93,7 @@ describe Rpush::Daemon::Apns::Delivery do
       end
 
       it 'marks the notification as failed' do
-        batch.should_receive(:mark_failed).with(notification, nil, "APNs disconnected without returning an error.")
+        delivery.should_receive(:mark_failed).with(nil, "APNs disconnected without returning an error.")
         perform
       end
     end

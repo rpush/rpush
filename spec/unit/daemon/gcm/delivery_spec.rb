@@ -28,7 +28,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     before { response.stub(:body => JSON.dump(body)) }
 
     it 'marks the original notification as failed' do
-      batch.should_receive(:mark_failed).with(notification, nil, error_description)
+      delivery.should_receive(:mark_failed).with(nil, error_description)
       perform rescue Rpush::DeliveryError
     end
 
@@ -129,7 +129,7 @@ describe Rpush::Daemon::Gcm::Delivery do
       before { response.stub(:body => JSON.dump(body)) }
 
       it 'marks the notification as delivered' do
-        batch.should_receive(:mark_delivered).with(notification)
+        delivery.should_receive(:mark_delivered)
         perform
       end
 
@@ -151,8 +151,8 @@ describe Rpush::Daemon::Gcm::Delivery do
           ]}
 
       response.stub(:body => JSON.dump(body))
-      batch.should_receive(:mark_failed)
-      batch.should_not_receive(:mark_retryable)
+      delivery.should_receive(:mark_failed)
+      delivery.should_not_receive(:mark_retryable)
       store.should_not_receive(:create_gcm_notification)
       perform rescue Rpush::DeliveryError
     end
@@ -166,7 +166,7 @@ describe Rpush::Daemon::Gcm::Delivery do
           { 'error' => 'InvalidDataKey' }
         ]}
       response.stub(:body => JSON.dump(body))
-      batch.should_receive(:mark_failed).with(notification, nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
+      delivery.should_receive(:mark_failed).with(nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
       perform rescue Rpush::DeliveryError
     end
 
@@ -186,17 +186,17 @@ describe Rpush::Daemon::Gcm::Delivery do
 
       it 'retries the notification respecting the Retry-After header' do
         response.stub(:header => { 'retry-after' => 10 })
-        batch.should_receive(:mark_retryable).with(notification, now + 10.seconds)
+        delivery.should_receive(:mark_retryable).with(notification, now + 10.seconds)
         perform
       end
 
       it 'retries the notification using exponential back-off if the Retry-After header is not present' do
-        batch.should_receive(:mark_retryable).with(notification, now + 2)
+        delivery.should_receive(:mark_retryable).with(notification, now + 2)
         perform
       end
 
       it 'does not mark the notification as failed' do
-        batch.should_not_receive(:mark_failed)
+        delivery.should_not_receive(:mark_failed)
         perform
       end
 
@@ -247,18 +247,18 @@ describe Rpush::Daemon::Gcm::Delivery do
 
     it 'respects an integer Retry-After header' do
       response.stub(:header => { 'retry-after' => 10 })
-      batch.should_receive(:mark_retryable).with(notification, now + 10.seconds)
+      delivery.should_receive(:mark_retryable).with(notification, now + 10.seconds)
       perform
     end
 
     it 'respects a HTTP-date Retry-After header' do
       response.stub(:header => { 'retry-after' => 'Wed, 03 Oct 2012 20:55:11 GMT' })
-      batch.should_receive(:mark_retryable).with(notification, Time.parse('Wed, 03 Oct 2012 20:55:11 GMT'))
+      delivery.should_receive(:mark_retryable).with(notification, Time.parse('Wed, 03 Oct 2012 20:55:11 GMT'))
       perform
     end
 
     it 'defaults to exponential back-off if the Retry-After header is not present' do
-      batch.should_receive(:mark_retryable).with(notification, now + 2 ** 1)
+      delivery.should_receive(:mark_retryable).with(notification, now + 2 ** 1)
       perform
     end
   end
@@ -277,7 +277,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'retries the notification in accordance with the exponential back-off strategy.' do
-      batch.should_receive(:mark_retryable).with(notification, now + 2 ** 3)
+      delivery.should_receive(:mark_retryable).with(notification, now + 2 ** 3)
       perform
     end
   end
@@ -294,7 +294,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     before { response.stub(:code => 400) }
 
     it 'marks the notification as failed' do
-      batch.should_receive(:mark_failed).with(notification, 400, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
+      delivery.should_receive(:mark_failed).with(400, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
       perform rescue Rpush::DeliveryError
     end
   end
@@ -303,7 +303,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     before { response.stub(:code => 418) }
 
     it 'marks the notification as failed' do
-      batch.should_receive(:mark_failed).with(notification, 418, "I'm a Teapot")
+      delivery.should_receive(:mark_failed).with(418, "I'm a Teapot")
       perform rescue Rpush::DeliveryError
     end
   end
