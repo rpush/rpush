@@ -108,8 +108,6 @@ describe Rpush::Daemon::Wpns::Delivery do
       perform
     end
 
-    it "does not retry a notification that first failed over 24 hours ago"
-
     it "logs a warning that the notification will be retried" do
       notification.retries = 1
       notification.deliver_after = now + 2
@@ -125,8 +123,6 @@ describe Rpush::Daemon::Wpns::Delivery do
       batch.should_receive(:mark_retryable).with(notification, Time.now + (60*60))
       perform
     end
-
-    it "fails the message if not delivered after 24 hours"
 
     it "logs a warning that the notification will be retried" do
       notification.retries = 1
