@@ -44,11 +44,13 @@ module Rpush
           end
         end
 
-        def handle_failure(code)
-          msg = if FAILURE_MESSAGES.key?(code)
-            FAILURE_MESSAGES[code]
-          else
-            Rpush::Daemon::HTTP_STATUS_CODES[code]
+        def handle_failure(code, msg=nil)
+          unless msg
+            msg = if FAILURE_MESSAGES.key?(code)
+              FAILURE_MESSAGES[code]
+            else
+              Rpush::Daemon::HTTP_STATUS_CODES[code]
+            end
           end
           raise Rpush::DeliveryError.new(code, @notification.id, msg)
         end
@@ -63,29 +65,31 @@ module Rpush
             mark_retryable(@notification, Time.now + (60*10))
             Rpush.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
           when ["Suppressed"]
-            mark_delivered
-            # TODO: Dropped by device or server?
-            Rpush.logger.warn "[#{@app.name}] #{@notification.id} was received and dropped by the server."
+            handle_failure(200, "Notification was received but suppressed by the service.")
           end
         end
 
         def not_acceptable(response)
-          # Per-day throttling limit reached. Retry the notification in 1 hour.
-          deliver_after = Time.now + (60*60)
-          mark_retryable(@notification, deliver_after)
-          Rpush.logger.warn("[#{@app.name}] #{@notification.id} Reached the per-day throttling limit. Notification will be retried after #{deliver_after.strftime("%Y-%m-%d %H:%M:%S")}.")
+          retry_notification("Per-day throttling limit reached.")
         end
 
         def precondition_failed(response)
-          # TODO: Retry after 1 hour. Fail after 24 hours.
-          deliver_after = Time.now + (60*60)
-          mark_retryable(@notification, deliver_after)
-          Rpush.logger.warn("[#{@app.name}] #{@notification.id} Device unreachable. Notification will be retried after #{deliver_after.strftime("%Y-%m-%d %H:%M:%S")}.")
+          retry_notification("Device unreachable.")
         end
 
         def service_unavailable(response)
           mark_retryable_exponential(@notification)
-          Rpush.logger.warn("...")
+          Rpush.logger.warn("Service Unavailable. " + retry_message)
+        end
+
+        def retry_message
+          "Notification #{@notification.id} will be retried after #{@notification.deliver_after.strftime("%Y-%m-%d %H:%M:%S")} (retry #{@notification.retries})."
+        end
+
+        def retry_notification(reason)
+          deliver_after = Time.now + (60*60)
+          mark_retryable(@notification, deliver_after)
+          Rpush.logger.warn("[#{@app.name}] #{reason} " + retry_message)
         end
 
         def do_post

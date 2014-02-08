@@ -8,7 +8,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   let(:logger) { double(:error => nil, :info => nil, :warn => nil) }
   let(:response) { double(:code => 200, :header => {}) }
   let(:http) { double(:shutdown => nil, :request => response) }
-  let(:now) { Time.now }
+  let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil) }
   let(:delivery) { Rpush::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(:create_wpns_notification => double(:id => 2)) }
@@ -58,11 +58,11 @@ describe Rpush::Daemon::Wpns::Delivery do
       perform
     end
 
-    it "marks the notification retryable if the notification is suppressed" do
+    it "marks the notification as failed if the notification is suppressed" do
       response.stub(:body => JSON.dump({ "faliure" => 0 }))
       response.stub(:to_hash => { "x-notificationstatus" => ["Suppressed"] })
-      batch.should_receive(:mark_delivered)
-      perform
+      delivery.should_receive(:mark_failed).with(200, "Notification was received but suppressed by the service.")
+      perform rescue Rpush::DeliveryError
     end
   end
 
@@ -108,8 +108,14 @@ describe Rpush::Daemon::Wpns::Delivery do
       perform
     end
 
-    it "logs a warning that the notification will be retried"
     it "does not retry a notification that first failed over 24 hours ago"
+
+    it "logs a warning that the notification will be retried" do
+      notification.retries = 1
+      notification.deliver_after = now + 2
+      logger.should_receive(:warn).with("[MyApp] Per-day throttling limit reached. Notification 1 will be retried after 2012-10-14 00:00:02 (retry 1).")
+      perform
+    end
   end
 
   describe "an 412 response" do
@@ -120,8 +126,14 @@ describe Rpush::Daemon::Wpns::Delivery do
       perform
     end
 
-    it "logs a warning that the notification will be retried"
-    it "does not retry a notification that first failed over 24 hours ago"
+    it "fails the message if not delivered after 24 hours"
+
+    it "logs a warning that the notification will be retried" do
+      notification.retries = 1
+      notification.deliver_after = now + 2
+      logger.should_receive(:warn).with("[MyApp] Device unreachable. Notification 1 will be retried after 2012-10-14 00:00:02 (retry 1).")
+      perform
+    end
   end
 
   describe "an 503 response" do
@@ -132,7 +144,12 @@ describe Rpush::Daemon::Wpns::Delivery do
       perform
     end
 
-    it 'logs a message'
+    it 'logs a warning that the notification will be retried.' do
+      notification.retries = 1
+      notification.deliver_after = now + 2
+      logger.should_receive(:warn).with("Service Unavailable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
+      perform
+    end
   end
 
   describe 'an un-handled response' do
