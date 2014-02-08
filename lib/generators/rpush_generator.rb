@@ -19,6 +19,7 @@ class RpushGenerator < Rails::Generators::Base
       add_rpush_migration('add_wpns')
       add_rpush_migration('add_adm')
       add_rpush_migration('rename_rapns_to_rpush')
+      add_rpush_migration('add_fail_after_to_rpush_notifications')
     else
       add_rpush_migration('add_rpush')
     end

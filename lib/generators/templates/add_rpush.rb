@@ -23,7 +23,8 @@ class AddRpush < ActiveRecord::Migration
   def self.migrations
     [CreateRapnsNotifications, CreateRapnsFeedback,
      AddAlertIsJsonToRapnsNotifications, AddAppToRapns,
-     CreateRapnsApps, AddGcm, AddWpns, AddAdm, RenameRapnsToRpush]
+     CreateRapnsApps, AddGcm, AddWpns, AddAdm, RenameRapnsToRpush,
+     AddFailAfterToRpushNotifications]
   end
 
   def self.up
@@ -333,6 +334,16 @@ class AddRpush < ActiveRecord::Migration
       rename_table :rpush_notifications, :rapns_notifications
       rename_table :rpush_apps, :rapns_apps
       rename_table :rpush_feedback, :rapns_feedback
+    end
+  end
+
+  class AddFailAfterToRpushNotifications < ActiveRecord::Migration
+    def self.up
+      add_column :rpush_notifications, :fail_after, :timestamp, :null => true
+    end
+
+    def self.down
+      remove_column :rpush_notifications, :fail_after
     end
   end
 end
