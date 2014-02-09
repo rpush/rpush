@@ -3,24 +3,27 @@
 [![Coverage Status](https://coveralls.io/repos/rpush/rpush/badge.png?branch=master)](https://coveralls.io/r/rpush/rpush?branch=master)
 [![Gem Version](https://badge.fury.io/rb/rpush.png)](http://badge.fury.io/rb/rpush)
 
-### Rpush - Professional grade APNs, GCM, ADM and WPNs for Ruby.
+===
 
-* Supports both APNs (iOS), GCM (Google Cloud Messaging, Android), ADM (Amazon Device Messaging) and WPNs (Windows Phone).
+<img src="https://raw.github.com/rpush/rpush/master/rpush.png" align="left" width="70px" style="margin-right: 10px" />
+
+<h1 style="margin: 0">Rpush</h1>
+## The push notification service for Ruby
+
+
+* Supports:
+  * **Apple Push Notification Service**
+  * **Google Cloud Messaging)**
+  * **Amazon Devide Messaging**
+  * **Windows Push Notification Service**.
 * Seamless Rails (3, 4) integration.
 * Scalable - choose the number of persistent connections for each app.
 * Designed for uptime - signal -HUP to add, update apps.
-* Stable - reconnects database and network connections when lost.
 * Run as a daemon or inside an [existing processs](https://github.com/rpush/rpush/wiki/Embedding-API).
 * Use in a scheduler for low-workload deployments ([Push API](https://github.com/rpush/rpush/wiki/Push-API)).
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
 * Works with MRI, JRuby, Rubinius 1.9, 2.0, 2.1.
-* Built with love.
 
-### Who uses Rpush?
-
-[GateGuru](http://gateguruapp.com) and [Desk.com](http://desk.com), among others!
-
-*I'd love to hear if you use Rpush - @ileitch on twitter.*
 
 ## Getting Started
 
