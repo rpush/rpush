@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
   s.homepage    = "https://github.com/rpush/rpush"
   s.summary     = %q{Professional grade APNs and GCM for Ruby}
   s.description = %q{Professional grade APNs and GCM for Ruby}
+  s.license    = "MIT"
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features,config}`.split("\n")
