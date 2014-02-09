@@ -21,7 +21,7 @@
 * Works with MRI, JRuby, Rubinius 1.9, 2.0, 2.1.
 
 
-## Getting Started
+### Getting Started
 
 Add Rpush to your Gemfile:
 
@@ -32,7 +32,7 @@ Generate the migrations, rpush.yml and migrate:
     rails g rpush
     rake db:migrate
 
-## Create an App & Notification
+### Create an App & Notification
 
 #### APNs
 
@@ -118,7 +118,7 @@ n.alert = "..."
 n.save!
 ```
 
-## Starting Rpush
+### Starting Rpush
 
 As a daemon:
 
@@ -142,17 +142,11 @@ Rpush.apns_feedback
 
 See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options, or run `rpush --help`.
 
-## Updating Rpush
+### Updating Rpush
 
 After updating you should run `rails g rpush` to check for any new migrations.
 
-## Rake task
-
-To clean up completed (*delivered* or *failed*) notifications:
-
-    bundle exec rake rpush:notifications:clean DAYS=<Number of days greater than 0>
-
-## Wiki
+### Wiki
 
 ### General
 * [Configuration](https://github.com/rpush/rpush/wiki/Configuration)
@@ -177,7 +171,7 @@ To clean up completed (*delivered* or *failed*) notifications:
 * [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
 * [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
 
-## Contributing
+### Contributing
 
 Fork as usual and go crazy!
 
