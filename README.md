@@ -5,11 +5,9 @@
 
 ===
 
-<img src="https://raw.github.com/rpush/rpush/master/rpush.png" align="left" width="70px" style="margin-right: 10px" />
+### Rpush. The push notification service for Ruby.
 
-<h1 style="margin: 0">Rpush</h1>
-<h2 style="margin: 0">The push notification service for Ruby</h2>
-
+<img src="https://raw.github.com/rpush/rpush/master/rpush.png" align="right" width="120px" />
 
 * Supports:
   * **Apple Push Notification Service**
