@@ -38,7 +38,7 @@ rake db:migrate
 
 ### Create an App & Notification
 
-#### APNs
+#### Apple Push Notification Service
 
 If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
@@ -63,7 +63,7 @@ n.save!
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
-#### GCM
+#### Google Cloud Messaging
 
 ```ruby
 app = Rpush::Gcm::App.new
@@ -83,7 +83,7 @@ n.save!
 
 GCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
 
-#### ADM
+#### Amazon Device Messaging
 
 ```ruby
 app = Rpush::Adm::App.new
@@ -105,7 +105,7 @@ n.save!
 
 For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 
-#### WPNS
+#### Windows Phone Notification Service
 
 ```ruby
 app = Rpush::Wpns::App.new
