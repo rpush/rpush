@@ -11,7 +11,7 @@ do
 done
 echo 'gem "rpush", path: "/rpush"' >> Gemfile
 bundle
-/etc/init.d mysql start
+/etc/init.d/mysql start
 mysqladmin create `echo $RAILS_NAME`_development
 rails g rpush
 rake db:migrate
@@ -28,5 +28,5 @@ n.data = {:message => "hi mom!"}
 n.save!
 EOF
 rails runner create_app.rb
-export RPUSH_GCM_HOST=`IP=$(/sbin/ip route | awk '/default/ { print $3 }')`
-rpush development
+export RPUSH_GCM_HOST=http://`/sbin/ip route | awk '/default/ { print $3 }'`
+rpush development -f

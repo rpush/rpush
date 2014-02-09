@@ -6,8 +6,8 @@ module Rpush
       class Delivery < Rpush::Daemon::Delivery
         include MultiJsonHelper
 
-        host = ENV["RPUSH_GCM_HOST"] || "android.googleapis.com"
-        GCM_URI = URI.parse("https://#{host}/gcm/send")
+        host = ENV["RPUSH_GCM_HOST"] || "https://android.googleapis.com"
+        GCM_URI = URI.parse("#{host}/gcm/send")
         UNAVAILABLE_STATES = ['Unavailable', 'InternalServerError']
         INVALID_REGISTRATION_ID_STATES = ['InvalidRegistration', 'MismatchSenderId', 'NotRegistered', 'InvalidPackageName']
 
