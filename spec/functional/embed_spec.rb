@@ -33,17 +33,15 @@ describe 'embedding' do
 
   it 'delivers a notification successfully' do
     expect do
-      ::ActiveRecord::Base.clear_all_connections!
-
-      pid = fork do
-        Rpush.embed
-        sleep 0.5
-        Rpush.shutdown
-        Kernel.at_exit { exit! } # Don't run any at_exit hooks.
+      Rpush.embed
+      Timeout.timeout(5) do
+        while !notification.delivered
+          notification.reload
+          sleep 0.1
+        end
       end
-
-      Process.waitpid(pid)
-      notification.reload
     end.to change(notification, :delivered).to(true)
   end
+
+  after { Rpush.shutdown }
 end
