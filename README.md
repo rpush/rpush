@@ -154,7 +154,7 @@ After updating you should run `rails g rpush` to check for any new migrations.
 
 ### General
 * [Configuration](https://github.com/rpush/rpush/wiki/Configuration)
-* [Upgrading from 2.x to 3.0](https://github.com/rpush/rpush/wiki/Upgrading-from-version-2.x-to-3.0)
+* [Moving from Rapns](https://github.com/rpush/rpush/wiki/Moving-from-Rapns-to-Rpush)
 * [Deploying to Heroku](https://github.com/rpush/rpush/wiki/Heroku)
 * [Hot App Updates](https://github.com/rpush/rpush/wiki/Hot-App-Updates)
 * [Signals](https://github.com/rpush/rpush/wiki/Signals)
@@ -162,15 +162,16 @@ After updating you should run `rails g rpush` to check for any new migrations.
 * [Push API](https://github.com/rpush/rpush/wiki/Push-API)
 * [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API)
 * [Implementing your own storage backend](https://github.com/rpush/rpush/wiki/Implementing-your-own-storage-backend)
+* [Upgrading from 2.x to 3.0](https://github.com/rpush/rpush/wiki/Upgrading-from-version-2.x-to-3.0)
 
-### APNs
+### Apple Push Notification Service
 * [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates)
 * [Advanced APNs Features](https://github.com/rpush/rpush/wiki/Advanced-APNs-Features)
 * [APNs Delivery Failure Handling](https://github.com/rpush/rpush/wiki/APNs-Delivery-Failure-Handling)
 * [Why open multiple connections to the APNs?](https://github.com/rpush/rpush/wiki/Why-open-multiple-connections-to-the-APNs%3F)
 * [Silent failures might be dropped connections](https://github.com/rpush/rpush/wiki/Dropped-connections)
 
-### GCM
+### Google Cloud Messaging
 * [Notification Options](https://github.com/rpush/rpush/wiki//GCM-Notification-Options)
 * [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
 * [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
