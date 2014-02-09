@@ -3,6 +3,7 @@ module Rpush
     class AppRunner
       extend Reflectable
       include Reflectable
+      include Loggable
 
       class << self
         attr_reader :runners
@@ -72,7 +73,7 @@ module Rpush
       def start
         app.connections.times { dispatchers.push(new_dispatcher_loop) }
         start_loops
-        Rpush.logger.info("[#{app.name}] Started, #{dispatchers_str}.")
+        log_info("Started, #{dispatchers_str}.")
       end
 
       def stop
@@ -94,10 +95,10 @@ module Rpush
         return if diff == 0
         if diff > 0
           decrement_dispatchers(diff)
-          Rpush.logger.info("[#{app.name}] Stopped #{dispatchers_str(diff)}. #{dispatchers_str} running.")
+          log_info("Stopped #{dispatchers_str(diff)}. #{dispatchers_str} running.")
         else
           increment_dispatchers(diff.abs)
-          Rpush.logger.info("[#{app.name}] Started #{dispatchers_str(diff)}. #{dispatchers_str} running.")
+          log_info("Started #{dispatchers_str(diff)}. #{dispatchers_str} running.")
         end
       end
 

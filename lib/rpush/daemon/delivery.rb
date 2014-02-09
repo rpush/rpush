@@ -2,6 +2,7 @@ module Rpush
   module Daemon
     class Delivery
       include Reflectable
+      include Loggable
 
       def mark_retryable(notification, deliver_after)
         if notification.fail_after && notification.fail_after < Time.now

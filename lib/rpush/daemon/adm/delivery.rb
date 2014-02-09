@@ -3,7 +3,7 @@ module Rpush
     module Adm
       # https://developer.amazon.com/sdk/adm/sending-message.html
       class Delivery < Rpush::Daemon::Delivery
-        include Rpush::MultiJsonHelper
+        include MultiJsonHelper
 
         # Oauth2.0 token endpoint. This endpoint is used to request authorization tokens.
         AMAZON_TOKEN_URI = URI.parse('https://api.amazon.com/auth/O2/token')
@@ -75,7 +75,7 @@ module Rpush
 
           if(response_body.has_key?('registrationID'))
             @sent_registration_ids << response_body['registrationID']
-            Rpush.logger.info("[#{@app.name}] #{@notification.id} sent to #{response_body['registrationID']}")
+            log_info("#{@notification.id} sent to #{response_body['registrationID']}")
           end
 
           if(current_registration_id != response_body['registrationID'])
@@ -92,7 +92,7 @@ module Rpush
             mark_retryable(@notification, Time.now) if @notification.app.access_token
           when 503
             retry_delivery(@notification, error.response)
-            Rpush.logger.warn("[#{@app.name}] ADM responded with an Service Unavailable Error. " + retry_message)
+            log_warn("ADM responded with an Service Unavailable Error. " + retry_message)
           end
         end
 
@@ -121,7 +121,7 @@ module Rpush
           response_body = multi_json_load(response.body)
 
           if(response_body.has_key?('reason'))
-            Rpush.logger.warn("[#{@app.name}] bad_request: #{current_registration_id} (#{response_body['reason']})")
+            log_warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
             @failed_registration_ids[current_registration_id] = response_body['reason']
           end
         end
@@ -138,7 +138,7 @@ module Rpush
 
         def internal_server_error(response, current_registration_id)
           @failed_registration_ids[current_registration_id] = "Internal Server Error"
-          Rpush.logger.warn("[#{@app.name}] internal_server_error: #{current_registration_id} (Internal Server Error)")
+          log_warn("internal_server_error: #{current_registration_id} (Internal Server Error)")
         end
 
         def service_unavailable(response)
@@ -206,9 +206,9 @@ module Rpush
           if(response.code.to_i == 200)
             update_access_token(JSON.parse(response.body))
             Rpush::Daemon.store.update_app(@notification.app)
-            Rpush.logger.info("ADM access token updated: token = #{@notification.app.access_token}, expires = #{@notification.app.access_token_expiration}")
+            log_info("ADM access token updated: token = #{@notification.app.access_token}, expires = #{@notification.app.access_token_expiration}")
           else
-            Rpush.logger.warn("Could not retrieve access token from ADM: #{response.body}")
+            log_warn("Could not retrieve access token from ADM: #{response.body}")
           end
         end
 

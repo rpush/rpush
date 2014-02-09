@@ -28,7 +28,7 @@ module Rpush
             @connection.write(@notification.to_binary)
             check_for_error if Rpush.config.check_for_errors
             mark_delivered
-            Rpush.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.device_token}")
+            log_info("#{@notification.id} sent to #{@notification.device_token}")
           rescue Rpush::DeliveryError, Rpush::Apns::DisconnectionError => error
             mark_failed(error.code, error.description)
             raise
@@ -51,7 +51,7 @@ module Rpush
             end
 
             begin
-              Rpush.logger.error("[#{@app.name}] Error received, reconnecting...")
+              log_error("Error received, reconnecting...")
               @connection.reconnect
             ensure
               raise error if error

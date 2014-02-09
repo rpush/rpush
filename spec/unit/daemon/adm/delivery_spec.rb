@@ -123,7 +123,7 @@ describe Rpush::Daemon::Adm::Delivery do
       store.should_not_receive(:update_app).with(notification.app)
       delivery.should_not_receive(:mark_retryable)
 
-      logger.should_receive(:warn).with("Could not retrieve access token from ADM: test")
+      logger.should_receive(:warn).with("[MyApp] Could not retrieve access token from ADM: test")
 
       perform
     end

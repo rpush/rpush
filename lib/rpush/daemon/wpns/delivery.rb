@@ -60,10 +60,10 @@ module Rpush
           case status[:notification]
           when ["Received"]
             mark_delivered
-            Rpush.logger.info "[#{@app.name}] #{@notification.id} sent successfully"
+            log_info("#{@notification.id} sent successfully")
           when ["QueueFull"]
             mark_retryable(@notification, Time.now + (60*10))
-            Rpush.logger.warn "[#{@app.name}] #{@notification.id} cannot be sent. The Queue is full."
+            log_warn("#{@notification.id} cannot be sent. The Queue is full.")
           when ["Suppressed"]
             handle_failure(200, "Notification was received but suppressed by the service.")
           end
@@ -79,7 +79,7 @@ module Rpush
 
         def service_unavailable(response)
           mark_retryable_exponential(@notification)
-          Rpush.logger.warn("Service Unavailable. " + retry_message)
+          log_warn("Service Unavailable. " + retry_message)
         end
 
         def retry_message
@@ -89,7 +89,7 @@ module Rpush
         def retry_notification(reason)
           deliver_after = Time.now + (60*60)
           mark_retryable(@notification, deliver_after)
-          Rpush.logger.warn("[#{@app.name}] #{reason} " + retry_message)
+          log_warn("#{reason} " + retry_message)
         end
 
         def do_post

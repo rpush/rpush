@@ -7,6 +7,7 @@ require 'net/http/persistent'
 
 require 'rpush/daemon/constants'
 require 'rpush/daemon/reflectable'
+require 'rpush/daemon/loggable'
 require 'rpush/daemon/interruptible_sleep'
 require 'rpush/daemon/delivery_error'
 require 'rpush/daemon/retryable_error'

@@ -4,7 +4,7 @@ module Rpush
 
       # http://developer.android.com/guide/google/gcm/gcm.html#response
       class Delivery < Rpush::Daemon::Delivery
-        include Rpush::MultiJsonHelper
+        include MultiJsonHelper
 
         GCM_URI = URI.parse('https://android.googleapis.com/gcm/send')
         UNAVAILABLE_STATES = ['Unavailable', 'InternalServerError']
@@ -54,7 +54,7 @@ module Rpush
             handle_failures(results.failures, response)
           else
             mark_delivered
-            Rpush.logger.info("[#{@app.name}] #{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
+            log_info("#{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
           end
         end
 
@@ -77,7 +77,7 @@ module Rpush
         def handle_failures(failures, response)
           if failures[:unavailable].count == @notification.registration_ids.count
             retry_delivery(@notification, response)
-            Rpush.logger.warn("All recipients unavailable. #{retry_message}")
+            log_warn("All recipients unavailable. #{retry_message}")
           else
             if failures[:unavailable].any?
               unavailable_idxs = failures[:unavailable].map { |result| result[:index] }
@@ -115,12 +115,12 @@ module Rpush
 
         def internal_server_error(response)
           retry_delivery(@notification, response)
-          Rpush.logger.warn("GCM responded with an Internal Error. " + retry_message)
+          log_warn("GCM responded with an Internal Error. " + retry_message)
         end
 
         def service_unavailable(response)
           retry_delivery(@notification, response)
-          Rpush.logger.warn("GCM responded with an Service Unavailable Error. " + retry_message)
+          log_warn("GCM responded with an Service Unavailable Error. " + retry_message)
         end
 
         def deliver_after_header(response)

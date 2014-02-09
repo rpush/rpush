@@ -4,6 +4,7 @@ module Rpush
 
     class TcpConnection
       include Reflectable
+      include Loggable
 
       attr_accessor :last_write
 
@@ -52,7 +53,7 @@ module Rpush
           retry_count += 1;
 
           if retry_count == 1
-            Rpush.logger.error("[#{@app.name}] Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
+            log_error("Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
             reflect(:apns_connection_lost, @app, e) # deprecated
             reflect(:tcp_connection_lost, @app, e)
           end
@@ -75,7 +76,7 @@ module Rpush
       protected
 
       def reconnect_idle
-        Rpush.logger.info("[#{@app.name}] Idle period exceeded, reconnecting...")
+        log_info("Idle period exceeded, reconnecting...")
         reconnect
       end
 
@@ -109,17 +110,17 @@ module Rpush
         ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
         ssl_socket.sync = true
         ssl_socket.connect
-        Rpush.logger.info("[#{@app.name}] Connected to #{@host}:#{@port}")
+        log_info("Connected to #{@host}:#{@port}")
         [tcp_socket, ssl_socket]
       end
 
       def check_certificate_expiration
         cert = @ssl_context.cert
         if certificate_expired?
-          Rpush.logger.error(certificate_msg('expired'))
+          log_error(certificate_msg('expired'))
           raise Rpush::Apns::CertificateExpiredError.new(@app, cert.not_after)
         elsif certificate_expires_soon?
-          Rpush.logger.warn(certificate_msg('will expire'))
+          log_warn(certificate_msg('will expire'))
           reflect(:apns_certificate_will_expire, @app, cert.not_after) # deprecated
           reflect(:ssl_certificate_will_expire, @app, cert.not_after)
         end
@@ -127,7 +128,7 @@ module Rpush
 
       def certificate_msg(msg)
         time = @ssl_context.cert.not_after.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
-        "[#{@app.name}] Certificate #{msg} at #{time}."
+        "Certificate #{msg} at #{time}."
       end
 
       def certificate_expired?

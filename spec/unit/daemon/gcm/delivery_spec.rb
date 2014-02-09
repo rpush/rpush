@@ -203,7 +203,7 @@ describe Rpush::Daemon::Gcm::Delivery do
       it 'logs that the notification will be retried' do
         notification.retries = 1
         notification.deliver_after = now + 2
-        Rpush.logger.should_receive(:warn).with("All recipients unavailable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
+        Rpush.logger.should_receive(:warn).with("[MyApp] All recipients unavailable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
         perform
       end
     end
@@ -241,7 +241,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     it 'logs a warning that the notification will be retried.' do
       notification.retries = 1
       notification.deliver_after = now + 2
-      logger.should_receive(:warn).with("GCM responded with an Service Unavailable Error. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
+      logger.should_receive(:warn).with("[MyApp] GCM responded with an Service Unavailable Error. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
       perform
     end
 
@@ -272,7 +272,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
       notification.deliver_after = now + 2 ** 3
-      Rpush.logger.should_receive(:warn).with("GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
+      Rpush.logger.should_receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
       perform
     end
 

@@ -3,6 +3,7 @@ module Rpush
     module Apns
       class FeedbackReceiver
         include Reflectable
+        include Loggable
 
         TUPLE_BYTES = 38
         HOSTS = {
@@ -51,7 +52,7 @@ module Rpush
               create_feedback(timestamp, device_token)
             end
           rescue StandardError => e
-            Rpush.logger.error(e)
+            log_error(e)
             reflect(:error, e)
           ensure
             connection.close if connection
@@ -67,7 +68,7 @@ module Rpush
 
         def create_feedback(failed_at, device_token)
           formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
-          Rpush.logger.info("[#{@app.name}] [FeedbackReceiver] Delivery failed at #{formatted_failed_at} for #{device_token}.")
+          log_info("[FeedbackReceiver] Delivery failed at #{formatted_failed_at} for #{device_token}.")
 
           feedback = Rpush::Daemon.store.create_apns_feedback(failed_at, device_token, @app)
           reflect(:apns_feedback, feedback)
