@@ -7,7 +7,7 @@
 
 ### Rpush. The push notification service for Ruby.
 
-<img src="https://raw.github.com/rpush/rpush/master/rpush.png" align="right" width="120px" />
+<img src="https://raw.github.com/rpush/rpush/master/rpush.png" align="right" width="200px" />
 
 * Supports:
   * **Apple Push Notification Service**
