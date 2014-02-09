@@ -25,12 +25,16 @@
 
 Add Rpush to your Gemfile:
 
-    gem 'rpush'
+```ruby
+gem 'rpush'
+```
 
 Generate the migrations, rpush.yml and migrate:
 
-    rails g rpush
-    rake db:migrate
+```
+rails g rpush
+rake db:migrate
+```
 
 ### Create an App & Notification
 
