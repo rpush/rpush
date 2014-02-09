@@ -31,7 +31,7 @@ gem 'rpush'
 
 Generate the migrations, rpush.yml and migrate:
 
-```ruby
+```
 rails g rpush
 rake db:migrate
 ```
