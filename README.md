@@ -23,7 +23,7 @@
 
 ### Getting Started
 
-Add Rpush to your Gemfile:
+Add it to your Gemfile:
 
 ```ruby
 gem 'rpush'
@@ -31,7 +31,7 @@ gem 'rpush'
 
 Generate the migrations, rpush.yml and migrate:
 
-```
+```ruby
 rails g rpush
 rake db:migrate
 ```
