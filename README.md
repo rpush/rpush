@@ -3,8 +3,6 @@
 [![Coverage Status](https://coveralls.io/repos/rpush/rpush/badge.png?branch=master)](https://coveralls.io/r/rpush/rpush?branch=master)
 [![Gem Version](https://badge.fury.io/rb/rpush.png)](http://badge.fury.io/rb/rpush)
 
-===
-
 <img src="https://raw.github.com/rpush/rpush/master/rpush.png" align="right" width="200px" />
 
 ### Rpush. The push notification service for Ruby.
