@@ -19,7 +19,6 @@ describe Rpush::Daemon::Feeder do
     Rpush::Daemon::Feeder.stub(:stop? => true)
     Rpush::Daemon::AppRunner.stub(:enqueue => nil, :idle => [double(:app => app)])
     Rpush::Daemon::InterruptibleSleep.stub(:new => interruptible_sleep)
-    Rpush::Daemon::Feeder.instance_variable_set('@interruptible_sleeper', nil)
   end
 
   def start_and_stop

@@ -111,7 +111,7 @@ describe Rpush::Daemon::Wpns::Delivery do
     it "logs a warning that the notification will be retried" do
       notification.retries = 1
       notification.deliver_after = now + 2
-      logger.should_receive(:warn).with("[MyApp] Per-day throttling limit reached. Notification 1 will be retried after 2012-10-14 00:00:02 (retry 1).")
+      logger.should_receive(:warn).with("[MyApp] Per-day throttling limit reached. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
       perform
     end
   end
@@ -127,7 +127,7 @@ describe Rpush::Daemon::Wpns::Delivery do
     it "logs a warning that the notification will be retried" do
       notification.retries = 1
       notification.deliver_after = now + 2
-      logger.should_receive(:warn).with("[MyApp] Device unreachable. Notification 1 will be retried after 2012-10-14 00:00:02 (retry 1).")
+      logger.should_receive(:warn).with("[MyApp] Device unreachable. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
       perform
     end
   end

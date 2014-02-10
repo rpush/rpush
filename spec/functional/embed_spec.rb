@@ -34,14 +34,20 @@ describe 'embedding' do
   it 'delivers a notification successfully' do
     expect do
       Rpush.embed
-      Timeout.timeout(5) do
-        while !notification.delivered
-          notification.reload
-          sleep 0.1
+
+      begin
+        Timeout.timeout(5) do
+          while !notification.delivered
+            notification.reload
+            sleep 0.1
+          end
         end
+      rescue Timeout::Error
+        Rpush.shutdown
+        raise
       end
+
+      Rpush.shutdown
     end.to change(notification, :delivered).to(true)
   end
-
-  after { Rpush.shutdown }
 end

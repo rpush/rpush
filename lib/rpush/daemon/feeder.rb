@@ -7,7 +7,7 @@ module Rpush
         @stop = false
 
         if Rpush.config.embedded
-          Thread.new { feed_forever }
+          @thread = Thread.new { feed_forever }
         elsif Rpush.config.push
           enqueue_notifications
         else
@@ -18,6 +18,8 @@ module Rpush
       def self.stop
         @stop = true
         interrupt_sleep
+        @thread.join if @thread
+        @interruptible_sleeper = nil
       end
 
       def self.interrupt_sleep

@@ -79,6 +79,7 @@ module Rpush
       def stop
         dispatchers.stop
         stop_loops
+        self.batch = nil
       end
 
       def enqueue(batch)
