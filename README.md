@@ -9,7 +9,7 @@
 
 * Supports:
   * **Apple Push Notification Service**
-  * **Google Cloud Messaging)**
+  * **Google Cloud Messaging**
   * **Amazon Devide Messaging**
   * **Windows Push Notification Service**.
 * Seamless Rails (3, 4) integration.
