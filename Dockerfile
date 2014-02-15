@@ -18,4 +18,4 @@ ENV PATH /usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/s
 
 RUN /bin/bash -l -c 'rvm install 2.0.0'
 RUN /bin/bash -l -c 'rvm use 2.0.0 --default'
-RUN /bin/bash -l -c 'gem install --no-ri --no-rdoc bundler rails mysql2 rake rdoc'
+RUN /bin/bash -l -c 'gem install --no-ri --no-rdoc bundler rails mysql2 rake rdoc minitest'

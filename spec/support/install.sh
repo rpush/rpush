@@ -26,7 +26,28 @@ n.app = app
 n.registration_ids = ["abc"]
 n.data = {:message => "hi mom!"}
 n.save!
+puts n.id
 EOF
-rails runner create_app.rb
+export NOTIFICATION_ID=`rails runner create_app.rb`
 export RPUSH_GCM_HOST=http://`/sbin/ip route | awk '/default/ { print $3 }'`
-rpush development -f
+rpush development
+cat > check_notification_status.rb <<EOF
+n = Rpush::Gcm::Notification.find(ENV["NOTIFICATION_ID"])
+
+while true do
+  if n.failed
+    puts "FAILED"
+    break
+  elsif n.delivered
+    puts "DELIVERED"
+    break
+  else
+    STDOUT.write(".")
+    STDOUT.flush
+  end
+
+  sleep 0.2
+  n.reload
+end
+EOF
+rails runner check_notification_status.rb
