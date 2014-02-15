@@ -7,7 +7,7 @@ rails new $RAILS_NAME -BJTS -d mysql
 cd $RAILS_NAME
 for gem in sdoc coffee-rails uglifier sass-rails jquery-rails jbuilder turbolinks
 do
-  sed -i.bak -e "s/^[\s]*gem '$gem'/\# gem '$gem'/g" Gemfile
+  sed -i.bak -e "s/^[ \t]*gem '$gem'/\# gem '$gem'/g" Gemfile
 done
 echo 'gem "rpush", path: "/rpush"' >> Gemfile
 bundle
