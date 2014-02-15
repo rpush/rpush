@@ -1,5 +1,5 @@
+set -e
 cp -R /mnt/rpush /rpush
-gem install --no-ri --no-rdoc rails
 cd /tmp
 export HOME=/
 export RAILS_NAME=rpush_`date +"%Y%m%d%H%M%S"`
