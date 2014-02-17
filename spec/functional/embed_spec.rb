@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'functional_spec_helper'
 
 describe 'embedding' do
   let(:app) { Rpush::Apns::App.new }

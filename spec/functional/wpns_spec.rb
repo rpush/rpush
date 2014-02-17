@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'functional_spec_helper'
 
 describe 'GCM' do
   let(:app) { Rpush::Wpns::App.new }
