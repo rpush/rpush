@@ -1,13 +1,6 @@
 status: 200 OK
 version: HTTP/1.1
-content-length: 78
-content-type: application/json; charset=UTF-8
+content-length: 35
+content-type: application/json
 
-
-{
-    "results": [
-        {
-            "message_id": "123"
-        }
-    ]
-}
+{"results":[{"message_id": "123"}]}
