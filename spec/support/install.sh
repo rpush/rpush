@@ -50,4 +50,5 @@ while true do
   n.reload
 end
 EOF
+nc -l 80 < /rpush/spec/integration/support/gcm_success_response.json
 rails runner check_notification_status.rb
