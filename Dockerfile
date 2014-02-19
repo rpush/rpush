@@ -27,3 +27,7 @@ RUN /bin/bash -l -c 'rvm use 2.0.0 --default'
 
 # Clean up APT.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN mkdir /etc/service/mysql
+ADD mysql.sh /etc/service/mysql/run
+RUN chmod 755 /etc/service/mysql/run

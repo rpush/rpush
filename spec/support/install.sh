@@ -12,7 +12,6 @@ do
 done
 echo 'gem "rpush", path: "/rpush"' >> Gemfile
 bundle
-/etc/init.d/mysql start
 mysqladmin create `echo $RAILS_NAME`_development
 rails g rpush
 rake db:migrate
