@@ -1,4 +1,4 @@
-require "unit_spec_helper"
+require 'spec_helper'
 
 describe Rpush::RetryableError do
   let(:response) { double(:code => 401, :header => { 'retry-after' => 3600 }) }

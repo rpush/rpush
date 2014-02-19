@@ -1,4 +1,4 @@
-require 'functional_spec_helper'
+require 'spec_helper'
 
 describe 'ADM' do
   let(:app) { Rpush::Adm::App.new }

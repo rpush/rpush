@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 
 describe Rpush, 'apns_feedback' do
   let!(:app) { Rpush::Apns::App.create!(:name => 'test', :environment => 'production', :certificate => TEST_CERT) }

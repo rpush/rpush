@@ -1,4 +1,4 @@
-require 'functional_spec_helper'
+require 'spec_helper'
 
 describe 'APNs' do
   let(:app) { Rpush::Apns::App.new }

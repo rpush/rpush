@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 
 describe Rpush::App do
   it 'does not validate an app with an invalid certificate' do

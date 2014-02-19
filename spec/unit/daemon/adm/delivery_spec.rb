@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 
 describe Rpush::Daemon::Adm::Delivery do
   let(:app) { Rpush::Adm::App.new(:name => 'MyApp', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }

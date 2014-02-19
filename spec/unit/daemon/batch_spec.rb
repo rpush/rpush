@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 
 describe Rpush::Daemon::Batch do
   let(:notification1) { double(:notification1, :id => 1) }

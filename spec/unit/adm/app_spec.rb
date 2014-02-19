@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 
 describe Rpush::Adm::App do
   subject { Rpush::Adm::App.new(:name => 'test', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }

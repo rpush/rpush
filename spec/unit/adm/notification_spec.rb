@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 require 'unit/notification_shared.rb'
 
 describe Rpush::Adm::Notification do

@@ -1,4 +1,4 @@
-require "unit_spec_helper"
+require 'spec_helper'
 
 describe Rpush::Daemon::TcpConnection do
   let(:rsa_key) { double }

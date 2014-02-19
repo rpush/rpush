@@ -1,4 +1,4 @@
-require 'unit_spec_helper'
+require 'spec_helper'
 
 describe Rpush::Daemon::DispatcherLoopCollection do
   let(:dispatcher_loop) { double.as_null_object }

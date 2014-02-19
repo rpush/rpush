@@ -1,4 +1,4 @@
-require "unit_spec_helper"
+require 'spec_helper'
 
 describe Rpush::DeliveryError do
   let(:error) { Rpush::DeliveryError.new(4, 12, "Missing payload") }

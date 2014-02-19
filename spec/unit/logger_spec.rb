@@ -1,4 +1,4 @@
-require "unit_spec_helper"
+require 'spec_helper'
 
 module Rails
   def self.logger
