@@ -172,7 +172,7 @@ After updating you should run `rails g rpush` to check for any new migrations.
 * [Silent failures might be dropped connections](https://github.com/rpush/rpush/wiki/Dropped-connections)
 
 ### Google Cloud Messaging
-* [Notification Options](https://github.com/rpush/rpush/wiki//GCM-Notification-Options)
+* [Notification Options](https://github.com/rpush/rpush/wiki/GCM-Notification-Options)
 * [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
 * [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
 
