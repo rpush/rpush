@@ -44,11 +44,13 @@ require 'generators/templates/add_rpush'
 
 migrations = [AddRpush]
 
-migrations.reverse.each do |m|
-  begin
-    m.down
-  rescue ActiveRecord::StatementInvalid => e
-    p e
+unless ENV['TRAVIS']
+  migrations.reverse.each do |m|
+    begin
+      m.down
+    rescue ActiveRecord::StatementInvalid => e
+      p e
+    end
   end
 end
 
