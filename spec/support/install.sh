@@ -1,4 +1,4 @@
-set -e
+set -ev
 cp -R /mnt/rpush /rpush
 cd /tmp
 export HOME=/
