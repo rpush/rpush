@@ -1,6 +1,6 @@
 before_script: "psql -c 'create database rpush_test;' -U postgres >/dev/null"
 language: ruby
-install: bundle install --no-prune --no-cache --jobs=4
+install: bundle install --local --deployment --no-prune --no-cache --jobs=4
 rvm:
   - 1.9.3
   - 2.0.0
