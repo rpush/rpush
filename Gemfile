@@ -4,12 +4,12 @@ gem 'rake'
 gem 'rspec', '>= 2.14.1'
 gem 'rails', '~> 3.2'
 gem 'database_cleaner'
-gem 'simplecov'
 gem 'timecop'
 
 platform :mri do
   gem 'cane'
   gem 'coveralls', :require => false
+  gem 'simplecov'
 end
 
 platform :ruby do
