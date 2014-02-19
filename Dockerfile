@@ -1,3 +1,5 @@
+# sudo docker run -i -t -v /home/vagrant/rpush:/mnt/rpush:ro rpush:latest bash -l
+
 FROM phusion/baseimage:0.9.6
 MAINTAINER Ian Leitch
 
@@ -21,10 +23,7 @@ ENV PATH /usr/local/rvm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/s
 
 RUN /bin/bash -l -c 'rvm install 2.0.0'
 RUN /bin/bash -l -c 'rvm use 2.0.0 --default'
-
-ADD gems/ /root/gems/
-
-RUN /bin/bash -l -c 'gem install --no-ri --no-rdoc --local --force /root/gems/*.gem'
+# RUN /bin/bash -l -c 'gem install --no-ri --no-rdoc bundler rails mysql2 rake rdoc minitest'
 
 # Clean up APT.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

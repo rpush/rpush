@@ -3,6 +3,7 @@ cp -R /mnt/rpush /rpush
 cd /tmp
 export HOME=/
 export RAILS_NAME=rpush_`date +"%Y%m%d%H%M%S"`
+gem install --no-ri --no-rdoc rails bundler
 rails new $RAILS_NAME -BJTS -d mysql
 cd $RAILS_NAME
 for gem in sdoc coffee-rails uglifier sass-rails jquery-rails jbuilder turbolinks
