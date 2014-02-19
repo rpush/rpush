@@ -53,6 +53,9 @@ matrix:
     - rvm: 2.0.0
       gemfile: Gemfile.rails-4.1
       env: QUALITY=true
+    - rvm: 2.1.0
+      gemfile: Gemfile.rails-4.1
+      env: QUALITY=true
     - rvm: jruby
       gemfile: Gemfile.rails-4.1
       env: QUALITY=true
