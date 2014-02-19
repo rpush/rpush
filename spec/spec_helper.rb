@@ -5,13 +5,15 @@ Bundler.require(:default)
 
 require 'active_record'
 
-unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
-  begin
-    require './spec/support/simplecov_helper'
-    include SimpleCovHelper
-    start_simple_cov("unit-#{RUBY_VERSION}")
-  rescue LoadError
-    puts "Coverage disabled."
+unless ENV['TRAVIS']
+  unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
+    begin
+      require './spec/support/simplecov_helper'
+      include SimpleCovHelper
+      start_simple_cov("unit-#{RUBY_VERSION}")
+    rescue LoadError
+      puts "Coverage disabled."
+    end
   end
 end
 
