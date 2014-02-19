@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 
 describe Rpush::Daemon::DispatcherLoop do
   def run_dispatcher_loop

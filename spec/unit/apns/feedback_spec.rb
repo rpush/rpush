@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "unit_spec_helper"
 
 describe Rpush::Apns::Feedback do
   it "should validate the format of the device_token" do

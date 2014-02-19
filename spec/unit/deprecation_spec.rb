@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 
 describe Rpush::Deprecation do
   it 'prints a warning' do

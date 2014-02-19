@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "unit_spec_helper"
 
 describe Rpush::Daemon::Feeder do
   let(:config) { double(:batch_size => 5000,

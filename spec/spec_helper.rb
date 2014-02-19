@@ -78,70 +78,17 @@ path = File.join(File.dirname(__FILE__), 'support')
 TEST_CERT = File.read(File.join(path, 'cert_without_password.pem'))
 TEST_CERT_WITH_PASSWORD = File.read(File.join(path, 'cert_with_password.pem'))
 
-def is_unit_example?(example)
-  path = example.metadata[:example_group][:file_path]
-  path =~ /spec\/unit/
-end
-
-require 'rails'
-
-def rails4?
-  ::Rails::VERSION::STRING >= '4'
-end
-
-require 'database_cleaner'
-DatabaseCleaner.strategy = :truncation
-
-def is_functional_example?(example)
-  path = example.metadata[:example_group][:file_path]
-  path =~ /spec\/functional/
-end
-
-def before_example
-  if is_unit_example?(example)
-    connection = ActiveRecord::Base.connection
-
-    if rails4?
-      connection.begin_transaction joinable: false
-    else
-      connection.increment_open_transactions
-      connection.transaction_joinable = false
-      connection.begin_db_transaction
-    end
-  end
-end
-
-def after_example
+def after_example_cleanup
   Rpush.logger = nil
   Rpush::Daemon.store = nil
   Rpush::Deprecation.muted do
     Rpush.config.set_defaults if Rpush.config.kind_of?(Rpush::Configuration)
   end
-
-  if is_unit_example?(example)
-    connection = ActiveRecord::Base.connection
-
-    if rails4?
-      connection.rollback_transaction if connection.transaction_open?
-    else
-      if connection.open_transactions != 0
-        connection.rollback_db_transaction
-        connection.decrement_open_transactions
-      end
-    end
-  end
-
-  if is_functional_example?(example)
-    DatabaseCleaner.clean
-  end
 end
 
 RSpec.configure do |config|
-  config.before(:each) do
-    before_example
-  end
-
   config.after(:each) do
-    after_example
+    after_example_cleanup
   end
 end
+

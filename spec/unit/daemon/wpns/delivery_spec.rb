@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 
 describe Rpush::Daemon::Wpns::Delivery do
   let(:app) { Rpush::Wpns::App.new(:name => "MyApp") }

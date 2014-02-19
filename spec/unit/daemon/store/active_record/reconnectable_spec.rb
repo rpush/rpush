@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record/reconnectable'
 
 describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do

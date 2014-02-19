@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "unit_spec_helper"
 
 describe Rpush::TooManyRequestsError do
   let(:response) { double(:code => 429, :header => { 'retry-after' => 3600 }) }

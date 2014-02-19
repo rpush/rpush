@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record'
 
 describe Rpush::Daemon::Store::ActiveRecord do

@@ -7,4 +7,3 @@ spec/acceptance/fixtures
 gcm_test/bin
 .DS_Store
 spec/tmp/
-.vagrant/

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 
 describe Rpush::Apns::CertificateExpiredError do
   let(:app) { double(:name => 'test') }

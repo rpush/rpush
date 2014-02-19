@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'functional_spec_helper'
 
 describe 'GCM' do
   let(:app) { Rpush::Gcm::App.new }

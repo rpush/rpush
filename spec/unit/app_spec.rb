@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 
 describe Rpush::App do
   it 'validates the uniqueness of name within type and environment' do

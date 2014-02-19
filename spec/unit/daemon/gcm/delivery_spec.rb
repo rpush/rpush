@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'unit_spec_helper'
 
 describe Rpush::Daemon::Gcm::Delivery do
   let(:app) { Rpush::Gcm::App.new(:name => 'MyApp', :auth_key => 'abc123') }

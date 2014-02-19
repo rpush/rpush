@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "unit_spec_helper"
 
 describe Rpush::Notification do
   let(:notification) { Rpush::Notification.new }
