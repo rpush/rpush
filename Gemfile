@@ -9,7 +9,7 @@ gem 'timecop'
 platform :mri do
   gem 'cane'
   gem 'coveralls', :require => false
-  gem 'simplecov'
+  gem 'simplecov', :require => false
 end
 
 platform :ruby do
