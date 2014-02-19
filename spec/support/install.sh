@@ -29,7 +29,7 @@ n.save!
 puts n.id
 EOF
 export NOTIFICATION_ID=`rails runner create_app.rb`
-export RPUSH_GCM_HOST=http://`/sbin/ip route | awk '/default/ { print $3 }'`
+export RPUSH_GCM_HOST='http://localhost'
 rpush development
 cat > check_notification_status.rb <<EOF
 n = Rpush::Gcm::Notification.find(ENV["NOTIFICATION_ID"])
