@@ -10,6 +10,7 @@ rvm:
 gemfile:
   - Gemfile
   - Gemfile.rails-4.0
+  - Gemfile.rails-4.1
 env: QUALITY=true
 
 matrix:
@@ -23,6 +24,9 @@ matrix:
       env: QUALITY=false
     - rvm: 2.1.0
       gemfile: Gemfile.rails-4.0
+      env: QUALITY=false
+    - rvm: 2.1.0
+      gemfile: Gemfile.rails-4.1
       env: QUALITY=false
     - rvm: 2.0.0
       gemfile: Gemfile
@@ -42,6 +46,18 @@ matrix:
       env: QUALITY=true
     - rvm: rbx
       gemfile: Gemfile.rails-4.0
+      env: QUALITY=true
+    - rvm: 1.9.3
+      gemfile: Gemfile.rails-4.1
+      env: QUALITY=true
+    - rvm: 2.0.0
+      gemfile: Gemfile.rails-4.1
+      env: QUALITY=true
+    - rvm: jruby
+      gemfile: Gemfile.rails-4.1
+      env: QUALITY=true
+    - rvm: rbx
+      gemfile: Gemfile.rails-4.1
       env: QUALITY=true
   allow_failures:
     - rvm: rbx
