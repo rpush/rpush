@@ -10,7 +10,7 @@
 * Supports:
   * **Apple Push Notification Service**
   * **Google Cloud Messaging**
-  * **Amazon Devide Messaging**
+  * **Amazon Device Messaging**
   * **Windows Phone Push Notification Service**.
 * Seamless Rails (3, 4) integration.
 * Scalable - choose the number of persistent connections for each app.
