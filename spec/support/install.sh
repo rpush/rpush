@@ -3,6 +3,7 @@ cp -R /mnt/rpush /rpush
 cd /tmp
 export HOME=/
 export RAILS_NAME=rpush_`date +"%Y%m%d%H%M%S"`
+mysqladmin create `echo $RAILS_NAME`_development
 gem install --no-ri --no-rdoc rails bundler
 rails new $RAILS_NAME -BJTS -d mysql
 cd $RAILS_NAME
@@ -10,9 +11,9 @@ for gem in sdoc coffee-rails uglifier sass-rails jquery-rails jbuilder turbolink
 do
   sed -i.bak -e "s/^[ \t]*gem '$gem'/\# gem '$gem'/g" Gemfile
 done
+
 echo 'gem "rpush", path: "/rpush"' >> Gemfile
 bundle
-mysqladmin create `echo $RAILS_NAME`_development
 rails g rpush
 rake db:migrate
 
@@ -25,7 +26,7 @@ server.mount_proc '/' do |req, res|
 end
 server.start
 EOF
-rails runner gcm_server.rb
+rails runner gcm_server.rb &
 
 cat > create_app.rb <<EOF
 app = Rpush::Gcm::App.new
