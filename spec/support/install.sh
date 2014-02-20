@@ -15,6 +15,18 @@ bundle
 mysqladmin create `echo $RAILS_NAME`_development
 rails g rpush
 rake db:migrate
+
+cat > gcm_server.rb <<EOF
+require 'webrick'
+server = WEBrick::HTTPServer.new(:Port => 80)
+server.mount_proc '/' do |req, res|
+  res["Content-Type"] = 'application/json'
+  res.body = File.read('/rpush/spec/integration/support/gcm_success_response.json')
+end
+server.start
+EOF
+rails runner gcm_server.rb
+
 cat > create_app.rb <<EOF
 app = Rpush::Gcm::App.new
 app.name = "android_app"
@@ -28,9 +40,11 @@ n.data = {:message => "hi mom!"}
 n.save!
 puts n.id
 EOF
+
 export NOTIFICATION_ID=`rails runner create_app.rb`
 export RPUSH_GCM_HOST='http://localhost'
 rpush development
+
 cat > check_notification_status.rb <<EOF
 n = Rpush::Gcm::Notification.find(ENV["NOTIFICATION_ID"])
 
@@ -50,5 +64,4 @@ while true do
   n.reload
 end
 EOF
-nc -l 80 < /rpush/spec/integration/support/gcm_success_response.json &
 rails runner check_notification_status.rb
