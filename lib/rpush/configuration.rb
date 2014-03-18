@@ -9,7 +9,7 @@ module Rpush
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
     :check_for_errors, :pid_file, :batch_size, :push, :store, :logger,
-    :batch_storage_updates, :wakeup]
+    :batch_storage_updates, :wakeup, :log_dir]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end
@@ -66,6 +66,7 @@ module Rpush
       self.store = :active_record
       self.logger = nil
       self.batch_storage_updates = true
+      self.log_dir = Rails.root
 
       # Internal options.
       self.embedded = false

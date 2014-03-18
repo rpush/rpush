@@ -53,7 +53,7 @@ module Rpush
   end
 
   def self.logger
-    @logger ||= Logger.new(:foreground => Rpush.config.foreground)
+    @logger ||= Logger.new
   end
 
   def self.logger=(logger)

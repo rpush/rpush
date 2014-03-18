@@ -17,7 +17,6 @@ describe Rpush::Daemon, "when starting" do
     Rpush::Daemon::AppRunner.stub(:sync => nil, :stop => nil)
     Rpush::Daemon.stub(:daemonize => nil, :exit => nil, :puts => nil)
     File.stub(:open)
-    Rails.stub(:root).and_return("/rails_root")
   end
 
   unless Rpush.jruby?

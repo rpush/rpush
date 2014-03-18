@@ -61,11 +61,6 @@ migrations.each(&:up)
 require 'rpush'
 require 'rpush/daemon'
 
-Rpush::Daemon.initialize_store
-Rpush::Notification.reset_column_information
-Rpush::App.reset_column_information
-Rpush::Apns::Feedback.reset_column_information
-
 # a test certificate that contains both an X509 certificate and
 # a private key, similar to those used for connecting to Apple
 # push notification servers.
@@ -89,6 +84,17 @@ def after_example_cleanup
 end
 
 RSpec.configure do |config|
+  config.before(:suite) do
+    Rpush::Notification.reset_column_information
+    Rpush::App.reset_column_information
+    Rpush::Apns::Feedback.reset_column_information
+  end
+
+  config.before(:each) do
+    Rails.stub(root: '/tmp/rails_root')
+    # Rpush::Daemon.initialize_store
+  end
+
   config.after(:each) do
     after_example_cleanup
   end

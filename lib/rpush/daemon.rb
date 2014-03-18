@@ -24,6 +24,8 @@ require 'rpush/daemon/dispatcher/tcp'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 
+require 'rpush/daemon/store/interface'
+
 require 'rpush/daemon/apns/delivery'
 require 'rpush/daemon/apns/disconnection_error'
 require 'rpush/daemon/apns/certificate_expired_error'

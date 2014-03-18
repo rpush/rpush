@@ -26,9 +26,8 @@ describe Rpush::Configuration do
   end
 
   it 'sets the pid_file relative if not absolute' do
-    Rails.stub(:root => '/rails')
     config.pid_file = 'tmp/rpush.pid'
-    config.pid_file.should eq '/rails/tmp/rpush.pid'
+    config.pid_file.should eq '/tmp/rails_root/tmp/rpush.pid'
   end
 
   it 'does not alter an absolute pid_file path' do

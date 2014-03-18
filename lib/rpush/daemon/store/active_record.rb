@@ -152,3 +152,6 @@ module Rpush
     end
   end
 end
+
+
+Rpush::Daemon::Store::Interface.check(Rpush::Daemon::Store::ActiveRecord)
