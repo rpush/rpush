@@ -2,7 +2,6 @@ require 'thread'
 require 'socket'
 require 'pathname'
 require 'openssl'
-
 require 'net/http/persistent'
 
 require 'rpush/daemon/constants'

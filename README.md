@@ -57,7 +57,7 @@ n = Rpush::Apns::Notification.new
 n.app = Rpush::Apns::App.find_by_name("ios_app")
 n.device_token = "..."
 n.alert = "hi mom!"
-n.attributes_for_device = {:foo => :bar}
+n.data = {:foo => :bar}
 n.save!
 ```
 

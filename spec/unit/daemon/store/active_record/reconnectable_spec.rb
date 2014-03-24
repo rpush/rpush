@@ -85,7 +85,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
 
   context "when the reconnection attempt is not successful" do
     before do
-      class << Rpush::Notification
+      class << Rpush::Client::ActiveRecord::Notification
         def count
           @count_calls += 1
           return if @count_calls == 2

@@ -2,8 +2,8 @@ require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record'
 
 describe Rpush::Daemon::Store::ActiveRecord do
-  let(:app) { Rpush::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
-  let(:notification) { Rpush::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
+  let(:app) { Rpush::Client::ActiveRecord::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
   let(:store) { Rpush::Daemon::Store::ActiveRecord.new }
   let(:time) { Time.now.utc }
   let(:logger) { double(Rpush::Logger, error: nil) }
@@ -281,7 +281,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      Rpush::Apns::Feedback.should_receive(:create!).with(
+      Rpush::Client::ActiveRecord::Apns::Feedback.should_receive(:create!).with(
         :failed_at => time, :device_token => 'ab' * 32, :app => app)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end

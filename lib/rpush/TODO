@@ -1,3 +1,0 @@
-* Should internal errors mark a notification as failed?
-* Check cert expiry when connected.
-* Lazy connect on socket write? - would allow to catch initial expiry error and mark on notification.

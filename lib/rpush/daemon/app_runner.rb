@@ -23,7 +23,7 @@ module Rpush
       end
 
       def self.sync
-        apps = Rpush::App.all
+        apps = Rpush::Daemon.store.all_apps
         apps.each { |app| sync_app(app) }
         removed = runners.keys - apps.map(&:id)
         removed.each { |app_id| runners.delete(app_id).stop }

@@ -22,6 +22,7 @@ jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 $adapter = ENV['ADAPTER'] || 'postgresql'
 $adapter = 'jdbc' + $adapter if jruby
 
+require 'yaml'
 DATABASE_CONFIG = YAML.load_file(File.expand_path("../config/database.yml", File.dirname(__FILE__)))
 
 if DATABASE_CONFIG[$adapter].nil?
@@ -61,6 +62,29 @@ migrations.each(&:up)
 require 'rpush'
 require 'rpush/daemon'
 
+# TEMPORARY
+require 'rpush/client/active_record'
+
+module Rpush
+  include Rpush::Client::ActiveRecord
+
+  module Apns
+    include Rpush::Client::ActiveRecord::Apns
+  end
+
+  module Gcm
+    include Rpush::Client::ActiveRecord::Gcm
+  end
+
+  module Wpns
+    include Rpush::Client::ActiveRecord::Wpns
+  end
+
+  module Adm
+    include Rpush::Client::ActiveRecord::Adm
+  end
+end
+
 # a test certificate that contains both an X509 certificate and
 # a private key, similar to those used for connecting to Apple
 # push notification servers.
@@ -85,14 +109,13 @@ end
 
 RSpec.configure do |config|
   config.before(:suite) do
-    Rpush::Notification.reset_column_information
-    Rpush::App.reset_column_information
-    Rpush::Apns::Feedback.reset_column_information
+    Rpush::Client::ActiveRecord::Notification.reset_column_information
+    Rpush::Client::ActiveRecord::App.reset_column_information
+    Rpush::Client::ActiveRecord::Apns::Feedback.reset_column_information
   end
 
   config.before(:each) do
     Rails.stub(root: '/tmp/rails_root')
-    # Rpush::Daemon.initialize_store
   end
 
   config.after(:each) do

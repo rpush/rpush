@@ -81,22 +81,18 @@ describe Rpush::Daemon::AppRunner, 'sync' do
   let(:runner) { double(:sync => nil, :stop => nil, :start => nil) }
   let(:logger) { double(Rpush::Logger, :error => nil, :warn => nil) }
   let(:queue) { Queue.new }
+  let(:store) { double(all_apps: [app]) }
 
   before do
     app.stub(:id => 1)
     new_app.stub(:id => 2)
     Queue.stub(:new => queue)
     Rpush::Daemon::AppRunner.runners[app.id] = runner
-    Rpush::App.stub(:all => [app])
     Rpush.stub(:logger => logger)
+    Rpush::Daemon.stub(store: store)
   end
 
   after { Rpush::Daemon::AppRunner.runners.clear }
-
-  it 'loads all apps' do
-    Rpush::App.should_receive(:all)
-    Rpush::Daemon::AppRunner.sync
-  end
 
   it 'instructs existing runners to sync' do
     runner.should_receive(:sync).with(app)
@@ -104,7 +100,7 @@ describe Rpush::Daemon::AppRunner, 'sync' do
   end
 
   it 'starts a runner for a new app' do
-    Rpush::App.stub(:all => [app, new_app])
+    store.stub(all_apps: [app, new_app])
     new_runner = double
     Rpush::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.should_receive(:start)
@@ -112,13 +108,13 @@ describe Rpush::Daemon::AppRunner, 'sync' do
   end
 
   it 'deletes old runners' do
-    Rpush::App.stub(:all => [])
+    store.stub(all_apps: [])
     runner.should_receive(:stop)
     Rpush::Daemon::AppRunner.sync
   end
 
   it 'logs an error if the runner could not be started' do
-    Rpush::App.stub(:all => [app, new_app])
+    store.stub(all_apps: [app, new_app])
     new_runner = double
     Rpush::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     new_runner.stub(:start).and_raise(StandardError)
@@ -127,7 +123,7 @@ describe Rpush::Daemon::AppRunner, 'sync' do
   end
 
   it 'reflects errors if the runner could not be started' do
-    Rpush::App.stub(:all => [app, new_app])
+    store.stub(all_apps: [app, new_app])
     new_runner = double
     Rpush::Daemon::AppRunner.should_receive(:new).with(new_app).and_return(new_runner)
     e = StandardError.new
@@ -141,10 +137,10 @@ describe Rpush::Daemon::AppRunner, 'debug' do
   let(:app) { double(Rpush::AppRunnerSpecService::App, :id => 1, :name => 'test', :connections => 1,
     :environment => 'development', :certificate => TEST_CERT, :service_name => 'app_runner_spec_service') }
   let(:logger) { double(Rpush::Logger, :info => nil) }
+  let(:store) { double(all_apps: [app]) }
 
   before do
-    Rpush::App.stub(:all => [app])
-    Rpush::Daemon.stub(:config => {})
+    Rpush::Daemon.stub(config: {}, store: store)
     Rpush.stub(:logger => logger)
     Rpush::Daemon::AppRunner.sync
   end
@@ -162,9 +158,10 @@ describe Rpush::Daemon::AppRunner, 'idle' do
     :environment => 'development', :certificate => TEST_CERT, :id => 1,
     :service_name => 'app_runner_spec_service') }
   let(:logger) { double(Rpush::Logger, :info => nil) }
+  let(:store) { double(all_apps: [app]) }
 
   before do
-    Rpush::App.stub(:all => [app])
+    Rpush::Daemon.stub(store: store)
     Rpush.stub(:logger => logger)
     Rpush::Daemon::AppRunner.sync
   end
@@ -182,9 +179,10 @@ describe Rpush::Daemon::AppRunner, 'wait' do
     :connections => 1, :environment => 'development', :certificate => TEST_CERT,
     :service_name => 'app_runner_spec_service') }
   let(:logger) { double(Rpush::Logger, :info => nil) }
+  let(:store) { double(all_apps: [app]) }
 
   before do
-    Rpush::App.stub(:all => [app])
+    Rpush::Daemon.stub(store: store)
     Rpush.stub(:logger => logger)
     Rpush::Daemon::AppRunner.sync
   end
