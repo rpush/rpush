@@ -8,9 +8,9 @@ module Rpush
           attr_accessible :name, :environment, :certificate, :password, :connections, :auth_key, :client_id, :client_secret
         end
 
-        has_many :notifications, :class_name => 'Rpush::Client::ActiveRecord::Notification', :dependent => :destroy
+        has_many :notifications, class_name: 'Rpush::Client::ActiveRecord::Notification', dependent: :destroy
 
-        validates :name, presence: true, :uniqueness => { scope: [:type, :environment] }
+        validates :name, presence: true, uniqueness: { scope: [:type, :environment] }
       end
     end
   end

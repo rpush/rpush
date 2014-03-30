@@ -7,9 +7,9 @@ module Rpush
 
         TUPLE_BYTES = 38
         HOSTS = {
-          :production  => ['feedback.push.apple.com', 2196],
-          :development => ['feedback.sandbox.push.apple.com', 2196], # deprecated
-          :sandbox     => ['feedback.sandbox.push.apple.com', 2196]
+          production: ['feedback.push.apple.com', 2196],
+          development: ['feedback.sandbox.push.apple.com', 2196], # deprecated
+          sandbox: ['feedback.sandbox.push.apple.com', 2196]
         }
 
         def initialize(app)

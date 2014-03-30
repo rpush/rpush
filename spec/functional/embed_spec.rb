@@ -25,10 +25,10 @@ describe 'embedding' do
   end
 
   def stub_tcp_connection
-    TCPSocket.stub(:new => tcp_socket)
-    OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    IO.stub(:select => nil)
-    Rpush::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
+    TCPSocket.stub(new: tcp_socket)
+    OpenSSL::SSL::SSLSocket.stub(new: ssl_socket)
+    IO.stub(select: nil)
+    Rpush::Daemon::Apns::FeedbackReceiver.stub(new: double.as_null_object)
   end
 
   it 'delivers a notification successfully' do

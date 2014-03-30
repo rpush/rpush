@@ -5,12 +5,12 @@ describe Rpush::Daemon::Reflectable do
     include Rpush::Daemon::Reflectable
   end
 
-  let(:logger) { double(:error => nil) }
+  let(:logger) { double(error: nil) }
   let(:test_reflectable) { TestReflectable.new }
 
   before do
     Rpush.reflections.stub(:__dispatch)
-    Rpush.stub(:logger => logger)
+    Rpush.stub(logger: logger)
   end
 
   it 'dispatches the given reflection' do

@@ -5,7 +5,7 @@ module Rpush
         module App
           def self.included(base)
             base.instance_eval do
-              validates :client_id, :client_secret, :presence => true
+              validates :client_id, :client_secret, presence: true
             end
           end
 

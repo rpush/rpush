@@ -9,7 +9,7 @@ module Rpush
         # TODO: Dump using multi json.
         serialize :registration_ids
 
-        belongs_to :app, :class_name => 'Rpush::Client::ActiveRecord::App'
+        belongs_to :app, class_name: 'Rpush::Client::ActiveRecord::App'
 
         if Rpush.attr_accessible_available?
           attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry,:delivered,
@@ -17,8 +17,8 @@ module Rpush
             :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids, :uri
         end
 
-        validates :expiry, :numericality => true, :allow_nil => true
-        validates :app, :presence => true
+        validates :expiry, numericality: true, allow_nil: true
+        validates :app, presence: true
 
         scope :ready_for_delivery, lambda {
           where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)',

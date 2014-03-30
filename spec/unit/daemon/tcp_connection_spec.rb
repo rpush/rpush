@@ -5,22 +5,22 @@ describe Rpush::Daemon::TcpConnection do
   let(:certificate) { double }
   let(:password) { double }
   let(:x509_certificate) { OpenSSL::X509::Certificate.new(TEST_CERT) }
-  let(:ssl_context) { double(:key= => nil, :cert= => nil, :cert => x509_certificate) }
+  let(:ssl_context) { double(:key= => nil, :cert= => nil, cert: x509_certificate) }
   let(:host) { 'gateway.push.apple.com' }
   let(:port) { '2195' }
-  let(:tcp_socket) { double(:setsockopt => nil, :close => nil) }
-  let(:ssl_socket) { double(:sync= => nil, :connect => nil, :close => nil, :write => nil, :flush => nil) }
-  let(:logger) { double(:info => nil, :error => nil, :warn => nil) }
-  let(:app) { double(:name => 'Connection 0', :certificate => certificate, :password => password)}
+  let(:tcp_socket) { double(setsockopt: nil, close: nil) }
+  let(:ssl_socket) { double(:sync= => nil, connect: nil, close: nil, write: nil, flush: nil) }
+  let(:logger) { double(info: nil, error: nil, warn: nil) }
+  let(:app) { double(name: 'Connection 0', certificate: certificate, password: password)}
   let(:connection) { Rpush::Daemon::TcpConnection.new(app, host, port) }
 
   before do
-    OpenSSL::SSL::SSLContext.stub(:new => ssl_context)
-    OpenSSL::PKey::RSA.stub(:new => rsa_key)
-    OpenSSL::X509::Certificate.stub(:new => x509_certificate)
-    TCPSocket.stub(:new => tcp_socket)
-    OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    Rpush.stub(:logger => logger)
+    OpenSSL::SSL::SSLContext.stub(new: ssl_context)
+    OpenSSL::PKey::RSA.stub(new: rsa_key)
+    OpenSSL::X509::Certificate.stub(new: x509_certificate)
+    TCPSocket.stub(new: tcp_socket)
+    OpenSSL::SSL::SSLSocket.stub(new: ssl_socket)
+    Rpush.stub(logger: logger)
     connection.stub(:reflect)
   end
 
@@ -259,15 +259,15 @@ describe Rpush::Daemon::TcpConnection do
     before { connection.connect }
 
     it 'reconnects if the connection has been idle for more than the defined period' do
-      Rpush::Daemon::TcpConnection.stub(:idle_period => 60)
-      Time.stub(:now => Time.now + 61)
+      Rpush::Daemon::TcpConnection.stub(idle_period: 60)
+      Time.stub(now: Time.now + 61)
       connection.should_receive(:reconnect)
       connection.write('blah')
     end
 
     it 'resets the last write time' do
       now = Time.now
-      Time.stub(:now => now)
+      Time.stub(now: now)
       connection.write('blah')
       connection.last_write.should eq now
     end
@@ -278,8 +278,8 @@ describe Rpush::Daemon::TcpConnection do
     end
 
     it 'logs the the connection is idle' do
-      Rpush::Daemon::TcpConnection.stub(:idle_period => 60)
-      Time.stub(:now => Time.now + 61)
+      Rpush::Daemon::TcpConnection.stub(idle_period: 60)
+      Time.stub(now: Time.now + 61)
       Rpush.logger.should_receive(:info).with('[Connection 0] Idle period exceeded, reconnecting...')
       connection.write('blah')
     end

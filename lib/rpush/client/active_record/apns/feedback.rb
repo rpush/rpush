@@ -9,8 +9,8 @@ module Rpush
             attr_accessible :device_token, :failed_at, :app
           end
 
-          validates :device_token, :presence => true
-          validates :failed_at, :presence => true
+          validates :device_token, presence: true
+          validates :failed_at, presence: true
 
           validates_with Rpush::Client::ActiveModel::Apns::DeviceTokenFormatValidator
         end

@@ -4,12 +4,12 @@ require 'unit/notification_shared.rb'
 describe Rpush::Client::ActiveRecord::Adm::Notification do
   it_should_behave_like 'an Notification subclass'
 
-  let(:app) { Rpush::Client::ActiveRecord::Adm::App.create!(:name => 'test', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
+  let(:app) { Rpush::Client::ActiveRecord::Adm::App.create!(name: 'test', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
   let(:notification_class) { Rpush::Client::ActiveRecord::Adm::Notification }
   let(:notification) { notification_class.new }
 
   it "has a 'data' payload limit of 6144 bytes" do
-    notification.data = { :key => "a" * 6144 }
+    notification.data = { key: "a" * 6144 }
     notification.valid?.should be_false
     notification.errors[:base].should eq ["Notification payload data cannot be larger than 6144 bytes."]
   end

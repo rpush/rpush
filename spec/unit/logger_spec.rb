@@ -25,11 +25,11 @@ describe Rpush::Logger do
       ActiveSupport::Logger
     end
 
-    @logger = double(@logger_class.name, :info => nil, :error => nil, :level => 0, :auto_flushing => 1, :auto_flushing= => nil)
+    @logger = double(@logger_class.name, info: nil, error: nil, level: 0, auto_flushing: 1, :auto_flushing= => nil)
     @logger_class.stub(:new).and_return(@logger)
     Rails.logger = @logger
-    File.stub(:open => log)
-    FileUtils.stub(:mkdir_p => nil)
+    File.stub(open: log)
+    FileUtils.stub(mkdir_p: nil)
     STDERR.stub(:puts)
     Rpush.config.foreground = true
   end
@@ -117,14 +117,14 @@ describe Rpush::Logger do
   it "should handle an Exception instance" do
     Rpush.config.foreground = false
     e = RuntimeError.new("hi mom")
-    e.stub(:backtrace => [])
+    e.stub(backtrace: [])
     logger = Rpush::Logger.new
     @logger.should_receive(:error).with(/RuntimeError, hi mom/)
     logger.error(e)
   end
 
   it 'defaults auto_flushing to true if the Rails logger does not respond to auto_flushing' do
-    rails_logger = double(:info => nil, :error => nil, :level => 0)
+    rails_logger = double(info: nil, error: nil, level: 0)
     Rails.logger = rails_logger
     @logger.auto_flushing.should be_true
   end

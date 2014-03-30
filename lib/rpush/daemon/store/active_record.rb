@@ -8,7 +8,7 @@ module Rpush
       class ActiveRecord
         include Reconnectable
 
-        DEFAULT_MARK_OPTIONS = {:persist => true}
+        DEFAULT_MARK_OPTIONS = {persist: true}
 
         def all_apps
           Rpush::Client::ActiveRecord::App.all
@@ -30,7 +30,7 @@ module Rpush
 
           if opts[:persist]
             with_database_reconnect_and_retry do
-              notification.save!(:validate => false)
+              notification.save!(validate: false)
             end
           end
         end
@@ -38,11 +38,11 @@ module Rpush
         def mark_batch_retryable(notifications, deliver_after)
           ids = []
           notifications.each do |n|
-            mark_retryable(n, deliver_after, :persist => false)
+            mark_retryable(n, deliver_after, persist: false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(:id => ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
           end
         end
 
@@ -53,7 +53,7 @@ module Rpush
 
           if opts[:persist]
             with_database_reconnect_and_retry do
-              notification.save!(:validate => false)
+              notification.save!(validate: false)
             end
           end
         end
@@ -62,11 +62,11 @@ module Rpush
           now = Time.now
           ids = []
           notifications.each do |n|
-            mark_delivered(n, now, :persist => false)
+            mark_delivered(n, now, persist: false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = ?', true, now])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = ?', true, now])
           end
         end
 
@@ -81,7 +81,7 @@ module Rpush
 
           if opts[:persist]
             with_database_reconnect_and_retry do
-              notification.save!(:validate => false)
+              notification.save!(validate: false)
             end
           end
         end
@@ -90,18 +90,18 @@ module Rpush
           now = Time.now
           ids = []
           notifications.each do |n|
-            mark_failed(n, code, description, now, :persist => false)
+            mark_failed(n, code, description, now, persist: false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, now, code, description])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, now, code, description])
           end
         end
 
         def create_apns_feedback(failed_at, device_token, app)
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Apns::Feedback.create!(:failed_at => failed_at,
-              :device_token => device_token, :app => app)
+            Rpush::Client::ActiveRecord::Apns::Feedback.create!(failed_at: failed_at,
+              device_token: device_token, app: app)
           end
         end
 

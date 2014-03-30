@@ -45,7 +45,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   let(:test_double) { TestDouble.new(error, 1) }
 
   before do
-    @logger = double("Logger", :info => nil, :error => nil, :warn => nil)
+    @logger = double("Logger", info: nil, error: nil, warn: nil)
     Rpush.stub(:logger).and_return(@logger)
 
     ActiveRecord::Base.stub(:clear_all_connections!)

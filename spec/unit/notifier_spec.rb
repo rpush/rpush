@@ -29,19 +29,19 @@ describe Rpush::Notifier do
 
   describe "default notifier" do
     it "creates using :connect first" do
-      Rpush.config.stub :wakeup => { :connect => '127.0.0.1', :port => 1234 }
+      Rpush.config.stub wakeup: { connect: '127.0.0.1', port: 1234 }
       Rpush::Notifier.should_receive(:new).with('127.0.0.1', 1234)
       Rpush.notifier
     end
 
     it "creates using :host next" do
-      Rpush.config.stub :wakeup => { :host => '127.0.0.1', :port => 1234 }
+      Rpush.config.stub wakeup: { host: '127.0.0.1', port: 1234 }
       Rpush::Notifier.should_receive(:new).with('127.0.0.1', 1234)
       Rpush.notifier
     end
 
     it "returns nil when wakeup is not specified" do
-      Rpush.config.stub :wakeup => nil
+      Rpush.config.stub wakeup: nil
       Rpush::Notifier.should_not_receive(:new)
       expect(Rpush.notifier).to be_nil
     end

@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
 describe Rpush::Client::ActiveRecord::Adm::App do
-  subject { Rpush::Client::ActiveRecord::Adm::App.new(:name => 'test', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
-  let(:existing_app) { Rpush::Client::ActiveRecord::Adm::App.create!(:name => 'existing', :environment => 'development', :client_id => 'CLIENT_ID', :client_secret => 'CLIENT_SECRET') }
+  subject { Rpush::Client::ActiveRecord::Adm::App.new(name: 'test', environment: 'development', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
+  let(:existing_app) { Rpush::Client::ActiveRecord::Adm::App.create!(name: 'existing', environment: 'development', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
 
   it 'should be valid if properly instantiated' do
     subject.should be_valid

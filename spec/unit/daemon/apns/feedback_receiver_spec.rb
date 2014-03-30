@@ -7,22 +7,22 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:poll) { 60 }
   let(:certificate) { double }
   let(:password) { double }
-  let(:app) { double(:name => 'my_app', :password => password, :certificate => certificate, :environment => 'production') }
-  let(:connection) { double(:connect => nil, :read => nil, :close => nil) }
-  let(:logger) { double(:error => nil, :info => nil) }
+  let(:app) { double(name: 'my_app', password: password, certificate: certificate, environment: 'production') }
+  let(:connection) { double(connect: nil, read: nil, close: nil) }
+  let(:logger) { double(error: nil, info: nil) }
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
-  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, :sleep => nil, :interrupt_sleep => nil) }
+  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, interrupt_sleep: nil) }
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord,
     create_apns_feedback: feedback, release_connection: nil) }
 
   before do
     Rpush.config.feedback_poll = poll
-    Rpush::Daemon::InterruptibleSleep.stub(:new => sleeper)
-    Rpush.stub(:logger => logger)
-    Rpush::Daemon::TcpConnection.stub(:new => connection)
+    Rpush::Daemon::InterruptibleSleep.stub(new: sleeper)
+    Rpush.stub(logger: logger)
+    Rpush::Daemon::TcpConnection.stub(new: connection)
     receiver.instance_variable_set("@stop", false)
-    Rpush::Daemon.stub(:store => store)
+    Rpush::Daemon.stub(store: store)
   end
 
   def double_connection_read_with_tuple

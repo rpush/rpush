@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rpush::Apns::CertificateExpiredError do
-  let(:app) { double(:name => 'test') }
+  let(:app) { double(name: 'test') }
   let(:error) { Rpush::Apns::CertificateExpiredError.new(app, Time.now) }
 
   it 'returns a message' do

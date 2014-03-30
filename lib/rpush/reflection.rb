@@ -19,8 +19,8 @@ module Rpush
     ]
 
     DEPRECATIONS = {
-      :apns_connection_lost => [:tcp_connection_lost, '4.1'],
-      :apns_certificate_will_expire => [:ssl_certificate_will_expire, '4.1']
+      apns_connection_lost: [:tcp_connection_lost, '4.1'],
+      apns_certificate_will_expire: [:ssl_certificate_will_expire, '4.1']
     }
 
     REFLECTIONS.each do |reflection|

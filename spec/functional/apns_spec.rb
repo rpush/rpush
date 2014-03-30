@@ -25,9 +25,9 @@ describe 'APNs' do
   end
 
   def stub_tcp_connection
-    TCPSocket.stub(:new => tcp_socket)
-    OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    IO.stub(:select => nil)
+    TCPSocket.stub(new: tcp_socket)
+    OpenSSL::SSL::SSLSocket.stub(new: ssl_socket)
+    IO.stub(select: nil)
   end
 
   it 'delivers a notification successfully' do
@@ -38,8 +38,8 @@ describe 'APNs' do
   end
 
   it 'fails to deliver a notification successfully' do
-    IO.stub(:select => true)
-    ssl_socket.stub(:read => [8, 4, 69].pack('ccN'))
+    IO.stub(select: true)
+    ssl_socket.stub(read: [8, 4, 69].pack('ccN'))
 
     expect do
       Rpush.push

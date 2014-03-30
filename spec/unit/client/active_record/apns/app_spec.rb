@@ -2,27 +2,27 @@ require 'unit_spec_helper'
 
 describe Rpush::Client::ActiveRecord::App do
   it 'does not validate an app with an invalid certificate' do
-    app = Rpush::Client::ActiveRecord::Apns::App.new(:name => 'test', :environment => 'development', :certificate => 'foo')
+    app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'test', environment: 'development', certificate: 'foo')
     app.valid?
     app.errors[:certificate].should eq ['Certificate value must contain a certificate and a private key.']
   end
 
   it 'validates a certificate without a password' do
-    app = Rpush::Client::ActiveRecord::Apns::App.new :name => 'test', :environment => 'development', :certificate => TEST_CERT
+    app = Rpush::Client::ActiveRecord::Apns::App.new name: 'test', environment: 'development', certificate: TEST_CERT
     app.valid?
     app.errors[:certificate].should eq []
   end
 
   it 'validates a certificate with a password' do
-    app = Rpush::Client::ActiveRecord::Apns::App.new :name => 'test', :environment => 'development',
-      :certificate => TEST_CERT_WITH_PASSWORD, :password => 'fubar'
+    app = Rpush::Client::ActiveRecord::Apns::App.new name: 'test', environment: 'development',
+      certificate: TEST_CERT_WITH_PASSWORD, password: 'fubar'
     app.valid?
     app.errors[:certificate].should eq []
   end
 
   it 'validates a certificate with an incorrect password' do
-    app = Rpush::Client::ActiveRecord::Apns::App.new :name => 'test', :environment => 'development',
-      :certificate => TEST_CERT_WITH_PASSWORD, :password => 'incorrect'
+    app = Rpush::Client::ActiveRecord::Apns::App.new name: 'test', environment: 'development',
+      certificate: TEST_CERT_WITH_PASSWORD, password: 'incorrect'
     app.valid?
     app.errors[:certificate].should eq ["Certificate value must contain a certificate and a private key."]
   end

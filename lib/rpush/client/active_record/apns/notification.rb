@@ -7,8 +7,8 @@ module Rpush
 
           class MultipleAppAssignmentError < StandardError; end
 
-          validates :device_token, :presence => true
-          validates :badge, :numericality => true, :allow_nil => true
+          validates :device_token, presence: true
+          validates :badge, numericality: true, allow_nil: true
 
           validates_with Rpush::Client::ActiveModel::Apns::DeviceTokenFormatValidator
           validates_with Rpush::Client::ActiveModel::Apns::BinaryNotificationValidator

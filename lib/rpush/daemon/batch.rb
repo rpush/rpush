@@ -23,7 +23,7 @@ module Rpush
         if Rpush.config.batch_storage_updates
           retryable[deliver_after] ||= []
           retryable[deliver_after] << notification
-          Rpush::Daemon.store.mark_retryable(notification, deliver_after, :persist => false)
+          Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
         else
           Rpush::Daemon.store.mark_retryable(notification, deliver_after)
           reflect(:notification_will_retry, notification)
@@ -33,7 +33,7 @@ module Rpush
       def mark_delivered(notification)
         if Rpush.config.batch_storage_updates
           delivered << notification
-          Rpush::Daemon.store.mark_delivered(notification, Time.now, :persist => false)
+          Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
         else
           Rpush::Daemon.store.mark_delivered(notification, Time.now)
           reflect(:notification_delivered, notification)
@@ -45,7 +45,7 @@ module Rpush
           key = [code, description]
           failed[key] ||= []
           failed[key] << notification
-          Rpush::Daemon.store.mark_failed(notification, code, description, Time.now, :persist => false)
+          Rpush::Daemon.store.mark_failed(notification, code, description, Time.now, persist: false)
         else
           Rpush::Daemon.store.mark_failed(notification, code, description, Time.now)
           reflect(:notification_failed, notification)

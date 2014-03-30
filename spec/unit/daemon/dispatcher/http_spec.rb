@@ -8,7 +8,7 @@ describe Rpush::Daemon::Dispatcher::Http do
   let(:http) { double }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Http.new(app, delivery_class) }
 
-  before { Net::HTTP::Persistent.stub(:new => http) }
+  before { Net::HTTP::Persistent.stub(new: http) }
 
   it 'constructs a new persistent connection' do
     Net::HTTP::Persistent.should_receive(:new)
