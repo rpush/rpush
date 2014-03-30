@@ -62,27 +62,8 @@ migrations.each(&:up)
 require 'rpush'
 require 'rpush/daemon'
 
-# TEMPORARY
-require 'rpush/client/active_record'
-
-module Rpush
-  include Rpush::Client::ActiveRecord
-
-  module Apns
-    include Rpush::Client::ActiveRecord::Apns
-  end
-
-  module Gcm
-    include Rpush::Client::ActiveRecord::Gcm
-  end
-
-  module Wpns
-    include Rpush::Client::ActiveRecord::Wpns
-  end
-
-  module Adm
-    include Rpush::Client::ActiveRecord::Adm
-  end
+Rpush.configure do |config|
+  config.client = :active_record
 end
 
 # a test certificate that contains both an X509 certificate and

@@ -7,7 +7,7 @@ describe Rpush::Daemon, "when starting" do
   let(:certificate) { double }
   let(:password) { double }
   let(:config) { double(:pid_file => nil, :foreground => true,
-    :embedded => false, :push => false, :store => :active_record,
+    :embedded => false, :push => false, :client => :active_record,
     :logger => nil) }
   let(:logger) { double(:logger, :info => nil, :error => nil, :warn => nil) }
 
@@ -66,13 +66,13 @@ describe Rpush::Daemon, "when starting" do
   end
 
   it 'instantiates the store' do
-    config.stub(:store => :active_record)
+    config.stub(:client => :active_record)
     Rpush::Daemon.start
     Rpush::Daemon.store.should be_kind_of(Rpush::Daemon::Store::ActiveRecord)
   end
 
   it 'logs an error if the store cannot be loaded' do
-    config.stub(:store => :foo_bar)
+    config.stub(:client => :foo_bar)
     Rpush.logger.should_receive(:error).with(kind_of(LoadError))
     Rpush::Daemon.start
   end

@@ -2,7 +2,6 @@ before_script: "psql -c 'create database rpush_test;' -U postgres >/dev/null"
 language: ruby
 install: bundle install --local --deployment --no-prune --no-cache --jobs=4
 rvm:
-  - 1.9.3
   - 2.0.0
   - 2.1.1
   - jruby
@@ -16,9 +15,6 @@ env: QUALITY=true
 matrix:
   fast_finish: true
   include:
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails-4.0
-      env: QUALITY=false
     - rvm: 2.0.0
       gemfile: Gemfile.rails-4.0
       env: QUALITY=false
@@ -32,9 +28,6 @@ matrix:
       gemfile: Gemfile
       env: ADAPTER=sqlite3
   exclude:
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails-4.0
-      env: QUALITY=true
     - rvm: 2.0.0
       gemfile: Gemfile.rails-4.0
       env: QUALITY=true
@@ -46,9 +39,6 @@ matrix:
       env: QUALITY=true
     - rvm: rbx
       gemfile: Gemfile.rails-4.0
-      env: QUALITY=true
-    - rvm: 1.9.3
-      gemfile: Gemfile.rails-4.1
       env: QUALITY=true
     - rvm: 2.0.0
       gemfile: Gemfile.rails-4.1

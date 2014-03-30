@@ -4,11 +4,18 @@ module Rpush
   end
 
   def self.configure
-    yield config if block_given?
+    if block_given?
+      yield config
+      initialize_client
+    end
+  end
+
+  def self.initialize_client
+    require "rpush/client/#{config.client}"
   end
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
-    :check_for_errors, :pid_file, :batch_size, :push, :store, :logger,
+    :check_for_errors, :pid_file, :batch_size, :push, :client, :logger,
     :batch_storage_updates, :wakeup, :log_dir]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
@@ -63,7 +70,7 @@ module Rpush
       self.check_for_errors = true
       self.batch_size = 100
       self.pid_file = nil
-      self.store = :active_record
+      self.client = :active_record
       self.logger = nil
       self.batch_storage_updates = true
       self.log_dir = Rails.root

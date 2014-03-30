@@ -17,3 +17,23 @@ require 'rpush/client/active_record/wpns/app'
 
 require 'rpush/client/active_record/adm/notification'
 require 'rpush/client/active_record/adm/app'
+
+module Rpush
+  include Rpush::Client::ActiveRecord
+
+  module Apns
+    include Rpush::Client::ActiveRecord::Apns
+  end
+
+  module Gcm
+    include Rpush::Client::ActiveRecord::Gcm
+  end
+
+  module Wpns
+    include Rpush::Client::ActiveRecord::Wpns
+  end
+
+  module Adm
+    include Rpush::Client::ActiveRecord::Adm
+  end
+end

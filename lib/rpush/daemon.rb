@@ -72,11 +72,11 @@ module Rpush
     def self.initialize_store
       return if store
       begin
-        name = Rpush.config.store.to_s
+        name = Rpush.config.client.to_s
         require "rpush/daemon/store/#{name}"
         self.store = Rpush::Daemon::Store.const_get(name.camelcase).new
       rescue StandardError, LoadError => e
-        Rpush.logger.error("Failed to load '#{Rpush.config.store}' storage backend.")
+        Rpush.logger.error("Failed to load '#{Rpush.config.client}' storage backend.")
         Rpush.logger.error(e)
       end
     end
