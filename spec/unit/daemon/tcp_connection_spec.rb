@@ -103,13 +103,13 @@ describe Rpush::Daemon::TcpConnection do
       it 'logs that the certificate has expired' do
         cert = OpenSSL::X509::Certificate.new(app.certificate)
         logger.should_receive(:error).with("[#{app.name}] Certificate expired at 2022-09-07 03:18:32 UTC.")
-        Timecop.freeze(cert.not_after + 1.day) { connection.connect rescue Rpush::Apns::CertificateExpiredError }
+        Timecop.freeze(cert.not_after + 1.day) { connection.connect rescue Rpush::CertificateExpiredError }
       end
 
       it 'raises an error if the certificate has expired' do
         cert = OpenSSL::X509::Certificate.new(app.certificate)
         Timecop.freeze(cert.not_after + 1.day) do
-          expect { connection.connect }.to raise_error(Rpush::Apns::CertificateExpiredError)
+          expect { connection.connect }.to raise_error(Rpush::CertificateExpiredError)
         end
       end
     end

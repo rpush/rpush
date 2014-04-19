@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Wpns::Delivery do
-  let(:app) { Rpush::Wpns::App.new(name: "MyApp") }
+  let(:app) { Rpush::Wpns::App.create!(name: "MyApp") }
   let(:notification) { Rpush::Wpns::Notification.create!(app: app,alert: "test",
                                                          uri: "http://some.example/",
                                                          deliver_after: Time.now) }

@@ -9,17 +9,13 @@ module Rpush
         attribute :environment, :string
         attribute :certificate, :string
         attribute :password, :string
-        attribute :connections, :integer
+        attribute :connections, :integer, default: 1
         attribute :auth_key, :string
         attribute :client_id, :string
         attribute :client_secret, :string
 
         validates :name, presence: true
         validates_numericality_of :connections, greater_than: 0, only_integer: true
-
-        def service_name
-          raise NotImplementedError
-        end
       end
     end
   end

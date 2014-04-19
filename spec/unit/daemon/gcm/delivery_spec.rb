@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Gcm::Delivery do
-  let(:app) { Rpush::Gcm::App.new(name: 'MyApp', auth_key: 'abc123') }
+  let(:app) { Rpush::Gcm::App.create!(name: 'MyApp', auth_key: 'abc123') }
   let(:notification) { Rpush::Gcm::Notification.create!(app: app, registration_ids: ['xyz'], deliver_after: Time.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}) }

@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ileitch/modis.git
-  revision: e878b101ffff220925a296e0058d91c0a7ac5c3c
+  revision: db910528556211ac5a91db65c5cc8ba355043ba4
   specs:
     modis (0.0.1)
       activemodel (>= 3.0)
@@ -94,7 +94,7 @@ GEM
       rake (>= 0.8.7)
       rdoc (~> 3.4)
       thor (>= 0.14.6, < 2.0)
-    rake (10.2.2)
+    rake (10.3.1)
     rdoc (3.12.2)
       json (~> 1.4)
     redis (3.0.7)
@@ -124,7 +124,7 @@ GEM
     thor (0.19.1)
     tilt (1.4.1)
     timecop (0.7.1)
-    tins (1.0.1)
+    tins (1.1.0)
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)

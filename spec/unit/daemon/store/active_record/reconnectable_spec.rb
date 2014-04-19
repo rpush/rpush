@@ -79,7 +79,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   it "should test out the new connection by performing a count" do
-    Rpush::Notification.should_receive(:count)
+    Rpush::Client::ActiveRecord::Notification.should_receive(:count)
     test_double.perform
   end
 
@@ -92,8 +92,8 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
           raise @error
         end
       end
-      Rpush::Notification.instance_variable_set("@count_calls", 0)
-      Rpush::Notification.instance_variable_set("@error", error)
+      Rpush::Client::ActiveRecord::Notification.instance_variable_set("@count_calls", 0)
+      Rpush::Client::ActiveRecord::Notification.instance_variable_set("@error", error)
     end
 
     it "should log the 2nd attempt" do

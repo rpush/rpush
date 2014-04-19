@@ -29,7 +29,7 @@ module Rpush
             check_for_error if Rpush.config.check_for_errors
             mark_delivered
             log_info("#{@notification.id} sent to #{@notification.device_token}")
-          rescue Rpush::DeliveryError, Rpush::Apns::DisconnectionError => error
+          rescue Rpush::DeliveryError, Rpush::DisconnectionError => error
             mark_failed(error.code, error.description)
             raise
           end
@@ -47,7 +47,8 @@ module Rpush
               description = APN_ERRORS[code.to_i] || "Unknown error. Possible Rpush bug?"
               error = Rpush::DeliveryError.new(code, notification_id, description)
             else
-              error = Rpush::Apns::DisconnectionError.new
+              error = Rpush::DisconnectionError.new
+              error.message = "The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host."
             end
 
             begin

@@ -5,19 +5,18 @@ describe Rpush::Daemon::Apns::Delivery do
   let(:notification) { double.as_null_object }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil) }
   let(:logger) { double(error: nil, info: nil) }
-  let(:config) { double(check_for_errors: true) }
   let(:connection) { double(select: false, write: nil, reconnect: nil, close: nil, connect: nil) }
   let(:delivery) { Rpush::Daemon::Apns::Delivery.new(app, connection, notification, batch) }
 
   def perform
     begin
       delivery.perform
-    rescue Rpush::DeliveryError, Rpush::Apns::DisconnectionError
+    rescue Rpush::DeliveryError, Rpush::DisconnectionError
     end
   end
 
   before do
-    Rpush.stub(config: config, logger: logger)
+    Rpush.stub(logger: logger)
   end
 
   it "sends the binary version of the notification" do
@@ -38,7 +37,7 @@ describe Rpush::Daemon::Apns::Delivery do
   end
 
   it 'does not check for errors if check_for_errors config option is false' do
-    config.stub(check_for_errors: false)
+    Rpush.config.stub(check_for_errors: false)
     delivery.should_not_receive(:check_for_error)
     perform
   end
@@ -89,11 +88,11 @@ describe Rpush::Daemon::Apns::Delivery do
       end
 
       it 'raises a DisconnectError error if the connection is closed without an error being returned' do
-        expect { delivery.perform }.to raise_error(Rpush::Apns::DisconnectionError)
+        expect { delivery.perform }.to raise_error(Rpush::DisconnectionError)
       end
 
       it 'marks the notification as failed' do
-        delivery.should_receive(:mark_failed).with(nil, "APNs disconnected without returning an error.")
+        delivery.should_receive(:mark_failed).with(nil, "Connection terminated without returning an error.")
         perform
       end
     end

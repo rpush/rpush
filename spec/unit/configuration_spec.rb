@@ -1,9 +1,12 @@
 require 'unit_spec_helper'
 
 describe Rpush do
-  let(:config) { double(client: :active_record) }
+  let(:config) { Rpush.config }
 
-  before { Rpush.stub(config: config) }
+  before do
+    Rpush.stub(require: nil)
+    Rpush.stub(config: config)
+  end
 
   it 'yields a configure block' do
     expect { |b| Rpush.configure(&b) }.to yield_with_args(config)

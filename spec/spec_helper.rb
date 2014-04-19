@@ -5,14 +5,22 @@ Bundler.require(:default)
 
 require 'rpush'
 require 'rpush/daemon'
+require 'rpush/client/redis'
+require 'rpush/client/active_record'
+
+require 'support/active_record_setup'
+
+RAILS_ROOT = '/tmp/rails_root'
 
 Rpush.configure do |config|
-  config.client = ENV['CLIENT'] || :active_record
+  config.client = (ENV['CLIENT'] || :active_record).to_sym
+  config.log_dir = RAILS_ROOT
 end
 
-case Rpush.config.client.to_sym
-  when :active_record
-    require 'support/active_record_setup'
+RPUSH_CLIENT = Rpush.config.client
+
+def active_record?
+  Rpush.config.client == :active_record
 end
 
 path = File.join(File.dirname(__FILE__), 'support')
@@ -24,16 +32,16 @@ def after_example_cleanup
   Rpush::Daemon.store = nil
   Rpush::Deprecation.muted do
     Rpush.config.set_defaults if Rpush.config.kind_of?(Rpush::Configuration)
+    Rpush.config.client = RPUSH_CLIENT
   end
 end
 
 RSpec.configure do |config|
   config.before(:each) do
-    Rails.stub(root: '/tmp/rails_root')
+    Rails.stub(root: RAILS_ROOT)
   end
 
   config.after(:each) do
     after_example_cleanup
   end
 end
-

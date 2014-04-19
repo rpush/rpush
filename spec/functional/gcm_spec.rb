@@ -11,7 +11,7 @@ describe 'GCM' do
     app.auth_key = 'abc123'
     app.save!
 
-    notification.app = app
+    notification.app_id = app.id
     notification.registration_ids = ['foo']
     notification.data = { message: 'test' }
     notification.save!

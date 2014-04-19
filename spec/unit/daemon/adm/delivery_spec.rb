@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Adm::Delivery do
-  let(:app) { Rpush::Adm::App.new(name: 'MyApp', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
+  let(:app) { Rpush::Adm::App.create!(name: 'MyApp', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
   let(:notification) { Rpush::Adm::Notification.create!(app: app, registration_ids: ['xyz'], deliver_after: Time.now, data: {'message' => 'test'}) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}) }

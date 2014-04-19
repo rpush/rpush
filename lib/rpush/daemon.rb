@@ -4,6 +4,7 @@ require 'pathname'
 require 'openssl'
 require 'net/http/persistent'
 
+require 'rpush/daemon/errors'
 require 'rpush/daemon/constants'
 require 'rpush/daemon/reflectable'
 require 'rpush/daemon/loggable'
@@ -26,8 +27,6 @@ require 'rpush/daemon/retry_header_parser'
 require 'rpush/daemon/store/interface'
 
 require 'rpush/daemon/apns/delivery'
-require 'rpush/daemon/apns/disconnection_error'
-require 'rpush/daemon/apns/certificate_expired_error'
 require 'rpush/daemon/apns/feedback_receiver'
 require 'rpush/daemon/apns'
 
@@ -84,7 +83,7 @@ module Rpush
     protected
 
     def self.daemonize?
-      !(Rpush.config.foreground || Rpush.config.embedded || Rpush.jruby?)
+      !(Rpush.config.push || Rpush.config.foreground || Rpush.config.embedded || Rpush.jruby?)
     end
 
     def self.trap_signals?

@@ -11,7 +11,16 @@ module Rpush
   end
 
   def self.initialize_client
+    return if @client_initialized
     require "rpush/client/#{config.client}"
+    client_module = Rpush::Client.const_get(config.client.to_s.camelize)
+    Rpush.include client_module
+
+    [:Apns, :Gcm, :Wpns, :Adm].each do |service|
+      Rpush.const_set(service, client_module.const_get(service))
+    end
+
+    @client_initialized = true
   end
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,

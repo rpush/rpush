@@ -51,7 +51,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
       Rpush.config.push = false
       relation = double.as_null_object
       relation.should_receive(:limit).with(5000)
-      Rpush::Notification.stub(ready_for_delivery: relation)
+      store.stub(ready_for_delivery_for_apps: relation)
       store.deliverable_notifications([app])
     end
 
