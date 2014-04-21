@@ -10,8 +10,6 @@ def rails4?
   ::Rails::VERSION::STRING >= '4'
 end
 
-redis = Redis.new
-
 RSpec.configure do |config|
   # config.before :suite do
   #   PerfTools::CpuProfiler.start('/tmp/rpush_profile')
@@ -21,7 +19,7 @@ RSpec.configure do |config|
   # end
 
   config.before(:each) do
-    Redis.new.keys('rpush:*').each { |key| redis.del(key) }
+    SPEC_REDIS.keys('rpush:*').each { |key| SPEC_REDIS.del(key) }
 
     if is_unit_example?(example)
       connection = ActiveRecord::Base.connection

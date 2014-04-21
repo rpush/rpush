@@ -18,6 +18,7 @@ Rpush.configure do |config|
 end
 
 RPUSH_CLIENT = Rpush.config.client
+SPEC_REDIS = Modis.redis
 
 def active_record?
   Rpush.config.client == :active_record

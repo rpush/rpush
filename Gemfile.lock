@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ileitch/modis.git
-  revision: db910528556211ac5a91db65c5cc8ba355043ba4
+  revision: b200c261e360188414395dc1be6ac4693c6f5342
   specs:
     modis (0.0.1)
       activemodel (>= 3.0)

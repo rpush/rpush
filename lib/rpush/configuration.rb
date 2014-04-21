@@ -14,7 +14,7 @@ module Rpush
     return if @client_initialized
     require "rpush/client/#{config.client}"
     client_module = Rpush::Client.const_get(config.client.to_s.camelize)
-    Rpush.include client_module
+    Rpush.send(:include, client_module)
 
     [:Apns, :Gcm, :Wpns, :Adm].each do |service|
       Rpush.const_set(service, client_module.const_get(service))

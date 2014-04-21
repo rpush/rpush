@@ -1,0 +1,11 @@
+*.rdb
+*.swp
+/.idea
+/.yardoc
+/coverage/*
+/doc/
+/nohup.out
+/pkg/*
+/rdsrv
+/redis/*
+/test/db

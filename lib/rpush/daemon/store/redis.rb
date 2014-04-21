@@ -4,15 +4,10 @@ module Rpush
       class Redis
         include Rpush::Client::Redis
 
-        DEFAULT_MARK_OPTIONS = {persist: true}
-
-        # TODO: Implement this.
-        def with_database_reconnect_and_retry
-          yield
-        end
+        DEFAULT_MARK_OPTIONS = { persist: true }
 
         def initialize
-          @redis = ::Redis.new
+          @redis = Modis.redis
         end
 
         def all_apps
@@ -35,9 +30,7 @@ module Rpush
           notification.delivered_at = time
 
           if opts[:persist]
-            with_database_reconnect_and_retry do
-              notification.save!(validate: false)
-            end
+            notification.save!(validate: false)
           end
         end
 
@@ -56,9 +49,7 @@ module Rpush
           notification.error_description = description
 
           if opts[:persist]
-            with_database_reconnect_and_retry do
-              notification.save!(validate: false)
-            end
+            notification.save!(validate: false)
           end
         end
 
@@ -73,9 +64,7 @@ module Rpush
           notification.deliver_after = deliver_after
 
           if opts[:persist]
-            with_database_reconnect_and_retry do
-              notification.save!(validate: false)
-            end
+            notification.save!(validate: false)
           end
         end
 
@@ -84,9 +73,7 @@ module Rpush
         end
 
         def create_apns_feedback(failed_at, device_token, app)
-          with_database_reconnect_and_retry do
-            Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app: app)
-          end
+          Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app: app)
         end
 
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
@@ -100,15 +87,11 @@ module Rpush
         end
 
         def update_app(app)
-          with_database_reconnect_and_retry do
-            app.save!
-          end
+          app.save!
         end
 
         def update_notification(notification)
-          with_database_reconnect_and_retry do
-            notification.save!
-          end
+          notification.save!
         end
 
         def release_connection
@@ -121,15 +104,13 @@ module Rpush
         private
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
-          with_database_reconnect_and_retry do
-            notification.assign_attributes(attrs)
-            notification.data = data
-            notification.registration_ids = registration_ids
-            notification.deliver_after = deliver_after
-            notification.app = app
-            notification.save!
-            notification
-          end
+          notification.assign_attributes(attrs)
+          notification.data = data
+          notification.registration_ids = registration_ids
+          notification.deliver_after = deliver_after
+          notification.app = app
+          notification.save!
+          notification
         end
       end
     end
