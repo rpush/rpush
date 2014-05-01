@@ -19,7 +19,7 @@ module Rpush
         attribute :sound, :string
         attribute :alert, :hash, strict: false
         attribute :data, :hash
-        attribute :expiry, :timestamp
+        attribute :expiry, :integer, default: 1.day.to_i
         attribute :delivered, :boolean
         attribute :delivered_at, :timestamp
         attribute :failed, :boolean

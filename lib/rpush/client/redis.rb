@@ -7,6 +7,7 @@ require 'rpush/client/redis/notification'
 
 require 'rpush/client/redis/apns/app'
 require 'rpush/client/redis/apns/notification'
+require 'rpush/client/redis/apns/feedback'
 
 require 'rpush/client/redis/gcm/app'
 require 'rpush/client/redis/gcm/notification'

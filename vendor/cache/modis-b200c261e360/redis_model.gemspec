@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib"]
   s.authors = ["Ian Leitch"]
-  s.date = "2014-04-21"
+  s.date = "2014-05-01"
   s.description = "ActiveModel + Redis"
   s.email = ["port001@gmail.com"]
   s.files = [".coveralls.yml", ".gitignore", ".ruby-gemset", ".ruby-version", ".travis.yml", "Gemfile", "LICENSE.txt", "README.md", "Rakefile", "lib/modis.rb", "lib/modis/attributes.rb", "lib/modis/configuration.rb", "lib/modis/errors.rb", "lib/modis/finders.rb", "lib/modis/model.rb", "lib/modis/persistence.rb", "lib/modis/transaction.rb", "lib/modis/version.rb", "lib/tasks/spec.rake", "redis_model.gemspec", "spec/attributes_spec.rb", "spec/errors_spec.rb", "spec/finders_spec.rb", "spec/persistence_spec.rb", "spec/spec_helper.rb", "spec/support/simplecov_helper.rb", "spec/support/simplecov_quality_formatter.rb", "spec/transaction_spec.rb", "spec/validations_spec.rb"]

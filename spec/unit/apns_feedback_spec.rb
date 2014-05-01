@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rpush, 'apns_feedback' do
-  let!(:app) { Rpush::Client::ActiveRecord::Apns::App.create!(name: 'test', environment: 'production', certificate: TEST_CERT) }
+  let!(:app) { Rpush::Apns::App.create!(name: 'test', environment: 'production', certificate: TEST_CERT) }
   let(:receiver) { double(check_for_feedback: nil) }
 
   before do

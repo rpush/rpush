@@ -2,7 +2,6 @@ module Rpush
   module Daemon
     module Store
       class Redis
-        include Rpush::Client::Redis
 
         DEFAULT_MARK_OPTIONS = { persist: true }
 
@@ -11,17 +10,18 @@ module Rpush
         end
 
         def all_apps
-          App.all
+          Rpush::Client::Redis::App.all
         end
 
         def deliverable_notifications(apps)
           batch_size = Rpush.config.batch_size
+          namespace = Rpush::Client::Redis::Notification.absolute_pending_namespace
           results = @redis.multi do
-            @redis.zrange(Notification.absolute_pending_namespace, 0, batch_size)
-            @redis.zremrangebyrank(Notification.absolute_pending_namespace, 0, batch_size)
+            @redis.zrange(namespace, 0, batch_size)
+            @redis.zremrangebyrank(namespace, 0, batch_size)
           end
           ids = results.first
-          ids.map { |id| Notification.find(id) }
+          ids.map { |id| Rpush::Client::Redis::Notification.find(id) }
         end
 
         def mark_delivered(notification, time, opts = {})
@@ -73,16 +73,16 @@ module Rpush
         end
 
         def create_apns_feedback(failed_at, device_token, app)
-          Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app: app)
+          Rpush::Client::Redis::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app: app)
         end
 
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
-          notification = Gcm::Notification.new
+          notification = Rpush::Client::Redis::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
-          notification = Adm::Notification.new
+          notification = Rpush::Client::Redis::Adm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 

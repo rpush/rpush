@@ -9,6 +9,10 @@ def is_functional_example?(example)
 end
 
 RSpec.configure do |config|
+  config.before(:each) do
+    SPEC_REDIS.keys('rpush:*').each { |key| SPEC_REDIS.del(key) }
+  end
+
   config.after(:each) do
     if is_functional_example?(example)
       DatabaseCleaner.clean

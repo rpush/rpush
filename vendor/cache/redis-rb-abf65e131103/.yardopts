@@ -1,3 +1,0 @@
---exclude redis/connection
---exclude redis/compat
---markup markdown

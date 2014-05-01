@@ -46,7 +46,7 @@ GEM
       multi_json (~> 1.0)
     arel (3.0.3)
     builder (3.0.4)
-    cane (2.6.1)
+    cane (2.6.2)
       parallel
     coveralls (0.7.0)
       multi_json (~> 1.3)
