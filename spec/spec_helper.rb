@@ -3,6 +3,18 @@ ENV['RAILS_ENV'] = 'test'
 require 'bundler'
 Bundler.require(:default)
 
+unless ENV['TRAVIS']
+  unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
+    begin
+      require './spec/support/simplecov_helper'
+      include SimpleCovHelper
+      start_simple_cov("unit-#{RUBY_VERSION}")
+    rescue LoadError
+      puts "Coverage disabled."
+    end
+  end
+end
+
 require 'rpush'
 require 'rpush/daemon'
 require 'rpush/client/redis'

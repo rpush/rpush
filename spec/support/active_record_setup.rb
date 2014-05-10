@@ -1,17 +1,5 @@
 require 'active_record'
 
-unless ENV['TRAVIS']
-  unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
-    begin
-      require './spec/support/simplecov_helper'
-      include SimpleCovHelper
-      start_simple_cov("unit-#{RUBY_VERSION}")
-    rescue LoadError
-      puts "Coverage disabled."
-    end
-  end
-end
-
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 
 $adapter = ENV['ADAPTER'] || 'postgresql'
