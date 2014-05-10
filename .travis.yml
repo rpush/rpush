@@ -3,41 +3,40 @@ language: ruby
 install: bundle install --local --deployment --no-prune --no-cache --jobs=4
 services:
   - redis-server
-rvm:
-  - 2.0.0
-  - 2.1.2
-  - jruby
-  - rbx
-gemfile:
-  - Gemfile
-  - Gemfile.rails-4
-env: QUALITY=true
 
 matrix:
   fast_finish: true
   include:
-    - rvm: 2.0.0
-      gemfile: Gemfile.rails-4
-      env: QUALITY=false
-    - rvm: 2.1.1
-      gemfile: Gemfile.rails-4
-      env: QUALITY=false
-    - rvm: 2.0.0
-      gemfile: Gemfile
-      env: ADAPTER=sqlite3
-  exclude:
-    - rvm: 2.0.0
-      gemfile: Gemfile.rails-4
-      env: QUALITY=true
-    - rvm: 2.1.1
-      gemfile: Gemfile.rails-4
-      env: QUALITY=true
-    - rvm: jruby
-      gemfile: Gemfile.rails-4
-      env: QUALITY=true
-    - rvm: rbx
-      gemfile: Gemfile.rails-4
-      env: QUALITY=true
-  allow_failures:
-    - rvm: rbx
-    - rvm: jruby
+  - rvm: 2.0.0
+    gemfile: Gemfile
+    env: CLIENT=active_record
+  - rvm: 2.1.2
+    gemfile: Gemfile
+    env: CLIENT=active_record
+  - rvm: 2.0.0
+    gemfile: Gemfile.rails-4
+    env: CLIENT=active_record
+  - rvm: 2.1.2
+    gemfile: Gemfile.rails-4
+    env: CLIENT=active_record
+  - rvm: 2.0.0
+    gemfile: Gemfile
+    env: CLIENT=redis
+  - rvm: 2.1.2
+    gemfile: Gemfile
+    env: CLIENT=redis
+  - rvm: 2.0.0
+    gemfile: Gemfile.rails-4
+    env: CLIENT=redis
+  - rvm: 2.1.2
+    gemfile: Gemfile.rails-4
+    env: CLIENT=redis
+  - rvm: 2.1.2
+    gemfile: Gemfile
+    env: CLIENT=active_record ADAPTER=sqlite3
+  - rvm: rbx
+    gemfile: Gemfile.rails-4
+    env: CLIENT=active_record
+  - rvm: jruby
+    gemfile: Gemfile.rails-4
+    env: CLIENT=active_record
