@@ -57,7 +57,7 @@ n = Rpush::Apns::Notification.new
 n.app = Rpush::Apns::App.find_by_name("ios_app")
 n.device_token = "..."
 n.alert = "hi mom!"
-n.data = {:foo => :bar}
+n.data = { foo: :bar }
 n.save!
 ```
 
@@ -76,8 +76,8 @@ app.save!
 ```ruby
 n = Rpush::Gcm::Notification.new
 n.app = Rpush::Gcm::App.find_by_name("android_app")
-n.registration_ids = ["..."]
-n.data = {:message => "hi mom!"}
+n.registration_ids = ["token", "..."]
+n.data = { message: "hi mom!" }
 n.save!
 ```
 
@@ -98,7 +98,7 @@ app.save!
 n = Rpush::Adm::Notification.new
 n.app = Rpush::Adm::App.find_by_name("kindle_app")
 n.registration_ids = ["..."]
-n.data = {:message => "hi mom!"}
+n.data = { message: "hi mom!"}
 n.collapse_key = "Optional consolidationKey"
 n.save!
 ```
