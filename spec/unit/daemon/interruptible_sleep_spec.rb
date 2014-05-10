@@ -2,8 +2,8 @@ require "unit_spec_helper"
 
 describe Rpush::Daemon::InterruptibleSleep do
 
-  let(:rd) { double(:close => nil) }
-  let(:wr) { double(:close => nil) }
+  let(:rd) { double(close: nil) }
+  let(:wr) { double(close: nil) }
 
   subject { Rpush::Daemon::InterruptibleSleep.new }
 
@@ -13,13 +13,13 @@ describe Rpush::Daemon::InterruptibleSleep do
   end
 
   it 'selects on the reader' do
-    IO.stub(:pipe => [rd, wr])
+    IO.stub(pipe: [rd, wr])
     IO.should_receive(:select).with([rd], nil, nil, 1)
     subject.sleep(1)
   end
 
   it 'closes the writer' do
-    IO.stub(:pipe => [rd, wr])
+    IO.stub(pipe: [rd, wr])
     rd.should_receive(:close)
     wr.should_receive(:close)
     subject.close

@@ -2,8 +2,8 @@ require 'unit_spec_helper'
 
 describe Rpush, 'push' do
   before do
-    Rpush::Daemon::AppRunner.stub(:sync => nil, :wait => nil)
-    Rpush::Daemon::Feeder.stub(:start => nil)
+    Rpush::Daemon::AppRunner.stub(sync: nil, wait: nil)
+    Rpush::Daemon::Feeder.stub(start: nil)
   end
 
   it 'sets the push config option to true' do
@@ -38,6 +38,6 @@ describe Rpush, 'push' do
 
   it 'overrides the default config options with those given as a hash' do
     Rpush.config.batch_size = 20
-    expect { Rpush.push(:batch_size => 10) }.to change(Rpush.config, :batch_size).to(10)
+    expect { Rpush.push(batch_size: 10) }.to change(Rpush.config, :batch_size).to(10)
   end
 end

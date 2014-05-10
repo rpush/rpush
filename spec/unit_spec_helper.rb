@@ -11,14 +11,9 @@ def rails4?
 end
 
 RSpec.configure do |config|
-  # config.before :suite do
-  #   PerfTools::CpuProfiler.start('/tmp/rpush_profile')
-  # end
-  # config.after :suite do
-  #   PerfTools::CpuProfiler.stop
-  # end
-
   config.before(:each) do
+    SPEC_REDIS.keys('rpush:*').each { |key| SPEC_REDIS.del(key) }
+
     if is_unit_example?(example)
       connection = ActiveRecord::Base.connection
 

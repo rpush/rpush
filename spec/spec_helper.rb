@@ -3,8 +3,6 @@ ENV['RAILS_ENV'] = 'test'
 require 'bundler'
 Bundler.require(:default)
 
-require 'active_record'
-
 unless ENV['TRAVIS']
   unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
     begin
@@ -17,64 +15,26 @@ unless ENV['TRAVIS']
   end
 end
 
-jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
-
-$adapter = ENV['ADAPTER'] || 'postgresql'
-$adapter = 'jdbc' + $adapter if jruby
-
-DATABASE_CONFIG = YAML.load_file(File.expand_path("../config/database.yml", File.dirname(__FILE__)))
-
-if DATABASE_CONFIG[$adapter].nil?
-  puts "No such adapter '#{$adapter}'. Valid adapters are #{DATABASE_CONFIG.keys.join(', ')}."
-  exit 1
-end
-
-if ENV['TRAVIS']
-  DATABASE_CONFIG[$adapter]['username'] = 'postgres'
-else
-  require 'etc'
-  username = $adapter =~ /mysql/ ? 'root' : Etc.getlogin
-  DATABASE_CONFIG[$adapter]['username'] = username
-end
-
-puts "Using #{$adapter} adapter."
-
-ActiveRecord::Base.configurations = {"test" => DATABASE_CONFIG[$adapter]}
-ActiveRecord::Base.establish_connection(DATABASE_CONFIG[$adapter])
-
-require 'generators/templates/add_rpush'
-
-migrations = [AddRpush]
-
-unless ENV['TRAVIS']
-  migrations.reverse.each do |m|
-    begin
-      m.down
-    rescue ActiveRecord::StatementInvalid => e
-      p e
-    end
-  end
-end
-
-migrations.each(&:up)
-
 require 'rpush'
 require 'rpush/daemon'
+require 'rpush/client/redis'
+require 'rpush/client/active_record'
 
-Rpush::Daemon.initialize_store
-Rpush::Notification.reset_column_information
-Rpush::App.reset_column_information
-Rpush::Apns::Feedback.reset_column_information
+require 'support/active_record_setup'
 
-# a test certificate that contains both an X509 certificate and
-# a private key, similar to those used for connecting to Apple
-# push notification servers.
-#
-# Note that we cannot validate the certificate and private key
-# because we are missing the certificate chain used to validate
-# the certificate, and this is private to Apple. So if the app
-# has a certificate and a private key in it, the only way to find
-# out if it really is valid is to connect to Apple's servers.
+RAILS_ROOT = '/tmp/rails_root'
+
+Rpush.configure do |config|
+  config.client = (ENV['CLIENT'] || :active_record).to_sym
+  config.log_dir = RAILS_ROOT
+end
+
+RPUSH_CLIENT = Rpush.config.client
+SPEC_REDIS = Modis.redis
+
+def active_record?
+  Rpush.config.client == :active_record
+end
 
 path = File.join(File.dirname(__FILE__), 'support')
 TEST_CERT = File.read(File.join(path, 'cert_without_password.pem'))
@@ -85,12 +45,16 @@ def after_example_cleanup
   Rpush::Daemon.store = nil
   Rpush::Deprecation.muted do
     Rpush.config.set_defaults if Rpush.config.kind_of?(Rpush::Configuration)
+    Rpush.config.client = RPUSH_CLIENT
   end
 end
 
 RSpec.configure do |config|
+  config.before(:each) do
+    Rails.stub(root: RAILS_ROOT)
+  end
+
   config.after(:each) do
     after_example_cleanup
   end
 end
-

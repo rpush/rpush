@@ -1,3 +1,6 @@
+## 2.0.0 (unreleased)
+  * Deprecated attributes_for_device accessors. Use data instead.
+
 ## 1.0.0 (Feb 9, 2014)
   * Renamed to Rpush (from Rapns). Version number reset to 1.0.0.
   * Reduce default batch size to 100.

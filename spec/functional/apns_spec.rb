@@ -6,6 +6,7 @@ describe 'APNs' do
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
   let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
     write: nil, flush: nil, read: nil, close: nil) }
+  let(:io_double) { double(select: nil) }
 
   before do
     app.certificate = TEST_CERT
@@ -25,9 +26,9 @@ describe 'APNs' do
   end
 
   def stub_tcp_connection
-    TCPSocket.stub(:new => tcp_socket)
-    OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    IO.stub(:select => nil)
+    Rpush::Daemon::TcpConnection.any_instance.stub(connect_socket: [tcp_socket, ssl_socket])
+    Rpush::Daemon::TcpConnection.any_instance.stub(setup_ssl_context: double.as_null_object)
+    stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
   end
 
   it 'delivers a notification successfully' do
@@ -38,8 +39,8 @@ describe 'APNs' do
   end
 
   it 'fails to deliver a notification successfully' do
-    IO.stub(:select => true)
-    ssl_socket.stub(:read => [8, 4, 69].pack('ccN'))
+    io_double.stub(select: true)
+    ssl_socket.stub(read: [8, 4, 69].pack('ccN'))
 
     expect do
       Rpush.push
@@ -50,9 +51,8 @@ describe 'APNs' do
   it 'receives feedback' do
     tuple = "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
     allow(ssl_socket).to receive(:read).and_return(tuple, nil)
-
-    expect do
-      Rpush.apns_feedback
-    end.to change(Rpush::Apns::Feedback, :count).to(1)
+    Rpush.apns_feedback
+    feedback = Rpush::Apns::Feedback.all
+    feedback.should_not be_empty
   end
 end

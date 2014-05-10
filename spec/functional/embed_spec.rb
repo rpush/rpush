@@ -6,6 +6,7 @@ describe 'embedding' do
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
   let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
     write: nil, flush: nil, read: nil, close: nil) }
+  let(:io_double) { double(select: nil) }
 
   before do
     app.certificate = TEST_CERT
@@ -25,10 +26,11 @@ describe 'embedding' do
   end
 
   def stub_tcp_connection
-    TCPSocket.stub(:new => tcp_socket)
-    OpenSSL::SSL::SSLSocket.stub(:new => ssl_socket)
-    IO.stub(:select => nil)
-    Rpush::Daemon::Apns::FeedbackReceiver.stub(:new => double.as_null_object)
+    Rpush::Daemon::TcpConnection.any_instance.stub(connect_socket: [tcp_socket, ssl_socket])
+    Rpush::Daemon::TcpConnection.any_instance.stub(setup_ssl_context: double.as_null_object)
+    stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
+    Rpush::Daemon::Apns::FeedbackReceiver.stub(new: double.as_null_object)
+
   end
 
   it 'delivers a notification successfully' do

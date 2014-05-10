@@ -55,7 +55,7 @@ module Rpush
 
           def check_database_is_connected
             # Simply asking the adapter for the connection state is not sufficient.
-            Rpush::Notification.count
+            Rpush::Client::ActiveRecord::Notification.count
           end
 
           def sleep_to_avoid_thrashing

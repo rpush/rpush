@@ -1,15 +1,15 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Batch do
-  let(:notification1) { double(:notification1, :id => 1) }
-  let(:notification2) { double(:notification2, :id => 2) }
+  let(:notification1) { double(:notification1, id: 1) }
+  let(:notification2) { double(:notification2, id: 2) }
   let(:batch) { Rpush::Daemon::Batch.new([notification1, notification2]) }
   let(:store) { double.as_null_object }
   let(:time) { Time.now }
 
   before do
-    Time.stub(:now => time)
-    Rpush::Daemon.stub(:store => store)
+    Time.stub(now: time)
+    Rpush::Daemon.stub(store: store)
   end
 
   it 'exposes the notifications' do
@@ -56,7 +56,7 @@ describe Rpush::Daemon::Batch do
       before { Rpush.config.batch_storage_updates = true }
 
       it 'marks the notification as delivered immediately without persisting' do
-        store.should_receive(:mark_delivered).with(notification1, time, :persist => false)
+        store.should_receive(:mark_delivered).with(notification1, time, persist: false)
         batch.mark_delivered(notification1)
       end
 
@@ -86,7 +86,7 @@ describe Rpush::Daemon::Batch do
       before { Rpush.config.batch_storage_updates = true }
 
       it 'marks the notification as failed without persisting' do
-        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, :persist => false)
+        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, persist: false)
         batch.mark_failed(notification1, 1, 'an error')
       end
 
@@ -117,7 +117,7 @@ describe Rpush::Daemon::Batch do
       before { Rpush.config.batch_storage_updates = true }
 
       it 'marks the notification as retryable without persisting' do
-        store.should_receive(:mark_retryable).with(notification1, time, :persist => false)
+        store.should_receive(:mark_retryable).with(notification1, time, persist: false)
         batch.mark_retryable(notification1, time)
       end
 
@@ -131,7 +131,7 @@ describe Rpush::Daemon::Batch do
   describe 'complete' do
     before do
       Rpush.config.batch_storage_updates = true
-      Rpush.stub(:logger => double.as_null_object)
+      Rpush.stub(logger: double.as_null_object)
       batch.stub(:reflect)
     end
 

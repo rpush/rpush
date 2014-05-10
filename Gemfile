@@ -5,11 +5,13 @@ gem 'rspec', '>= 2.14.1'
 gem 'rails', '~> 3.2'
 gem 'database_cleaner'
 gem 'timecop'
+gem 'redis'
+gem 'modis', github: 'ileitch/modis'
 
 platform :mri do
   gem 'cane'
-  gem 'coveralls', :require => false
-  gem 'simplecov', :require => false
+  gem 'coveralls', require: false
+  gem 'simplecov', require: false
 end
 
 platform :ruby do

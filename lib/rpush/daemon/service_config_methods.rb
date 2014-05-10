@@ -2,8 +2,8 @@ module Rpush
   module Daemon
     module ServiceConfigMethods
       DISPATCHERS = {
-        :http => Rpush::Daemon::Dispatcher::Http,
-        :tcp => Rpush::Daemon::Dispatcher::Tcp
+        http: Rpush::Daemon::Dispatcher::Http,
+        tcp: Rpush::Daemon::Dispatcher::Tcp
       }
 
       def dispatcher(name = nil, options = {})

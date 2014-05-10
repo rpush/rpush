@@ -2,9 +2,9 @@ require 'thread'
 require 'socket'
 require 'pathname'
 require 'openssl'
-
 require 'net/http/persistent'
 
+require 'rpush/daemon/errors'
 require 'rpush/daemon/constants'
 require 'rpush/daemon/reflectable'
 require 'rpush/daemon/loggable'
@@ -24,9 +24,9 @@ require 'rpush/daemon/dispatcher/tcp'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 
+require 'rpush/daemon/store/interface'
+
 require 'rpush/daemon/apns/delivery'
-require 'rpush/daemon/apns/disconnection_error'
-require 'rpush/daemon/apns/certificate_expired_error'
 require 'rpush/daemon/apns/feedback_receiver'
 require 'rpush/daemon/apns'
 
@@ -71,11 +71,11 @@ module Rpush
     def self.initialize_store
       return if store
       begin
-        name = Rpush.config.store.to_s
+        name = Rpush.config.client.to_s
         require "rpush/daemon/store/#{name}"
         self.store = Rpush::Daemon::Store.const_get(name.camelcase).new
       rescue StandardError, LoadError => e
-        Rpush.logger.error("Failed to load '#{Rpush.config.store}' storage backend.")
+        Rpush.logger.error("Failed to load '#{Rpush.config.client}' storage backend.")
         Rpush.logger.error(e)
       end
     end
@@ -83,7 +83,7 @@ module Rpush
     protected
 
     def self.daemonize?
-      !(Rpush.config.foreground || Rpush.config.embedded || Rpush.jruby?)
+      !(Rpush.config.push || Rpush.config.foreground || Rpush.config.embedded || Rpush.jruby?)
     end
 
     def self.trap_signals?

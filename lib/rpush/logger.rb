@@ -1,10 +1,8 @@
 module Rpush
   class Logger
-    def initialize(options)
-      @options = options
-
+    def initialize
       begin
-        log_dir = File.join(Rails.root, 'log')
+        log_dir = File.join(Rpush.config.log_dir, 'log')
         FileUtils.mkdir_p(log_dir)
         log = File.open(File.join(log_dir, 'rpush.log'), 'a')
         log.sync = true
@@ -53,7 +51,7 @@ module Rpush
 
       if io == STDERR
         io.puts formatted_msg
-      elsif @options[:foreground]
+      elsif Rpush.config.foreground
         io.puts formatted_msg
       end
 

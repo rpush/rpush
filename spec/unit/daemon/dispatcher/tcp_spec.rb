@@ -2,17 +2,17 @@ require 'unit_spec_helper'
 
 describe Rpush::Daemon::Dispatcher::Tcp do
   let(:app) { double }
-  let(:delivery) { double(:perform => nil) }
-  let(:delivery_class) { double(:new => delivery) }
+  let(:delivery) { double(perform: nil) }
+  let(:delivery_class) { double(new: delivery) }
   let(:notification) { double }
   let(:batch) { double }
-  let(:connection) { double(Rpush::Daemon::TcpConnection, :connect => nil) }
+  let(:connection) { double(Rpush::Daemon::TcpConnection, connect: nil) }
   let(:host) { 'localhost' }
   let(:port) { 1234 }
   let(:host_proc) { Proc.new { |app| [host, port] } }
-  let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, :host => host_proc) }
+  let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, host: host_proc) }
 
-  before { Rpush::Daemon::TcpConnection.stub(:new => connection) }
+  before { Rpush::Daemon::TcpConnection.stub(new: connection) }
 
   describe 'dispatch' do
     it 'lazily connects the socket' do

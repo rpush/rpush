@@ -29,7 +29,7 @@ module Rpush
               handle_response(do_post(registration_id), registration_id)
             end
 
-            if(@sent_registration_ids.empty?)
+            if @sent_registration_ids.empty?
               raise Rpush::DeliveryError.new(nil, @notification.id, describe_errors)
             else
               unless(@failed_registration_ids.empty?)
@@ -73,12 +73,12 @@ module Rpush
         def ok(response, current_registration_id)
           response_body = multi_json_load(response.body)
 
-          if(response_body.has_key?('registrationID'))
+          if response_body.has_key?('registrationID')
             @sent_registration_ids << response_body['registrationID']
             log_info("#{@notification.id} sent to #{response_body['registrationID']}")
           end
 
-          if(current_registration_id != response_body['registrationID'])
+          if current_registration_id != response_body['registrationID']
             reflect(:adm_canonical_id, current_registration_id, response_body['registrationID'])
           end
         end
@@ -97,7 +97,7 @@ module Rpush
         end
 
         def handle_too_many_requests(error)
-          if(@sent_registration_ids.empty?)
+          if @sent_registration_ids.empty?
             # none sent yet, just resend after the specified retry-after response.header
             retry_delivery(@notification, error.response)
           else
@@ -120,7 +120,7 @@ module Rpush
         def bad_request(response, current_registration_id)
           response_body = multi_json_load(response.body)
 
-          if(response_body.has_key?('reason'))
+          if response_body.has_key?('reason')
             log_warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
             @failed_registration_ids[current_registration_id] = response_body['reason']
           end
@@ -192,7 +192,7 @@ module Rpush
         end
 
         def get_access_token
-          if(@notification.app.access_token.nil? || @notification.app.access_token_expired?)
+          if @notification.app.access_token.nil? || @notification.app.access_token_expired?
             post = Net::HTTP::Post.new(AMAZON_TOKEN_URI.path, initheader = {'Content-Type' => 'application/x-www-form-urlencoded'})
             post.set_form_data(ACCESS_TOKEN_REQUEST_DATA.merge({'client_id' => @notification.app.client_id, 'client_secret' => @notification.app.client_secret}))
 
@@ -203,7 +203,7 @@ module Rpush
         end
 
         def handle_access_token(response)
-          if(response.code.to_i == 200)
+          if response.code.to_i == 200
             update_access_token(JSON.parse(response.body))
             Rpush::Daemon.store.update_app(@notification.app)
             log_info("ADM access token updated: token = #{@notification.app.access_token}, expires = #{@notification.app.access_token_expiration}")

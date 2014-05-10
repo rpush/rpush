@@ -45,7 +45,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   let(:test_double) { TestDouble.new(error, 1) }
 
   before do
-    @logger = double("Logger", :info => nil, :error => nil, :warn => nil)
+    @logger = double("Logger", info: nil, error: nil, warn: nil)
     Rpush.stub(:logger).and_return(@logger)
 
     ActiveRecord::Base.stub(:clear_all_connections!)
@@ -79,21 +79,21 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   it "should test out the new connection by performing a count" do
-    Rpush::Notification.should_receive(:count)
+    Rpush::Client::ActiveRecord::Notification.should_receive(:count)
     test_double.perform
   end
 
   context "when the reconnection attempt is not successful" do
     before do
-      class << Rpush::Notification
+      class << Rpush::Client::ActiveRecord::Notification
         def count
           @count_calls += 1
           return if @count_calls == 2
           raise @error
         end
       end
-      Rpush::Notification.instance_variable_set("@count_calls", 0)
-      Rpush::Notification.instance_variable_set("@error", error)
+      Rpush::Client::ActiveRecord::Notification.instance_variable_set("@count_calls", 0)
+      Rpush::Client::ActiveRecord::Notification.instance_variable_set("@error", error)
     end
 
     it "should log the 2nd attempt" do

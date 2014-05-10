@@ -8,12 +8,12 @@ Gem::Specification.new do |s|
   s.authors     = ["Ian Leitch"]
   s.email       = ["port001@gmail.com"]
   s.homepage    = "https://github.com/rpush/rpush"
-  s.summary     = %q{Professional grade APNs and GCM for Ruby}
-  s.description = %q{Professional grade APNs and GCM for Ruby}
+  s.summary     = %q{The push notification service for Ruby.}
+  s.description = %q{The push notification service for Ruby.}
   s.license    = "MIT"
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features,config}`.split("\n")
+  s.test_files    = `git ls-files -- {test,spec,features}`.split("\n")
   s.executables   = `git ls-files -- bin`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 

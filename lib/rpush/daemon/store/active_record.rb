@@ -8,12 +8,16 @@ module Rpush
       class ActiveRecord
         include Reconnectable
 
-        DEFAULT_MARK_OPTIONS = {:persist => true}
+        DEFAULT_MARK_OPTIONS = {persist: true}
+
+        def all_apps
+          Rpush::Client::ActiveRecord::App.all
+        end
 
         def deliverable_notifications(apps)
           with_database_reconnect_and_retry do
             batch_size = Rpush.config.batch_size
-            relation = Rpush::Notification.ready_for_delivery.for_apps(apps)
+            relation = ready_for_delivery_for_apps(apps)
             relation = relation.limit(batch_size) unless Rpush.config.push
             relation.to_a
           end
@@ -26,7 +30,7 @@ module Rpush
 
           if opts[:persist]
             with_database_reconnect_and_retry do
-              notification.save!(:validate => false)
+              notification.save!(validate: false)
             end
           end
         end
@@ -34,11 +38,11 @@ module Rpush
         def mark_batch_retryable(notifications, deliver_after)
           ids = []
           notifications.each do |n|
-            mark_retryable(n, deliver_after, :persist => false)
+            mark_retryable(n, deliver_after, persist: false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Notification.where(:id => ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
           end
         end
 
@@ -49,7 +53,7 @@ module Rpush
 
           if opts[:persist]
             with_database_reconnect_and_retry do
-              notification.save!(:validate => false)
+              notification.save!(validate: false)
             end
           end
         end
@@ -58,11 +62,11 @@ module Rpush
           now = Time.now
           ids = []
           notifications.each do |n|
-            mark_delivered(n, now, :persist => false)
+            mark_delivered(n, now, persist: false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = ?', true, now])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = ?', true, now])
           end
         end
 
@@ -77,7 +81,7 @@ module Rpush
 
           if opts[:persist]
             with_database_reconnect_and_retry do
-              notification.save!(:validate => false)
+              notification.save!(validate: false)
             end
           end
         end
@@ -86,28 +90,28 @@ module Rpush
           now = Time.now
           ids = []
           notifications.each do |n|
-            mark_failed(n, code, description, now, :persist => false)
+            mark_failed(n, code, description, now, persist: false)
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Notification.where(:id => ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, now, code, description])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, now, code, description])
           end
         end
 
         def create_apns_feedback(failed_at, device_token, app)
           with_database_reconnect_and_retry do
-            Rpush::Apns::Feedback.create!(:failed_at => failed_at,
-              :device_token => device_token, :app => app)
+            Rpush::Client::ActiveRecord::Apns::Feedback.create!(failed_at: failed_at,
+              device_token: device_token, app: app)
           end
         end
 
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
-          notification = Rpush::Gcm::Notification.new
+          notification = Rpush::Client::ActiveRecord::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
-          notification = Rpush::Adm::Notification.new
+          notification = Rpush::Client::ActiveRecord::Adm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
@@ -148,7 +152,13 @@ module Rpush
             notification
           end
         end
+
+        def ready_for_delivery_for_apps(apps)
+          Rpush::Client::ActiveRecord::Notification.where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, Time.now).where('app_id IN (?)', apps.map(&:id))
+        end
       end
     end
   end
 end
+
+Rpush::Daemon::Store::Interface.check(Rpush::Daemon::Store::ActiveRecord)

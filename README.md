@@ -18,7 +18,7 @@
 * Run as a daemon or inside an [existing processs](https://github.com/rpush/rpush/wiki/Embedding-API).
 * Use in a scheduler for low-workload deployments ([Push API](https://github.com/rpush/rpush/wiki/Push-API)).
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
-* Works with MRI, JRuby, Rubinius 1.9, 2.0, 2.1.
+* Works with MRI, JRuby, Rubinius 2.0, 2.1.
 
 
 ### Getting Started
@@ -57,7 +57,7 @@ n = Rpush::Apns::Notification.new
 n.app = Rpush::Apns::App.find_by_name("ios_app")
 n.device_token = "..."
 n.alert = "hi mom!"
-n.attributes_for_device = { foo: "bar" }
+n.data = { foo: :bar }
 n.save!
 ```
 

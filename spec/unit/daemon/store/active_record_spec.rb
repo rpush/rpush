@@ -2,15 +2,15 @@ require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record'
 
 describe Rpush::Daemon::Store::ActiveRecord do
-  let(:app) { Rpush::Apns::App.create!(:name => 'my_app', :environment => 'development', :certificate => TEST_CERT) }
-  let(:notification) { Rpush::Apns::Notification.create!(:device_token => "a" * 64, :app => app) }
+  let(:app) { Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:store) { Rpush::Daemon::Store::ActiveRecord.new }
   let(:time) { Time.now.utc }
   let(:logger) { double(Rpush::Logger, error: nil) }
 
   before do
     Rpush.stub(logger: logger)
-    Time.stub(:now => time)
+    Time.stub(now: time)
   end
 
   it 'reconnects after daemonize' do
@@ -51,7 +51,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
       Rpush.config.push = false
       relation = double.as_null_object
       relation.should_receive(:limit).with(5000)
-      Rpush::Notification.stub(:ready_for_delivery => relation)
+      store.stub(ready_for_delivery_for_apps: relation)
       store.deliverable_notifications([app])
     end
 
@@ -59,32 +59,32 @@ describe Rpush::Daemon::Store::ActiveRecord do
       Rpush.config.push = true
       relation = double.as_null_object
       relation.should_not_receive(:limit)
-      Rpush::Notification.stub(:ready_for_delivery => relation)
+      Rpush::Notification.stub(ready_for_delivery: relation)
       store.deliverable_notifications([app])
     end
 
     it 'loads an undelivered notification without deliver_after set' do
-      notification.update_attributes!(:delivered => false, :deliver_after => nil)
+      notification.update_attributes!(delivered: false, deliver_after: nil)
       store.deliverable_notifications([app]).should eq [notification]
     end
 
     it 'loads an notification with a deliver_after time in the past' do
-      notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.ago)
+      notification.update_attributes!(delivered: false, deliver_after: 1.hour.ago)
       store.deliverable_notifications([app]).should eq [notification]
     end
 
     it 'does not load an notification with a deliver_after time in the future' do
-      notification.update_attributes!(:delivered => false, :deliver_after => 1.hour.from_now)
+      notification.update_attributes!(delivered: false, deliver_after: 1.hour.from_now)
       store.deliverable_notifications([app]).should be_empty
     end
 
     it 'does not load a previously delivered notification' do
-      notification.update_attributes!(:delivered => true, :delivered_at => time)
+      notification.update_attributes!(delivered: true, delivered_at: time)
       store.deliverable_notifications([app]).should be_empty
     end
 
     it "does not enqueue a notification that has previously failed delivery" do
-      notification.update_attributes!(:delivered => false, :failed => true)
+      notification.update_attributes!(delivered: false, failed: true)
       store.deliverable_notifications([app]).should be_empty
     end
 
@@ -109,13 +109,13 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'saves the notification without validation' do
-      notification.should_receive(:save!).with(:validate => false)
+      notification.should_receive(:save!).with(validate: false)
       store.mark_retryable(notification, time)
     end
 
-    it 'does not save the notification if :persist => false' do
+    it 'does not save the notification if persist: false' do
       notification.should_not_receive(:save!)
-      store.mark_retryable(notification, time, :persist => false)
+      store.mark_retryable(notification, time, persist: false)
     end
   end
 
@@ -158,13 +158,13 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'saves the notification without validation' do
-      notification.should_receive(:save!).with(:validate => false)
+      notification.should_receive(:save!).with(validate: false)
       store.mark_delivered(notification, time)
     end
 
-    it 'does not save the notification if :persist => false' do
+    it 'does not save the notification if persist: false' do
       notification.should_not_receive(:save!)
-      store.mark_delivered(notification, time, :persist => false)
+      store.mark_delivered(notification, time, persist: false)
     end
   end
 
@@ -223,13 +223,13 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'saves the notification without validation' do
-      notification.should_receive(:save!).with(:validate => false)
+      notification.should_receive(:save!).with(validate: false)
       store.mark_failed(notification, nil, '', time)
     end
 
-    it 'does not save the notification if :persist => false' do
+    it 'does not save the notification if persist: false' do
       notification.should_not_receive(:save!)
-      store.mark_failed(notification, nil, '', time, :persist => false)
+      store.mark_failed(notification, nil, '', time, persist: false)
     end
   end
 
@@ -281,15 +281,15 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      Rpush::Apns::Feedback.should_receive(:create!).with(
-        :failed_at => time, :device_token => 'ab' * 32, :app => app)
+      Rpush::Client::ActiveRecord::Apns::Feedback.should_receive(:create!).with(
+        failed_at: time, device_token: 'ab' * 32, app: app)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end
   end
 
   describe 'create_gcm_notification' do
-    let(:data) { { :data => true } }
-    let(:attributes) { { :device_token => 'ab' * 32 } }
+    let(:data) { { data: true } }
+    let(:attributes) { { device_token: 'ab' * 32 } }
     let(:registration_ids) { ['123', '456'] }
     let(:deliver_after) { time + 10.seconds }
     let(:args) { [attributes, data, registration_ids, deliver_after, app] }
@@ -321,8 +321,8 @@ describe Rpush::Daemon::Store::ActiveRecord do
   end
 
   describe 'create_adm_notification' do
-    let(:data) { { :data => true } }
-    let(:attributes) { {:app_id => app.id, :collapse_key => 'ckey', :delay_while_idle => true} }
+    let(:data) { { data: true } }
+    let(:attributes) { {app_id: app.id, collapse_key: 'ckey', delay_while_idle: true} }
     let(:registration_ids) { ['123', '456'] }
     let(:deliver_after) { time + 10.seconds }
     let(:args) { [attributes, data, registration_ids, deliver_after, app] }
