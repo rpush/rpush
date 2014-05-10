@@ -5,54 +5,38 @@ services:
   - redis-server
 rvm:
   - 2.0.0
-  - 2.1.1
+  - 2.1.2
   - jruby
   - rbx
 gemfile:
   - Gemfile
-  - Gemfile.rails-4.0
-  - Gemfile.rails-4.1
+  - Gemfile.rails-4
 env: QUALITY=true
 
 matrix:
   fast_finish: true
   include:
     - rvm: 2.0.0
-      gemfile: Gemfile.rails-4.0
+      gemfile: Gemfile.rails-4
       env: QUALITY=false
     - rvm: 2.1.1
-      gemfile: Gemfile.rails-4.0
-      env: QUALITY=false
-    - rvm: 2.1.0
-      gemfile: Gemfile.rails-4.1
+      gemfile: Gemfile.rails-4
       env: QUALITY=false
     - rvm: 2.0.0
       gemfile: Gemfile
       env: ADAPTER=sqlite3
   exclude:
     - rvm: 2.0.0
-      gemfile: Gemfile.rails-4.0
+      gemfile: Gemfile.rails-4
       env: QUALITY=true
     - rvm: 2.1.1
-      gemfile: Gemfile.rails-4.0
+      gemfile: Gemfile.rails-4
       env: QUALITY=true
     - rvm: jruby
-      gemfile: Gemfile.rails-4.0
+      gemfile: Gemfile.rails-4
       env: QUALITY=true
     - rvm: rbx
-      gemfile: Gemfile.rails-4.0
-      env: QUALITY=true
-    - rvm: 2.0.0
-      gemfile: Gemfile.rails-4.1
-      env: QUALITY=true
-    - rvm: 2.1.0
-      gemfile: Gemfile.rails-4.1
-      env: QUALITY=true
-    - rvm: jruby
-      gemfile: Gemfile.rails-4.1
-      env: QUALITY=true
-    - rvm: rbx
-      gemfile: Gemfile.rails-4.1
+      gemfile: Gemfile.rails-4
       env: QUALITY=true
   allow_failures:
     - rvm: rbx
