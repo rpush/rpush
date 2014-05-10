@@ -40,3 +40,7 @@ matrix:
   - rvm: jruby
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record
+  allow_failures:
+    - rvm: rbx
+    - rvm: jruby
+    - env: CLIENT=active_record ADAPTER=sqlite3
