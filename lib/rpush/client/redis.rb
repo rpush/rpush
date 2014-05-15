@@ -1,3 +1,14 @@
+begin
+  require 'modis'
+rescue LoadError
+  puts
+  str = "* Please add Modis (github.com/ileitch/modis) to your Gemfile to use the Redis client. *"
+  puts "*" * str.size
+  puts str
+  puts "*" * str.size
+  puts
+end
+
 require 'redis'
 
 require 'rpush/client/active_model'
