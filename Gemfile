@@ -6,7 +6,7 @@ gem 'rails', '~> 3.2'
 gem 'database_cleaner'
 gem 'timecop'
 gem 'redis'
-gem 'modis', github: 'ileitch/modis'
+gem 'modis'
 
 platform :mri do
   gem 'cane'

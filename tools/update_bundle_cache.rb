@@ -5,10 +5,11 @@ require 'fileutils'
 
 FileUtils.rm_rf("vendor/cache")
 
-travis_yml = YAML.load(File.read(".travis.yml"))
+RUBYS = ["2.0.0", "2.1.2", "rbx", "jruby"]
+GEMFILES = ["Gemfile", "Gemfile.rails-4"]
 
-travis_yml["rvm"].each do |ruby|
-    travis_yml["gemfile"].each do |gemfile|
+RUBYS.each do |ruby|
+    GEMFILES.each do |gemfile|
         cmd = "export BUNDLE_GEMFILE=#{gemfile}; rvm #{ruby} do bundle package --all --no-prune"
         puts cmd
         puts `#{cmd}`
