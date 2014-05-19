@@ -1,0 +1,12 @@
+AllCops:
+  Exclude:
+    - lib/generators/**/*
+
+LineLength:
+  Enabled: false
+
+StringLiterals:
+  Enabled: false
+
+Documentation:
+  Enabled: false
