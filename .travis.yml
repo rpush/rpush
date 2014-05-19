@@ -1,6 +1,6 @@
 before_script: "psql -c 'create database rpush_test;' -U postgres >/dev/null"
 language: ruby
-install: bundle install --local --deployment --no-prune --no-cache --jobs=4
+install: bundle install --jobs=4
 services:
   - redis-server
 
