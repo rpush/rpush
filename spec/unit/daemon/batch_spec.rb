@@ -93,7 +93,7 @@ describe Rpush::Daemon::Batch do
       it 'defers persisting' do
         Rpush.config.batch_storage_updates = true
         batch.mark_failed(notification1, 1, 'an error')
-        batch.failed.should eq({[1, 'an error'] => [notification1]})
+        batch.failed.should eq([1, 'an error'] => [notification1])
       end
     end
   end
@@ -123,7 +123,7 @@ describe Rpush::Daemon::Batch do
 
       it 'defers persisting' do
         batch.mark_retryable(notification1, time)
-        batch.retryable.should eq({time => [notification1]})
+        batch.retryable.should eq(time => [notification1])
       end
     end
   end

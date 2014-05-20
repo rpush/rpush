@@ -15,7 +15,7 @@ describe Rpush::Client::ActiveRecord::Gcm::Notification do
   end
 
   it 'limits the number of registration ids to 1000' do
-    notification.registration_ids = ['a']*(1000+1)
+    notification.registration_ids = ['a'] * (1000 + 1)
     notification.valid?.should be_false
     notification.errors[:base].should eq ["Number of registration_ids cannot be larger than 1000."]
   end

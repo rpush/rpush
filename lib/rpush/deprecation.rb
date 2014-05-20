@@ -1,13 +1,11 @@
 module Rpush
   class Deprecation
     def self.muted
-      begin
-        orig_val = Thread.current[:rpush_mute_deprecations]
-        Thread.current[:rpush_mute_deprecations] = true
-        yield
-      ensure
-        Thread.current[:rpush_mute_deprecations] = orig_val
-      end
+      orig_val = Thread.current[:rpush_mute_deprecations]
+      Thread.current[:rpush_mute_deprecations] = true
+      yield
+    ensure
+      Thread.current[:rpush_mute_deprecations] = orig_val
     end
 
     def self.muted?

@@ -13,14 +13,14 @@ module Rpush
         belongs_to :app, class_name: 'Rpush::Client::ActiveRecord::App'
 
         if Rpush.attr_accessible_available?
-          attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry,:delivered,
-            :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
-            :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids, :uri
+          attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry, :delivered,
+                          :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
+                          :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids, :uri
         end
 
         def data=(attrs)
           return unless attrs
-          raise ArgumentError, "must be a Hash" if !attrs.is_a?(Hash)
+          fail ArgumentError, "must be a Hash" unless attrs.is_a?(Hash)
           write_attribute(:data, multi_json_dump(attrs.merge(data || {})))
         end
 

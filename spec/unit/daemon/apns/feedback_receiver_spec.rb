@@ -13,8 +13,8 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
   let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, interrupt_sleep: nil) }
-  let(:store) { double(Rpush::Daemon::Store::ActiveRecord,
-    create_apns_feedback: feedback, release_connection: nil) }
+  let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
+                        create_apns_feedback: feedback, release_connection: nil) end
 
   before do
     Rpush.config.feedback_poll = poll
@@ -29,7 +29,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     connection.unstub(:read)
 
     def connection.read(bytes)
-      if !@called
+      unless @called
         @called = true
         "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
       end
@@ -63,7 +63,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'creates the feedback' do
-    Rpush::Daemon.store.should_receive(:create_apns_feedback).with(Time.at(1323533325), '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', app)
+    Rpush::Daemon.store.should_receive(:create_apns_feedback).with(Time.at(1_323_533_325), '834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17', app)
     double_connection_read_with_tuple
     receiver.check_for_feedback
   end

@@ -4,8 +4,8 @@ describe 'embedding' do
   let(:app) { Rpush::Apns::App.new }
   let(:notification) { Rpush::Apns::Notification.new }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
-  let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
-    write: nil, flush: nil, read: nil, close: nil) }
+  let(:ssl_socket) do double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
+                                                      write: nil, flush: nil, read: nil, close: nil) end
   let(:io_double) { double(select: nil) }
 
   before do
@@ -30,7 +30,6 @@ describe 'embedding' do
     Rpush::Daemon::TcpConnection.any_instance.stub(setup_ssl_context: double.as_null_object)
     stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
     Rpush::Daemon::Apns::FeedbackReceiver.stub(new: double.as_null_object)
-
   end
 
   it 'delivers a notification successfully' do
@@ -39,7 +38,7 @@ describe 'embedding' do
 
       begin
         Timeout.timeout(5) do
-          while !notification.delivered
+          until notification.delivered
             notification.reload
             sleep 0.1
           end

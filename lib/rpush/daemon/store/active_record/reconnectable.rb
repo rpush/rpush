@@ -1,11 +1,11 @@
-class PGError < StandardError; end if !defined?(PGError)
-class Mysql; class Error < StandardError; end; end if !defined?(Mysql)
-module Mysql2; class Error < StandardError; end; end if !defined?(Mysql2)
+class PGError < StandardError; end unless defined?(PGError)
+class Mysql; class Error < StandardError; end; end unless defined?(Mysql)
+module Mysql2; class Error < StandardError; end; end unless defined?(Mysql2)
 module ActiveRecord; end
-class ActiveRecord::JDBCError < StandardError; end if !defined?(::ActiveRecord::JDBCError)
+class ActiveRecord::JDBCError < StandardError; end unless defined?(::ActiveRecord::JDBCError)
 
 # :nocov:
-if !defined?(::SQLite3::Exception)
+unless defined?(::SQLite3::Exception)
   module SQLite3
     class Exception < StandardError; end
   end
@@ -20,15 +20,13 @@ module Rpush
                             Mysql2::Error, ::ActiveRecord::JDBCError, SQLite3::Exception]
 
           def with_database_reconnect_and_retry
-            begin
-              ::ActiveRecord::Base.connection_pool.with_connection do
-                yield
-              end
-            rescue *ADAPTER_ERRORS => e
-              Rpush.logger.error(e)
-              database_connection_lost
-              retry
+            ::ActiveRecord::Base.connection_pool.with_connection do
+              yield
             end
+          rescue *ADAPTER_ERRORS => e
+            Rpush.logger.error(e)
+            database_connection_lost
+            retry
           end
 
           def database_connection_lost

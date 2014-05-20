@@ -14,18 +14,18 @@ module Rpush
           end
 
           def device_token=(token)
-            write_attribute(:device_token, token.delete(" <>")) if !token.nil?
+            write_attribute(:device_token, token.delete(" <>")) unless token.nil?
           end
 
           MDM_KEY = '__rpush_mdm__'
           def mdm=(magic)
-            self.data = (data || {}).merge({ MDM_KEY => magic })
+            self.data = (data || {}).merge(MDM_KEY => magic)
           end
 
           CONTENT_AVAILABLE_KEY = '__rpush_content_available__'
           def content_available=(bool)
             return unless bool
-            self.data = (data || {}).merge({ CONTENT_AVAILABLE_KEY => true })
+            self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
           def as_json

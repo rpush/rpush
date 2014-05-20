@@ -20,7 +20,7 @@ describe Rpush::Logger do
 
   before do
     @logger_class = if defined?(ActiveSupport::BufferedLogger)
-      ActiveSupport::BufferedLogger
+                      ActiveSupport::BufferedLogger
     else
       ActiveSupport::Logger
     end

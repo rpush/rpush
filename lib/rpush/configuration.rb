@@ -24,8 +24,8 @@ module Rpush
   end
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
-    :check_for_errors, :pid_file, :batch_size, :push, :client, :logger,
-    :batch_storage_updates, :wakeup, :log_dir]
+                  :check_for_errors, :pid_file, :batch_size, :push, :client, :logger,
+                  :batch_storage_updates, :wakeup, :log_dir]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end

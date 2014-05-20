@@ -9,10 +9,8 @@ describe Rpush::Daemon::Apns::Delivery do
   let(:delivery) { Rpush::Daemon::Apns::Delivery.new(app, connection, notification, batch) }
 
   def perform
-    begin
-      delivery.perform
-    rescue Rpush::DeliveryError, Rpush::DisconnectionError
-    end
+    delivery.perform
+  rescue Rpush::DeliveryError, Rpush::DisconnectionError
   end
 
   before do
@@ -54,9 +52,9 @@ describe Rpush::Daemon::Apns::Delivery do
       # checking for the doublebed error doesn't work in jruby, but checking
       # for the exception by class does.
 
-      #error = Rpush::DeliveryError.new(4, 12, "Missing payload")
-      #Rpush::DeliveryError.stub(new: error)
-      #expect { delivery.perform }.to raise_error(error)
+      # error = Rpush::DeliveryError.new(4, 12, "Missing payload")
+      # Rpush::DeliveryError.stub(new: error)
+      # expect { delivery.perform }.to raise_error(error)
 
       expect { delivery.perform }.to raise_error(Rpush::DeliveryError)
     end

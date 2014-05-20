@@ -8,7 +8,7 @@ module Rpush
       class ActiveRecord
         include Reconnectable
 
-        DEFAULT_MARK_OPTIONS = {persist: true}
+        DEFAULT_MARK_OPTIONS = { persist: true }
 
         def all_apps
           Rpush::Client::ActiveRecord::App.all
@@ -101,7 +101,7 @@ module Rpush
         def create_apns_feedback(failed_at, device_token, app)
           with_database_reconnect_and_retry do
             Rpush::Client::ActiveRecord::Apns::Feedback.create!(failed_at: failed_at,
-              device_token: device_token, app: app)
+                                                                device_token: device_token, app: app)
           end
         end
 
@@ -132,11 +132,9 @@ module Rpush
         end
 
         def release_connection
-          begin
-            ::ActiveRecord::Base.connection_pool.release_connection
-          rescue StandardError => e
-            Rpush.logger.error(e)
-          end
+          ::ActiveRecord::Base.connection_pool.release_connection
+        rescue StandardError => e
+          Rpush.logger.error(e)
         end
 
         private

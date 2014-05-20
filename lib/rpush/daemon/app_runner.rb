@@ -59,7 +59,7 @@ module Rpush
       end
 
       def self.wait
-        sleep 0.1 while !runners.values.all?(&:idle?)
+        sleep 0.1 until runners.values.all?(&:idle?)
       end
 
       attr_reader :app

@@ -5,7 +5,7 @@ describe Rpush::Daemon::Gcm::Delivery do
   let(:notification) { Rpush::Gcm::Notification.create!(app: app, registration_ids: ['xyz'], deliver_after: Time.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}) }
-  let(:http) { double(shutdown: nil, request: response)}
+  let(:http) { double(shutdown: nil, request: response) }
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil) }
   let(:delivery) { Rpush::Daemon::Gcm::Delivery.new(app, http, notification, batch) }
@@ -33,11 +33,11 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'creates a new notification for the unavailable devices' do
-      notification.update_attributes(registration_ids: ['id_0', 'id_1', 'id_2'], data: {'one' => 1}, collapse_key: 'thing', delay_while_idle: true)
+      notification.update_attributes(registration_ids: %w(id_0 id_1 id_2), data: { 'one' => 1 }, collapse_key: 'thing', delay_while_idle: true)
       response.stub(header: { 'retry-after' => 10 })
       attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
       store.should_receive(:create_gcm_notification).with(attrs, notification.data,
-          ['id_0', 'id_2'], now + 10.seconds, notification.app)
+                                                          %w(id_0 id_2), now + 10.seconds, notification.app)
       perform rescue Rpush::DeliveryError
     end
 
@@ -62,7 +62,7 @@ describe Rpush::Daemon::Gcm::Delivery do
       }
 
       response.stub(body: JSON.dump(body))
-      notification.stub(registration_ids: ['1', '2'])
+      notification.stub(registration_ids: %w(1 2))
       delivery.should_receive(:reflect).with(:gcm_delivered_to_recipient, notification, '1')
       delivery.should_not_receive(:reflect).with(:gcm_delivered_to_recipient, notification, '2')
       perform rescue Rpush::DeliveryError
@@ -79,7 +79,7 @@ describe Rpush::Daemon::Gcm::Delivery do
       }
 
       response.stub(body: JSON.dump(body))
-      notification.stub(registration_ids: ['1', '2'])
+      notification.stub(registration_ids: %w(1 2))
       delivery.should_receive(:reflect).with(:gcm_failed_to_recipient, notification, 'Err', '1')
       delivery.should_not_receive(:reflect).with(:gcm_failed_to_recipient, notification, anything, '2')
       perform rescue Rpush::DeliveryError
@@ -94,37 +94,37 @@ describe Rpush::Daemon::Gcm::Delivery do
           { 'message_id' => '1:000' },
           { 'message_id' => '1:000', 'registration_id' => 'canonical123' },
           { 'message_id' => '1:000' },
-        ]}
+        ] }
 
       response.stub(body: JSON.dump(body))
-      notification.stub(registration_ids: ['1', '2', '3'])
+      notification.stub(registration_ids: %w(1 2 3))
       delivery.should_receive(:reflect).with(:gcm_canonical_id, '2', 'canonical123')
       perform
     end
 
     it 'reflects on invalid IDs' do
       body = {
-          'failure' => 1,
-          'success' => 2,
-          'canonical_ids' => 0,
-          'results' => [
-              { 'message_id' => '1:000' },
-              { 'error' => 'NotRegistered' },
-              { 'message_id' => '1:000' },
-          ]}
+        'failure' => 1,
+        'success' => 2,
+        'canonical_ids' => 0,
+        'results' => [
+          { 'message_id' => '1:000' },
+          { 'error' => 'NotRegistered' },
+          { 'message_id' => '1:000' },
+          ] }
 
       response.stub(body: JSON.dump(body))
-      notification.stub(registration_ids: ['1', '2', '3'])
+      notification.stub(registration_ids: %w(1 2 3))
       delivery.should_receive(:reflect).with(:gcm_invalid_registration_id, app, 'NotRegistered', '2')
       perform rescue Rpush::DeliveryError
     end
 
     describe 'when delivered successfully to all devices' do
-      let(:body) {{
+      let(:body) do{
         'failure' => 0,
         'success' => 1,
-        'results' => [{ 'message_id' => '1:000'}]
-      }}
+        'results' => [{ 'message_id' => '1:000' }]
+      }end
 
       before { response.stub(body: JSON.dump(body)) }
 
@@ -141,14 +141,14 @@ describe Rpush::Daemon::Gcm::Delivery do
 
     it 'marks a notification as failed if any ids are invalid' do
       body = {
-          'failure' => 1,
-          'success' => 2,
-          'canonical_ids' => 0,
-          'results' => [
-              { 'message_id' => '1:000' },
-              { 'error' => 'NotRegistered' },
-              { 'message_id' => '1:000' },
-          ]}
+        'failure' => 1,
+        'success' => 2,
+        'canonical_ids' => 0,
+        'results' => [
+          { 'message_id' => '1:000' },
+          { 'error' => 'NotRegistered' },
+          { 'message_id' => '1:000' },
+          ] }
 
       response.stub(body: JSON.dump(body))
       delivery.should_receive(:mark_failed)
@@ -164,24 +164,24 @@ describe Rpush::Daemon::Gcm::Delivery do
         'results' => [
           { 'message_id' => '1:000' },
           { 'error' => 'InvalidDataKey' }
-        ]}
+        ] }
       response.stub(body: JSON.dump(body))
       delivery.should_receive(:mark_failed).with(nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
       perform rescue Rpush::DeliveryError
     end
 
     describe 'all deliveries failed with Unavailable or InternalServerError' do
-      let(:body) {{
+      let(:body) do{
         'failure' => 2,
         'success' => 0,
         'results' => [
           { 'error' => 'Unavailable' },
           { 'error' => 'Unavailable' }
-        ]}}
+        ] }end
 
       before do
         response.stub(body: JSON.dump(body))
-        notification.stub(registration_ids: ['1', '2'])
+        notification.stub(registration_ids: %w(1 2))
       end
 
       it 'retries the notification respecting the Retry-After header' do
@@ -209,27 +209,27 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     describe 'all deliveries failed with some as Unavailable or InternalServerError' do
-      let(:body) {{
+      let(:body) do{
         'failure' => 3,
         'success' => 0,
         'results' => [
           { 'error' => 'Unavailable' },
           { 'error' => 'InvalidDataKey' },
           { 'error' => 'Unavailable' }
-        ]}}
+        ] }end
       let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, InvalidDataKey, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'a notification with some delivery failures'
     end
 
     describe 'some deliveries failed with Unavailable or InternalServerError' do
-      let(:body) {{
+      let(:body) do{
         'failure' => 2,
         'success' => 1,
         'results' => [
           { 'error' => 'Unavailable' },
           { 'message_id' => '1:000' },
           { 'error' => 'InternalServerError' }
-        ]}}
+        ] }end
       let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'a notification with some delivery failures'
     end
@@ -258,7 +258,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'defaults to exponential back-off if the Retry-After header is not present' do
-      delivery.should_receive(:mark_retryable).with(notification, now + 2 ** 1)
+      delivery.should_receive(:mark_retryable).with(notification, now + 2**1)
       perform
     end
   end
@@ -271,13 +271,13 @@ describe Rpush::Daemon::Gcm::Delivery do
 
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
-      notification.deliver_after = now + 2 ** 3
-      Rpush.logger.should_receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2 ** 3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
+      notification.deliver_after = now + 2**3
+      Rpush.logger.should_receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2**3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
       perform
     end
 
     it 'retries the notification in accordance with the exponential back-off strategy.' do
-      delivery.should_receive(:mark_retryable).with(notification, now + 2 ** 3)
+      delivery.should_receive(:mark_retryable).with(notification, now + 2**3)
       perform
     end
   end

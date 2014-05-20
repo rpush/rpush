@@ -16,7 +16,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
     def perform
       with_database_reconnect_and_retry do
         @calls += 1
-        raise @error if @calls <= @max_calls
+        fail @error if @calls <= @max_calls
       end
     end
   end
@@ -38,7 +38,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
     when 'sqlite3'
       SQLite3::Exception
     else
-      raise "Please update #{__FILE__} for adapter #{$adapter}"
+      fail "Please update #{__FILE__} for adapter #{$adapter}"
     end
   end
   let(:error) { adapter_error_class.new("db down!") }
@@ -89,7 +89,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
         def count
           @count_calls += 1
           return if @count_calls == 2
-          raise @error
+          fail @error
         end
       end
       Rpush::Client::ActiveRecord::Notification.instance_variable_set("@count_calls", 0)

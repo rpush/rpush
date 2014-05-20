@@ -11,7 +11,7 @@ describe Rpush::Daemon::TcpConnection do
   let(:tcp_socket) { double(setsockopt: nil, close: nil) }
   let(:ssl_socket) { double(:sync= => nil, connect: nil, close: nil, write: nil, flush: nil) }
   let(:logger) { double(info: nil, error: nil, warn: nil) }
-  let(:app) { double(name: 'Connection 0', certificate: certificate, password: password)}
+  let(:app) { double(name: 'Connection 0', certificate: certificate, password: password) }
   let(:connection) { Rpush::Daemon::TcpConnection.new(app, host, port) }
 
   before do

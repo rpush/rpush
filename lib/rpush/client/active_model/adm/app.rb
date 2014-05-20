@@ -10,7 +10,7 @@ module Rpush
           end
 
           def access_token_expired?
-            self.access_token_expiration.nil? || self.access_token_expiration < Time.now
+            access_token_expiration.nil? || access_token_expiration < Time.now
           end
 
           def service_name

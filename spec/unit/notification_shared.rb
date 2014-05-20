@@ -5,14 +5,14 @@ shared_examples_for "an Notification subclass" do
     it "calls MultiJson.dump when multi_json responds to :dump" do
       notification = notification_class.new
       MultiJson.stub(:respond_to?).with(:dump).and_return(true)
-      MultiJson.should_receive(:dump).with(any_args())
+      MultiJson.should_receive(:dump).with(any_args)
       notification.data = { pirates: 1 }
     end
 
     it "calls MultiJson.encode when multi_json does not respond to :dump" do
       notification = notification_class.new
       MultiJson.stub(:respond_to?).with(:dump).and_return(false)
-      MultiJson.should_receive(:encode).with(any_args())
+      MultiJson.should_receive(:encode).with(any_args)
       notification.data = { ninjas: 1 }
     end
 
@@ -29,7 +29,7 @@ shared_examples_for "an Notification subclass" do
 
     it "decodes the JSON when using the reader method" do
       notification.data = { hi: "mom" }
-      notification.data.should eq ({"hi" => "mom"})
+      notification.data.should eq ({ "hi" => "mom" })
     end
   end
 end

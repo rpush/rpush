@@ -23,7 +23,7 @@ end
 
 puts "Using #{$adapter} adapter."
 
-ActiveRecord::Base.configurations = {"test" => db_config[$adapter]}
+ActiveRecord::Base.configurations = { "test" => db_config[$adapter] }
 ActiveRecord::Base.establish_connection(db_config[$adapter])
 
 require 'generators/templates/add_rpush'

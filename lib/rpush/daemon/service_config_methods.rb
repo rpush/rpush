@@ -12,7 +12,7 @@ module Rpush
       end
 
       def dispatcher_class
-        DISPATCHERS[@dispatcher_name] || (raise NotImplementedError)
+        DISPATCHERS[@dispatcher_name] || (fail NotImplementedError)
       end
 
       def delivery_class

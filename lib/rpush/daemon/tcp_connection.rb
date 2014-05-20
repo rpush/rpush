@@ -27,11 +27,9 @@ module Rpush
       end
 
       def close
-        begin
-          @ssl_socket.close if @ssl_socket
-          @tcp_socket.close if @tcp_socket
-        rescue IOError
-        end
+        @ssl_socket.close if @ssl_socket
+        @tcp_socket.close if @tcp_socket
+      rescue IOError
       end
 
       def read(num_bytes)
@@ -50,7 +48,7 @@ module Rpush
         begin
           write_data(data)
         rescue Errno::EPIPE, Errno::ETIMEDOUT, OpenSSL::SSL::SSLError, IOError => e
-          retry_count += 1;
+          retry_count += 1
 
           if retry_count == 1
             log_error("Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
@@ -63,7 +61,7 @@ module Rpush
             sleep 1
             retry
           else
-            raise TcpConnectionError, "#{@app.name} tried #{retry_count-1} times to reconnect but failed (#{e.class.name})."
+            raise TcpConnectionError, "#{@app.name} tried #{retry_count - 1} times to reconnect but failed (#{e.class.name})."
           end
         end
       end
@@ -117,7 +115,7 @@ module Rpush
         cert = @ssl_context.cert
         if certificate_expired?
           log_error(certificate_msg('expired'))
-          raise Rpush::CertificateExpiredError.new(@app, cert.not_after)
+          fail Rpush::CertificateExpiredError.new(@app, cert.not_after)
         elsif certificate_expires_soon?
           log_warn(certificate_msg('will expire'))
           reflect(:apns_certificate_will_expire, @app, cert.not_after) # deprecated

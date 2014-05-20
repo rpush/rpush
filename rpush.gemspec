@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 require "rpush/version"
 
 Gem::Specification.new do |s|
@@ -8,13 +8,13 @@ Gem::Specification.new do |s|
   s.authors     = ["Ian Leitch"]
   s.email       = ["port001@gmail.com"]
   s.homepage    = "https://github.com/rpush/rpush"
-  s.summary     = %q{The push notification service for Ruby.}
-  s.description = %q{The push notification service for Ruby.}
+  s.summary     = %q(The push notification service for Ruby.)
+  s.description = %q(The push notification service for Ruby.)
   s.license    = "MIT"
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}`.split("\n")
-  s.executables   = `git ls-files -- bin`.split("\n").map{ |f| File.basename(f) }
+  s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
   s.add_dependency "multi_json", "~> 1.0"

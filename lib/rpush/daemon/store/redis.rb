@@ -2,7 +2,6 @@ module Rpush
   module Daemon
     module Store
       class Redis
-
         DEFAULT_MARK_OPTIONS = { persist: true }
 
         def initialize

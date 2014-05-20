@@ -17,14 +17,14 @@ describe Rpush::Client::ActiveRecord::App do
   context 'validating certificates' do
     it 'rescues from certificate error' do
       app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'test', environment: 'development', certificate: 'bad')
-      expect{app.valid?}.not_to raise_error
+      expect { app.valid? }.not_to raise_error
       expect(app.valid?).to be_false
     end
 
     it 'raises other errors' do
       app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'test', environment: 'development', certificate: 'bad')
       OpenSSL::X509::Certificate.stub(:new).and_raise(NameError, 'simulating no openssl')
-      expect{app.valid?}.to raise_error(NameError)
+      expect { app.valid? }.to raise_error(NameError)
     end
   end
 end

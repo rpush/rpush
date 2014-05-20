@@ -5,7 +5,7 @@ module Rpush
     end
 
     module ClassMethods
-      def deprecated(method_name, version, msg=nil)
+      def deprecated(method_name, version, msg = nil)
         instance_eval do
           alias_method "#{method_name}_without_warning", method_name
         end

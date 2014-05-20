@@ -24,7 +24,7 @@ describe 'ADM' do
   end
 
   it 'delivers a notification successfully' do
-    response.stub(body: JSON.dump({registrationID: notification.registration_ids.first.to_s}))
+    response.stub(body: JSON.dump(registrationID: notification.registration_ids.first.to_s))
 
     expect do
       Rpush.push
@@ -33,7 +33,7 @@ describe 'ADM' do
   end
 
   it 'fails to deliver a notification successfully' do
-    response.stub(code: 400, body: JSON.dump({reason: 'error', registrationID: notification.registration_ids.first.to_s}))
+    response.stub(code: 400, body: JSON.dump(reason: 'error', registrationID: notification.registration_ids.first.to_s))
 
     expect do
       Rpush.push

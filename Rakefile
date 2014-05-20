@@ -9,9 +9,9 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
 end
 
 if ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
-  task :default => 'spec'
+  task default: 'spec'
 elsif RUBY_VERSION > '1.9' && defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
-  task :default => 'spec:quality'
+  task default: 'spec:quality'
 else
-  task :default => 'spec'
+  task default: 'spec'
 end

@@ -23,7 +23,7 @@ describe 'GCM' do
   end
 
   it 'delivers a notification successfully' do
-    response.stub(body: JSON.dump({results: [{message_id: notification.registration_ids.first.to_s}]}))
+    response.stub(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))
 
     expect do
       Rpush.push
@@ -32,7 +32,7 @@ describe 'GCM' do
   end
 
   it 'fails to deliver a notification successfully' do
-    response.stub(body: JSON.dump({results: [{error: 'Err'}]}))
+    response.stub(body: JSON.dump(results: [{ error: 'Err' }]))
 
     expect do
       Rpush.push

@@ -1,15 +1,14 @@
 module Rpush
   module Daemon
     module Gcm
-
       # http://developer.android.com/guide/google/gcm/gcm.html#response
       class Delivery < Rpush::Daemon::Delivery
         include MultiJsonHelper
 
         host = ENV["RPUSH_GCM_HOST"] || "https://android.googleapis.com"
         GCM_URI = URI.parse("#{host}/gcm/send")
-        UNAVAILABLE_STATES = ['Unavailable', 'InternalServerError']
-        INVALID_REGISTRATION_ID_STATES = ['InvalidRegistration', 'MismatchSenderId', 'NotRegistered', 'InvalidPackageName']
+        UNAVAILABLE_STATES = %w(Unavailable InternalServerError)
+        INVALID_REGISTRATION_ID_STATES = %w(InvalidRegistration MismatchSenderId NotRegistered InvalidPackageName)
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -19,12 +18,10 @@ module Rpush
         end
 
         def perform
-          begin
-            handle_response(do_post)
-          rescue Rpush::DeliveryError => error
-            mark_failed(error.code, error.description)
-            raise
-          end
+          handle_response(do_post)
+        rescue Rpush::DeliveryError => error
+          mark_failed(error.code, error.description)
+          raise
         end
 
         protected
@@ -42,7 +39,7 @@ module Rpush
           when 503
             service_unavailable(response)
           else
-            raise Rpush::DeliveryError.new(response.code, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
+            fail Rpush::DeliveryError.new(response.code, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
           end
         end
 
@@ -69,7 +66,7 @@ module Rpush
         def handle_successes(successes)
           successes.each do |result|
             reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
-            if result.has_key?(:canonical_id)
+            if result.key?(:canonical_id)
               reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
             end
           end
@@ -86,7 +83,7 @@ module Rpush
               failures.description += " #{unavailable_idxs.join(', ')} will be retried as notification #{new_notification.id}."
             end
             handle_errors(failures)
-            raise Rpush::DeliveryError.new(nil, @notification.id, failures.description)
+            fail Rpush::DeliveryError.new(nil, @notification.id, failures.description)
           end
         end
 
@@ -103,15 +100,15 @@ module Rpush
           attrs = @notification.attributes.slice('app_id', 'collapse_key', 'delay_while_idle')
           registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
           Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data,
-            registration_ids, deliver_after_header(response), @notification.app)
+                                                      registration_ids, deliver_after_header(response), @notification.app)
         end
 
         def bad_request
-          raise Rpush::DeliveryError.new(400, @notification.id, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
+          fail Rpush::DeliveryError.new(400, @notification.id, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
         end
 
         def unauthorized
-          raise Rpush::DeliveryError.new(401, @notification.id, 'Unauthorized, check your App auth_key.')
+          fail Rpush::DeliveryError.new(401, @notification.id, 'Unauthorized, check your App auth_key.')
         end
 
         def internal_server_error(response)
@@ -141,8 +138,8 @@ module Rpush
         end
 
         def do_post
-          post = Net::HTTP::Post.new(GCM_URI.path, initheader = {'Content-Type'  => 'application/json',
-                                                                 'Authorization' => "key=#{@notification.app.auth_key}"})
+          post = Net::HTTP::Post.new(GCM_URI.path, initheader = { 'Content-Type'  => 'application/json',
+                                                                  'Authorization' => "key=#{@notification.app.auth_key}" })
           post.body = @notification.as_json.to_json
           @http.request(GCM_URI, post)
         end

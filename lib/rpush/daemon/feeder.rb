@@ -44,15 +44,13 @@ module Rpush
       end
 
       def self.enqueue_notifications
-        begin
-          idle = Rpush::Daemon::AppRunner.idle.map(&:app)
-          return if idle.empty?
-          notifications = Rpush::Daemon.store.deliverable_notifications(idle)
-          Rpush::Daemon::AppRunner.enqueue(notifications)
-        rescue StandardError => e
-          Rpush.logger.error(e)
-          reflect(:error, e)
-        end
+        idle = Rpush::Daemon::AppRunner.idle.map(&:app)
+        return if idle.empty?
+        notifications = Rpush::Daemon.store.deliverable_notifications(idle)
+        Rpush::Daemon::AppRunner.enqueue(notifications)
+      rescue StandardError => e
+        Rpush.logger.error(e)
+        reflect(:error, e)
       end
 
       def self.interruptible_sleeper
