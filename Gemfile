@@ -12,6 +12,7 @@ platform :mri do
   gem 'cane'
   gem 'coveralls', require: false
   gem 'simplecov', require: false
+  gem 'rubocop', require: false
 end
 
 platform :ruby do
