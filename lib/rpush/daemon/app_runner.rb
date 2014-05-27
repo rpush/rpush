@@ -14,7 +14,8 @@ module Rpush
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
           batch = Batch.new(group)
-          if app = runners[app_id]
+          app = runners[app_id]
+          if app
             app.enqueue(batch)
           else
             Rpush.logger.error("No such app '#{app_id}' for notifications #{batch.describe}.")

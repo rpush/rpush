@@ -9,7 +9,7 @@ describe Rpush::Daemon::Dispatcher::Tcp do
   let(:connection) { double(Rpush::Daemon::TcpConnection, connect: nil) }
   let(:host) { 'localhost' }
   let(:port) { 1234 }
-  let(:host_proc) { proc { |app| [host, port] } }
+  let(:host_proc) { proc { [host, port] } }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, host: host_proc) }
 
   before { Rpush::Daemon::TcpConnection.stub(new: connection) }

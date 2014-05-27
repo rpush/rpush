@@ -1,8 +1,9 @@
 class PGError < StandardError; end unless defined?(PGError)
 class Mysql; class Error < StandardError; end; end unless defined?(Mysql)
 module Mysql2; class Error < StandardError; end; end unless defined?(Mysql2)
-module ActiveRecord; end
-class ActiveRecord::JDBCError < StandardError; end unless defined?(::ActiveRecord::JDBCError)
+module ActiveRecord
+  class JDBCError < StandardError; end unless defined?(::ActiveRecord::JDBCError)
+end
 
 # :nocov:
 unless defined?(::SQLite3::Exception)

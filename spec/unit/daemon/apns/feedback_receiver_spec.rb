@@ -14,7 +14,8 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:feedback) { double }
   let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, interrupt_sleep: nil) }
   let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
-                        create_apns_feedback: feedback, release_connection: nil) end
+                        create_apns_feedback: feedback, release_connection: nil)
+  end
 
   before do
     Rpush.config.feedback_poll = poll
@@ -28,7 +29,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   def double_connection_read_with_tuple
     connection.unstub(:read)
 
-    def connection.read(bytes)
+    def connection.read(*)
       unless @called
         @called = true
         "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"

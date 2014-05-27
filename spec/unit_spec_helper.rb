@@ -1,7 +1,7 @@
 require 'spec_helper'
 require 'rails'
 
-def is_unit_example?(example)
+def unit_example?(example)
   path = example.metadata[:example_group][:file_path]
   path =~ /spec\/unit/
 end
@@ -14,7 +14,7 @@ RSpec.configure do |config|
   config.before(:each) do
     SPEC_REDIS.keys('rpush:*').each { |key| SPEC_REDIS.del(key) }
 
-    if is_unit_example?(example)
+    if unit_example?(example)
       connection = ActiveRecord::Base.connection
 
       if rails4?
@@ -28,7 +28,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    if is_unit_example?(example)
+    if unit_example?(example)
       connection = ActiveRecord::Base.connection
 
       if rails4?

@@ -57,7 +57,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
 
   it "should encode the alert as JSON if it is a Hash" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { 'body' => "hi mom", 'alert-loc-key' => "View" })
-    notification.as_json["aps"]["alert"].should eq ({ 'body' => "hi mom", 'alert-loc-key' => "View" })
+    notification.as_json["aps"]["alert"].should eq('body' => "hi mom", 'alert-loc-key' => "View")
   end
 
   it "should include the badge if present" do
@@ -101,7 +101,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
 
   it 'includes the mdm magic in the payload' do
     notification.mdm = magic
-    notification.as_json.should eq ({ 'mdm' => magic })
+    notification.as_json.should eq('mdm' => magic)
   end
 
   it 'does not include aps attribute' do
@@ -169,7 +169,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #31" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new
     notification.stub(:has_attribute? => false)
     notification.alert = "{\"one\":2}"
-    notification.alert.should eq ({ "one" => 2 })
+    notification.alert.should eq('one' => 2)
   end
 end
 
@@ -181,8 +181,8 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
       n.app = Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     end
 
-    notification.to_binary(for_validation: true).bytesize.should > 256
-    notification.payload_size.should < 256
+    notification.to_binary(for_validation: true).bytesize.should be > 256
+    notification.payload_size.should be < 256
     notification.should be_valid
   end
 end

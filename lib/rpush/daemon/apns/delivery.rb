@@ -38,8 +38,9 @@ module Rpush
         def check_for_error
           if @connection.select(SELECT_TIMEOUT)
             error = nil
+            tuple = @connection.read(ERROR_TUPLE_BYTES)
 
-            if tuple = @connection.read(ERROR_TUPLE_BYTES)
+            if tuple
               _, code, notification_id = tuple.unpack("ccN")
 
               description = APN_ERRORS[code.to_i] || "Unknown error. Possible Rpush bug?"

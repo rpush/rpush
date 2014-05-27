@@ -24,12 +24,12 @@ shared_examples_for "an Notification subclass" do
 
     it "encodes the given Hash as JSON" do
       notification.data = { hi: "mom" }
-      notification.read_attribute(:data).should eq "{\"hi\":\"mom\"}"
+      notification.read_attribute(:data).should eq("{\"hi\":\"mom\"}")
     end
 
     it "decodes the JSON when using the reader method" do
       notification.data = { hi: "mom" }
-      notification.data.should eq ({ "hi" => "mom" })
+      notification.data.should eq("hi" => "mom")
     end
   end
 end

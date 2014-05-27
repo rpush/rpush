@@ -2,7 +2,7 @@ module Rpush
   module Daemon
     module Dispatcher
       class Http
-        def initialize(app, delivery_class, options = {})
+        def initialize(app, delivery_class, _options = {})
           @app = app
           @delivery_class = delivery_class
           @http = Net::HTTP::Persistent.new('rpush')

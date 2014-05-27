@@ -30,11 +30,11 @@ module Rpush
           when 200
             ok(response)
           when 406
-            not_acceptable(response)
+            not_acceptable
           when 412
-            precondition_failed(response)
+            precondition_failed
           when 503
-            service_unavailable(response)
+            service_unavailable
           else
             handle_failure(code)
           end
@@ -42,11 +42,7 @@ module Rpush
 
         def handle_failure(code, msg = nil)
           unless msg
-            msg = if FAILURE_MESSAGES.key?(code)
-                    FAILURE_MESSAGES[code]
-            else
-              Rpush::Daemon::HTTP_STATUS_CODES[code]
-            end
+            msg = FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
           end
           fail Rpush::DeliveryError.new(code, @notification.id, msg)
         end
@@ -65,15 +61,15 @@ module Rpush
           end
         end
 
-        def not_acceptable(response)
+        def not_acceptable
           retry_notification("Per-day throttling limit reached.")
         end
 
-        def precondition_failed(response)
+        def precondition_failed
           retry_notification("Device unreachable.")
         end
 
-        def service_unavailable(response)
+        def service_unavailable
           mark_retryable_exponential(@notification)
           log_warn("Service Unavailable. " + retry_message)
         end
@@ -90,13 +86,10 @@ module Rpush
 
         def do_post
           body = notification_to_xml
-          header = {
-            "Content-Length" => body.length.to_s,
-            "Content-Type" => "text/xml",
-            "X-WindowsPhone-Target" => "toast",
-            "X-NotificationClass" => '2'
-          }
-          post = Net::HTTP::Post.new(URI.parse(@notification.uri).path, initheader = header)
+          post = Net::HTTP::Post.new(URI.parse(@notification.uri).path, "Content-Length" => body.length.to_s,
+                                                                        "Content-Type" => "text/xml",
+                                                                        "X-WindowsPhone-Target" => "toast",
+                                                                        "X-NotificationClass" => '2')
           post.body = body
           @http.request(URI.parse(@notification.uri), post)
         end

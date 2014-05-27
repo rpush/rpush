@@ -37,16 +37,17 @@ module Rpush
       end
 
       def close
-        @sleep_reader.close rescue nil
-        @wake_writer.close rescue nil
-        @udp_wakeup.close if @udp_wakeup rescue nil
+        @sleep_reader.close
+        @wake_writer.close
+        @udp_wakeup.close if @udp_wakeup
+      rescue IOError
       end
 
       private
 
       def perform_io(selected, io, meth)
         if selected && selected.include?(io)
-          while true
+          loop do
             begin
               io.__send__(meth, 1)
             rescue Errno::EAGAIN, IO::WaitReadable

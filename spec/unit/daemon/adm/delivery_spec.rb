@@ -88,7 +88,7 @@ describe Rpush::Daemon::Adm::Delivery do
       response.stub(code: 401, header: { 'retry-after' => 10 })
 
       # first request to deliver message that returns unauthorized response
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, notification.registration_ids.first))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
     end
 
@@ -138,7 +138,7 @@ describe Rpush::Daemon::Adm::Delivery do
       response.stub(code: 429, header: { 'retry-after' => 3600 })
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, notification.registration_ids.first))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       delivery.should_receive(:mark_retryable).with(notification, now + 1.hour)
@@ -149,7 +149,7 @@ describe Rpush::Daemon::Adm::Delivery do
       response.stub(code: 429, header: {})
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % [notification.registration_ids.first])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, notification.registration_ids.first))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       delivery.should_receive(:mark_retryable).with(notification, Time.now + 2**(notification.retries + 1))
@@ -160,11 +160,11 @@ describe Rpush::Daemon::Adm::Delivery do
       response.stub(code: 200, body: JSON.dump('registrationID' => 'abc'))
 
       # first request to deliver message succeeds
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, 'abc'))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, 'xyz'))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(too_many_request_response)
 
       store.should_receive(:update_notification).with do |notif|
@@ -172,7 +172,7 @@ describe Rpush::Daemon::Adm::Delivery do
         notif.registration_ids.include?('xyz').should be_false
       end
 
-      store.should_receive(:create_adm_notification).with do |attrs, notification_data, reg_ids, deliver_after, notification_app|
+      store.should_receive(:create_adm_notification).with do |attrs, _notification_data, reg_ids, deliver_after, notification_app|
         attrs.key?('collapse_key').should be_true
         attrs.key?('delay_while_idle').should be_true
         attrs.key?('app_id').should be_true
@@ -224,11 +224,11 @@ describe Rpush::Daemon::Adm::Delivery do
       response.stub(code: 200, body: JSON.dump('registrationID' => 'abc'))
 
       # first request to deliver message succeeds
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['abc'])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, 'abc'))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
       # first request to deliver message that returns too many request response
-      adm_uri = URI.parse(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL % ['xyz'])
+      adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, 'xyz'))
       http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(bad_request_response)
 
       store.should_receive(:update_notification).with do |notif|

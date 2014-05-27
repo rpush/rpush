@@ -10,9 +10,7 @@ module Rpush
 
         def self.check(klass)
           missing = PUBLIC_METHODS - klass.instance_methods.map(&:to_sym)
-          if missing.any?
-            fail "#{klass} must implement #{missing.join(', ')}."
-          end
+          fail "#{klass} must implement #{missing.join(', ')}." if missing.any?
         end
       end
     end

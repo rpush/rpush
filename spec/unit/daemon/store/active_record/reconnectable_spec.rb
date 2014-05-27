@@ -22,7 +22,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   let(:adapter_error_class) do
-    case $adapter
+    case SPEC_ADAPTER
     when 'postgresql'
       PGError
     when 'mysql'
@@ -38,7 +38,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
     when 'sqlite3'
       SQLite3::Exception
     else
-      fail "Please update #{__FILE__} for adapter #{$adapter}"
+      fail "Please update #{__FILE__} for adapter #{SPEC_ADAPTER}"
     end
   end
   let(:error) { adapter_error_class.new("db down!") }

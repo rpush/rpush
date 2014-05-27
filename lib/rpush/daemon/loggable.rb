@@ -20,10 +20,8 @@ module Rpush
       private
 
       def app_prefix(msg)
-        if app = instance_variable_get('@app')
-          msg = "[#{app.name}] #{msg}"
-        end
-
+        app = instance_variable_get('@app')
+        msg = "[#{app.name}] #{msg}" if app
         msg
       end
     end

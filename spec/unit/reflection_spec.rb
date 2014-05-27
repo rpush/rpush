@@ -3,7 +3,7 @@
  describe Rpush do
    it 'yields reflections for configuration' do
      did_yield = false
-     Rpush.reflect { |on| did_yield = true }
+     Rpush.reflect { did_yield = true }
      did_yield.should be_true
    end
 

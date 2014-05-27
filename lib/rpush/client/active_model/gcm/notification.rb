@@ -20,15 +20,8 @@ module Rpush
               'delay_while_idle' => delay_while_idle,
               'data' => data
             }
-
-            if collapse_key
-              json['collapse_key'] = collapse_key
-            end
-
-            if expiry
-              json['time_to_live'] = expiry
-            end
-
+            json['collapse_key'] = collapse_key if collapse_key
+            json['time_to_live'] = expiry if expiry
             json
           end
         end

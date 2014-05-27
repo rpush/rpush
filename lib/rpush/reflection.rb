@@ -44,9 +44,7 @@ module Rpush
         Rpush::Deprecation.warn("#{reflection} is deprecated and will be removed in version #{removal_version}. Use #{replacement} instead.")
       end
 
-      if reflections[reflection]
-        reflections[reflection].call(*args)
-      end
+      reflections[reflection].call(*args) if reflections[reflection]
     end
 
     private

@@ -126,7 +126,8 @@ module Rpush
         end
 
         def retry_delivery(notification, response)
-          if time = deliver_after_header(response)
+          time = deliver_after_header(response)
+          if time
             mark_retryable(notification, time)
           else
             mark_retryable_exponential(notification)
@@ -138,8 +139,8 @@ module Rpush
         end
 
         def do_post
-          post = Net::HTTP::Post.new(GCM_URI.path, initheader = { 'Content-Type'  => 'application/json',
-                                                                  'Authorization' => "key=#{@notification.app.auth_key}" })
+          post = Net::HTTP::Post.new(GCM_URI.path, 'Content-Type'  => 'application/json',
+                                                   'Authorization' => "key=#{@notification.app.auth_key}")
           post.body = @notification.as_json.to_json
           @http.request(GCM_URI, post)
         end

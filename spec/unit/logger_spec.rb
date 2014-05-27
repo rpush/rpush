@@ -1,30 +1,14 @@
 require "unit_spec_helper"
 
 module Rails
-  def self.logger
-    @logger
-  end
-
-  def self.logger=(logger)
-    @logger = logger
-  end
-end
-
-module HoptoadNotifier
-  def self.notify(e)
-  end
+  attr_accessor :logger
 end
 
 describe Rpush::Logger do
   let(:log) { double(:sync= => true) }
 
   before do
-    @logger_class = if defined?(ActiveSupport::BufferedLogger)
-                      ActiveSupport::BufferedLogger
-    else
-      ActiveSupport::Logger
-    end
-
+    @logger_class = defined?(ActiveSupport::BufferedLogger) ? ActiveSupport::BufferedLogger : ActiveSupport::Logger
     @logger = double(@logger_class.name, info: nil, error: nil, level: 0, auto_flushing: 1, :auto_flushing= => nil)
     @logger_class.stub(:new).and_return(@logger)
     Rails.logger = @logger

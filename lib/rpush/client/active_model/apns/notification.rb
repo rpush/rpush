@@ -44,7 +44,7 @@ module Rpush
               end
 
               if data
-                non_aps_attributes = data.reject { |k, v| k == CONTENT_AVAILABLE_KEY }
+                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY }
                 non_aps_attributes.each { |k, v| json[k.to_s] = v }
               end
             end

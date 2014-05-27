@@ -158,26 +158,17 @@ describe Rpush::Daemon::TcpConnection do
 
     it 'reflects the connection has been lost' do
       connection.should_receive(:reflect).with(:tcp_connection_lost, app, kind_of(error_type))
-      begin
-        connection.write(nil)
-      rescue Rpush::Daemon::TcpConnectionError
-      end
+      expect { connection.write(nil) }.to raise_error(Rpush::Daemon::TcpConnectionError)
     end
 
     it "logs that the connection has been lost once only" do
       logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error_type.name}), reconnecting...").once
-      begin
-        connection.write(nil)
-      rescue Rpush::Daemon::TcpConnectionError
-      end
+      expect { connection.write(nil) }.to raise_error(Rpush::Daemon::TcpConnectionError)
     end
 
     it "retries to make a connection 3 times" do
       connection.should_receive(:reconnect).exactly(3).times
-      begin
-        connection.write(nil)
-      rescue Rpush::Daemon::TcpConnectionError
-      end
+      expect { connection.write(nil) }.to raise_error(Rpush::Daemon::TcpConnectionError)
     end
 
     it "raises a TcpConnectionError after 3 attempts at reconnecting" do
@@ -188,10 +179,7 @@ describe Rpush::Daemon::TcpConnection do
 
     it "sleeps 1 second before retrying the connection" do
       connection.should_receive(:sleep).with(1)
-      begin
-        connection.write(nil)
-      rescue Rpush::Daemon::TcpConnectionError
-      end
+      expect { connection.write(nil) }.to raise_error(Rpush::Daemon::TcpConnectionError)
     end
   end
 
