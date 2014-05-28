@@ -2,7 +2,7 @@ module Rpush
   module Daemon
     module Apns
       class Delivery < Rpush::Daemon::Delivery
-        SELECT_TIMEOUT = 0.2
+        SELECT_TIMEOUT = Rpush.config.check_for_errors
         ERROR_TUPLE_BYTES = 6
         APN_ERRORS = {
           1 => "Processing error",

@@ -76,7 +76,7 @@ module Rpush
 
       self.push_poll = 2
       self.feedback_poll = 60
-      self.check_for_errors = true
+      self.check_for_errors = 0.2
       self.batch_size = 100
       self.pid_file = nil
       self.client = :active_record
