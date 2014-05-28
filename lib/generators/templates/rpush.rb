@@ -15,7 +15,7 @@
   # config.feedback_poll = 60
 
   # Disable APNs error checking after notification delivery.
-  # config.check_for_errors = true
+  # config.check_for_errors = 0.2
 
   # ActiveRecord notifications batch size.
   # config.batch_size = 100
