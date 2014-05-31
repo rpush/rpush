@@ -92,12 +92,25 @@ module Rpush
 
     def self.setup_signal_traps
       @shutting_down = false
+      read_io, write_io = IO.pipe
+      start_signal_handler(read_io)
+      %w(INT TERM HUP USR2).each do |signal|
+        Signal.trap(signal) { write_io.write("#{Signal.list[signal]}\n") }
+      end
+    end
 
-      Signal.trap('SIGHUP') { AppRunner.sync }
-      Signal.trap('SIGUSR2') { AppRunner.debug }
-
-      %w(SIGINT SIGTERM).each do |signal|
-        Signal.trap(signal) { handle_shutdown_signal }
+    def self.start_signal_handler(read_io)
+      Thread.new do
+        loop do
+          case read_io.readline.strip.to_i
+          when Signal.list['HUP']
+            AppRunner.sync
+          when Signal.list['USR2']
+            AppRunner.debug
+          when Signal.list['INT'], Signal.list['TERM']
+            handle_shutdown_signal
+          end
+        end
       end
     end
 
