@@ -2,29 +2,29 @@ require 'active_record'
 
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 
-$adapter = ENV['ADAPTER'] || 'postgresql'
-$adapter = 'jdbc' + $adapter if jruby
+SPEC_ADAPTER = ENV['ADAPTER'] || 'postgresql'
+SPEC_ADAPTER = 'jdbc' + SPEC_ADAPTER if jruby
 
 require 'yaml'
 db_config = YAML.load_file(File.expand_path("config/database.yml", File.dirname(__FILE__)))
 
-if db_config[$adapter].nil?
-  puts "No such adapter '#{$adapter}'. Valid adapters are #{db_config.keys.join(', ')}."
+if db_config[SPEC_ADAPTER].nil?
+  puts "No such adapter '#{SPEC_ADAPTER}'. Valid adapters are #{db_config.keys.join(', ')}."
   exit 1
 end
 
 if ENV['TRAVIS']
-  db_config[$adapter]['username'] = 'postgres'
+  db_config[SPEC_ADAPTER]['username'] = 'postgres'
 else
   require 'etc'
-  username = $adapter =~ /mysql/ ? 'root' : Etc.getlogin
-  db_config[$adapter]['username'] = username
+  username = SPEC_ADAPTER =~ /mysql/ ? 'root' : Etc.getlogin
+  db_config[SPEC_ADAPTER]['username'] = username
 end
 
-puts "Using #{$adapter} adapter."
+puts "Using #{SPEC_ADAPTER} adapter."
 
-ActiveRecord::Base.configurations = {"test" => db_config[$adapter]}
-ActiveRecord::Base.establish_connection(db_config[$adapter])
+ActiveRecord::Base.configurations = { "test" => db_config[SPEC_ADAPTER] }
+ActiveRecord::Base.establish_connection(db_config[SPEC_ADAPTER])
 
 require 'generators/templates/add_rpush'
 

@@ -6,7 +6,7 @@ module Rpush
           def self.included(base)
             base.instance_eval do
               validates :uri, presence: true
-              validates :uri, format: { with: /https?:\/\/[\S]+/ }
+              validates :uri, format: { with: %r{https?://[\S]+} }
               validates :alert, presence: true
             end
           end

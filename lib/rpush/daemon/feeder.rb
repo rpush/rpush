@@ -16,43 +16,38 @@ module Rpush
       end
 
       def self.stop
-        @stop = true
+        @should_stop = true
         interrupt_sleep
         @thread.join if @thread
         @interruptible_sleeper = nil
+      end
+
+      class << self
+        attr_reader :should_stop
       end
 
       def self.interrupt_sleep
         interruptible_sleeper.interrupt_sleep
       end
 
-      protected
-
       def self.feed_forever
         loop do
           enqueue_notifications
           interruptible_sleeper.sleep(Rpush.config.push_poll)
-          break if stop?
+          break if should_stop
         end
 
         Rpush::Daemon.store.release_connection
       end
 
-      # :nocov:
-      def self.stop?
-        @stop
-      end
-
       def self.enqueue_notifications
-        begin
-          idle = Rpush::Daemon::AppRunner.idle.map(&:app)
-          return if idle.empty?
-          notifications = Rpush::Daemon.store.deliverable_notifications(idle)
-          Rpush::Daemon::AppRunner.enqueue(notifications)
-        rescue StandardError => e
-          Rpush.logger.error(e)
-          reflect(:error, e)
-        end
+        idle = Rpush::Daemon::AppRunner.idle.map(&:app)
+        return if idle.empty?
+        notifications = Rpush::Daemon.store.deliverable_notifications(idle)
+        Rpush::Daemon::AppRunner.enqueue(notifications)
+      rescue StandardError => e
+        Rpush.logger.error(e)
+        reflect(:error, e)
       end
 
       def self.interruptible_sleeper

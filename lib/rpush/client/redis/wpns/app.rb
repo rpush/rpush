@@ -9,4 +9,3 @@ module Rpush
     end
   end
 end
-

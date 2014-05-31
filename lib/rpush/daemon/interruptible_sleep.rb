@@ -1,7 +1,6 @@
 module Rpush
   module Daemon
     class InterruptibleSleep
-
       def initialize
         @sleep_reader, @wake_writer = IO.pipe
         @udp_wakeup = nil
@@ -14,7 +13,7 @@ module Rpush
       def enable_wake_on_udp(host, port)
         @udp_wakeup = UDPSocket.new
         @udp_wakeup.bind(host, port)
-        @udp_wakeup.addr.values_at(3,1)
+        @udp_wakeup.addr.values_at(3, 1)
       end
 
       # wait for the given timeout in seconds, or data was written to the pipe
@@ -29,7 +28,7 @@ module Rpush
         perform_io(rs, @sleep_reader, :read_nonblock)
         perform_io(rs, @udp_wakeup, :recv_nonblock)
 
-        !rs.nil? && rs.any?
+        rs && rs.any?
       end
 
       # writing to the pipe will wake the sleeping thread
@@ -38,16 +37,17 @@ module Rpush
       end
 
       def close
-        @sleep_reader.close rescue nil
-        @wake_writer.close rescue nil
-        @udp_wakeup.close if @udp_wakeup rescue nil
+        @sleep_reader.close
+        @wake_writer.close
+        @udp_wakeup.close if @udp_wakeup
+      rescue IOError
       end
 
       private
 
       def perform_io(selected, io, meth)
         if selected && selected.include?(io)
-          while true
+          loop do
             begin
               io.__send__(meth, 1)
             rescue Errno::EAGAIN, IO::WaitReadable

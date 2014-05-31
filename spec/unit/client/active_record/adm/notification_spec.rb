@@ -15,7 +15,7 @@ describe Rpush::Client::ActiveRecord::Adm::Notification do
   end
 
   it 'limits the number of registration ids to 100' do
-    notification.registration_ids = ['a']*(100+1)
+    notification.registration_ids = ['a'] * (100 + 1)
     notification.valid?.should be_false
     notification.errors[:base].should eq ["Number of registration_ids cannot be larger than 100."]
   end

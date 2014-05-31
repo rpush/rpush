@@ -290,7 +290,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   describe 'create_gcm_notification' do
     let(:data) { { data: true } }
     let(:attributes) { { device_token: 'ab' * 32 } }
-    let(:registration_ids) { ['123', '456'] }
+    let(:registration_ids) { %w(123 456) }
     let(:deliver_after) { time + 10.seconds }
     let(:args) { [attributes, data, registration_ids, deliver_after, app] }
 
@@ -322,8 +322,8 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
   describe 'create_adm_notification' do
     let(:data) { { data: true } }
-    let(:attributes) { {app_id: app.id, collapse_key: 'ckey', delay_while_idle: true} }
-    let(:registration_ids) { ['123', '456'] }
+    let(:attributes) { { app_id: app.id, collapse_key: 'ckey', delay_while_idle: true } }
+    let(:registration_ids) { %w(123 456) }
     let(:deliver_after) { time + 10.seconds }
     let(:args) { [attributes, data, registration_ids, deliver_after, app] }
 

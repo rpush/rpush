@@ -96,7 +96,7 @@ module Rpush
       Signal.trap('SIGHUP') { AppRunner.sync }
       Signal.trap('SIGUSR2') { AppRunner.debug }
 
-      ['SIGINT', 'SIGTERM'].each do |signal|
+      %w(SIGINT SIGTERM).each do |signal|
         Signal.trap(signal) { handle_shutdown_signal }
       end
     end
@@ -108,7 +108,7 @@ module Rpush
     end
 
     def self.write_pid_file
-      if !Rpush.config.pid_file.blank?
+      unless Rpush.config.pid_file.blank?
         begin
           File.open(Rpush.config.pid_file, 'w') { |f| f.puts Process.pid }
         rescue SystemCallError => e
@@ -119,7 +119,7 @@ module Rpush
 
     def self.delete_pid_file
       pid_file = Rpush.config.pid_file
-      File.delete(pid_file) if !pid_file.blank? && File.exists?(pid_file)
+      File.delete(pid_file) if !pid_file.blank? && File.exist?(pid_file)
     end
 
     # :nocov:

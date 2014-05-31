@@ -36,7 +36,7 @@ module Rpush
       reflection = reflection.to_sym
 
       unless REFLECTIONS.include?(reflection)
-        raise NoSuchReflectionError, reflection
+        fail NoSuchReflectionError, reflection
       end
 
       if DEPRECATIONS.key?(reflection)
@@ -44,9 +44,7 @@ module Rpush
         Rpush::Deprecation.warn("#{reflection} is deprecated and will be removed in version #{removal_version}. Use #{replacement} instead.")
       end
 
-      if reflections[reflection]
-        reflections[reflection].call(*args)
-      end
+      reflections[reflection].call(*args) if reflections[reflection]
     end
 
     private

@@ -2,7 +2,6 @@ module Rpush
   module Daemon
     module Store
       class Redis
-
         DEFAULT_MARK_OPTIONS = { persist: true }
 
         def initialize
@@ -13,7 +12,8 @@ module Rpush
           Rpush::Client::Redis::App.all
         end
 
-        def deliverable_notifications(apps)
+        def deliverable_notifications(_apps)
+          # TODO, respect apps?
           batch_size = Rpush.config.batch_size
           namespace = Rpush::Client::Redis::Notification.absolute_pending_namespace
           results = @redis.multi do
@@ -28,10 +28,7 @@ module Rpush
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.delivered = true
           notification.delivered_at = time
-
-          if opts[:persist]
-            notification.save!(validate: false)
-          end
+          notification.save!(validate: false) if opts[:persist]
         end
 
         def mark_batch_delivered(notifications)
@@ -47,10 +44,7 @@ module Rpush
           notification.failed_at = time
           notification.error_code = code
           notification.error_description = description
-
-          if opts[:persist]
-            notification.save!(validate: false)
-          end
+          notification.save!(validate: false) if opts[:persist]
         end
 
         def mark_batch_failed(notifications, code, description)
@@ -62,10 +56,7 @@ module Rpush
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.retries += 1
           notification.deliver_after = deliver_after
-
-          if opts[:persist]
-            notification.save!(validate: false)
-          end
+          notification.save!(validate: false) if opts[:persist]
         end
 
         def mark_batch_retryable(notifications, deliver_after)

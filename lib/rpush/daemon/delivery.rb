@@ -13,7 +13,7 @@ module Rpush
       end
 
       def mark_retryable_exponential(notification)
-        mark_retryable(notification, Time.now + 2 ** (notification.retries + 1))
+        mark_retryable(notification, Time.now + 2**(notification.retries + 1))
       end
 
       def mark_delivered

@@ -1,17 +1,15 @@
 module Rpush
   class Logger
     def initialize
-      begin
-        log_dir = File.join(Rpush.config.log_dir, 'log')
-        FileUtils.mkdir_p(log_dir)
-        log = File.open(File.join(log_dir, 'rpush.log'), 'a')
-        log.sync = true
-        setup_logger(log)
-      rescue Errno::ENOENT, Errno::EPERM => e
-        @logger = nil
-        error(e)
-        error('Logging disabled.')
-      end
+      log_dir = File.join(Rpush.config.log_dir, 'log')
+      FileUtils.mkdir_p(log_dir)
+      log = File.open(File.join(log_dir, 'rpush.log'), 'a')
+      log.sync = true
+      setup_logger(log)
+    rescue Errno::ENOENT, Errno::EPERM => e
+      @logger = nil
+      error(e)
+      error('Logging disabled.')
     end
 
     def info(msg)

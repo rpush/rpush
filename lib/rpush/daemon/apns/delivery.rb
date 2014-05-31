@@ -24,15 +24,13 @@ module Rpush
         end
 
         def perform
-          begin
-            @connection.write(@notification.to_binary)
-            check_for_error if Rpush.config.check_for_errors
-            mark_delivered
-            log_info("#{@notification.id} sent to #{@notification.device_token}")
-          rescue Rpush::DeliveryError, Rpush::DisconnectionError => error
-            mark_failed(error.code, error.description)
-            raise
-          end
+          @connection.write(@notification.to_binary)
+          check_for_error if Rpush.config.check_for_errors
+          mark_delivered
+          log_info("#{@notification.id} sent to #{@notification.device_token}")
+        rescue Rpush::DeliveryError, Rpush::DisconnectionError => error
+          mark_failed(error.code, error.description)
+          raise
         end
 
         protected
@@ -40,8 +38,9 @@ module Rpush
         def check_for_error
           if @connection.select(SELECT_TIMEOUT)
             error = nil
+            tuple = @connection.read(ERROR_TUPLE_BYTES)
 
-            if tuple = @connection.read(ERROR_TUPLE_BYTES)
+            if tuple
               _, code, notification_id = tuple.unpack("ccN")
 
               description = APN_ERRORS[code.to_i] || "Unknown error. Possible Rpush bug?"
@@ -55,7 +54,7 @@ module Rpush
               log_error("Error received, reconnecting...")
               @connection.reconnect
             ensure
-              raise error if error
+              fail error if error
             end
           end
         end

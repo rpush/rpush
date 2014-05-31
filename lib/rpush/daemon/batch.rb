@@ -4,7 +4,7 @@ module Rpush
       include Reflectable
 
       attr_reader :num_processed, :notifications,
-        :delivered, :failed, :retryable
+                  :delivered, :failed, :retryable
 
       def initialize(notifications)
         @notifications = notifications

@@ -57,7 +57,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
 
   it "should encode the alert as JSON if it is a Hash" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { 'body' => "hi mom", 'alert-loc-key' => "View" })
-    notification.as_json["aps"]["alert"].should eq ({ 'body' => "hi mom", 'alert-loc-key' => "View" })
+    notification.as_json["aps"]["alert"].should eq('body' => "hi mom", 'alert-loc-key' => "View")
   end
 
   it "should include the badge if present" do
@@ -82,14 +82,14 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
 
   it "should include attributes for the device" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new
-    notification.data = {omg: :lol, wtf: :dunno}
+    notification.data = { omg: :lol, wtf: :dunno }
     notification.as_json["omg"].should eq "lol"
     notification.as_json["wtf"].should eq "dunno"
   end
 
   it "should allow attributes to include a hash" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new
-    notification.data = {omg: {ilike: :hashes}}
+    notification.data = { omg: { ilike: :hashes } }
     notification.as_json["omg"]["ilike"].should eq "hashes"
   end
 
@@ -101,7 +101,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
 
   it 'includes the mdm magic in the payload' do
     notification.mdm = magic
-    notification.as_json.should eq ({'mdm' => magic})
+    notification.as_json.should eq('mdm' => magic)
   end
 
   it 'does not include aps attribute' do
@@ -129,7 +129,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
   end
 
   it 'does not overwrite existing attributes for the device' do
-    notification.data = {hi: :mom}
+    notification.data = { hi: :mom }
     notification.content_available = true
     notification.as_json['aps']['content-available'].should eq 1
     notification.as_json['hi'].should eq 'mom'
@@ -137,7 +137,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
 
   it 'does not overwrite the content-available flag when setting attributes for the device' do
     notification.content_available = true
-    notification.data = {hi: :mom}
+    notification.data = { hi: :mom }
     notification.as_json['aps']['content-available'].should eq 1
     notification.as_json['hi'].should eq 'mom'
   end
@@ -150,8 +150,8 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "to_binary" do
     notification.sound = "1.aiff"
     notification.badge = 3
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
-    notification.data = {hi: :mom}
-    notification.expiry = 86400 # 1 day, \x00\x01Q\x80
+    notification.data = { hi: :mom }
+    notification.expiry = 86_400 # 1 day, \x00\x01Q\x80
     notification.app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     notification.stub(:id).and_return(1234)
     notification.to_binary.should eq "\x01\x00\x00\x04\xD2\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}"
@@ -169,7 +169,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #31" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new
     notification.stub(:has_attribute? => false)
     notification.alert = "{\"one\":2}"
-    notification.alert.should eq ({"one" => 2})
+    notification.alert.should eq('one' => 2)
   end
 end
 
@@ -181,8 +181,8 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
       n.app = Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     end
 
-    notification.to_binary(for_validation: true).bytesize.should > 256
-    notification.payload_size.should < 256
+    notification.to_binary(for_validation: true).bytesize.should be > 256
+    notification.payload_size.should be < 256
     notification.should be_valid
   end
 end
@@ -191,15 +191,15 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "multi_json usage" do
   describe Rpush::Client::ActiveRecord::Apns::Notification, "alert" do
     it "should call MultiJson.load when multi_json version is 1.3.0" do
       notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { a: 1 }, alert_is_json: true)
-      Gem.stub(:loaded_specs).and_return( { 'multi_json' => Gem::Specification.new('multi_json', '1.3.0') } )
-      MultiJson.should_receive(:load).with(any_args())
+      Gem.stub(:loaded_specs).and_return('multi_json' => Gem::Specification.new('multi_json', '1.3.0'))
+      MultiJson.should_receive(:load).with(any_args)
       notification.alert
     end
 
     it "should call MultiJson.decode when multi_json version is 1.2.9" do
       notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { a: 1 }, alert_is_json: true)
-      Gem.stub(:loaded_specs).and_return( { 'multi_json' => Gem::Specification.new('multi_json', '1.2.9') } )
-      MultiJson.should_receive(:decode).with(any_args())
+      Gem.stub(:loaded_specs).and_return('multi_json' => Gem::Specification.new('multi_json', '1.2.9'))
+      MultiJson.should_receive(:decode).with(any_args)
       notification.alert
     end
   end

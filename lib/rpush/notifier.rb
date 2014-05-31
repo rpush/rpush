@@ -30,7 +30,6 @@ module Rpush
         @socket = nil
       end
     end
-
   end
 
   # Call this from a client application after saving a Notification to the database to wakeup the Rpush

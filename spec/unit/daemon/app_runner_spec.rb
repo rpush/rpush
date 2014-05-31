@@ -11,7 +11,7 @@ module Rpush
       extend ServiceConfigMethods
 
       class ServiceLoop
-        def initialize(app)
+        def initialize(*)
         end
 
         def start
@@ -134,8 +134,9 @@ describe Rpush::Daemon::AppRunner, 'sync' do
 end
 
 describe Rpush::Daemon::AppRunner, 'debug' do
-  let(:app) { double(Rpush::AppRunnerSpecService::App, id: 1, name: 'test', connections: 1,
-    environment: 'development', certificate: TEST_CERT, service_name: 'app_runner_spec_service') }
+  let(:app) do double(Rpush::AppRunnerSpecService::App, id: 1, name: 'test', connections: 1,
+                                                        environment: 'development', certificate: TEST_CERT, service_name: 'app_runner_spec_service')
+  end
   let(:logger) { double(Rpush::Logger, info: nil) }
   let(:store) { double(all_apps: [app]) }
 
@@ -154,9 +155,10 @@ describe Rpush::Daemon::AppRunner, 'debug' do
 end
 
 describe Rpush::Daemon::AppRunner, 'idle' do
-  let(:app) { double(Rpush::AppRunnerSpecService::App, name: 'test', connections: 1,
-    environment: 'development', certificate: TEST_CERT, id: 1,
-    service_name: 'app_runner_spec_service') }
+  let(:app) do double(Rpush::AppRunnerSpecService::App, name: 'test', connections: 1,
+                                                        environment: 'development', certificate: TEST_CERT, id: 1,
+                                                        service_name: 'app_runner_spec_service')
+  end
   let(:logger) { double(Rpush::Logger, info: nil) }
   let(:store) { double(all_apps: [app]) }
 
@@ -175,9 +177,10 @@ describe Rpush::Daemon::AppRunner, 'idle' do
 end
 
 describe Rpush::Daemon::AppRunner, 'wait' do
-  let(:app) { double(Rpush::AppRunnerSpecService::App, id: 1, name: 'test',
-    connections: 1, environment: 'development', certificate: TEST_CERT,
-    service_name: 'app_runner_spec_service') }
+  let(:app) do double(Rpush::AppRunnerSpecService::App, id: 1, name: 'test',
+                                                        connections: 1, environment: 'development', certificate: TEST_CERT,
+                                                        service_name: 'app_runner_spec_service')
+  end
   let(:logger) { double(Rpush::Logger, info: nil) }
   let(:store) { double(all_apps: [app]) }
 
@@ -196,15 +199,17 @@ describe Rpush::Daemon::AppRunner, 'wait' do
 end
 
 describe Rpush::Daemon::AppRunner do
-  let(:app) { double(Rpush::AppRunnerSpecService::App, environment: :sandbox,
-    connections: 1, service_name: 'app_runner_spec_service',
-    name: 'test') }
+  let(:app) do double(Rpush::AppRunnerSpecService::App, environment: :sandbox,
+                                                        connections: 1, service_name: 'app_runner_spec_service',
+                                                        name: 'test')
+  end
   let(:runner) { Rpush::Daemon::AppRunner.new(app) }
   let(:logger) { double(Rpush::Logger, info: nil) }
   let(:queue) { Queue.new }
   let(:dispatcher_loop_collection) { Rpush::Daemon::DispatcherLoopCollection.new }
-  let(:service_loop) { double(Rpush::Daemon::AppRunnerSpecService::ServiceLoop,
-    start: nil, stop: nil) }
+  let(:service_loop) do double(Rpush::Daemon::AppRunnerSpecService::ServiceLoop,
+                               start: nil, stop: nil)
+  end
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, release_connection: nil) }
 
   before do

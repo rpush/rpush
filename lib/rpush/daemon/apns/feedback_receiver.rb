@@ -46,10 +46,12 @@ module Rpush
           begin
             connection = Rpush::Daemon::TcpConnection.new(@app, @host, @port)
             connection.connect
+            tuple = connection.read(TUPLE_BYTES)
 
-            while tuple = connection.read(TUPLE_BYTES)
+            while tuple
               timestamp, device_token = parse_tuple(tuple)
               create_feedback(timestamp, device_token)
+              tuple = connection.read(TUPLE_BYTES)
             end
           rescue StandardError => e
             log_error(e)

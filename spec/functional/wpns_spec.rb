@@ -22,7 +22,7 @@ describe 'GCM' do
   end
 
   it 'delivers a notification successfully' do
-    response.stub(to_hash: {'x-notificationstatus' => ['Received']})
+    response.stub(to_hash: { 'x-notificationstatus' => ['Received'] })
 
     expect do
       Rpush.push

@@ -15,19 +15,10 @@ module Rpush
           end
 
           def as_json
-            json = {
-              'data' => data
-            }
-
-            if collapse_key
-              json['consolidationKey'] = collapse_key
-            end
-
+            json = { 'data' => data }
+            json['consolidationKey'] = collapse_key if collapse_key
             # number of seconds before message is expired
-            if expiry
-              json['expiresAfter'] = expiry
-            end
-
+            json['expiresAfter'] = expiry if expiry
             json
           end
         end

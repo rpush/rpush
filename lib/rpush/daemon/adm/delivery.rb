@@ -12,7 +12,7 @@ module Rpush
         AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations/%s/messages'
 
         # Data used to request authorization tokens.
-        ACCESS_TOKEN_REQUEST_DATA = {"grant_type" => "client_credentials", "scope" => "messaging:push"}
+        ACCESS_TOKEN_REQUEST_DATA = { "grant_type" => "client_credentials", "scope" => "messaging:push" }
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -24,29 +24,25 @@ module Rpush
         end
 
         def perform
-          begin
-            @notification.registration_ids.each do |registration_id|
-              handle_response(do_post(registration_id), registration_id)
-            end
-
-            if @sent_registration_ids.empty?
-              raise Rpush::DeliveryError.new(nil, @notification.id, describe_errors)
-            else
-              unless(@failed_registration_ids.empty?)
-                @notification.error_description = describe_errors
-                Rpush::Daemon.store.update_notification(@notification)
-              end
-
-              mark_delivered
-            end
-          rescue Rpush::RetryableError => error
-            handle_retryable(error)
-          rescue Rpush::TooManyRequestsError => error
-            handle_too_many_requests(error)
-          rescue Rpush::DeliveryError => error
-            mark_failed(error.code, error.description)
-            raise
+          @notification.registration_ids.each do |registration_id|
+            handle_response(do_post(registration_id), registration_id)
           end
+          if @sent_registration_ids.empty?
+            fail Rpush::DeliveryError.new(nil, @notification.id, describe_errors)
+          else
+            unless @failed_registration_ids.empty?
+              @notification.error_description = describe_errors
+              Rpush::Daemon.store.update_notification(@notification)
+            end
+            mark_delivered
+          end
+        rescue Rpush::RetryableError => error
+          handle_retryable(error)
+        rescue Rpush::TooManyRequestsError => error
+          handle_too_many_requests(error)
+        rescue Rpush::DeliveryError => error
+          mark_failed(error.code, error.description)
+          raise
         end
 
         protected
@@ -62,18 +58,18 @@ module Rpush
           when 429
             too_many_requests(response)
           when 500
-            internal_server_error(response, current_registration_id)
+            internal_server_error(current_registration_id)
           when 503
             service_unavailable(response)
           else
-            raise Rpush::DeliveryError.new(response.code, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
+            fail Rpush::DeliveryError.new(response.code, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
           end
         end
 
         def ok(response, current_registration_id)
           response_body = multi_json_load(response.body)
 
-          if response_body.has_key?('registrationID')
+          if response_body.key?('registrationID')
             @sent_registration_ids << response_body['registrationID']
             log_info("#{@notification.id} sent to #{response_body['registrationID']}")
           end
@@ -88,7 +84,7 @@ module Rpush
           when 401
             # clear app access_token so a new one is fetched
             @notification.app.access_token = nil
-            get_access_token
+            access_token
             mark_retryable(@notification, Time.now) if @notification.app.access_token
           when 503
             retry_delivery(@notification, error.response)
@@ -120,7 +116,7 @@ module Rpush
         def bad_request(response, current_registration_id)
           response_body = multi_json_load(response.body)
 
-          if response_body.has_key?('reason')
+          if response_body.key?('reason')
             log_warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
             @failed_registration_ids[current_registration_id] = response_body['reason']
           end
@@ -128,22 +124,22 @@ module Rpush
 
         def unauthorized(response)
           # Indicate a notification is retryable. Because ADM requires separate request for each push token, this will safely mark the entire notification to retry delivery.
-          raise Rpush::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Unauthorized Error.', response)
+          fail Rpush::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Unauthorized Error.', response)
         end
 
         def too_many_requests(response)
           # raise error so the current notification stops sending messages to remaining reg ids
-          raise Rpush::TooManyRequestsError.new(response.code.to_i, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
+          fail Rpush::TooManyRequestsError.new(response.code.to_i, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
         end
 
-        def internal_server_error(response, current_registration_id)
+        def internal_server_error(current_registration_id)
           @failed_registration_ids[current_registration_id] = "Internal Server Error"
           log_warn("internal_server_error: #{current_registration_id} (Internal Server Error)")
         end
 
         def service_unavailable(response)
           # Indicate a notification is retryable. Because ADM requires separate request for each push token, this will safely mark the entire notification to retry delivery.
-          raise Rpush::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Service Unavailable Error.', response)
+          fail Rpush::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Service Unavailable Error.', response)
         end
 
         def create_new_notification(response, registration_ids)
@@ -156,7 +152,8 @@ module Rpush
         end
 
         def retry_delivery(notification, response)
-          if time = deliver_after_header(response)
+          time = deliver_after_header(response)
+          if time
             mark_retryable(notification, time)
           else
             mark_retryable_exponential(notification)
@@ -178,23 +175,22 @@ module Rpush
         end
 
         def do_post(registration_id)
-          adm_uri = URI.parse(AMAZON_ADM_URL % [registration_id])
-          post = Net::HTTP::Post.new(adm_uri.path, initheader = {
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'x-amzn-type-version' => 'com.amazon.device.messaging.ADMMessage@1.0',
-            'x-amzn-accept-type' => 'com.amazon.device.messaging.ADMSendResult@1.0',
-            'Authorization' => "Bearer #{get_access_token}"
-          })
+          adm_uri = URI.parse(format(AMAZON_ADM_URL, registration_id))
+          post = Net::HTTP::Post.new(adm_uri.path,
+                                     'Content-Type' => 'application/json',
+                                     'Accept' => 'application/json',
+                                     'x-amzn-type-version' => 'com.amazon.device.messaging.ADMMessage@1.0',
+                                     'x-amzn-accept-type' => 'com.amazon.device.messaging.ADMSendResult@1.0',
+                                     'Authorization' => "Bearer #{access_token}")
           post.body = @notification.as_json.to_json
 
           @http.request(adm_uri, post)
         end
 
-        def get_access_token
+        def access_token
           if @notification.app.access_token.nil? || @notification.app.access_token_expired?
-            post = Net::HTTP::Post.new(AMAZON_TOKEN_URI.path, initheader = {'Content-Type' => 'application/x-www-form-urlencoded'})
-            post.set_form_data(ACCESS_TOKEN_REQUEST_DATA.merge({'client_id' => @notification.app.client_id, 'client_secret' => @notification.app.client_secret}))
+            post = Net::HTTP::Post.new(AMAZON_TOKEN_URI.path, 'Content-Type' => 'application/x-www-form-urlencoded')
+            post.set_form_data(ACCESS_TOKEN_REQUEST_DATA.merge('client_id' => @notification.app.client_id, 'client_secret' => @notification.app.client_secret))
 
             handle_access_token(@http.request(AMAZON_TOKEN_URI, post))
           end

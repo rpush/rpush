@@ -5,8 +5,9 @@ describe Rpush::Daemon::Feeder do
   let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:logger) { double }
   let(:interruptible_sleep) { double(sleep: nil, interrupt_sleep: nil) }
-  let(:store) { double(Rpush::Daemon::Store::ActiveRecord,
-      deliverable_notifications: [notification], release_connection: nil) }
+  let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
+                        deliverable_notifications: [notification], release_connection: nil)
+  end
 
   before do
     Rpush.configure do |config|
@@ -18,7 +19,7 @@ describe Rpush::Daemon::Feeder do
     end
     Rpush.stub(logger: logger)
     Rpush::Daemon.stub(store: store)
-    Rpush::Daemon::Feeder.stub(:stop? => true)
+    Rpush::Daemon::Feeder.stub(should_stop: true)
     Rpush::Daemon::AppRunner.stub(enqueue: nil, idle: [double(app: app)])
     Rpush::Daemon::InterruptibleSleep.stub(new: interruptible_sleep)
   end
@@ -91,8 +92,8 @@ describe Rpush::Daemon::Feeder do
 
   it "creates the wakeup socket" do
     bind = '127.0.0.1'
-    port = 12345
-    Rpush.config.wakeup = { bind: bind, port: port}
+    port = 12_345
+    Rpush.config.wakeup = { bind: bind, port: port }
     interruptible_sleep.should_receive(:enable_wake_on_udp).with(bind, port)
     start_and_stop
   end

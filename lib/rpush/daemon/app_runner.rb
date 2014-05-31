@@ -14,7 +14,8 @@ module Rpush
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
           batch = Batch.new(group)
-          if app = runners[app_id]
+          app = runners[app_id]
+          if app
             app.enqueue(batch)
           else
             Rpush.logger.error("No such app '#{app_id}' for notifications #{batch.describe}.")
@@ -59,7 +60,7 @@ module Rpush
       end
 
       def self.wait
-        sleep 0.1 while !runners.values.all?(&:idle?)
+        sleep 0.1 until runners.values.all?(&:idle?)
       end
 
       attr_reader :app
