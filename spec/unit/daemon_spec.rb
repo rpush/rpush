@@ -135,7 +135,7 @@ describe Rpush::Daemon, "when being shutdown" do
 
   it "removes the PID file if one was written" do
     Rpush.config.pid_file = "/rails_root/rpush.pid"
-    File.stub(:exists?).and_return(true)
+    File.stub(:exist?).and_return(true)
     File.should_receive(:delete).with("/rails_root/rpush.pid")
     Rpush::Daemon.shutdown
   end
