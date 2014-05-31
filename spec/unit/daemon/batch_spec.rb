@@ -16,10 +16,6 @@ describe Rpush::Daemon::Batch do
     batch.notifications.should eq [notification1, notification2]
   end
 
-  it 'exposes the number notifications' do
-    batch.num_notifications.should eq 2
-  end
-
   it 'exposes the number notifications processed' do
     batch.num_processed.should eq 0
   end

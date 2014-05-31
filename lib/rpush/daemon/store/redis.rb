@@ -12,13 +12,11 @@ module Rpush
           Rpush::Client::Redis::App.all
         end
 
-        def deliverable_notifications(_apps)
-          # TODO, respect apps?
-          batch_size = Rpush.config.batch_size
+        def deliverable_notifications(limit)
           namespace = Rpush::Client::Redis::Notification.absolute_pending_namespace
           results = @redis.multi do
-            @redis.zrange(namespace, 0, batch_size)
-            @redis.zremrangebyrank(namespace, 0, batch_size)
+            @redis.zrange(namespace, 0, limit)
+            @redis.zremrangebyrank(namespace, 0, limit)
           end
           ids = results.first
           ids.map { |id| Rpush::Client::Redis::Notification.find(id) }

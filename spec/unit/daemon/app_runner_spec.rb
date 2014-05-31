@@ -149,52 +149,8 @@ describe Rpush::Daemon::AppRunner, 'debug' do
   after { Rpush::Daemon::AppRunner.runners.clear }
 
   it 'prints debug app states to the log' do
-    Rpush.logger.should_receive(:info).with("\ntest:\n  dispatchers: 1\n  queued: 0\n  batch size: 0\n  batch processed: 0\n  idle: true\n")
+    Rpush.logger.should_receive(:info).with("\ntest:\n  dispatchers: 1\n  queued: 0\n")
     Rpush::Daemon::AppRunner.debug
-  end
-end
-
-describe Rpush::Daemon::AppRunner, 'idle' do
-  let(:app) do double(Rpush::AppRunnerSpecService::App, name: 'test', connections: 1,
-                                                        environment: 'development', certificate: TEST_CERT, id: 1,
-                                                        service_name: 'app_runner_spec_service')
-  end
-  let(:logger) { double(Rpush::Logger, info: nil) }
-  let(:store) { double(all_apps: [app]) }
-
-  before do
-    Rpush::Daemon.stub(store: store)
-    Rpush.stub(logger: logger)
-    Rpush::Daemon::AppRunner.sync
-  end
-
-  after { Rpush::Daemon::AppRunner.runners.clear }
-
-  it 'returns idle runners' do
-    runner = Rpush::Daemon::AppRunner.runners[app.id]
-    Rpush::Daemon::AppRunner.idle.should eq [runner]
-  end
-end
-
-describe Rpush::Daemon::AppRunner, 'wait' do
-  let(:app) do double(Rpush::AppRunnerSpecService::App, id: 1, name: 'test',
-                                                        connections: 1, environment: 'development', certificate: TEST_CERT,
-                                                        service_name: 'app_runner_spec_service')
-  end
-  let(:logger) { double(Rpush::Logger, info: nil) }
-  let(:store) { double(all_apps: [app]) }
-
-  before do
-    Rpush::Daemon.stub(store: store)
-    Rpush.stub(logger: logger)
-    Rpush::Daemon::AppRunner.sync
-  end
-
-  after { Rpush::Daemon::AppRunner.runners.clear }
-
-  it 'waits until all runners are idle' do
-    Rpush::Daemon::AppRunner.runners.count.should eq 1
-    Timeout.timeout(5) { Rpush::Daemon::AppRunner.wait }
   end
 end
 
@@ -259,23 +215,6 @@ describe Rpush::Daemon::AppRunner do
     it 'stop the loops' do
       service_loop.should_receive(:stop)
       runner.stop
-    end
-  end
-
-  describe 'idle?' do
-    it 'is idle if all notifications have been processed' do
-      runner.batch = double(:complete? => true)
-      runner.idle?.should be_true
-    end
-
-    it 'is idle if the runner has no associated batch' do
-      runner.batch = nil
-      runner.idle?.should be_true
-    end
-
-    it 'is not idle if not all notifications have been processed' do
-      runner.batch = double(:complete? => false)
-      runner.idle?.should be_false
     end
   end
 

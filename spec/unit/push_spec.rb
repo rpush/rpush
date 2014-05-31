@@ -26,11 +26,6 @@ describe Rpush, 'push' do
     Rpush.push
   end
 
-  it 'waits on the app runner' do
-    Rpush::Daemon::AppRunner.should_receive(:wait)
-    Rpush.push
-  end
-
   it 'stops on the app runner' do
     Rpush::Daemon::AppRunner.should_receive(:stop)
     Rpush.push

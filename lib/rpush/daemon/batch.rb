@@ -3,8 +3,7 @@ module Rpush
     class Batch
       include Reflectable
 
-      attr_reader :num_processed, :notifications,
-                  :delivered, :failed, :retryable
+      attr_reader :notifications, :num_processed, :delivered, :failed, :retryable
 
       def initialize(notifications)
         @notifications = notifications
@@ -15,14 +14,16 @@ module Rpush
         @mutex = Mutex.new
       end
 
-      def num_notifications
-        @notifications.size
+      def complete?
+        @complete == true
       end
 
       def mark_retryable(notification, deliver_after)
         if Rpush.config.batch_storage_updates
-          retryable[deliver_after] ||= []
-          retryable[deliver_after] << notification
+          @mutex.synchronize do
+            @retryable[deliver_after] ||= []
+            @retryable[deliver_after] << notification
+          end
           Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
         else
           Rpush::Daemon.store.mark_retryable(notification, deliver_after)
@@ -32,7 +33,9 @@ module Rpush
 
       def mark_delivered(notification)
         if Rpush.config.batch_storage_updates
-          delivered << notification
+          @mutex.synchronize do
+            @delivered << notification
+          end
           Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
         else
           Rpush::Daemon.store.mark_delivered(notification, Time.now)
@@ -43,8 +46,10 @@ module Rpush
       def mark_failed(notification, code, description)
         if Rpush.config.batch_storage_updates
           key = [code, description]
-          failed[key] ||= []
-          failed[key] << notification
+          @mutex.synchronize do
+            @failed[key] ||= []
+            @failed[key] << notification
+          end
           Rpush::Daemon.store.mark_failed(notification, code, description, Time.now, persist: false)
         else
           Rpush::Daemon.store.mark_failed(notification, code, description, Time.now)
@@ -59,12 +64,8 @@ module Rpush
         end
       end
 
-      def complete?
-        @complete == true
-      end
-
       def describe
-        notifications.map(&:id).join(', ')
+        @notifications.map(&:id).join(', ')
       end
 
       private
@@ -79,36 +80,36 @@ module Rpush
           end
         end
 
-        notifications.clear
+        @notifications.clear
         @complete = true
       end
 
       def complete_delivered
-        Rpush::Daemon.store.mark_batch_delivered(delivered)
-        delivered.each do |notification|
+        Rpush::Daemon.store.mark_batch_delivered(@delivered)
+        @delivered.each do |notification|
           reflect(:notification_delivered, notification)
         end
-        delivered.clear
+        @delivered.clear
       end
 
       def complete_failed
-        failed.each do |(code, description), notifications|
+        @failed.each do |(code, description), notifications|
           Rpush::Daemon.store.mark_batch_failed(notifications, code, description)
           notifications.each do |notification|
             reflect(:notification_failed, notification)
           end
         end
-        failed.clear
+        @failed.clear
       end
 
       def complete_retried
-        retryable.each do |deliver_after, notifications|
+        @retryable.each do |deliver_after, notifications|
           Rpush::Daemon.store.mark_batch_retryable(notifications, deliver_after)
           notifications.each do |notification|
             reflect(:notification_will_retry, notification)
           end
         end
-        retryable.clear
+        @retryable.clear
       end
     end
   end

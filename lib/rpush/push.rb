@@ -10,7 +10,7 @@ module Rpush
     Rpush::Daemon.initialize_store
     Rpush::Daemon::AppRunner.sync
     Rpush::Daemon::Feeder.start
-    Rpush::Daemon::AppRunner.wait
+    sleep 0.1 while Rpush::Daemon::AppRunner.cumulative_queue_size > 0
     Rpush::Daemon::AppRunner.stop
   end
 end

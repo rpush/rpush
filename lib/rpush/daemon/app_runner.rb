@@ -51,20 +51,17 @@ module Rpush
         runners.clear
       end
 
+      def self.cumulative_queue_size
+        size = 0
+        runners.values.each { |runner| size += runner.queue_size }
+        size
+      end
+
       def self.debug
         runners.values.map(&:debug)
       end
 
-      def self.idle
-        runners.values.select(&:idle?)
-      end
-
-      def self.wait
-        sleep 0.1 until runners.values.all?(&:idle?)
-      end
-
       attr_reader :app
-      attr_accessor :batch
 
       def initialize(app)
         @app = app
@@ -80,11 +77,9 @@ module Rpush
       def stop
         dispatchers.stop
         stop_loops
-        self.batch = nil
       end
 
       def enqueue(batch)
-        self.batch = batch
         batch.notifications.each do |notification|
           queue.push([notification, batch])
           reflect(:notification_enqueued, notification)
@@ -118,33 +113,18 @@ module Rpush
 #{@app.name}:
   dispatchers: #{num_dispatchers}
   queued: #{queue_size}
-  batch size: #{batch_size}
-  batch processed: #{batch_processed}
-  idle: #{idle?}
         EOS
-      end
-
-      def idle?
-        batch ? batch.complete? : true
       end
 
       def queue_size
         queue.size
       end
 
-      def batch_size
-        batch ? batch.num_notifications : 0
-      end
-
-      def batch_processed
-        batch ? batch.num_processed : 0
-      end
-
       def num_dispatchers
         dispatchers.size
       end
 
-      protected
+      private
 
       def start_loops
         service_module.loops.each do |loop_class|

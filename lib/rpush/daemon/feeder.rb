@@ -41,9 +41,9 @@ module Rpush
       end
 
       def self.enqueue_notifications
-        idle = Rpush::Daemon::AppRunner.idle.map(&:app)
-        return if idle.empty?
-        notifications = Rpush::Daemon.store.deliverable_notifications(idle)
+        batch_size = Rpush.config.batch_size - Rpush::Daemon::AppRunner.cumulative_queue_size
+        return if batch_size <= 0
+        notifications = Rpush::Daemon.store.deliverable_notifications(batch_size)
         Rpush::Daemon::AppRunner.enqueue(notifications)
       rescue StandardError => e
         Rpush.logger.error(e)

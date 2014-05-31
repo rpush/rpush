@@ -43,7 +43,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   describe 'deliverable_notifications' do
     it 'checks for new notifications with the ability to reconnect the database' do
       store.should_receive(:with_database_reconnect_and_retry)
-      store.deliverable_notifications(app)
+      store.deliverable_notifications(Rpush.config.batch_size)
     end
 
     it 'loads notifications in batches' do
@@ -51,8 +51,8 @@ describe Rpush::Daemon::Store::ActiveRecord do
       Rpush.config.push = false
       relation = double.as_null_object
       relation.should_receive(:limit).with(5000)
-      store.stub(ready_for_delivery_for_apps: relation)
-      store.deliverable_notifications([app])
+      store.stub(ready_for_delivery: relation)
+      store.deliverable_notifications(Rpush.config.batch_size)
     end
 
     it 'does not load notification in batches if in push mode' do
@@ -60,37 +60,32 @@ describe Rpush::Daemon::Store::ActiveRecord do
       relation = double.as_null_object
       relation.should_not_receive(:limit)
       Rpush::Notification.stub(ready_for_delivery: relation)
-      store.deliverable_notifications([app])
+      store.deliverable_notifications(Rpush.config.batch_size)
     end
 
     it 'loads an undelivered notification without deliver_after set' do
       notification.update_attributes!(delivered: false, deliver_after: nil)
-      store.deliverable_notifications([app]).should eq [notification]
+      store.deliverable_notifications(Rpush.config.batch_size).should eq [notification]
     end
 
     it 'loads an notification with a deliver_after time in the past' do
       notification.update_attributes!(delivered: false, deliver_after: 1.hour.ago)
-      store.deliverable_notifications([app]).should eq [notification]
+      store.deliverable_notifications(Rpush.config.batch_size).should eq [notification]
     end
 
     it 'does not load an notification with a deliver_after time in the future' do
       notification.update_attributes!(delivered: false, deliver_after: 1.hour.from_now)
-      store.deliverable_notifications([app]).should be_empty
+      store.deliverable_notifications(Rpush.config.batch_size).should be_empty
     end
 
     it 'does not load a previously delivered notification' do
       notification.update_attributes!(delivered: true, delivered_at: time)
-      store.deliverable_notifications([app]).should be_empty
+      store.deliverable_notifications(Rpush.config.batch_size).should be_empty
     end
 
     it "does not enqueue a notification that has previously failed delivery" do
       notification.update_attributes!(delivered: false, failed: true)
-      store.deliverable_notifications([app]).should be_empty
-    end
-
-    it 'does not load notifications for apps that are still processing the previous batch' do
-      notification
-      store.deliverable_notifications([]).should be_empty
+      store.deliverable_notifications(Rpush.config.batch_size).should be_empty
     end
   end
 

@@ -14,11 +14,10 @@ module Rpush
           Rpush::Client::ActiveRecord::App.all
         end
 
-        def deliverable_notifications(apps)
+        def deliverable_notifications(limit)
           with_database_reconnect_and_retry do
-            batch_size = Rpush.config.batch_size
-            relation = ready_for_delivery_for_apps(apps)
-            relation = relation.limit(batch_size) unless Rpush.config.push
+            relation = ready_for_delivery
+            relation = relation.limit(limit) unless Rpush.config.push
             relation.to_a
           end
         end
@@ -151,8 +150,8 @@ module Rpush
           end
         end
 
-        def ready_for_delivery_for_apps(apps)
-          Rpush::Client::ActiveRecord::Notification.where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, Time.now).where('app_id IN (?)', apps.map(&:id))
+        def ready_for_delivery
+          Rpush::Client::ActiveRecord::Notification.where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, Time.now)
         end
       end
     end
