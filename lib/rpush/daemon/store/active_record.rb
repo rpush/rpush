@@ -10,6 +10,10 @@ module Rpush
 
         DEFAULT_MARK_OPTIONS = { persist: true }
 
+        def app(id)
+          Rpush::Client::ActiveRecord::App.find(id)
+        end
+
         def all_apps
           Rpush::Client::ActiveRecord::App.all
         end

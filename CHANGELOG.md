@@ -1,6 +1,7 @@
 ## 2.0.0 (unreleased)
   * Deprecated attributes_for_device accessors. Use data instead.
   * Fix signal handling to work with Ruby 2.x. (#40).
+  * You no longer need to signal HUP after creating a new app.
 
 ## 1.0.0 (Feb 9, 2014)
   * Renamed to Rpush (from Rapns). Version number reset to 1.0.0.

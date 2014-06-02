@@ -45,11 +45,12 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
   let(:runner) { double(enqueue: nil) }
   let(:notification1) { double(app_id: 1) }
   let(:notification2) { double(app_id: 2) }
-  let(:logger) { double(Rpush::Logger, error: nil) }
+  let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
 
   before do
     Rpush.stub(logger: logger)
     Rpush::Daemon::AppRunner.runners[1] = runner
+    Rpush::Daemon::AppRunner.runners[2] = runner
   end
 
   after { Rpush::Daemon::AppRunner.runners.clear }
@@ -67,11 +68,13 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
     Rpush::Daemon::AppRunner.enqueue([notification1])
   end
 
-  it 'logs an error if there is no runner to deliver the notification' do
-    notification1.stub(app_id: 2, id: 123)
-    notification2.stub(app_id: 2, id: 456)
-    logger.should_receive(:error).with("No such app '#{notification1.app_id}' for notifications 123, 456.")
-    Rpush::Daemon::AppRunner.enqueue([notification1, notification2])
+  it 'syncs the app if a runner does not exist' do
+    Rpush::Daemon::AppRunner.runners[3].should be_nil
+    notification = double(app_id: 3)
+    app = double(Rpush::App, id: 3, connections: 1, service_name: 'app_runner_spec_service', environment: 'sandbox', certificate: TEST_CERT, password: nil, name: 'test')
+    Rpush::Daemon.store.stub(app: app)
+    Rpush::Daemon::AppRunner.enqueue([notification])
+    Rpush::Daemon::AppRunner.runners[3].should_not be_nil
   end
 end
 

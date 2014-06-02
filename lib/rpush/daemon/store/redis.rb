@@ -8,6 +8,10 @@ module Rpush
           @redis = Modis.redis
         end
 
+        def app(app_id)
+          Rpush::Client::Redis::App.find(app_id)
+        end
+
         def all_apps
           Rpush::Client::Redis::App.all
         end

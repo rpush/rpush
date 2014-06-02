@@ -13,13 +13,8 @@ module Rpush
 
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
-          batch = Batch.new(group)
-          app = runners[app_id]
-          if app
-            app.enqueue(batch)
-          else
-            Rpush.logger.error("No such app '#{app_id}' for notifications #{batch.describe}.")
-          end
+          sync_app_with_id(app_id) unless runners[app_id]
+          runners[app_id].enqueue(Batch.new(group))
         end
       end
 
@@ -44,6 +39,10 @@ module Rpush
             reflect(:error, e)
           end
         end
+      end
+
+      def self.sync_app_with_id(app_id)
+        sync_app(Rpush::Daemon.store.app(app_id))
       end
 
       def self.stop
