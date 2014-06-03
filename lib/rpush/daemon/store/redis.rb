@@ -23,7 +23,15 @@ module Rpush
             @redis.zremrangebyrank(namespace, 0, limit)
           end
           ids = results.first
-          ids.map { |id| Rpush::Client::Redis::Notification.find(id) }
+          ids.map { |id| Rpush::Client::Redis::Notification.find(id) }.select do |n|
+            deliver_after = n.deliver_after || Time.now
+            if deliver_after < Time.now
+              true
+            else
+              n.enqueue
+              false
+            end
+          end
         end
 
         def mark_delivered(notification, time, opts = {})
@@ -58,7 +66,7 @@ module Rpush
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.retries += 1
           notification.deliver_after = deliver_after
-          notification.save!(validate: false) if opts[:persist]
+          notification.enqueue if opts[:persist]
         end
 
         def mark_batch_retryable(notifications, deliver_after)

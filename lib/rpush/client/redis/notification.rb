@@ -50,6 +50,11 @@ module Rpush
           end
         end
 
+        def enqueue
+          save!(validate: false)
+          register_notification
+        end
+
         private
 
         def register_notification
