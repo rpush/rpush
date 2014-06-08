@@ -9,7 +9,8 @@ module Rpush
         sandbox: ['gateway.sandbox.push.apple.com', 2195]
       }
 
-      dispatcher :tcp, host: proc { |app| HOSTS[app.environment.to_sym] }
+      batch_deliveries true
+      dispatcher :batched_tcp, host: proc { |app| HOSTS[app.environment.to_sym] }
       loops Rpush::Daemon::Apns::FeedbackReceiver
     end
   end

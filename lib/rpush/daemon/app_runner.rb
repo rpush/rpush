@@ -79,9 +79,13 @@ module Rpush
       end
 
       def enqueue(batch)
-        batch.notifications.each do |notification|
-          queue.push([notification, batch])
-          reflect(:notification_enqueued, notification)
+        if service.batch_deliveries?
+          queue.push(QueuePayload.new(batch: batch))
+        else
+          batch.notifications.each do |notification|
+            queue.push(QueuePayload.new(batch: batch, notification: notification))
+            reflect(:notification_enqueued, notification)
+          end
         end
       end
 
@@ -126,7 +130,7 @@ module Rpush
       private
 
       def start_loops
-        service_module.loops.each do |loop_class|
+        service.loops.each do |loop_class|
           instance = loop_class.new(@app)
           instance.start
           @loops << instance
@@ -139,15 +143,15 @@ module Rpush
       end
 
       def new_dispatcher_loop
-        dispatcher = service_module.new_dispatcher(@app)
-        dispatcher_loop = Rpush::Daemon::DispatcherLoop.new(queue, dispatcher)
+        dispatcher = service.new_dispatcher(@app)
+        dispatcher_loop = Rpush::Daemon::DispatcherLoop.new(queue, dispatcher, service.batch_deliveries?)
         dispatcher_loop.start
         dispatcher_loop
       end
 
-      def service_module
-        return @service_module if defined? @service_module
-        @service_module = "Rpush::Daemon::#{@app.service_name.camelize}".constantize
+      def service
+        return @service if defined? @service
+        @service = "Rpush::Daemon::#{@app.service_name.camelize}".constantize
       end
 
       def queue
