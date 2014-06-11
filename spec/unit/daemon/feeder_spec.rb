@@ -4,7 +4,7 @@ describe Rpush::Daemon::Feeder do
   let!(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
   let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:logger) { double }
-  let(:interruptible_sleep) { double(sleep: nil, interrupt_sleep: nil) }
+  let(:interruptible_sleep) { double(sleep: nil, stop: nil, start: nil) }
   let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
                         deliverable_notifications: [notification], release_connection: nil)
   end
@@ -15,7 +15,6 @@ describe Rpush::Daemon::Feeder do
       config.push_poll = 0
       config.embedded = false
       config.push = false
-      config.wakeup = nil
     end
     Rpush.stub(logger: logger)
     Rpush::Daemon.stub(store: store)
@@ -75,7 +74,7 @@ describe Rpush::Daemon::Feeder do
 
   describe 'stop' do
     it 'interrupts sleep when stopped' do
-      Rpush::Daemon::Feeder.should_receive(:interrupt_sleep)
+      interruptible_sleep.should_receive(:stop)
       start_and_stop
     end
 
@@ -85,23 +84,14 @@ describe Rpush::Daemon::Feeder do
     end
   end
 
-  it "enqueues notifications when started" do
+  it 'enqueues notifications when started' do
     Rpush::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
     Rpush::Daemon::Feeder.stub(:loop).and_yield
     start_and_stop
   end
 
-  it "sleeps for the given period" do
-    Rpush.config.push_poll = 2
-    interruptible_sleep.should_receive(:sleep).with(2)
-    start_and_stop
-  end
-
-  it "creates the wakeup socket" do
-    bind = '127.0.0.1'
-    port = 12_345
-    Rpush.config.wakeup = { bind: bind, port: port }
-    interruptible_sleep.should_receive(:enable_wake_on_udp).with(bind, port)
+  it 'sleeps' do
+    interruptible_sleep.should_receive(:sleep)
     start_and_stop
   end
 end

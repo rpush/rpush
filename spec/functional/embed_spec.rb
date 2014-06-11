@@ -34,6 +34,8 @@ describe 'embedding' do
   end
 
   it 'delivers a notification successfully' do
+    Rpush.config.push_poll = 5
+
     expect do
       Rpush.embed
 

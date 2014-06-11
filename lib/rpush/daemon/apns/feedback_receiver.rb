@@ -15,20 +15,20 @@ module Rpush
         def initialize(app)
           @app = app
           @host, @port = HOSTS[@app.environment.to_sym]
-          @poll = Rpush.config.feedback_poll
           @certificate = app.certificate
           @password = app.password
-          @interruptible_sleep = InterruptibleSleep.new
+          @interruptible_sleep = InterruptibleSleep.new(Rpush.config.feedback_poll)
         end
 
         def start
           return if Rpush.config.push
+          @interruptible_sleep.start
 
           @thread = Thread.new do
             loop do
               break if @stop
               check_for_feedback
-              @interruptible_sleep.sleep @poll
+              @interruptible_sleep.sleep
             end
 
             Rpush::Daemon.store.release_connection
@@ -37,7 +37,7 @@ module Rpush
 
         def stop
           @stop = true
-          @interruptible_sleep.interrupt_sleep
+          @interruptible_sleep.stop
           @thread.join if @thread
         end
 

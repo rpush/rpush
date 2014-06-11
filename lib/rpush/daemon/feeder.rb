@@ -17,7 +17,7 @@ module Rpush
 
       def self.stop
         @should_stop = true
-        interrupt_sleep
+        interruptible_sleeper.stop
         @thread.join if @thread
         @interruptible_sleeper = nil
       end
@@ -26,14 +26,10 @@ module Rpush
         attr_reader :should_stop
       end
 
-      def self.interrupt_sleep
-        interruptible_sleeper.interrupt_sleep
-      end
-
       def self.feed_forever
         loop do
           enqueue_notifications
-          interruptible_sleeper.sleep(Rpush.config.push_poll)
+          interruptible_sleeper.sleep
           break if should_stop
         end
 
@@ -53,12 +49,8 @@ module Rpush
 
       def self.interruptible_sleeper
         return @interruptible_sleeper if @interruptible_sleeper
-
-        @interruptible_sleeper = InterruptibleSleep.new
-        if Rpush.config.wakeup
-          @interruptible_sleeper.enable_wake_on_udp Rpush.config.wakeup[:bind], Rpush.config.wakeup[:port]
-        end
-
+        @interruptible_sleeper = InterruptibleSleep.new(Rpush.config.push_poll)
+        @interruptible_sleeper.start
         @interruptible_sleeper
       end
     end

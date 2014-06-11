@@ -17,7 +17,6 @@ require 'rpush/reflection'
 require 'rpush/embed'
 require 'rpush/push'
 require 'rpush/apns_feedback'
-require 'rpush/notifier'
 
 module Rpush
   def self.jruby?

@@ -1,4 +1,5 @@
-require "unit_spec_helper"
+require 'unit_spec_helper'
+require 'rpush/daemon/store/active_record'
 
 describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
@@ -12,7 +13,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:logger) { double(error: nil, info: nil) }
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
-  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, interrupt_sleep: nil) }
+  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, start: nil, stop: nil) }
   let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
                         create_apns_feedback: feedback, release_connection: nil)
   end
@@ -35,6 +36,11 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
         "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
       end
     end
+  end
+
+  it 'initializes the sleeper with the feedback polling duration' do
+    Rpush::Daemon::InterruptibleSleep.should_receive(:new).with(poll).and_return(sleeper)
+    Rpush::Daemon::Apns::FeedbackReceiver.new(app)
   end
 
   it 'instantiates a new connection' do
@@ -82,9 +88,9 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
       receiver.stub(:loop).and_yield
     end
 
-    it 'sleeps for the feedback poll period' do
+    it 'sleeps' do
       receiver.stub(:check_for_feedback)
-      sleeper.should_receive(:sleep).with(60).at_least(:once)
+      sleeper.should_receive(:sleep).at_least(:once)
       receiver.start
     end
 
@@ -97,7 +103,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   describe 'stop' do
     it 'interrupts sleep when stopped' do
       receiver.stub(:check_for_feedback)
-      sleeper.should_receive(:interrupt_sleep)
+      sleeper.should_receive(:stop)
       receiver.stop
     end
 
