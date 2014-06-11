@@ -3,8 +3,15 @@ module Rpush
     module ServiceConfigMethods
       DISPATCHERS = {
         http: Rpush::Daemon::Dispatcher::Http,
-        tcp: Rpush::Daemon::Dispatcher::Tcp
+        tcp: Rpush::Daemon::Dispatcher::Tcp,
+        bathed_tcp: Rpush::Daemon::Dispatcher::BatchedTcp
       }
+
+      attr_writer :batch_deliveries
+
+      def batch_deliveries?
+        @batch_deliveries = true
+      end
 
       def dispatcher(name = nil, options = {})
         @dispatcher_name = name

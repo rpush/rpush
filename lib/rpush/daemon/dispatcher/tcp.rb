@@ -8,15 +8,15 @@ module Rpush
           @host, @port = options[:host].call(@app)
         end
 
-        def dispatch(notification, batch)
-          @delivery_class.new(@app, connection, notification, batch).perform
+        def dispatch(payload)
+          @delivery_class.new(@app, connection, payload.notification, payload.batch).perform
         end
 
         def cleanup
           @connection.close if @connection
         end
 
-        private
+        protected
 
         def connection
           return @connection if defined? @connection

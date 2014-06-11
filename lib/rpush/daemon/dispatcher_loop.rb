@@ -5,9 +5,10 @@ module Rpush
 
       WAKEUP = :wakeup
 
-      def initialize(queue, dispatcher)
+      def initialize(queue, dispatcher, batch_deliveries)
         @queue = queue
         @dispatcher = dispatcher
+        @batch_deliveries = batch_deliveries
       end
 
       def start
@@ -37,11 +38,11 @@ module Rpush
       protected
 
       def dispatch
-        notification, batch = @queue.pop
-        return if notification == WAKEUP
+        payload = @queue.pop
+        return if payload == WAKEUP
 
         begin
-          @dispatcher.dispatch(notification, batch)
+          @dispatcher.dispatch(payload)
         rescue StandardError => e
           Rpush.logger.error(e)
           reflect(:error, e)

@@ -8,8 +8,8 @@ module Rpush
           @http = Net::HTTP::Persistent.new('rpush')
         end
 
-        def dispatch(notification, batch)
-          @delivery_class.new(@app, @http, notification, batch).perform
+        def dispatch(payload)
+          @delivery_class.new(@app, @http, payload.notification, payload.batch).perform
         end
 
         def cleanup
