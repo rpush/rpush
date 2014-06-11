@@ -44,7 +44,7 @@ describe Rpush::Daemon::Apns::Delivery do
     before { connection.stub(select: true, read: [8, 4, 69].pack("ccN")) }
 
     it "marks the notification as failed" do
-      delivery.should_receive(:mark_failed).with(4, "Missing payload")
+      delivery.should_receive(:mark_failed).with(4, "Unable to deliver notification 69, received error 4 (Missing payload)")
       perform
     end
 
@@ -90,7 +90,7 @@ describe Rpush::Daemon::Apns::Delivery do
       end
 
       it 'marks the notification as failed' do
-        delivery.should_receive(:mark_failed).with(nil, "Connection terminated without returning an error.")
+        delivery.should_receive(:mark_failed).with(nil, "The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host.")
         perform
       end
     end

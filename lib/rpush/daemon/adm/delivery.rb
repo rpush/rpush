@@ -40,8 +40,8 @@ module Rpush
           handle_retryable(error)
         rescue Rpush::TooManyRequestsError => error
           handle_too_many_requests(error)
-        rescue Rpush::DeliveryError => error
-          mark_failed(error.code, error.description)
+        rescue StandardError => error
+          mark_failed(error.try(:code), error.to_s)
           raise
         end
 

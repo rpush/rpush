@@ -32,7 +32,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(body: JSON.dump('reason' => 'InvalidData'))
-      delivery.should_receive(:mark_failed).with(408, 'Request Timeout')
+      delivery.should_receive(:mark_failed).with(408,  "Unable to deliver notification #{notification.id}, received error 408 (Request Timeout)")
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
@@ -69,7 +69,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(body: JSON.dump('reason' => 'InvalidData'))
-      delivery.should_receive(:mark_failed).with(nil, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:mark_failed).with(nil, "Unable to deliver notification #{notification.id}, received error (Failed to deliver to all recipients.)")
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 
@@ -194,7 +194,7 @@ describe Rpush::Daemon::Adm::Delivery do
     end
 
     it 'marks the notification as failed because no successful delivery was made' do
-      delivery.should_receive(:mark_failed).with(nil, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:mark_failed).with(nil, "Unable to deliver notification #{notification.id}, received error (Failed to deliver to all recipients.)")
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 

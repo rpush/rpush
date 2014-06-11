@@ -174,7 +174,7 @@ describe Rpush::Daemon::Gcm::Delivery do
           { 'error' => 'InvalidDataKey' }
         ] }
       response.stub(body: JSON.dump(body))
-      delivery.should_receive(:mark_failed).with(nil, "Failed to deliver to all recipients. Errors: InvalidDataKey.")
+      delivery.should_receive(:mark_failed).with(nil, "Unable to deliver notification #{notification.id}, received error (Failed to deliver to all recipients. Errors: InvalidDataKey.)")
       perform_with_rescue
     end
 
@@ -307,7 +307,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     before { response.stub(code: 400) }
 
     it 'marks the notification as failed' do
-      delivery.should_receive(:mark_failed).with(400, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
+      delivery.should_receive(:mark_failed).with(400,  "Unable to deliver notification #{notification.id}, received error 400 (GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.)")
       perform_with_rescue
     end
   end
@@ -316,7 +316,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     before { response.stub(code: 418) }
 
     it 'marks the notification as failed' do
-      delivery.should_receive(:mark_failed).with(418, "I'm a Teapot")
+      delivery.should_receive(:mark_failed).with(418, "Unable to deliver notification #{notification.id}, received error 418 (I'm a Teapot)")
       perform_with_rescue
     end
   end

@@ -17,8 +17,8 @@ module Rpush
 
         def perform
           handle_response(do_post)
-        rescue Rpush::DeliveryError => error
-          mark_failed(error.code, error.description)
+        rescue StandardError => error
+          mark_failed(error.try(:code), error.to_s)
           raise
         end
 

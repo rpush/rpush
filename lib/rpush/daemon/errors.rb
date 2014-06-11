@@ -19,12 +19,11 @@ end
 
 module Rpush
   class DisconnectionError < StandardError
-    attr_accessor :message
-    attr_reader :code, :description
+    attr_reader :code, :message
 
-    def initialize
+    def initialize(message)
       @code = nil
-      @description = "Connection terminated without returning an error."
+      @message = message
     end
 
     def to_s
