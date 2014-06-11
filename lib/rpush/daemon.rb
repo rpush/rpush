@@ -107,6 +107,7 @@ module Rpush
           case read_io.readline.strip.to_i
           when Signal.list['HUP']
             AppRunner.sync
+            Feeder.wakeup
           when Signal.list['USR2']
             AppRunner.debug
           when Signal.list['INT'], Signal.list['TERM']

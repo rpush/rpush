@@ -22,6 +22,10 @@ module Rpush
         @interruptible_sleeper = nil
       end
 
+      def self.wakeup
+        interruptible_sleeper.wakeup
+      end
+
       class << self
         attr_reader :should_stop
       end

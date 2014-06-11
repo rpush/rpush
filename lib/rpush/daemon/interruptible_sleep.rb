@@ -33,6 +33,10 @@ module Rpush
         @thread.kill if @thread
       end
 
+      def wakeup
+        signal
+      end
+
       private
 
       def signal

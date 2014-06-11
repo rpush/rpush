@@ -73,12 +73,12 @@ describe Rpush::Daemon::Feeder do
   end
 
   describe 'stop' do
-    it 'interrupts sleep when stopped' do
+    it 'interrupts sleep' do
       interruptible_sleep.should_receive(:stop)
       start_and_stop
     end
 
-    it 'releases the store connection when stopped' do
+    it 'releases the store connection' do
       Rpush::Daemon.store.should_receive(:release_connection)
       start_and_stop
     end
@@ -93,5 +93,15 @@ describe Rpush::Daemon::Feeder do
   it 'sleeps' do
     interruptible_sleep.should_receive(:sleep)
     start_and_stop
+  end
+
+  describe 'wakeup' do
+    it 'interrupts sleep' do
+      interruptible_sleep.should_receive(:wakeup)
+      Rpush::Daemon::Feeder.start
+      Rpush::Daemon::Feeder.wakeup
+    end
+
+    after { Rpush::Daemon::Feeder.stop }
   end
 end
