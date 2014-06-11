@@ -4,13 +4,16 @@ module Rpush
       DISPATCHERS = {
         http: Rpush::Daemon::Dispatcher::Http,
         tcp: Rpush::Daemon::Dispatcher::Tcp,
-        bathed_tcp: Rpush::Daemon::Dispatcher::BatchedTcp
+        batched_tcp: Rpush::Daemon::Dispatcher::BatchedTcp
       }
 
-      attr_writer :batch_deliveries
+      def batch_deliveries(value = nil)
+        return batch_deliveries? if value.nil?
+        @batch_deliveries = value
+      end
 
       def batch_deliveries?
-        @batch_deliveries = true
+        @batch_deliveries == true
       end
 
       def dispatcher(name = nil, options = {})

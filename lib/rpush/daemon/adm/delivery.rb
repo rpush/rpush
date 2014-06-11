@@ -41,8 +41,10 @@ module Rpush
         rescue Rpush::TooManyRequestsError => error
           handle_too_many_requests(error)
         rescue StandardError => error
-          mark_failed(error.try(:code), error.to_s)
+          mark_failed(error)
           raise
+        ensure
+          @batch.notification_processed
         end
 
         protected

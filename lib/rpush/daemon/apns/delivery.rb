@@ -16,29 +16,32 @@ module Rpush
           255 => "None (unknown error)"
         }
 
-        def initialize(app, conneciton, batch)
+        def initialize(app, connection, batch)
           @app = app
-          @connection = conneciton
+          @connection = connection
           @batch = batch
         end
 
         def perform
           @connection.write(batch_to_binary)
           check_for_error if Rpush.config.check_for_errors
-          mark_delivered
+          mark_batch_delivered
           describe_deliveries
-          rescue StandardError => error
-            mark_failed(error.try(:code), error.to_s)
+        rescue StandardError => error
+          mark_batch_failed(error)
           raise
+        ensure
+          @batch.all_processed
         end
 
         protected
 
         def batch_to_binary
-          payload = []
+          payload = ""
           @batch.each_notification do |notification|
-            payload.merge!(notification.to_binary)
+            payload << notification.to_binary
           end
+          payload
         end
 
         def describe_deliveries

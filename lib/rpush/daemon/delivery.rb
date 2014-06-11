@@ -20,8 +20,18 @@ module Rpush
         @batch.mark_delivered(@notification)
       end
 
-      def mark_failed(code, description)
-        @batch.mark_failed(@notification, code, description)
+      def mark_batch_delivered
+        @batch.mark_all_delivered
+      end
+
+      def mark_failed(error)
+        code = error.respond_to?(:code) ? error.code : nil
+        @batch.mark_failed(@notification, code, error.to_s)
+      end
+
+      def mark_batch_failed(error)
+        code = error.respond_to?(:code) ? error.code : nil
+        @batch.mark_all_failed(code, error.to_s)
       end
     end
   end

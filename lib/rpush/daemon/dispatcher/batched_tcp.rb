@@ -3,7 +3,7 @@ module Rpush
     module Dispatcher
       class BatchedTcp < Rpush::Daemon::Dispatcher::Tcp
         def dispatch(payload)
-          @delivery_class.new(@app, payload.batch).perform
+          @delivery_class.new(@app, connection, payload.batch).perform
         end
       end
     end

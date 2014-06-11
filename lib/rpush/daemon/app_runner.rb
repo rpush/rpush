@@ -14,7 +14,7 @@ module Rpush
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
           sync_app_with_id(app_id) unless runners[app_id]
-          runners[app_id].enqueue(Batch.new(group))
+          runners[app_id].enqueue(Batch.new(group)) if runners[app_id]
         end
       end
 
@@ -82,7 +82,7 @@ module Rpush
         if service.batch_deliveries?
           queue.push(QueuePayload.new(batch: batch))
         else
-          batch.notifications.each do |notification|
+          batch.each_notification do |notification|
             queue.push(QueuePayload.new(batch: batch, notification: notification))
             reflect(:notification_enqueued, notification)
           end
@@ -144,7 +144,7 @@ module Rpush
 
       def new_dispatcher_loop
         dispatcher = service.new_dispatcher(@app)
-        dispatcher_loop = Rpush::Daemon::DispatcherLoop.new(queue, dispatcher, service.batch_deliveries?)
+        dispatcher_loop = Rpush::Daemon::DispatcherLoop.new(queue, dispatcher)
         dispatcher_loop.start
         dispatcher_loop
       end

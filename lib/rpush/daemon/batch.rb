@@ -47,6 +47,22 @@ module Rpush
         end
       end
 
+      def mark_all_delivered
+        if Rpush.config.batch_storage_updates
+          @mutex.synchronize do
+            @delivered = @notifications
+          end
+          each_notification do |notification|
+            Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
+          end
+        else
+          each_notification do |notification|
+            Rpush::Daemon.store.mark_delivered(notification, Time.now)
+            reflect(:notification_delivered, notification)
+          end
+        end
+      end
+
       def mark_failed(notification, code, description)
         if Rpush.config.batch_storage_updates
           key = [code, description]
@@ -61,10 +77,34 @@ module Rpush
         end
       end
 
-      def notification_dispatched
+      def mark_all_failed(code, message)
+        if Rpush.config.batch_storage_updates
+          key = [code, message]
+          @mutex.synchronize do
+            @failed[key] = @notifications
+          end
+          each_notification do |notification|
+            Rpush::Daemon.store.mark_failed(notification, code, message, Time.now, persist: false)
+          end
+        else
+          each_notification do |notification|
+            Rpush::Daemon.store.mark_failed(notification, code, message, Time.now)
+            reflect(:notification_failed, notification)
+          end
+        end
+      end
+
+      def notification_processed
         @mutex.synchronize do
           @num_processed += 1
           complete if @num_processed >= @notifications.size
+        end
+      end
+
+      def all_processed
+        @mutex.synchronize do
+          @num_processed = @notifications.size
+          complete
         end
       end
 
@@ -75,6 +115,8 @@ module Rpush
       private
 
       def complete
+        return if complete?
+
         [:complete_delivered, :complete_failed, :complete_retried].each do |method|
           begin
             send(method)

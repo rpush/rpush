@@ -7,7 +7,7 @@ describe Rpush::Daemon::Adm::Delivery do
   let(:response) { double(code: 200, header: {}) }
   let(:http) { double(shutdown: nil, request: response) }
   let(:now) { Time.parse('2012-10-14 00:00:00') }
-  let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil) }
+  let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil, notification_processed: nil) }
   let(:delivery) { Rpush::Daemon::Adm::Delivery.new(app, http, notification, batch) }
   let(:store) { double(create_adm_notification: double(id: 2)) }
 
@@ -32,7 +32,8 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(body: JSON.dump('reason' => 'InvalidData'))
-      delivery.should_receive(:mark_failed).with(408,  "Unable to deliver notification #{notification.id}, received error 408 (Request Timeout)")
+      error = Rpush::DeliveryError.new(408, notification.id, 'Request Timeout')
+      delivery.should_receive(:mark_failed).with(error)
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
@@ -69,14 +70,15 @@ describe Rpush::Daemon::Adm::Delivery do
 
     it 'marks the notification as failed because no successful delivery was made' do
       response.stub(body: JSON.dump('reason' => 'InvalidData'))
-      delivery.should_receive(:mark_failed).with(nil, "Unable to deliver notification #{notification.id}, received error (Failed to deliver to all recipients.)")
-      expect { perform }.to raise_error(Rpush::DeliveryError)
+      error = Rpush::DeliveryError.new(nil, notification.id, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:mark_failed).with(error)
+      expect { perform }.to raise_error(error)
     end
 
     it 'logs that the notification was not delivered' do
       response.stub(body: JSON.dump('reason' => 'InvalidRegistrationId'))
       logger.should_receive(:warn).with("[MyApp] bad_request: xyz (InvalidRegistrationId)")
-      expect { perform }.to raise_error(Rpush::DeliveryError)
+      expect { perform }.to raise_error
     end
   end
 
@@ -194,7 +196,8 @@ describe Rpush::Daemon::Adm::Delivery do
     end
 
     it 'marks the notification as failed because no successful delivery was made' do
-      delivery.should_receive(:mark_failed).with(nil, "Unable to deliver notification #{notification.id}, received error (Failed to deliver to all recipients.)")
+      error = Rpush::DeliveryError.new(nil, notification.id, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:mark_failed).with(error)
       expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 

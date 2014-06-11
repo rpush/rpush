@@ -9,7 +9,7 @@ describe Rpush::Daemon::DispatcherLoop do
   end
 
   let(:notification) { double }
-  let(:batch) { double(notification_dispatched: nil) }
+  let(:batch) { double(notification_processed: nil) }
   let(:queue) { Queue.new }
   let(:dispatcher) { double(dispatch: nil, cleanup: nil) }
   let(:dispatcher_loop) { Rpush::Daemon::DispatcherLoop.new(queue, dispatcher) }
@@ -37,12 +37,7 @@ describe Rpush::Daemon::DispatcherLoop do
     run_dispatcher_loop
   end
 
-  it 'instructs the batch that the notification has been processed' do
-    batch.should_receive(:notification_dispatched)
-    run_dispatcher_loop
-  end
-
-  it "instructs the queue to wakeup the thread when told to stop" do
+  it 'instructs the queue to wakeup the thread when told to stop' do
     queue.should_receive(:push).with(Rpush::Daemon::DispatcherLoop::WAKEUP).and_call_original
     run_dispatcher_loop
   end

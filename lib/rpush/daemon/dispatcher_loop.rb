@@ -5,10 +5,9 @@ module Rpush
 
       WAKEUP = :wakeup
 
-      def initialize(queue, dispatcher, batch_deliveries)
+      def initialize(queue, dispatcher)
         @queue = queue
         @dispatcher = dispatcher
-        @batch_deliveries = batch_deliveries
       end
 
       def start
@@ -46,8 +45,6 @@ module Rpush
         rescue StandardError => e
           Rpush.logger.error(e)
           reflect(:error, e)
-        ensure
-          batch.notification_dispatched
         end
       end
     end

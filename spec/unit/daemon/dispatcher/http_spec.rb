@@ -6,6 +6,7 @@ describe Rpush::Daemon::Dispatcher::Http do
   let(:notification) { double }
   let(:batch) { double }
   let(:http) { double }
+  let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch: batch, notification: notification) }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Http.new(app, delivery_class) }
 
   before { Net::HTTP::Persistent.stub(new: http) }
@@ -20,7 +21,7 @@ describe Rpush::Daemon::Dispatcher::Http do
       delivery = double
       delivery_class.should_receive(:new).with(app, http, notification, batch).and_return(delivery)
       delivery.should_receive(:perform)
-      dispatcher.dispatch(notification, batch)
+      dispatcher.dispatch(queue_payload)
     end
   end
 

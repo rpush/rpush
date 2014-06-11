@@ -10,6 +10,7 @@ describe Rpush::Daemon::Dispatcher::Tcp do
   let(:host) { 'localhost' }
   let(:port) { 1234 }
   let(:host_proc) { proc { [host, port] } }
+  let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch: batch, notification: notification) }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, host: host_proc) }
 
   before { Rpush::Daemon::TcpConnection.stub(new: connection) }
@@ -18,19 +19,19 @@ describe Rpush::Daemon::Dispatcher::Tcp do
     it 'lazily connects the socket' do
       Rpush::Daemon::TcpConnection.should_receive(:new).with(app, host, port).and_return(connection)
       connection.should_receive(:connect)
-      dispatcher.dispatch(notification, batch)
+      dispatcher.dispatch(queue_payload)
     end
 
     it 'delivers the notification' do
       delivery_class.should_receive(:new).with(app, connection, notification, batch).and_return(delivery)
       delivery.should_receive(:perform)
-      dispatcher.dispatch(notification, batch)
+      dispatcher.dispatch(queue_payload)
     end
   end
 
   describe 'cleanup' do
     it 'closes the connection' do
-      dispatcher.dispatch(notification, batch) # lazily initialize connection
+      dispatcher.dispatch(queue_payload) # lazily initialize connection
       connection.should_receive(:close)
       dispatcher.cleanup
     end

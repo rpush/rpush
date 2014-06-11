@@ -1,4 +1,5 @@
 require 'unit_spec_helper'
+require 'rpush/daemon/store/active_record'
 
 module Rpush
   module AppRunnerSpecService
@@ -196,8 +197,15 @@ describe Rpush::Daemon::AppRunner do
     let(:notification) { double }
     let(:batch) { double(notifications: [notification]) }
 
+    before do
+      batch.stub(:each_notification).and_yield(notification)
+    end
+
     it 'enqueues the batch' do
-      queue.should_receive(:push).with([notification, batch])
+      queue.should_receive(:push) do |queue_payload|
+        queue_payload.notification.should eq notification
+        queue_payload.batch.should eq batch
+      end
       runner.enqueue(batch)
     end
 

@@ -16,7 +16,6 @@ describe Rpush::Daemon::Delivery do
   before { Time.stub(now: now) }
 
   describe 'mark_retryable' do
-
     it 'does not retry a notification with an expired fail_after' do
       batch.should_receive(:mark_failed).with(notification, nil, "Notification failed to be delivered before 2014-10-13 23:00:00.")
       notification.fail_after = Time.now - 1.hour
@@ -33,6 +32,21 @@ describe Rpush::Daemon::Delivery do
       batch.should_receive(:mark_retryable)
       notification.fail_after = Time.now + 1.hour
       delivery.mark_retryable(notification, Time.now + 1.hour)
+    end
+  end
+
+  describe 'mark_batch_delivered' do
+    it 'marks all notifications as delivered' do
+      batch.should_receive(:mark_all_delivered)
+      delivery.mark_batch_delivered
+    end
+  end
+
+  describe 'mark_batch_failed' do
+    it 'marks all notifications as delivered' do
+      error = Rpush::DeliveryError.new(1, 42, 'an error')
+      batch.should_receive(:mark_all_failed).with(1, 'Unable to deliver notification 42, received error 1 (an error)')
+      delivery.mark_batch_failed(error)
     end
   end
 end

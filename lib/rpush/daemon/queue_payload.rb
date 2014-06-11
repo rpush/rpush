@@ -6,6 +6,7 @@ module Rpush
       def initialize(batch: nil, notification: nil)
         @batch = batch
         @notification = notification
+      end
     end
   end
 end

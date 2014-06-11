@@ -1,6 +1,6 @@
 module Rpush
   class DeliveryError < StandardError
-    attr_reader :code
+    attr_reader :code, :notification_id
 
     def initialize(code, notification_id, description)
       @code = code
@@ -15,6 +15,13 @@ module Rpush
     def message
       error_str = [@code, "(#{@description})"].compact.join(' ')
       "Unable to deliver notification #{@notification_id}, received error #{error_str}"
+    end
+
+    def ==(other)
+      other.kind_of?(DeliveryError) && \
+      other.code == code && \
+      other.notification_id == notification_id && \
+      other.to_s == to_s
     end
   end
 end

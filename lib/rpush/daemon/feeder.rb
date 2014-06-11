@@ -41,6 +41,7 @@ module Rpush
       end
 
       def self.enqueue_notifications
+        # TODO: Worker modle is broken for batch APNS.
         batch_size = Rpush.config.batch_size - Rpush::Daemon::AppRunner.cumulative_queue_size
         return if batch_size <= 0
         notifications = Rpush::Daemon.store.deliverable_notifications(batch_size)

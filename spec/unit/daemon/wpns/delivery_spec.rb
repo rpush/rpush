@@ -10,7 +10,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   let(:response) { double(code: 200, header: {}) }
   let(:http) { double(shutdown: nil, request: response) }
   let(:now) { Time.parse('2012-10-14 00:00:00') }
-  let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil) }
+  let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil, notification_processed: nil) }
   let(:delivery) { Rpush::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(create_wpns_notification: double(id: 2)) }
 
@@ -19,7 +19,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   end
 
   def perform_with_rescue
-    expect { perform }.to raise_error(Rpush::DeliveryError)
+    expect { perform }.to raise_error
   end
 
   before do
@@ -35,7 +35,9 @@ describe Rpush::Daemon::Wpns::Delivery do
     before { response.stub(body: JSON.dump(body)) }
 
     it "marks the original notification falied" do
-      delivery.should_receive(:mark_failed).with(notification, nil, error_description)
+      delivery.should_receive(:mark_failed) do |error|
+        error.message.should =~ error_description
+      end
       perform_with_rescue
     end
 
@@ -66,7 +68,8 @@ describe Rpush::Daemon::Wpns::Delivery do
     it "marks the notification as failed if the notification is suppressed" do
       response.stub(body: JSON.dump("faliure" => 0))
       response.stub(to_hash: { "x-notificationstatus" => ["Suppressed"] })
-      delivery.should_receive(:mark_failed).with(200, "Unable to deliver notification #{notification.id}, received error 200 (Notification was received but suppressed by the service.)")
+      error = Rpush::DeliveryError.new(200, notification.id, 'Notification was received but suppressed by the service.')
+      delivery.should_receive(:mark_failed).with(error)
       perform_with_rescue
     end
   end
@@ -74,7 +77,8 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 400 response" do
     before { response.stub(code: 400) }
     it "marks notifications as failed" do
-      delivery.should_receive(:mark_failed).with(400, "Unable to deliver notification #{notification.id}, received error 400 (Bad XML or malformed notification URI.)")
+      error = Rpush::DeliveryError.new(400, notification.id, 'Bad XML or malformed notification URI.')
+      delivery.should_receive(:mark_failed).with(error)
       perform_with_rescue
     end
   end
@@ -82,7 +86,8 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 401 response" do
     before { response.stub(code: 401) }
     it "marks notifications as failed" do
-      delivery.should_receive(:mark_failed).with(401, "Unable to deliver notification #{notification.id}, received error 401 (Unauthorized to send a notification to this app.)")
+      error = Rpush::DeliveryError.new(401, notification.id, 'Unauthorized to send a notification to this app.')
+      delivery.should_receive(:mark_failed).with(error)
       perform_with_rescue
     end
   end
@@ -90,7 +95,8 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 404 response" do
     before { response.stub(code: 404) }
     it "marks notifications as failed" do
-      delivery.should_receive(:mark_failed).with(404, "Unable to deliver notification #{notification.id}, received error 404 (Not Found)")
+      error = Rpush::DeliveryError.new(404, notification.id, 'Not Found')
+      delivery.should_receive(:mark_failed).with(error)
       perform_with_rescue
     end
   end
@@ -98,7 +104,8 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 405 response" do
     before { response.stub(code: 405) }
     it "marks notifications as failed" do
-      delivery.should_receive(:mark_failed).with(405, "Unable to deliver notification #{notification.id}, received error 405 (Method Not Allowed)")
+      error = Rpush::DeliveryError.new(405, notification.id, 'Method Not Allowed')
+      delivery.should_receive(:mark_failed).with(error)
       perform_with_rescue
     end
   end
@@ -155,7 +162,8 @@ describe Rpush::Daemon::Wpns::Delivery do
     before { response.stub(code: 418) }
 
     it 'marks the notification as failed' do
-      delivery.should_receive(:mark_failed).with(418, "Unable to deliver notification #{notification.id}, received error 418 (I'm a Teapot)")
+      error = Rpush::DeliveryError.new(418, notification.id, "I'm a Teapot")
+      delivery.should_receive(:mark_failed).with(error)
       perform_with_rescue
     end
   end
