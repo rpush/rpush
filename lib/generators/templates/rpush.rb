@@ -20,9 +20,6 @@
   # ActiveRecord notifications batch size.
   # config.batch_size = 100
 
-  # Perform updates to the storage backend in batches to reduce IO.
-  # config.batch_storage_updates = true
-
   # Path to write PID file. Relative to Rails root unless absolute.
   # config.pid_file = '/path/to/rpush.pid'
 

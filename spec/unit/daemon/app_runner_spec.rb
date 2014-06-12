@@ -73,7 +73,7 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
     Rpush::Daemon::AppRunner.runners[3].should be_nil
     notification = double(app_id: 3)
     app = double(Rpush::App, id: 3, connections: 1, service_name: 'app_runner_spec_service', environment: 'sandbox', certificate: TEST_CERT, password: nil, name: 'test')
-    Rpush::Daemon.store.stub(app: app)
+    Rpush::Daemon.store = double(app: app)
     Rpush::Daemon::AppRunner.enqueue([notification])
     Rpush::Daemon::AppRunner.runners[3].should_not be_nil
   end

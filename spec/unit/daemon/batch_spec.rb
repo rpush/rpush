@@ -30,166 +30,69 @@ describe Rpush::Daemon::Batch do
   end
 
   describe 'mark_delivered' do
-    describe 'batching is disabled' do
-      before { Rpush.config.batch_storage_updates = false }
-
-      it 'marks the notification as delivered immediately' do
-        store.should_receive(:mark_delivered).with(notification1, time)
-        batch.mark_delivered(notification1)
-      end
-
-      it 'reflects the notification was delivered' do
-        batch.should_receive(:reflect).with(:notification_delivered, notification1)
-        batch.mark_delivered(notification1)
-      end
+    it 'marks the notification as delivered immediately without persisting' do
+      store.should_receive(:mark_delivered).with(notification1, time, persist: false)
+      batch.mark_delivered(notification1)
     end
 
-    describe 'batching is enabled' do
-      before { Rpush.config.batch_storage_updates = true }
-
-      it 'marks the notification as delivered immediately without persisting' do
-        store.should_receive(:mark_delivered).with(notification1, time, persist: false)
-        batch.mark_delivered(notification1)
-      end
-
-      it 'defers persisting' do
-        batch.mark_delivered(notification1)
-        batch.delivered.should eq [notification1]
-      end
+    it 'defers persisting' do
+      batch.mark_delivered(notification1)
+      batch.delivered.should eq [notification1]
     end
   end
 
   describe 'mark_all_delivered' do
-    describe 'batching is disabled' do
-      before { Rpush.config.batch_storage_updates = false }
-
-      it 'marks the notifications as delivered immediately' do
-        store.should_receive(:mark_delivered).with(notification1, time)
-        store.should_receive(:mark_delivered).with(notification2, time)
-        batch.mark_all_delivered
-      end
-
-      it 'reflects the notifications were delivered' do
-        batch.should_receive(:reflect).with(:notification_delivered, notification1)
-        batch.should_receive(:reflect).with(:notification_delivered, notification2)
-        batch.mark_all_delivered
-      end
+    it 'marks the notifications as delivered immediately without persisting' do
+      store.should_receive(:mark_delivered).with(notification1, time, persist: false)
+      store.should_receive(:mark_delivered).with(notification2, time, persist: false)
+      batch.mark_all_delivered
     end
 
-    describe 'batching is enabled' do
-      before { Rpush.config.batch_storage_updates = true }
-
-      it 'marks the notifications as delivered immediately without persisting' do
-        store.should_receive(:mark_delivered).with(notification1, time, persist: false)
-        store.should_receive(:mark_delivered).with(notification2, time, persist: false)
-        batch.mark_all_delivered
-      end
-
-      it 'defers persisting' do
-        batch.mark_all_delivered
-        batch.delivered.should eq [notification1, notification2]
-      end
+    it 'defers persisting' do
+      batch.mark_all_delivered
+      batch.delivered.should eq [notification1, notification2]
     end
   end
 
   describe 'mark_failed' do
-    describe 'batching is disabled' do
-      before { Rpush.config.batch_storage_updates = false }
-
-      it 'marks the notification as failed' do
-        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time)
-        batch.mark_failed(notification1, 1, 'an error')
-      end
-
-      it 'reflects the notification failed' do
-        batch.should_receive(:reflect).with(:notification_failed, notification1)
-        batch.mark_failed(notification1, 1, 'an error')
-      end
+    it 'marks the notification as failed without persisting' do
+      store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, persist: false)
+      batch.mark_failed(notification1, 1, 'an error')
     end
 
-    describe 'batching is enabled' do
-      before { Rpush.config.batch_storage_updates = true }
-
-      it 'marks the notification as failed without persisting' do
-        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, persist: false)
-        batch.mark_failed(notification1, 1, 'an error')
-      end
-
-      it 'defers persisting' do
-        Rpush.config.batch_storage_updates = true
-        batch.mark_failed(notification1, 1, 'an error')
-        batch.failed.should eq([1, 'an error'] => [notification1])
-      end
+    it 'defers persisting' do
+      batch.mark_failed(notification1, 1, 'an error')
+      batch.failed.should eq([1, 'an error'] => [notification1])
     end
   end
 
   describe 'mark_failed' do
-    describe 'batching is disabled' do
-      before { Rpush.config.batch_storage_updates = false }
-
-      it 'marks the notification as failed' do
-        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time)
-        store.should_receive(:mark_failed).with(notification2, 1, 'an error', time)
-        batch.mark_all_failed(1, 'an error')
-      end
-
-      it 'reflects the notification failed' do
-        batch.should_receive(:reflect).with(:notification_failed, notification1)
-        batch.should_receive(:reflect).with(:notification_failed, notification2)
-        batch.mark_all_failed(1, 'an error')
-      end
+    it 'marks the notification as failed without persisting' do
+      store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, persist: false)
+      store.should_receive(:mark_failed).with(notification2, 1, 'an error', time, persist: false)
+      batch.mark_all_failed(1, 'an error')
     end
 
-    describe 'batching is enabled' do
-      before { Rpush.config.batch_storage_updates = true }
-
-      it 'marks the notification as failed without persisting' do
-        store.should_receive(:mark_failed).with(notification1, 1, 'an error', time, persist: false)
-        store.should_receive(:mark_failed).with(notification2, 1, 'an error', time, persist: false)
-        batch.mark_all_failed(1, 'an error')
-      end
-
-      it 'defers persisting' do
-        Rpush.config.batch_storage_updates = true
-        batch.mark_all_failed(1, 'an error')
-        batch.failed.should eq([1, 'an error'] => [notification1, notification2])
-      end
+    it 'defers persisting' do
+      batch.mark_all_failed(1, 'an error')
+      batch.failed.should eq([1, 'an error'] => [notification1, notification2])
     end
   end
 
   describe 'mark_retryable' do
-    describe 'batching is disabled' do
-      before { Rpush.config.batch_storage_updates = false }
-
-      it 'marks the notification as retryable' do
-        store.should_receive(:mark_retryable).with(notification1, time)
-        batch.mark_retryable(notification1, time)
-      end
-
-      it 'reflects the notification will be retried' do
-        batch.should_receive(:reflect).with(:notification_will_retry, notification1)
-        batch.mark_retryable(notification1, time)
-      end
+    it 'marks the notification as retryable without persisting' do
+      store.should_receive(:mark_retryable).with(notification1, time, persist: false)
+      batch.mark_retryable(notification1, time)
     end
 
-    describe 'batching is enabled' do
-      before { Rpush.config.batch_storage_updates = true }
-
-      it 'marks the notification as retryable without persisting' do
-        store.should_receive(:mark_retryable).with(notification1, time, persist: false)
-        batch.mark_retryable(notification1, time)
-      end
-
-      it 'defers persisting' do
-        batch.mark_retryable(notification1, time)
-        batch.retryable.should eq(time => [notification1])
-      end
+    it 'defers persisting' do
+      batch.mark_retryable(notification1, time)
+      batch.retryable.should eq(time => [notification1])
     end
   end
 
   describe 'complete' do
     before do
-      Rpush.config.batch_storage_updates = true
       Rpush.stub(logger: double.as_null_object)
       batch.stub(:reflect)
     end

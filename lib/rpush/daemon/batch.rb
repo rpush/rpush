@@ -23,74 +23,45 @@ module Rpush
       end
 
       def mark_retryable(notification, deliver_after)
-        if Rpush.config.batch_storage_updates
-          @mutex.synchronize do
-            @retryable[deliver_after] ||= []
-            @retryable[deliver_after] << notification
-          end
-          Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
-        else
-          Rpush::Daemon.store.mark_retryable(notification, deliver_after)
-          reflect(:notification_will_retry, notification)
+        @mutex.synchronize do
+          @retryable[deliver_after] ||= []
+          @retryable[deliver_after] << notification
         end
+        Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
       end
 
       def mark_delivered(notification)
-        if Rpush.config.batch_storage_updates
-          @mutex.synchronize do
-            @delivered << notification
-          end
-          Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
-        else
-          Rpush::Daemon.store.mark_delivered(notification, Time.now)
-          reflect(:notification_delivered, notification)
+        @mutex.synchronize do
+          @delivered << notification
         end
+        Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
       end
 
       def mark_all_delivered
-        if Rpush.config.batch_storage_updates
-          @mutex.synchronize do
-            @delivered = @notifications
-          end
-          each_notification do |notification|
-            Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
-          end
-        else
-          each_notification do |notification|
-            Rpush::Daemon.store.mark_delivered(notification, Time.now)
-            reflect(:notification_delivered, notification)
-          end
+        @mutex.synchronize do
+          @delivered = @notifications
+        end
+        each_notification do |notification|
+          Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
         end
       end
 
       def mark_failed(notification, code, description)
-        if Rpush.config.batch_storage_updates
-          key = [code, description]
-          @mutex.synchronize do
-            @failed[key] ||= []
-            @failed[key] << notification
-          end
-          Rpush::Daemon.store.mark_failed(notification, code, description, Time.now, persist: false)
-        else
-          Rpush::Daemon.store.mark_failed(notification, code, description, Time.now)
-          reflect(:notification_failed, notification)
+        key = [code, description]
+        @mutex.synchronize do
+          @failed[key] ||= []
+          @failed[key] << notification
         end
+        Rpush::Daemon.store.mark_failed(notification, code, description, Time.now, persist: false)
       end
 
       def mark_all_failed(code, message)
-        if Rpush.config.batch_storage_updates
-          key = [code, message]
-          @mutex.synchronize do
-            @failed[key] = @notifications
-          end
-          each_notification do |notification|
-            Rpush::Daemon.store.mark_failed(notification, code, message, Time.now, persist: false)
-          end
-        else
-          each_notification do |notification|
-            Rpush::Daemon.store.mark_failed(notification, code, message, Time.now)
-            reflect(:notification_failed, notification)
-          end
+        key = [code, message]
+        @mutex.synchronize do
+          @failed[key] = @notifications
+        end
+        each_notification do |notification|
+          Rpush::Daemon.store.mark_failed(notification, code, message, Time.now, persist: false)
         end
       end
 

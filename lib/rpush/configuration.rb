@@ -33,6 +33,8 @@ module Rpush
   class Configuration < Struct.new(*CONFIG_ATTRS)
     include Deprecatable
 
+    deprecated(:batch_storage_updates=, '2.1.0', 'Updates are now always batched by the storage backends.')
+
     def initialize
       super
       set_defaults
@@ -81,7 +83,6 @@ module Rpush
       self.pid_file = nil
       self.client = :active_record
       self.logger = nil
-      self.batch_storage_updates = true
       self.log_dir = Rails.root
 
       # Internal options.
