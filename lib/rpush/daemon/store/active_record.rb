@@ -31,10 +31,10 @@ module Rpush
           notification.retries += 1
           notification.deliver_after = deliver_after
 
-          if opts[:persist]
-            with_database_reconnect_and_retry do
-              notification.save!(validate: false)
-            end
+          return unless opts[:persist]
+
+          with_database_reconnect_and_retry do
+            notification.save!(validate: false)
           end
         end
 
@@ -54,10 +54,10 @@ module Rpush
           notification.delivered = true
           notification.delivered_at = time
 
-          if opts[:persist]
-            with_database_reconnect_and_retry do
-              notification.save!(validate: false)
-            end
+          return unless opts[:persist]
+
+          with_database_reconnect_and_retry do
+            notification.save!(validate: false)
           end
         end
 
@@ -82,10 +82,10 @@ module Rpush
           notification.error_code = code
           notification.error_description = description
 
-          if opts[:persist]
-            with_database_reconnect_and_retry do
-              notification.save!(validate: false)
-            end
+          return unless opts[:persist]
+
+          with_database_reconnect_and_retry do
+            notification.save!(validate: false)
           end
         end
 

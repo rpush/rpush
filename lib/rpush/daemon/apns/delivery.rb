@@ -51,25 +51,25 @@ module Rpush
         end
 
         def check_for_error
-          if @connection.select(SELECT_TIMEOUT)
-            error = nil
-            tuple = @connection.read(ERROR_TUPLE_BYTES)
+          return unless @connection.select(SELECT_TIMEOUT)
 
-            if tuple
-              _, code, notification_id = tuple.unpack("ccN")
+          error = nil
+          tuple = @connection.read(ERROR_TUPLE_BYTES)
 
-              description = APN_ERRORS[code.to_i] || "Unknown error. Possible Rpush bug?"
-              error = Rpush::DeliveryError.new(code, notification_id, description)
-            else
-              error = Rpush::DisconnectionError.new("The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host.")
-            end
+          if tuple
+            _, code, notification_id = tuple.unpack("ccN")
 
-            begin
-              log_error("Error received, reconnecting...")
-              @connection.reconnect
-            ensure
-              fail error if error
-            end
+            description = APN_ERRORS[code.to_i] || "Unknown error. Possible Rpush bug?"
+            error = Rpush::DeliveryError.new(code, notification_id, description)
+          else
+            error = Rpush::DisconnectionError.new("The APNs disconnected without returning an error. This may indicate you are using an invalid certificate for the host.")
+          end
+
+          begin
+            log_error("Error received, reconnecting...")
+            @connection.reconnect
+          ensure
+            fail error if error
           end
         end
       end

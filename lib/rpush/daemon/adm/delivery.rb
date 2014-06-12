@@ -76,9 +76,9 @@ module Rpush
             log_info("#{@notification.id} sent to #{response_body['registrationID']}")
           end
 
-          if current_registration_id != response_body['registrationID']
-            reflect(:adm_canonical_id, current_registration_id, response_body['registrationID'])
-          end
+          return if current_registration_id == response_body['registrationID']
+
+          reflect(:adm_canonical_id, current_registration_id, response_body['registrationID'])
         end
 
         def handle_retryable(error)
@@ -118,10 +118,10 @@ module Rpush
         def bad_request(response, current_registration_id)
           response_body = multi_json_load(response.body)
 
-          if response_body.key?('reason')
-            log_warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
-            @failed_registration_ids[current_registration_id] = response_body['reason']
-          end
+          return unless response_body.key?('reason')
+
+          log_warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
+          @failed_registration_ids[current_registration_id] = response_body['reason']
         end
 
         def unauthorized(response)

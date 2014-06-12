@@ -68,9 +68,8 @@ module Rpush
         def handle_successes(successes)
           successes.each do |result|
             reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
-            if result.key?(:canonical_id)
-              reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
-            end
+            next unless result.key?(:canonical_id)
+            reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
           end
         end
 

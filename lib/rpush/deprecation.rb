@@ -13,9 +13,8 @@ module Rpush
     end
 
     def self.warn(msg)
-      unless Rpush::Deprecation.muted?
-        STDERR.puts "DEPRECATION WARNING: #{msg}"
-      end
+      return if Rpush::Deprecation.muted?
+      STDERR.puts "DEPRECATION WARNING: #{msg}"
     end
   end
 end

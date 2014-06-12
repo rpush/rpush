@@ -10,12 +10,12 @@ module Rpush
       end
 
       def parse
-        if @header
-          if @header.to_s =~ /^[0-9]+$/
-            Time.now + @header.to_i
-          else
-            Time.httpdate(@header)
-          end
+        return unless @header
+
+        if @header.to_s =~ /^[0-9]+$/
+          Time.now + @header.to_i
+        else
+          Time.httpdate(@header)
         end
       end
     end
