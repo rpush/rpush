@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rake'
-gem 'rspec', '>= 2.14.1'
+gem 'rspec', '= 2.14.1'
 gem 'rails', '~> 3.2'
 gem 'database_cleaner'
 gem 'timecop'

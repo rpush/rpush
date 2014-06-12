@@ -22,9 +22,8 @@ rescue LoadError
 end
 
 begin
-  require 'rubocop'
   require 'rubocop/rake_task'
-  Rubocop::RakeTask.new
+  RuboCop::RakeTask.new
 rescue LoadError
   warn 'rubocop not available.'
   task :rubocop => ['spec']
