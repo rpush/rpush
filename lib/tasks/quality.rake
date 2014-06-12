@@ -1,7 +1,7 @@
 begin
   require 'cane/rake_task'
 
-  desc "Run cane to check quality metrics"
+  desc 'Run cane to check quality metrics'
   Cane::RakeTask.new(:cane_quality) do |cane|
     cane.add_threshold 'coverage/covered_percent', :>=, 98
     cane.no_style = false
@@ -22,10 +22,11 @@ rescue LoadError
 end
 
 begin
+  require 'rubocop'
   require 'rubocop/rake_task'
   Rubocop::RakeTask.new
 rescue LoadError
-  warn "rubocop not available."
+  warn 'rubocop not available.'
   task :rubocop => ['spec']
 end
 
