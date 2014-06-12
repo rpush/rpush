@@ -11,6 +11,9 @@ end
 RSpec.configure do |config|
   config.before(:each) do
     SPEC_REDIS.keys('rpush:*').each { |key| SPEC_REDIS.del(key) }
+
+    Rails.stub(root: File.expand_path(File.join(File.dirname(__FILE__), '..', 'tmp')))
+    Rpush.config.logger = ::Logger.new(STDOUT)
   end
 
   config.after(:each) do

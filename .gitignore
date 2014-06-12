@@ -8,3 +8,4 @@ gcm_test/bin
 .DS_Store
 spec/tmp/
 .vagrant/
+tmp/

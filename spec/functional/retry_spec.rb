@@ -20,9 +20,6 @@ describe 'Retries' do
 
     Modis.redis.del(Rpush::Client::Redis::Notification.absolute_pending_namespace)
 
-    Rails.stub(root: File.expand_path(File.join(File.dirname(__FILE__), '..', 'tmp')))
-    Rpush.config.logger = ::Logger.new(STDOUT)
-
     Net::HTTP::Persistent.stub(new: http)
     response.stub(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))
   end

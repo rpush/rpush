@@ -20,9 +20,6 @@ describe 'embedding' do
     notification.device_token = 'a' * 64
     notification.save!
 
-    Rails.stub(root: File.expand_path(File.join(File.dirname(__FILE__), '..', 'tmp')))
-    Rpush.config.logger = ::Logger.new(STDOUT)
-
     stub_tcp_connection
   end
 

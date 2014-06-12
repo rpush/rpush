@@ -16,9 +16,6 @@ describe 'GCM' do
     notification.data = { message: 'test' }
     notification.save!
 
-    Rails.stub(root: File.expand_path(File.join(File.dirname(__FILE__), '..', 'tmp')))
-    Rpush.config.logger = ::Logger.new(STDOUT)
-
     Net::HTTP::Persistent.stub(new: http)
   end
 
