@@ -17,12 +17,30 @@ module Rpush
         end
 
         def deliverable_notifications(limit)
-          namespace = Rpush::Client::Redis::Notification.absolute_pending_namespace
-          results = @redis.multi do
-            @redis.zrange(namespace, 0, limit)
-            @redis.zremrangebyrank(namespace, 0, limit)
+          pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
+          retryable_ns = Rpush::Client::Redis::Notification.absolute_retryable_namespace
+
+          retryable_results = @redis.multi do
+            now = Time.now.to_i
+            @redis.zrangebyscore(retryable_ns, 0, now)
+            @redis.zremrangebyscore(retryable_ns, 0, now)
           end
-          ids = results.first
+
+          retryable_ids = retryable_results.first
+          limit -= retryable_ids.size
+
+          if limit > 0
+            pending_results = @redis.multi do
+              @redis.zrange(pending_ns, 0, limit)
+              @redis.zremrangebyrank(pending_ns, 0, limit)
+            end
+
+            pending_ids = pending_results.first
+          else
+            pending_ids = []
+          end
+
+          ids = retryable_ids + pending_ids
           ids.map { |id| Rpush::Client::Redis::Notification.find(id) }
         end
 
@@ -58,7 +76,11 @@ module Rpush
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.retries += 1
           notification.deliver_after = deliver_after
-          notification.save!(validate: false) if opts[:persist]
+          if opts[:persist]
+            notification.save!(validate: false)
+            namespace = Rpush::Client::Redis::Notification.absolute_retryable_namespace
+            @redis.zadd(namespace, deliver_after.to_i, notification.id)
+          end
         end
 
         def mark_batch_retryable(notifications, deliver_after)

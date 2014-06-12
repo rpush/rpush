@@ -14,6 +14,10 @@ module Rpush
           "#{absolute_namespace}:pending"
         end
 
+        def self.absolute_retryable_namespace
+          "#{absolute_namespace}:retryable"
+        end
+
         attribute :badge, :integer
         attribute :device_token, :string
         attribute :sound, :string
