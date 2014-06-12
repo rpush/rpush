@@ -69,12 +69,12 @@ module Rpush
           Rpush::Client::Redis::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app: app)
         end
 
-        def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
+        def create_gcm_notification(attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
           notification = Rpush::Client::Redis::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
-        def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
+        def create_adm_notification(attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
           notification = Rpush::Client::Redis::Adm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
@@ -96,7 +96,7 @@ module Rpush
 
         private
 
-        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
+        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
           notification.assign_attributes(attrs)
           notification.data = data
           notification.registration_ids = registration_ids

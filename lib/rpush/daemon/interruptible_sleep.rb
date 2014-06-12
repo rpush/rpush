@@ -13,7 +13,7 @@ module Rpush
 
       def sleep
         @obj.synchronize do
-          @condition.wait(100000)
+          @condition.wait(100_000)
         end
       end
 

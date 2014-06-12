@@ -29,7 +29,7 @@ module Rpush
       def close
         @ssl_socket.close if @ssl_socket
         @tcp_socket.close if @tcp_socket
-      rescue IOError
+      rescue IOError # rubocop:disable HandleExceptions
       end
 
       def read(num_bytes)

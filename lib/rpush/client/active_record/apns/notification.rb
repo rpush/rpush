@@ -32,7 +32,11 @@ module Rpush
                 string_or_json
               end
             else
-              multi_json_load(string_or_json) rescue string_or_json
+              begin
+                multi_json_load(string_or_json)
+              rescue StandardError
+                string_or_json
+              end
             end
           end
         end
