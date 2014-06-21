@@ -42,9 +42,7 @@ module Rpush
 
         def start_error_receiver
           @error_receiver_thread = Thread.new do
-            while !@stop_error_receiver
-              check_for_error
-            end
+            check_for_error until @stop_error_receiver
           end
         end
 

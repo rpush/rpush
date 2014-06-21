@@ -21,7 +21,7 @@ options = ARGV.options do |opts|
     exit
   end
   opts.on('-h', '--help', 'You\'re looking at it.') do
-    hidden_switches = ['-e', '--no-error-checks']
+    hidden_switches = %w(-e --no-error-checks)
     puts opts.to_s.split("\n").delete_if do |line|
       hidden_switches.any? { |s| line =~ /#{s}/ }
     end.join("\n")

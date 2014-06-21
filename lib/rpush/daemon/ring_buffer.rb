@@ -10,7 +10,7 @@ module Rpush
         super
       end
 
-      alias :push :<<
+      alias_method :push, :<<
     end
   end
 end

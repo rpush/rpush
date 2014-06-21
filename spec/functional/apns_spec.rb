@@ -23,7 +23,6 @@ describe 'APNs' do
   end
 
   def create_notification
-
     notification = Rpush::Apns::Notification.new
     notification.app = app
     notification.alert = 'test'
@@ -40,7 +39,7 @@ describe 'APNs' do
 
   def wait_for_notification_to_deliver(notification)
     Timeout.timeout(5) do
-      while !notification.delivered
+      until notification.delivered
         sleep 0.1
         notification.reload
       end
