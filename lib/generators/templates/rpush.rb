@@ -14,9 +14,6 @@
   # Frequency in seconds to check for feedback
   # config.feedback_poll = 60
 
-  # Disable APNs error checking after notification delivery.
-  # config.check_for_errors = true
-
   # ActiveRecord notifications batch size.
   # config.batch_size = 100
 

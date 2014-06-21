@@ -34,6 +34,7 @@ module Rpush
     include Deprecatable
 
     deprecated(:batch_storage_updates=, '2.1.0', 'Updates are now always batched by the storage backends.')
+    deprecated(:check_for_errors=, '2.1.0', 'APNs error detection is now performed asynchronously and does not require pauses.')
 
     def initialize
       super
@@ -78,7 +79,6 @@ module Rpush
 
       self.push_poll = 2
       self.feedback_poll = 60
-      self.check_for_errors = true
       self.batch_size = 100
       self.pid_file = nil
       self.client = :active_record

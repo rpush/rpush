@@ -36,12 +36,6 @@ describe Rpush::Daemon::Apns::Delivery do
     delivery.perform
   end
 
-  it 'does not check for errors if check_for_errors config option is false' do
-    Rpush.config.stub(check_for_errors: false)
-    delivery.should_not_receive(:check_for_error)
-    delivery.perform
-  end
-
   it 'notifies the batch all notifications have been processed' do
     batch.should_receive(:all_processed)
     delivery.perform
