@@ -13,11 +13,6 @@ describe Rpush::Daemon::Store::ActiveRecord do
     Time.stub(now: time)
   end
 
-  it 'reconnects after daemonize' do
-    store.should_receive(:reconnect_database)
-    store.after_daemonize
-  end
-
   it 'can update a notification' do
     notification.should_receive(:save!)
     store.update_notification(notification)

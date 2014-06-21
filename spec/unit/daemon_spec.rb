@@ -20,15 +20,7 @@ describe Rpush::Daemon, "when starting" do
     it "forks into a daemon if the foreground option is false" do
       Rpush.config.foreground = false
       Rpush::Daemon.initialize_store
-      Rpush::Daemon.store.stub(after_daemonize: nil)
       Rpush::Daemon.should_receive(:daemonize)
-      Rpush::Daemon.start
-    end
-
-    it 'notifies the store after forking' do
-      Rpush.config.foreground = false
-      Rpush::Daemon.initialize_store
-      Rpush::Daemon.store.should_receive(:after_daemonize)
       Rpush::Daemon.start
     end
 

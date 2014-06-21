@@ -13,6 +13,7 @@ platform :mri do
   gem 'coveralls', require: false
   gem 'simplecov', require: false
   gem 'rubocop', require: false
+  gem 'byebug'
 end
 
 platform :ruby do

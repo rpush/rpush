@@ -138,10 +138,6 @@ module Rpush
           end
         end
 
-        def after_daemonize
-          reconnect_database
-        end
-
         def release_connection
           ::ActiveRecord::Base.connection_pool.release_connection
         rescue StandardError => e

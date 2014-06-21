@@ -50,14 +50,10 @@ module Rpush
 
     def self.start
       setup_signal_traps if trap_signals?
+      daemonize if daemonize?
 
       initialize_store
       return unless store
-
-      if daemonize?
-        daemonize
-        store.after_daemonize
-      end
 
       write_pid_file
       AppRunner.sync
@@ -80,6 +76,7 @@ module Rpush
       rescue StandardError, LoadError => e
         Rpush.logger.error("Failed to load '#{Rpush.config.client}' storage backend.")
         Rpush.logger.error(e)
+        exit 1
       end
     end
 

@@ -34,7 +34,7 @@ matrix:
   - rvm: 2.1.2
     gemfile: Gemfile
     env: CLIENT=active_record ADAPTER=sqlite3
-  - rvm: rbx
+  - rvm: rbx-2
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record
   - rvm: jruby

@@ -6,7 +6,7 @@ module Rpush
                           :mark_batch_retryable, :mark_delivered, :mark_batch_delivered,
                           :mark_failed, :mark_batch_failed, :create_apns_feedback,
                           :create_gcm_notification, :create_adm_notification, :update_app,
-                          :update_notification, :after_daemonize, :release_connection,
+                          :update_notification, :release_connection,
                           :all_apps, :app, :mark_ids_failed, :mark_ids_retryable]
 
         def self.check(klass)

@@ -17,9 +17,9 @@ module Rpush
         end
 
         def deliverable_notifications(limit)
-          retryable_ids = retryable_notification_ids(limit)
+          retryable_ids = retryable_notification_ids
           limit -= retryable_ids.size
-          pending_ids = limit > 0 ? pending_notification_ids : []
+          pending_ids = limit > 0 ? pending_notification_ids(limit) : []
           ids = retryable_ids + pending_ids
           ids.map { |id| Rpush::Client::Redis::Notification.find(id) }
         end
@@ -99,10 +99,6 @@ module Rpush
         end
 
         def release_connection
-          @redis.client.disconnect
-        end
-
-        def after_daemonize
         end
 
         private
