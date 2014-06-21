@@ -22,9 +22,10 @@ require 'rpush/daemon/dispatcher_loop'
 require 'rpush/daemon/dispatcher_loop_collection'
 require 'rpush/daemon/dispatcher/http'
 require 'rpush/daemon/dispatcher/tcp'
-require 'rpush/daemon/dispatcher/batched_tcp'
+require 'rpush/daemon/dispatcher/apns_tcp'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
+require 'rpush/daemon/ring_buffer'
 
 require 'rpush/daemon/store/interface'
 

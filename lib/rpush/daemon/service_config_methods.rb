@@ -4,7 +4,7 @@ module Rpush
       DISPATCHERS = {
         http: Rpush::Daemon::Dispatcher::Http,
         tcp: Rpush::Daemon::Dispatcher::Tcp,
-        batched_tcp: Rpush::Daemon::Dispatcher::BatchedTcp
+        apns_tcp: Rpush::Daemon::Dispatcher::ApnsTcp
       }
 
       def batch_deliveries(value = nil)

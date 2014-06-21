@@ -72,6 +72,10 @@ module Rpush
           notifications.each { |n| mark_failed(n, code, description, now) }
         end
 
+        def mark_ids_failed(ids, code, description, time)
+          ids.each { |id| mark_failed(Rpush::Client::Redis::Apns::Notification.find(id), code, description, time) }
+        end
+
         def mark_retryable(notification, deliver_after, opts = {})
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
           notification.retries += 1
@@ -85,6 +89,10 @@ module Rpush
 
         def mark_batch_retryable(notifications, deliver_after)
           notifications.each { |n| mark_retryable(n, deliver_after) }
+        end
+
+        def mark_ids_retryable(ids, deliver_after)
+          ids.each { |id| mark_retryable(Rpush::Client::Redis::Apns::Notification.find(id), deliver_after) }
         end
 
         def create_apns_feedback(failed_at, device_token, app)

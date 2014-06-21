@@ -10,7 +10,7 @@ module Rpush
       }
 
       batch_deliveries true
-      dispatcher :batched_tcp, host: proc { |app| HOSTS[app.environment.to_sym] }
+      dispatcher :apns_tcp, host: proc { |app| HOSTS[app.environment.to_sym] }
       loops Rpush::Daemon::Apns::FeedbackReceiver
     end
   end

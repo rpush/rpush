@@ -44,8 +44,12 @@ module Rpush
             mark_retryable(n, deliver_after, persist: false)
             ids << n.id
           end
+          mark_ids_retryable(ids, deliver_after)
+        end
+
+        def mark_ids_retryable(ids, deliver_after)
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['retries = retries + 1, deliver_after = ?', deliver_after])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = ?, failed = ?, failed_at = ?, retries = retries + 1, deliver_after = ?', false, nil, false, nil, deliver_after])
           end
         end
 
@@ -96,8 +100,12 @@ module Rpush
             mark_failed(n, code, description, now, persist: false)
             ids << n.id
           end
+          mark_ids_failed(ids, code, description, now)
+        end
+
+        def mark_ids_failed(ids, code, description, time)
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, now, code, description])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, time, code, description])
           end
         end
 

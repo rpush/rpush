@@ -7,7 +7,7 @@ module Rpush
                           :mark_failed, :mark_batch_failed, :create_apns_feedback,
                           :create_gcm_notification, :create_adm_notification, :update_app,
                           :update_notification, :after_daemonize, :release_connection,
-                          :all_apps, :app]
+                          :all_apps, :app, :mark_ids_failed, :mark_ids_retryable]
 
         def self.check(klass)
           missing = PUBLIC_METHODS - klass.instance_methods.map(&:to_sym)

@@ -22,6 +22,10 @@ module Rpush
         @notifications.each(&blk)
       end
 
+      def each_delivered(&blk)
+        @delivered.each(&blk)
+      end
+
       def mark_retryable(notification, deliver_after)
         @mutex.synchronize do
           @retryable[deliver_after] ||= []
@@ -79,10 +83,6 @@ module Rpush
         end
       end
 
-      def describe
-        @notifications.map(&:id).join(', ')
-      end
-
       private
 
       def complete
@@ -97,7 +97,6 @@ module Rpush
           end
         end
 
-        @notifications.clear
         @complete = true
       end
 
@@ -106,7 +105,6 @@ module Rpush
         @delivered.each do |notification|
           reflect(:notification_delivered, notification)
         end
-        @delivered.clear
       end
 
       def complete_failed
@@ -116,7 +114,6 @@ module Rpush
             reflect(:notification_failed, notification)
           end
         end
-        @failed.clear
       end
 
       def complete_retried
@@ -126,7 +123,6 @@ module Rpush
             reflect(:notification_will_retry, notification)
           end
         end
-        @retryable.clear
       end
     end
   end

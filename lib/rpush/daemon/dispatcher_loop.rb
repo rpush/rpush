@@ -2,6 +2,7 @@ module Rpush
   module Daemon
     class DispatcherLoop
       include Reflectable
+      include Loggable
 
       WAKEUP = :wakeup
 
@@ -43,7 +44,7 @@ module Rpush
         begin
           @dispatcher.dispatch(payload)
         rescue StandardError => e
-          Rpush.logger.error(e)
+          log_error(e)
           reflect(:error, e)
         end
       end

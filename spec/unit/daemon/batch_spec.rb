@@ -25,10 +25,6 @@ describe Rpush::Daemon::Batch do
     2.times { batch.notification_processed }
   end
 
-  it 'can be described' do
-    batch.describe.should eq '1, 2'
-  end
-
   describe 'mark_delivered' do
     it 'marks the notification as delivered immediately without persisting' do
       store.should_receive(:mark_delivered).with(notification1, time, persist: false)
@@ -128,11 +124,6 @@ describe Rpush::Daemon::Batch do
         batch.should_receive(:reflect).with(:notification_delivered, notification2)
         complete
       end
-
-      it 'clears the delivered notifications' do
-        complete
-        batch.delivered.should eq([])
-      end
     end
 
     describe 'failed' do
@@ -153,11 +144,6 @@ describe Rpush::Daemon::Batch do
         batch.should_receive(:reflect).with(:notification_failed, notification2)
         complete
       end
-
-      it 'clears the failed notifications' do
-        complete
-        batch.failed.should eq({})
-      end
     end
 
     describe 'retryable' do
@@ -177,11 +163,6 @@ describe Rpush::Daemon::Batch do
         batch.should_receive(:reflect).with(:notification_will_retry, notification1)
         batch.should_receive(:reflect).with(:notification_will_retry, notification2)
         complete
-      end
-
-      it 'clears the retryable notifications' do
-        complete
-        batch.retryable.should eq({})
       end
     end
   end
