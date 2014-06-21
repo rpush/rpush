@@ -1,6 +1,8 @@
 require 'functional_spec_helper'
 
 describe 'APNs' do
+  TIMEOUT = 10
+
   let(:app) { create_app }
   let!(:notification) { create_notification }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
@@ -38,7 +40,7 @@ describe 'APNs' do
   end
 
   def wait_for_notification_to_deliver(notification)
-    Timeout.timeout(5) do
+    Timeout.timeout(TIMEOUT) do
       until notification.delivered
         sleep 0.1
         notification.reload
@@ -47,7 +49,7 @@ describe 'APNs' do
   end
 
   def wait_for_notification_to_fail(notification)
-    Timeout.timeout(5) do
+    Timeout.timeout(TIMEOUT) do
       while notification.delivered
         sleep 0.1
         notification.reload
@@ -87,7 +89,7 @@ describe 'APNs' do
   end
 
   describe 'delivery failures' do
-    after { Timeout.timeout(5) { Rpush.shutdown } }
+    after { Timeout.timeout(TIMEOUT) { Rpush.shutdown } }
 
     it 'fails to deliver a notification' do
       Rpush.embed
