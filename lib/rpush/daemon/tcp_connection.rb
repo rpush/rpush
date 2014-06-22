@@ -52,7 +52,6 @@ module Rpush
 
           if retry_count == 1
             log_error("Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
-            reflect(:apns_connection_lost, @app, e) # deprecated
             reflect(:tcp_connection_lost, @app, e)
           end
 
@@ -118,7 +117,6 @@ module Rpush
           fail Rpush::CertificateExpiredError.new(@app, cert.not_after)
         elsif certificate_expires_soon?
           log_warn(certificate_msg('will expire'))
-          reflect(:apns_certificate_will_expire, @app, cert.not_after) # deprecated
           reflect(:ssl_certificate_will_expire, @app, cert.not_after)
         end
       end

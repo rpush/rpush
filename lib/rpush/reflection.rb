@@ -12,16 +12,12 @@ module Rpush
 
     REFLECTIONS = [
       :apns_feedback, :notification_enqueued, :notification_delivered,
-      :notification_failed, :notification_will_retry, :apns_connection_lost,
-      :gcm_delivered_to_recipient, :gcm_failed_to_recipient, :gcm_canonical_id,
-      :gcm_invalid_registration_id, :error, :apns_certificate_will_expire,
-      :adm_canonical_id, :tcp_connection_lost, :ssl_certificate_will_expire
+      :notification_failed, :notification_will_retry, :gcm_delivered_to_recipient,
+      :gcm_failed_to_recipient, :gcm_canonical_id, :gcm_invalid_registration_id,
+      :error, :adm_canonical_id, :tcp_connection_lost, :ssl_certificate_will_expire
     ]
 
-    DEPRECATIONS = {
-      apns_connection_lost: [:tcp_connection_lost, '4.1'],
-      apns_certificate_will_expire: [:ssl_certificate_will_expire, '4.1']
-    }
+    DEPRECATIONS = {}
 
     REFLECTIONS.each do |reflection|
       class_eval(<<-RUBY, __FILE__, __LINE__)
