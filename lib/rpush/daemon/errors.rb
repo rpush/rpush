@@ -16,18 +16,3 @@ module Rpush
     end
   end
 end
-
-module Rpush
-  class DisconnectionError < StandardError
-    attr_reader :code, :message
-
-    def initialize(message)
-      @code = nil
-      @message = message
-    end
-
-    def to_s
-      message
-    end
-  end
-end

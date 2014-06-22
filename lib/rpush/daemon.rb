@@ -136,19 +136,8 @@ module Rpush
       File.delete(pid_file) if !pid_file.blank? && File.exist?(pid_file)
     end
 
-    # :nocov:
     def self.daemonize
-      if RUBY_VERSION < "1.9"
-        exit if fork
-        Process.setsid
-        exit if fork
-        Dir.chdir "/"
-        STDIN.reopen "/dev/null"
-        STDOUT.reopen "/dev/null", "a"
-        STDERR.reopen "/dev/null", "a"
-      else
-        Process.daemon
-      end
+      Process.daemon
     end
   end
 end
