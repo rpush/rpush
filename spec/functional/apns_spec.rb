@@ -57,6 +57,15 @@ describe 'APNs' do
     end
   end
 
+  def wait_for_notification_to_retry(notification)
+    Timeout.timeout(TIMEOUT) do
+      until !notification.delivered && !notification.failed && !notification.deliver_after.nil?
+        sleep 0.1
+        notification.reload
+      end
+    end
+  end
+
   def fail_notification(notification)
     ssl_socket.stub(read: [8, 4, notification.id].pack('ccN'))
     enable_io_select
@@ -132,13 +141,9 @@ describe 'APNs' do
 
         notifications.each { |n| wait_for_notification_to_deliver(n) }
         fail_notification(notification2)
-        sleep 1
 
         [notification3, notification4].each do |n|
-          n.reload
-          n.delivered.should be_false
-          n.failed.should be_false
-          n.deliver_after.should_not be_nil
+          wait_for_notification_to_retry(n)
         end
       end
 
@@ -152,12 +157,9 @@ describe 'APNs' do
           notifications.each { |n| wait_for_notification_to_deliver(n) }
           ssl_socket.stub(read: nil)
           enable_io_select
-          sleep 1
 
           notifications.each do |n|
-            n.reload
-            n.delivered.should be_false
-            n.failed.should be_true
+            wait_for_notification_to_fail(n)
           end
         end
       end

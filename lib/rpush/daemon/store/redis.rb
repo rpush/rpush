@@ -58,6 +58,10 @@ module Rpush
 
         def mark_retryable(notification, deliver_after, opts = {})
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
+          notification.delivered = false
+          notification.delivered_at = nil
+          notification.failed = false
+          notification.failed_at = nil
           notification.retries += 1
           notification.deliver_after = deliver_after
 

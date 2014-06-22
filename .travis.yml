@@ -43,4 +43,3 @@ matrix:
   allow_failures:
     - rvm: rbx-2
     - rvm: jruby
-    - env: CLIENT=active_record ADAPTER=sqlite3

@@ -89,10 +89,8 @@ module Rpush
           Rpush::Daemon.store.mark_ids_failed([notification_id], code, description, Time.now)
 
           if failed_pos
-            failed_ids = delivered_buffer[(failed_pos + 1)..-1]
-            if failed_ids.size > 0
-              Rpush::Daemon.store.mark_ids_retryable(failed_ids, Time.now)
-            end
+            retry_ids = delivered_buffer[(failed_pos + 1)..-1]
+            Rpush::Daemon.store.mark_ids_retryable(retry_ids, Time.now) if retry_ids.size > 0
           elsif delivered_buffer.size > 0
             log_error("Delivery sequence unknown for notifications following #{notification_id}.")
           end
