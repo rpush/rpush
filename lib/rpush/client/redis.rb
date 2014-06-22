@@ -2,7 +2,7 @@ begin
   require 'modis'
 rescue LoadError
   puts
-  str = "* Please add Modis (github.com/ileitch/modis) to your Gemfile to use the Redis client. *"
+  str = "* Please add 'rpush-redis' to your Gemfile to use the Redis client. *"
   puts "*" * str.size
   puts str
   puts "*" * str.size

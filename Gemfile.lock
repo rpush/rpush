@@ -63,7 +63,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.25.1)
-    modis (0.0.1)
+    modis (1.0.0)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
       redis (>= 3.0)
@@ -106,6 +106,8 @@ GEM
     redis (3.1.0)
     rest-client (1.6.7)
       mime-types (>= 1.16)
+    rpush-redis (0.0.1)
+      modis (~> 1.0)
     rspec (2.14.1)
       rspec-core (~> 2.14.0)
       rspec-expectations (~> 2.14.0)
@@ -160,13 +162,12 @@ DEPENDENCIES
   database_cleaner
   jdbc-postgres
   jruby-openssl
-  modis
   mysql2
   pg
   rails (~> 3.2)
   rake
-  redis
   rpush!
+  rpush-redis
   rspec (= 2.14.1)
   rubocop
   simplecov
