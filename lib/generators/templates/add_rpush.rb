@@ -175,7 +175,7 @@ class AddRpush < ActiveRecord::Migration
       AddGcm::Rapns::App.reset_column_information
 
       AddGcm::Rapns::App.all.each do |app|
-        AddGcm::Rapns::Notification.update_all(['app_id = ?', app.id], ['app = ?', app.name])
+        AddGcm::Rapns::Notification.where(app: app.name).update_all(app_id: app.id)
       end
 
       change_column :rapns_notifications, :app_id, :integer, null: false
@@ -219,7 +219,7 @@ class AddRpush < ActiveRecord::Migration
       AddGcm::Rapns::App.reset_column_information
 
       AddGcm::Rapns::App.all.each do |app|
-        AddGcm::Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
+        AddGcm::Rapns::Notification.where(app_id: app.id).update_all(app: app.key)
       end
 
       if index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi, true)
