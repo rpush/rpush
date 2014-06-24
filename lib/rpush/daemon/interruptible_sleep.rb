@@ -13,6 +13,7 @@ module Rpush
 
       def sleep
         @obj.synchronize do
+          return if @stop
           @condition.wait(100_000)
         end
       end
@@ -28,7 +29,7 @@ module Rpush
       end
 
       def stop
-        @stop = true
+        @obj.synchronize { @stop = true }
         signal
         @thread.kill if @thread
       end
@@ -40,9 +41,7 @@ module Rpush
       private
 
       def signal
-        @obj.synchronize do
-          @condition.signal
-        end
+        @obj.synchronize { @condition.signal }
       end
     end
   end
