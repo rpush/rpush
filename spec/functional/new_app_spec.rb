@@ -49,6 +49,7 @@ describe 'New app loading' do
   end
 
   it 'delivers a notification successfully' do
+    Rpush.config.push_poll = 0
     Rpush.embed
     sleep 1 # wait to boot. this sucks.
     wait_for_notification_to_deliver(notification)

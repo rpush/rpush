@@ -3,7 +3,7 @@ module Rpush
     class Batch
       include Reflectable
 
-      attr_reader :num_processed, :delivered, :failed, :retryable
+      attr_reader :num_processed, :notifications, :delivered, :failed, :retryable
 
       def initialize(notifications)
         @notifications = notifications

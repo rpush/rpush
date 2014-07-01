@@ -80,7 +80,11 @@ module Rpush
 
       def enqueue(batch)
         if service.batch_deliveries?
-          queue.push(QueuePayload.new(batch: batch))
+            batch_size = (batch.notifications.size / num_dispatchers).ceil
+            batch.notifications.in_groups_of(batch_size, false).each do |notifications|
+              sub_batch = Batch.new(notifications)
+              queue.push(QueuePayload.new(batch: sub_batch))
+            end
         else
           batch.each_notification do |notification|
             queue.push(QueuePayload.new(batch: batch, notification: notification))
