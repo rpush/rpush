@@ -14,7 +14,10 @@
   # Frequency in seconds to check for feedback
   # config.feedback_poll = 60
 
-  # ActiveRecord notifications batch size.
+  # The maximum number of notifications to load from the store every `push_poll` seconds.
+  # If some notifications are still enqueued internally, Rpush will load the batch_size less
+  # the number enqueued. An exception to this is if the service is able to receive multiple
+  # notification payloads over the connection with a single write, such as APNs.
   # config.batch_size = 100
 
   # Path to write PID file. Relative to Rails root unless absolute.
