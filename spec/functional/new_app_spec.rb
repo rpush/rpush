@@ -1,8 +1,7 @@
 require 'functional_spec_helper'
 
 describe 'New app loading' do
-  TIMEOUT = 10
-
+  let(:timeout) { 10 }
   let(:app) { create_app }
   let(:notification) { create_notification }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
@@ -40,7 +39,7 @@ describe 'New app loading' do
   end
 
   def wait_for_notification_to_deliver(notification)
-    Timeout.timeout(TIMEOUT) do
+    Timeout.timeout(timeout) do
       until notification.delivered
         sleep 0.1
         notification.reload
@@ -55,5 +54,5 @@ describe 'New app loading' do
     wait_for_notification_to_deliver(notification)
   end
 
-  after { Timeout.timeout(TIMEOUT) { Rpush.shutdown } }
+  after { Timeout.timeout(timeout) { Rpush.shutdown } }
 end

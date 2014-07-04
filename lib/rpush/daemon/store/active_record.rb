@@ -20,14 +20,19 @@ module Rpush
 
         def deliverable_notifications(limit)
           with_database_reconnect_and_retry do
-            relation = ready_for_delivery
-            relation = relation.limit(limit) unless Rpush.config.push
-            relation.to_a
+            Rpush::Client::ActiveRecord::Notification.transaction do
+              relation = ready_for_delivery
+              relation = relation.limit(limit) unless Rpush.config.push
+              notifications = relation.lock(true).to_a
+              mark_processing(notifications)
+              notifications
+            end
           end
         end
 
         def mark_retryable(notification, deliver_after, opts = {})
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
+          notification.processing = false
           notification.retries += 1
           notification.deliver_after = deliver_after
 
@@ -49,12 +54,13 @@ module Rpush
 
         def mark_ids_retryable(ids, deliver_after)
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = ?, failed = ?, failed_at = ?, retries = retries + 1, deliver_after = ?', false, nil, false, nil, deliver_after])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?, delivered = ?, delivered_at = ?, failed = ?, failed_at = ?, retries = retries + 1, deliver_after = ?', false, false, nil, false, nil, deliver_after])
           end
         end
 
         def mark_delivered(notification, time, opts = {})
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
+          notification.processing = false
           notification.delivered = true
           notification.delivered_at = time
 
@@ -73,12 +79,13 @@ module Rpush
             ids << n.id
           end
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = ?', true, now])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?, delivered = ?, delivered_at = ?', false, true, now])
           end
         end
 
         def mark_failed(notification, code, description, time, opts = {})
           opts = DEFAULT_MARK_OPTIONS.dup.merge(opts)
+          notification.processing = false
           notification.delivered = false
           notification.delivered_at = nil
           notification.failed = true
@@ -105,7 +112,7 @@ module Rpush
 
         def mark_ids_failed(ids, code, description, time)
           with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, true, time, code, description])
+            Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?, delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, false, true, time, code, description])
           end
         end
 
@@ -159,7 +166,16 @@ module Rpush
         end
 
         def ready_for_delivery
-          Rpush::Client::ActiveRecord::Notification.where('delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, Time.now)
+          Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now)
+        end
+
+        def mark_processing(notifications)
+          ids = []
+          notifications.each do |n|
+            n.processing = true
+            ids << n.id
+          end
+          Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?', true])
         end
       end
     end

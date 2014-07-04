@@ -135,8 +135,6 @@ Inside an existing process (see [Embedding API](https://github.com/rpush/rpush/w
 Rpush.embed
 ```
 
-*Please note that only ever a single instance of Rpush should be running.*
-
 In a scheduler (see [Push API](https://github.com/rpush/rpush/wiki/Push-API)):
 
 ```ruby
