@@ -26,6 +26,7 @@ module Rpush
             end
           rescue *ADAPTER_ERRORS => e
             Rpush.logger.error(e)
+            sleep_to_avoid_thrashing
             database_connection_lost
             retry
           end
