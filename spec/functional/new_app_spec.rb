@@ -1,9 +1,8 @@
 require 'functional_spec_helper'
 
 describe 'New app loading' do
-  let(:timeout) { 20 }
+  let(:timeout) { 10 }
   let(:app) { create_app }
-  let(:notification) { create_notification }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
   let(:ssl_socket) do double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
                                                       write: nil, flush: nil, read: nil, close: nil)
@@ -47,10 +46,13 @@ describe 'New app loading' do
     end
   end
 
-  it 'delivers a notification successfully' do
+  before do
     Rpush.config.push_poll = 0
     Rpush.embed
-    sleep 1 # wait to boot. this sucks.
+  end
+
+  it 'delivers a notification successfully' do
+    notification = create_notification
     wait_for_notification_to_deliver(notification)
   end
 

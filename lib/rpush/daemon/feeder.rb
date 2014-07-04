@@ -4,7 +4,7 @@ module Rpush
       extend Reflectable
 
       def self.start
-        @stop = false
+        self.should_stop = false
 
         if Rpush.config.embedded
           @thread = Thread.new { feed_forever }
@@ -16,7 +16,7 @@ module Rpush
       end
 
       def self.stop
-        @should_stop = true
+        self.should_stop = true
         interruptible_sleeper.stop
         @thread.join if @thread
         @interruptible_sleeper = nil
@@ -27,7 +27,7 @@ module Rpush
       end
 
       class << self
-        attr_reader :should_stop
+        attr_accessor :should_stop
       end
 
       def self.feed_forever

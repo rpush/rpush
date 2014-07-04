@@ -1,6 +1,6 @@
 require 'functional_spec_helper'
 
-describe 'GCM' do
+describe 'WPNs' do
   let(:app) { Rpush::Wpns::App.new }
   let(:notification) { Rpush::Wpns::Notification.new }
   let(:response) { double(Net::HTTPResponse, code: 200) }

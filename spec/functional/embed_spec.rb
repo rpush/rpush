@@ -1,6 +1,7 @@
 require 'functional_spec_helper'
 
 describe 'embedding' do
+  let(:timeout) { 10 }
   let(:app) { Rpush::Apns::App.new }
   let(:notification) { Rpush::Apns::Notification.new }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
@@ -30,25 +31,21 @@ describe 'embedding' do
     Rpush::Daemon::Apns::FeedbackReceiver.stub(new: double.as_null_object)
   end
 
-  it 'delivers a notification successfully' do
+  before do
     Rpush.config.push_poll = 5
+    Rpush.embed
+  end
 
+  it 'delivers a notification successfully' do
     expect do
-      Rpush.embed
-
-      begin
-        Timeout.timeout(5) do
-          until notification.delivered
-            notification.reload
-            sleep 0.1
-          end
+      Timeout.timeout(timeout) do
+        until notification.delivered
+          notification.reload
+          sleep 0.1
         end
-      rescue Timeout::Error
-        Rpush.shutdown
-        raise
       end
-
-      Rpush.shutdown
     end.to change(notification, :delivered).to(true)
   end
+
+  after { Timeout.timeout(timeout) { Rpush.shutdown } }
 end
