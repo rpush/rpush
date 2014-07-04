@@ -109,7 +109,7 @@ module Rpush
           when Signal.list['USR2']
             AppRunner.debug
           when Signal.list['INT'], Signal.list['TERM']
-            handle_shutdown_signal
+            Thread.new { handle_shutdown_signal }
           end
         end
       end
