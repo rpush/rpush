@@ -1,7 +1,7 @@
 require 'functional_spec_helper'
 
 describe 'New app loading' do
-  let(:timeout) { 10 }
+  let(:timeout) { 20 }
   let(:app) { create_app }
   let(:notification) { create_notification }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
