@@ -17,8 +17,9 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency "multi_json", "~> 1.0"
-  s.add_dependency "net-http-persistent"
+  s.add_dependency 'multi_json', '~> 1.0'
+  s.add_dependency 'net-http-persistent'
+  s.add_dependency 'activesupport'
 
   if defined? JRUBY_VERSION
     s.platform = 'java'
