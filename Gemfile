@@ -8,8 +8,9 @@ gem 'timecop'
 gem 'rpush-redis'
 
 platform :mri do
+  gem 'travis'
   gem 'cane'
-  gem 'coveralls', require: false
+  gem 'codeclimate-test-reporter', require: nil
   gem 'simplecov', require: false
   gem 'rubocop', require: false
   gem 'byebug'

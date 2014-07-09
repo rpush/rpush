@@ -1,9 +1,8 @@
-before_script: "psql -c 'create database rpush_test;' -U postgres >/dev/null"
+before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 language: ruby
 install: bundle install --jobs=4
 services:
-  - redis-server
-
+- redis-server
 matrix:
   fast_finish: true
   include:
@@ -41,5 +40,8 @@ matrix:
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record
   allow_failures:
-    - rvm: rbx-2
-    - rvm: jruby
+  - rvm: rbx-2
+  - rvm: jruby
+env:
+  global:
+    secure: NmFJ2Wk0W4mCce7pLXNcuQEd7Omr+XQxXyVlOQMtve6wwLv+R6r49Rgx7EkkbHd6OhspYoprtGsOPYE1c1fGOXn9Cd9Lf+SXNMmLnhXlvXWY1GDv2ULzL1cbu9dtc7KoHXkFmWYGqjuHzB5IkBFNqSKWaF4L4iM4Oh6MFE4kZ2M=

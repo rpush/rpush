@@ -9,12 +9,11 @@ module SimpleCovHelper
       command_name name
 
       if ENV['TRAVIS']
-        require 'coveralls'
-        formatter SimpleCov::Formatter::MultiFormatter[SimpleCov::Formatter::QualityFormatter,
-                                                       Coveralls::SimpleCov::Formatter]
-      else
-        formatter SimpleCov::Formatter::QualityFormatter
+        require 'codeclimate-test-reporter'
+        CodeClimate::TestReporter.start
       end
+
+      formatter SimpleCov::Formatter::QualityFormatter
     end
   end
 end
