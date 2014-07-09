@@ -16,7 +16,7 @@ module Rpush
       end
 
       def self.stop
-        @write_io.write("shutdown\n")
+        @write_io.write("shutdown\n") if @write_io
         @thread.join if @thread
       end
 

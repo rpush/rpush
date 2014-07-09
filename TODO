@@ -1,0 +1,3 @@
+* Update SQL index
+* Add Redis connecton pool
+* Find_by_name for Redis?

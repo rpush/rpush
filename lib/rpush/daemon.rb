@@ -51,7 +51,7 @@ module Rpush
 
     def self.start
       SignalHandler.start
-      daemonize if daemonize?
+      Process.daemon if daemonize?
       initialize_store
       write_pid_file
       AppRunner.sync
@@ -114,10 +114,6 @@ module Rpush
     def self.delete_pid_file
       pid_file = Rpush.config.pid_file
       File.delete(pid_file) if !pid_file.blank? && File.exist?(pid_file)
-    end
-
-    def self.daemonize
-      Process.daemon
     end
   end
 end

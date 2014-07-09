@@ -1,3 +1,4 @@
+# :nocov:
 begin
   require 'modis'
 rescue LoadError

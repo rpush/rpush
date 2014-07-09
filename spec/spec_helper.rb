@@ -2,12 +2,13 @@ ENV['RAILS_ENV'] = 'test'
 
 require 'bundler'
 Bundler.require(:default)
+client = (ENV['CLIENT'] || :active_record).to_sym
 
 unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
   begin
     require './spec/support/simplecov_helper'
     include SimpleCovHelper
-    start_simple_cov("unit-#{RUBY_VERSION}")
+    start_simple_cov("rpush-#{client}-#{RUBY_VERSION}")
   rescue LoadError
     puts "Coverage disabled."
   end
@@ -25,7 +26,7 @@ require 'support/active_record_setup'
 RAILS_ROOT = '/tmp/rails_root'
 
 Rpush.configure do |config|
-  config.client = (ENV['CLIENT'] || :active_record).to_sym
+  config.client = client
   config.log_dir = RAILS_ROOT
 end
 

@@ -52,6 +52,7 @@ describe 'New app loading' do
   end
 
   it 'delivers a notification successfully' do
+    sleep 1 # TODO: Need a better way to detect when the Feeder is running.
     notification = create_notification
     wait_for_notification_to_deliver(notification)
   end

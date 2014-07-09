@@ -12,8 +12,9 @@ describe Rpush::Daemon, "when starting" do
     Rpush.stub(logger: logger)
     Rpush::Daemon::Feeder.stub(:start)
     Rpush::Daemon::AppRunner.stub(sync: nil, stop: nil)
-    Rpush::Daemon.stub(daemonize: nil, exit: nil, puts: nil)
+    Rpush::Daemon.stub(exit: nil, puts: nil)
     Rpush::Daemon::SignalHandler.stub(start: nil, stop: nil, handle_shutdown_signal: nil)
+    Process.stub(:daemon)
     File.stub(:open)
   end
 
@@ -21,25 +22,25 @@ describe Rpush::Daemon, "when starting" do
     it "forks into a daemon if the foreground option is false" do
       Rpush.config.foreground = false
       Rpush::Daemon.initialize_store
-      Rpush::Daemon.should_receive(:daemonize)
+      Process.should_receive(:daemon)
       Rpush::Daemon.start
     end
 
     it "does not fork into a daemon if the foreground option is true" do
       Rpush.config.foreground = true
-      Rpush::Daemon.should_not_receive(:daemonize)
+      Process.should_not_receive(:daemon)
       Rpush::Daemon.start
     end
 
     it "does not fork into a daemon if the push option is true" do
       Rpush.config.push = true
-      Rpush::Daemon.should_not_receive(:daemonize)
+      Process.should_not_receive(:daemon)
       Rpush::Daemon.start
     end
 
     it "does not fork into a daemon if the embedded option is true" do
       Rpush.config.embedded = true
-      Rpush::Daemon.should_not_receive(:daemonize)
+      Process.should_not_receive(:daemon)
       Rpush::Daemon.start
     end
   end

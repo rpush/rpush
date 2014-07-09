@@ -23,24 +23,18 @@ module Rpush
           loop do
             break if @stop
             Kernel.sleep(@duration)
-            signal
+            wakeup
           end
         end
       end
 
       def stop
         @stop = true
-        signal
+        wakeup
         @thread.kill if @thread
       end
 
       def wakeup
-        signal
-      end
-
-      private
-
-      def signal
         @obj.synchronize { @condition.signal }
       end
     end

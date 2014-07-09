@@ -1,23 +1,32 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::SignalHandler do
+  def signal_handler(sig)
+    Process.kill(sig, Process.pid)
+    Thread.pass
+  end
+
+  def with_handler_start_stop
+    Rpush::Daemon::SignalHandler.start
+    yield
+  ensure
+    Rpush::Daemon::SignalHandler.stop
+  end
+
   describe 'shutdown signals' do
-    # These tests do not work on JRuby.
-    unless Rpush.jruby?
+    unless Rpush.jruby? # These tests do not work on JRuby.
       it "shuts down when signaled signaled SIGINT" do
-        Rpush::Daemon::SignalHandler.start
-        Rpush::Daemon.should_receive(:shutdown)
-        Process.kill("SIGINT", Process.pid)
-        sleep 0.01
-        Rpush::Daemon::SignalHandler.stop
+        with_handler_start_stop do
+          Rpush::Daemon.should_receive(:shutdown)
+          signal_handler('SIGINT')
+        end
       end
 
       it "shuts down when signaled signaled SIGTERM" do
-        Rpush::Daemon::SignalHandler.start
-        Rpush::Daemon.should_receive(:shutdown)
-        Process.kill("SIGTERM", Process.pid)
-        sleep 0.01
-        Rpush::Daemon::SignalHandler.stop
+        with_handler_start_stop do
+          Rpush::Daemon.should_receive(:shutdown)
+          signal_handler('SIGTERM')
+        end
       end
     end
   end
@@ -28,6 +37,36 @@ describe Rpush::Daemon::SignalHandler do
     it 'does not trap signals' do
       Signal.should_not_receive(:trap)
       Rpush::Daemon::SignalHandler.start
+    end
+  end
+
+  describe 'HUP' do
+    before do
+      Rpush::Daemon::AppRunner.stub(:sync)
+      Rpush::Daemon::Feeder.stub(:wakeup)
+    end
+
+    it 'syncs the AppRunner' do
+      with_handler_start_stop do
+        Rpush::Daemon::AppRunner.should_receive(:sync)
+        signal_handler('HUP')
+      end
+    end
+
+    it 'wakes up the Feeder' do
+      with_handler_start_stop do
+        Rpush::Daemon::Feeder.should_receive(:wakeup)
+        signal_handler('HUP')
+      end
+    end
+  end
+
+  describe 'USR2' do
+    it 'instructs the AppRunner to print debug information' do
+      with_handler_start_stop do
+        Rpush::Daemon::AppRunner.should_receive(:debug)
+        signal_handler('USR2')
+      end
     end
   end
 end

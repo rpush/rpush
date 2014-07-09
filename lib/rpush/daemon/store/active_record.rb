@@ -22,7 +22,7 @@ module Rpush
           with_database_reconnect_and_retry do
             Rpush::Client::ActiveRecord::Notification.transaction do
               relation = ready_for_delivery
-              relation = relation.limit(limit) unless Rpush.config.push
+              relation = relation.limit(limit)
               notifications = relation.lock(true).to_a
               mark_processing(notifications)
               notifications

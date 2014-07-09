@@ -50,11 +50,6 @@ module Rpush
         runners.clear
       end
 
-      def self.wait_until_idle
-        runners.values.map(&:wait_until_idle)
-        runners.clear
-      end
-
       def self.cumulative_queue_size
         size = 0
         runners.values.each { |runner| size += runner.queue_size }

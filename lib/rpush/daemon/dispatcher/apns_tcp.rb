@@ -7,15 +7,15 @@ module Rpush
         SELECT_TIMEOUT = 10
         ERROR_TUPLE_BYTES = 6
         APNS_ERRORS = {
-          1 => "Processing error",
-          2 => "Missing device token",
-          3 => "Missing topic",
-          4 => "Missing payload",
-          5 => "Missing token size",
-          6 => "Missing topic size",
-          7 => "Missing payload size",
-          8 => "Invalid token",
-          255 => "None (unknown error)"
+          1 => 'Processing error',
+          2 => 'Missing device token',
+          3 => 'Missing topic',
+          4 => 'Missing payload',
+          5 => 'Missing token size',
+          6 => 'Missing topic size',
+          7 => 'Missing payload size',
+          8 => 'Invalid token',
+          255 => 'None (unknown error)'
         }
 
         def initialize(*args)
@@ -66,22 +66,21 @@ module Rpush
           end
 
           tuple = connection.read(ERROR_TUPLE_BYTES)
+          @dispatch_mutex.synchronize { handle_error_response(tuple) }
+        end
 
-          @dispatch_mutex.synchronize do
-            if tuple
-              _, code, notification_id = tuple.unpack('ccN')
-              handle_error(code, notification_id)
-            else
-              handle_disconnect
-            end
-
-            begin
-              log_error('Error received, reconnecting...')
-              connection.reconnect
-            ensure
-              delivered_buffer.clear
-            end
+        def handle_error_response(tuple)
+          if tuple
+            _, code, notification_id = tuple.unpack('ccN')
+            handle_error(code, notification_id)
+          else
+            handle_disconnect
           end
+
+          log_error('Error received, reconnecting...')
+          connection.reconnect
+        ensure
+          delivered_buffer.clear
         end
 
         def handle_disconnect
