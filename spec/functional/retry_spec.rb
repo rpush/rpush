@@ -18,7 +18,9 @@ describe 'Retries' do
     notification.data = { message: 'test' }
     notification.save!
 
-    Modis.redis.del(Rpush::Client::Redis::Notification.absolute_pending_namespace)
+    Modis.with_connection do |redis|
+      redis.del(Rpush::Client::Redis::Notification.absolute_pending_namespace)
+    end
 
     Net::HTTP::Persistent.stub(new: http)
     response.stub(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))

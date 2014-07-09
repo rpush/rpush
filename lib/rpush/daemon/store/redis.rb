@@ -4,10 +4,6 @@ module Rpush
       class Redis
         DEFAULT_MARK_OPTIONS = { persist: true }
 
-        def initialize
-          @redis = Modis.redis
-        end
-
         def app(app_id)
           Rpush::Client::Redis::App.find(app_id)
         end
@@ -69,7 +65,9 @@ module Rpush
 
           notification.save!(validate: false)
           namespace = Rpush::Client::Redis::Notification.absolute_retryable_namespace
-          @redis.zadd(namespace, deliver_after.to_i, notification.id)
+          Modis.with_connection do |redis|
+            redis.zadd(namespace, deliver_after.to_i, notification.id)
+          end
         end
 
         def mark_batch_retryable(notifications, deliver_after)
@@ -120,24 +118,28 @@ module Rpush
         def retryable_notification_ids
           retryable_ns = Rpush::Client::Redis::Notification.absolute_retryable_namespace
 
-          retryable_results = @redis.multi do
-            now = Time.now.to_i
-            @redis.zrangebyscore(retryable_ns, 0, now)
-            @redis.zremrangebyscore(retryable_ns, 0, now)
-          end
+          Modis.with_connection do |redis|
+            retryable_results = redis.multi do
+              now = Time.now.to_i
+              redis.zrangebyscore(retryable_ns, 0, now)
+              redis.zremrangebyscore(retryable_ns, 0, now)
+            end
 
-          retryable_results.first
+            retryable_results.first
+          end
         end
 
         def pending_notification_ids(limit)
           pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
 
-          pending_results = @redis.multi do
-            @redis.zrange(pending_ns, 0, limit)
-            @redis.zremrangebyrank(pending_ns, 0, limit)
-          end
+          Modis.with_connection do |redis|
+            pending_results = redis.multi do
+              redis.zrange(pending_ns, 0, limit)
+              redis.zremrangebyrank(pending_ns, 0, limit)
+            end
 
-          pending_results.first
+            pending_results.first
+          end
         end
       end
     end

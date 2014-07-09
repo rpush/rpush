@@ -57,7 +57,9 @@ module Rpush
         private
 
         def register_notification
-          ::Modis.redis.zadd(self.class.absolute_pending_namespace, id, id)
+          Modis.with_connection do |redis|
+            redis.zadd(self.class.absolute_pending_namespace, id, id)
+          end
         end
       end
     end

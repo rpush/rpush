@@ -12,7 +12,9 @@ end
 
 RSpec.configure do |config|
   config.before(:each) do
-    SPEC_REDIS.keys('rpush:*').each { |key| SPEC_REDIS.del(key) }
+    Modis.with_connection do |redis|
+      redis.keys('rpush:*').each { |key| redis.del(key) }
+    end
 
     if unit_example?(example)
       connection = ActiveRecord::Base.connection
