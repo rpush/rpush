@@ -3,7 +3,7 @@ require 'unit_spec_helper'
 describe Rpush::Daemon::SignalHandler do
   def signal_handler(sig)
     Process.kill(sig, Process.pid)
-    Thread.pass
+    sleep 0.1
   end
 
   def with_handler_start_stop
