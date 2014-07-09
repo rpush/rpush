@@ -5,6 +5,9 @@
   # Supported clients are :active_record and :redis.
   # config.client = :active_record
 
+  # Options passed to Redis.new
+  # config.redis_options = {}
+
   # Run in the foreground?
   # config.foreground = false
 

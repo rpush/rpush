@@ -36,6 +36,8 @@ module Rpush
     deprecated(:batch_storage_updates=, '2.1.0', 'Updates are now always batched by the storage backends.')
     deprecated(:check_for_errors=, '2.1.0', 'APNs error detection is now performed asynchronously and does not require pauses.')
 
+    delegate :redis_options, :redis_options=, to: :Modis
+
     def initialize
       super
       set_defaults
