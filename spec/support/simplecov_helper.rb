@@ -8,12 +8,17 @@ module SimpleCovHelper
       add_filter '/lib/generators'
       command_name name
 
+      formatters = [SimpleCov::Formatter::QualityFormatter]
+
       if ENV['TRAVIS']
         require 'codeclimate-test-reporter'
-        CodeClimate::TestReporter.start
-      end
 
-      formatter SimpleCov::Formatter::QualityFormatter
+        if CodeClimate::TestReporter.run?
+          formatters << CodeClimate::TestReporter::Formatter
+        end
+
+        formatter SimpleCov::Formatter::MultiFormatter[*formatters]
+      end
     end
   end
 end
