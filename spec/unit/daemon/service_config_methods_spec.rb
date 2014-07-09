@@ -10,10 +10,13 @@ describe Rpush::Daemon::ServiceConfigMethods do
     ServiceConfigMethodsSpec.delivery_class.should eq ServiceConfigMethodsSpec::Delivery
   end
 
-  it 'gets & sets loops' do
-    loop_class = double
+  it 'instantiates loops' do
+    loop_class = Class.new
+    app = double
+    loop_instance = loop_class.new
+    loop_class.should_receive(:new).with(app).and_return(loop_instance)
     ServiceConfigMethodsSpec.loops loop_class
-    ServiceConfigMethodsSpec.loops.should eq [loop_class]
+    ServiceConfigMethodsSpec.loop_instances(app).should eq [loop_instance]
   end
 
   it 'returns a new dispatcher' do

@@ -26,6 +26,7 @@ require 'rpush/daemon/dispatcher/apns_tcp'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 require 'rpush/daemon/ring_buffer'
+require 'rpush/daemon/signal_handler'
 
 require 'rpush/daemon/store/interface'
 
@@ -49,22 +50,36 @@ module Rpush
     end
 
     def self.start
-      setup_signal_traps if trap_signals?
+      SignalHandler.start
       daemonize if daemonize?
-
       initialize_store
-      return unless store
-
       write_pid_file
       AppRunner.sync
+
+      # No further store connections will be made from this thread.
+      store.release_connection
+
+      # Blocking call, returns after Feeder.stop is called from another thread.
       Feeder.start
+
+      # Wait for shutdown to complete.
+      shutdown_lock.synchronize { true }
     end
 
     def self.shutdown(quiet = false)
       puts "\nShutting down..." unless quiet
-      Feeder.stop
-      AppRunner.stop
-      delete_pid_file
+
+      shutdown_lock.synchronize do
+        Feeder.stop
+        AppRunner.stop
+        delete_pid_file
+      end
+    end
+
+    def self.shutdown_lock
+      return @shutdown_lock if @shutdown_lock
+      @shutdown_lock = Mutex.new
+      @shutdown_lock
     end
 
     def self.initialize_store
@@ -84,41 +99,6 @@ module Rpush
 
     def self.daemonize?
       !(Rpush.config.push || Rpush.config.foreground || Rpush.config.embedded || Rpush.jruby?)
-    end
-
-    def self.trap_signals?
-      !Rpush.config.embedded
-    end
-
-    def self.setup_signal_traps
-      @shutting_down = false
-      read_io, write_io = IO.pipe
-      start_signal_handler(read_io)
-      %w(INT TERM HUP USR2).each do |signal|
-        Signal.trap(signal) { write_io.write("#{Signal.list[signal]}\n") }
-      end
-    end
-
-    def self.start_signal_handler(read_io)
-      Thread.new do
-        loop do
-          case read_io.readline.strip.to_i
-          when Signal.list['HUP']
-            AppRunner.sync
-            Feeder.wakeup
-          when Signal.list['USR2']
-            AppRunner.debug
-          when Signal.list['INT'], Signal.list['TERM']
-            Thread.new { handle_shutdown_signal }
-          end
-        end
-      end
-    end
-
-    def self.handle_shutdown_signal
-      exit 1 if @shutting_down
-      @shutting_down = true
-      shutdown
     end
 
     def self.write_pid_file

@@ -5,21 +5,13 @@ module Rpush
 
       def self.start
         self.should_stop = false
-
-        if Rpush.config.embedded
-          @thread = Thread.new { feed_forever }
-        elsif Rpush.config.push
-          enqueue_notifications
-        else
-          feed_forever
-        end
+        Rpush.config.push ? enqueue_notifications : feed_forever
       end
 
       def self.stop
         self.should_stop = true
         interruptible_sleeper.stop
         @thread.join if @thread
-        @interruptible_sleeper = nil
       end
 
       def self.wakeup
@@ -31,13 +23,17 @@ module Rpush
       end
 
       def self.feed_forever
-        loop do
-          enqueue_notifications
-          interruptible_sleeper.sleep
-          break if should_stop
+        @thread = Thread.new do
+          loop do
+            enqueue_notifications
+            interruptible_sleeper.sleep
+            break if should_stop
+          end
+
+          Rpush::Daemon.store.release_connection
         end
 
-        Rpush::Daemon.store.release_connection
+        @thread.join
       end
 
       def self.enqueue_notifications

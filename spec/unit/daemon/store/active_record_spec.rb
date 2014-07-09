@@ -24,13 +24,13 @@ describe Rpush::Daemon::Store::ActiveRecord do
   end
 
   it 'can release a connection' do
-    ActiveRecord::Base.connection_pool.should_receive(:release_connection)
+    ActiveRecord::Base.connection.should_receive(:close)
     store.release_connection
   end
 
   it 'logs errors raised when trying to release the connection' do
     e = StandardError.new
-    ActiveRecord::Base.connection_pool.stub(:release_connection).and_raise(e)
+    ActiveRecord::Base.connection.stub(:close).and_raise(e)
     Rpush.logger.should_receive(:error).with(e)
     store.release_connection
   end

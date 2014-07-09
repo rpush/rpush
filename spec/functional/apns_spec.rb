@@ -97,11 +97,10 @@ describe 'APNs' do
   end
 
   describe 'delivery failures' do
+    before { Rpush.embed }
     after { Timeout.timeout(timeout) { Rpush.shutdown } }
 
     it 'fails to deliver a notification' do
-      Rpush.embed
-
       wait_for_notification_to_deliver(notification)
       fail_notification(notification)
       wait_for_notification_to_fail(notification)
@@ -115,16 +114,12 @@ describe 'APNs' do
       let!(:notifications) { [notification1, notification2, notification3, notification4] }
 
       it 'marks the correct notification as failed' do
-        Rpush.embed
-
         notifications.each { |n| wait_for_notification_to_deliver(n) }
         fail_notification(notification2)
         wait_for_notification_to_fail(notification2)
       end
 
       it 'does not mark prior notifications as failed' do
-        Rpush.embed
-
         notifications.each { |n| wait_for_notification_to_deliver(n) }
         fail_notification(notification2)
         sleep 1
@@ -133,8 +128,6 @@ describe 'APNs' do
       end
 
       it 'marks notifications following the failed one as retryable' do
-        Rpush.embed
-
         # Such hacks. Set the poll frequency high enough that we'll only ever feed once.
         Rpush.config.push_poll = 1_000_000
 
@@ -148,8 +141,6 @@ describe 'APNs' do
 
       describe 'without an error response' do
         it 'marks all notifications as failed' do
-          Rpush.embed
-
           # Such hacks. Set the poll frequency high enough that we'll only ever feed once.
           Rpush.config.push_poll = 1_000_000
 

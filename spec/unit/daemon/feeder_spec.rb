@@ -4,7 +4,7 @@ describe Rpush::Daemon::Feeder do
   let!(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
   let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:logger) { double }
-  let(:interruptible_sleep) { double(sleep: nil, stop: nil, start: nil) }
+  let(:interruptible_sleeper) { double(sleep: nil, stop: nil, start: nil) }
   let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
                         deliverable_notifications: [notification], release_connection: nil)
   end
@@ -13,26 +13,18 @@ describe Rpush::Daemon::Feeder do
     Rpush.configure do |config|
       config.batch_size = 5000
       config.push_poll = 0
-      config.embedded = false
       config.push = false
     end
+
     Rpush.stub(logger: logger)
     Rpush::Daemon.stub(store: store)
-    Rpush::Daemon::Feeder.stub(should_stop: true)
+    Rpush::Daemon::Feeder.stub(should_stop: true, interruptible_sleeper: interruptible_sleeper)
     Rpush::Daemon::AppRunner.stub(enqueue: nil, cumulative_queue_size: 0)
-    Rpush::Daemon::InterruptibleSleep.stub(new: interruptible_sleep)
   end
 
   def start_and_stop
     Rpush::Daemon::Feeder.start
     Rpush::Daemon::Feeder.stop
-  end
-
-  it 'starts the loop in a new thread if embedded' do
-    Rpush.config.embedded = true
-    Thread.should_receive(:new).and_yield
-    Rpush::Daemon::Feeder.should_receive(:feed_forever)
-    start_and_stop
   end
 
   it 'loads deliverable notifications' do
@@ -74,7 +66,7 @@ describe Rpush::Daemon::Feeder do
 
   describe 'stop' do
     it 'interrupts sleep' do
-      interruptible_sleep.should_receive(:stop)
+      interruptible_sleeper.should_receive(:stop)
       start_and_stop
     end
 
@@ -91,13 +83,13 @@ describe Rpush::Daemon::Feeder do
   end
 
   it 'sleeps' do
-    interruptible_sleep.should_receive(:sleep)
+    interruptible_sleeper.should_receive(:sleep)
     start_and_stop
   end
 
   describe 'wakeup' do
     it 'interrupts sleep' do
-      interruptible_sleep.should_receive(:wakeup)
+      interruptible_sleeper.should_receive(:wakeup)
       Rpush::Daemon::Feeder.start
       Rpush::Daemon::Feeder.wakeup
     end

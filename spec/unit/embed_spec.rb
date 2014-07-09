@@ -2,9 +2,11 @@ require 'unit_spec_helper'
 
 describe Rpush, 'embed' do
   before do
-    Rpush::Daemon.stub(:start)
+    Rpush::Daemon.stub(start: nil, shutdown: nil)
     Kernel.stub(:at_exit)
   end
+
+  after { Rpush.shutdown }
 
   it 'sets the embedded config option to true' do
     Rpush.embed

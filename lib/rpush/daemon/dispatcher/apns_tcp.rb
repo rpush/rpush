@@ -33,8 +33,8 @@ module Rpush
         end
 
         def cleanup
-          super
           @stop_error_receiver = true
+          super
           @error_receiver_thread.join if @error_receiver_thread
         end
 
@@ -43,6 +43,7 @@ module Rpush
         def start_error_receiver
           @error_receiver_thread = Thread.new do
             check_for_error until @stop_error_receiver
+            Rpush::Daemon.store.release_connection
           end
         end
 
@@ -57,7 +58,12 @@ module Rpush
         end
 
         def check_for_error
-          return unless connection.select(SELECT_TIMEOUT)
+          begin
+            return unless connection.select(SELECT_TIMEOUT)
+          rescue Errno::EBADF
+            # Connection closed, daemon is shutting down.
+            return
+          end
 
           tuple = connection.read(ERROR_TUPLE_BYTES)
 

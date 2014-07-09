@@ -33,10 +33,16 @@ module Rpush
         dispatcher_class.new(app, delivery_class, @dispatcher_options)
       end
 
-      def loops(*loops)
-        @loops ||= []
-        @loops = loops if loops.any?
-        @loops
+      def loops(classes, options = {})
+        classes = Array[*classes]
+        @loops = classes.map { |cls| [cls, options] }
+      end
+
+      def loop_instances(app)
+        (@loops || []).map do |cls, options|
+          next unless options.key?(:if) ? options[:if].call : true
+          cls.new(app)
+        end.compact
       end
     end
   end

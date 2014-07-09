@@ -13,6 +13,7 @@ describe Rpush::Daemon, "when starting" do
     Rpush::Daemon::Feeder.stub(:start)
     Rpush::Daemon::AppRunner.stub(sync: nil, stop: nil)
     Rpush::Daemon.stub(daemonize: nil, exit: nil, puts: nil)
+    Rpush::Daemon::SignalHandler.stub(start: nil, stop: nil, handle_shutdown_signal: nil)
     File.stub(:open)
   end
 
@@ -43,14 +44,14 @@ describe Rpush::Daemon, "when starting" do
     end
   end
 
-  it 'sets up setup signal traps' do
-    Rpush::Daemon.should_receive(:setup_signal_traps)
+  it 'releases the store connection' do
+    Rpush::Daemon.store = double
+    Rpush::Daemon.store.should_receive(:release_connection)
     Rpush::Daemon.start
   end
 
-  it 'does not setup signal traps when embedded' do
-    Rpush.config.embedded = true
-    Rpush::Daemon.should_not_receive(:setup_signal_traps)
+  it 'sets up setup signal traps' do
+    Rpush::Daemon::SignalHandler.should_receive(:start)
     Rpush::Daemon.start
   end
 
@@ -63,6 +64,7 @@ describe Rpush::Daemon, "when starting" do
   it 'logs an error if the store cannot be loaded' do
     Rpush.config.client = :foo_bar
     Rpush.logger.should_receive(:error).with(kind_of(LoadError))
+    Rpush::Daemon.stub(:exit) { Rpush::Daemon.store = double.as_null_object }
     Rpush::Daemon.start
   end
 
@@ -87,60 +89,35 @@ describe Rpush::Daemon, "when starting" do
     Rpush::Daemon::AppRunner.should_receive(:sync)
     Rpush::Daemon.start
   end
-end
 
-describe Rpush::Daemon, "when being shutdown" do
-  let(:logger) { double(info: nil, error: nil, warn: nil) }
-
-  before do
-    Rpush::Daemon.stub(puts: nil)
-    Rpush::Daemon::Feeder.stub(:stop)
-    Rpush::Daemon::AppRunner.stub(:stop)
-  end
-
-  # These tests do not work on JRuby.
-  unless Rpush.jruby?
-    it "shuts down when signaled signaled SIGINT" do
-      Rpush::Daemon.setup_signal_traps
-      Rpush::Daemon.should_receive(:shutdown)
-      Process.kill("SIGINT", Process.pid)
-      sleep 0.01
+  describe "shutdown" do
+    it "stops the feeder" do
+      Rpush::Daemon::Feeder.should_receive(:stop)
+      Rpush::Daemon.shutdown
     end
 
-    it "shuts down when signaled signaled SIGTERM" do
-      Rpush::Daemon.setup_signal_traps
-      Rpush::Daemon.should_receive(:shutdown)
-      Process.kill("SIGTERM", Process.pid)
-      sleep 0.01
+    it "stops the app runners" do
+      Rpush::Daemon::AppRunner.should_receive(:stop)
+      Rpush::Daemon.shutdown
     end
-  end
 
-  it "stops the feeder" do
-    Rpush::Daemon::Feeder.should_receive(:stop)
-    Rpush::Daemon.shutdown
-  end
+    it "removes the PID file if one was written" do
+      Rpush.config.pid_file = "/rails_root/rpush.pid"
+      File.stub(:exist?).and_return(true)
+      File.should_receive(:delete).with("/rails_root/rpush.pid")
+      Rpush::Daemon.shutdown
+    end
 
-  it "stops the app runners" do
-    Rpush::Daemon::AppRunner.should_receive(:stop)
-    Rpush::Daemon.shutdown
-  end
+    it "does not attempt to remove the PID file if it does not exist" do
+      File.stub(:exists?).and_return(false)
+      File.should_not_receive(:delete)
+      Rpush::Daemon.shutdown
+    end
 
-  it "removes the PID file if one was written" do
-    Rpush.config.pid_file = "/rails_root/rpush.pid"
-    File.stub(:exist?).and_return(true)
-    File.should_receive(:delete).with("/rails_root/rpush.pid")
-    Rpush::Daemon.shutdown
-  end
-
-  it "does not attempt to remove the PID file if it does not exist" do
-    File.stub(:exists?).and_return(false)
-    File.should_not_receive(:delete)
-    Rpush::Daemon.shutdown
-  end
-
-  it "does not attempt to remove the PID file if one was not written" do
-    Rpush.config.pid_file = nil
-    File.should_not_receive(:delete)
-    Rpush::Daemon.shutdown
+    it "does not attempt to remove the PID file if one was not written" do
+      Rpush.config.pid_file = nil
+      File.should_not_receive(:delete)
+      Rpush::Daemon.shutdown
+    end
   end
 end

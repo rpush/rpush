@@ -2,18 +2,23 @@ module Rpush
   def self.embed(options = {})
     Rpush.require_for_daemon
 
+    if @embed_thread
+      STDERR.puts 'Rpush.embed can only be run once inside this process.'
+    end
+
     config = Rpush::ConfigurationWithoutDefaults.new
     options.each { |k, v| config.send("#{k}=", v) }
     config.embedded = true
     Rpush.config.update(config)
-    Rpush::Daemon.start
-
     Kernel.at_exit { shutdown }
+    @embed_thread = Thread.new { Rpush::Daemon.start }
   end
 
   def self.shutdown
     return unless Rpush.config.embedded
     Rpush::Daemon.shutdown
+    @embed_thread.join if @embed_thread
+    @embed_thread = nil
   end
 
   def self.sync

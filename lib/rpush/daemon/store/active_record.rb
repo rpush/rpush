@@ -146,7 +146,7 @@ module Rpush
         end
 
         def release_connection
-          ::ActiveRecord::Base.connection_pool.release_connection
+          ::ActiveRecord::Base.connection.close
         rescue StandardError => e
           Rpush.logger.error(e)
         end

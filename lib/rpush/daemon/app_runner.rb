@@ -31,8 +31,8 @@ module Rpush
         else
           runner = new(app)
           begin
-            runner.start
             runners[app.id] = runner
+            runner.start
           rescue StandardError => e
             Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
             Rpush.logger.error(e)
@@ -47,6 +47,11 @@ module Rpush
 
       def self.stop
         runners.values.map(&:stop)
+        runners.clear
+      end
+
+      def self.wait_until_idle
+        runners.values.map(&:wait_until_idle)
         runners.clear
       end
 
@@ -74,8 +79,14 @@ module Rpush
       end
 
       def stop
+        wait_until_idle
         dispatchers.stop
+        @dispatchers = nil
         stop_loops
+      end
+
+      def wait_until_idle
+        sleep 0.5 while queue.size > 0
       end
 
       def enqueue(batch)
@@ -134,11 +145,8 @@ module Rpush
       private
 
       def start_loops
-        service.loops.each do |loop_class|
-          instance = loop_class.new(@app)
-          instance.start
-          @loops << instance
-        end
+        @loops = service.loop_instances(@app)
+        @loops.map(&:start)
       end
 
       def stop_loops

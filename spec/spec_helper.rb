@@ -17,6 +17,8 @@ require 'rpush'
 require 'rpush/daemon'
 require 'rpush/client/redis'
 require 'rpush/client/active_record'
+require 'rpush/daemon/store/active_record'
+require 'rpush/daemon/store/redis'
 
 require 'support/active_record_setup'
 

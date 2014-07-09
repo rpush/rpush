@@ -22,6 +22,7 @@ module Rpush
 
         def start
           return if Rpush.config.push
+          log_info("APNs Feedback Receiver started.")
           @interruptible_sleep.start
 
           @thread = Thread.new do
