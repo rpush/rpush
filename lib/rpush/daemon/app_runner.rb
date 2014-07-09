@@ -14,7 +14,7 @@ module Rpush
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
           sync_app_with_id(app_id) unless runners[app_id]
-          runners[app_id].enqueue(Batch.new(group)) if runners[app_id]
+          runners[app_id].enqueue(group) if runners[app_id]
         end
       end
 
@@ -84,15 +84,16 @@ module Rpush
         sleep 0.5 while queue.size > 0
       end
 
-      def enqueue(batch)
+      def enqueue(notifications)
         if service.batch_deliveries?
-          batch_size = (batch.notifications.size / num_dispatchers).ceil
-          batch.notifications.in_groups_of(batch_size, false).each do |notifications|
-            sub_batch = Batch.new(notifications)
-            queue.push(QueuePayload.new(batch: sub_batch))
+          batch_size = (notifications.size / num_dispatchers).ceil
+          notifications.in_groups_of(batch_size, false).each do |batch_notifications|
+            batch = Batch.new(batch_notifications)
+            queue.push(QueuePayload.new(batch: batch))
           end
         else
-          batch.each_notification do |notification|
+          batch = Batch.new(notifications)
+          notifications.each do |notification|
             queue.push(QueuePayload.new(batch: batch, notification: notification))
             reflect(:notification_enqueued, notification)
           end

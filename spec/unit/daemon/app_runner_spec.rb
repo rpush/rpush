@@ -56,17 +56,10 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
 
   after { Rpush::Daemon::AppRunner.runners.clear }
 
-  it 'batches notifications by app' do
-    batch = double.as_null_object
-    Rpush::Daemon::Batch.stub(new: batch)
-    Rpush::Daemon::Batch.should_receive(:new).with([notification1])
-    Rpush::Daemon::Batch.should_receive(:new).with([notification2])
+  it 'enqueues notifications on each runner' do
+    runner.should_receive(:enqueue).with([notification1])
+    runner.should_receive(:enqueue).with([notification2])
     Rpush::Daemon::AppRunner.enqueue([notification1, notification2])
-  end
-
-  it 'enqueues each batch' do
-    runner.should_receive(:enqueue).with(kind_of(Rpush::Daemon::Batch))
-    Rpush::Daemon::AppRunner.enqueue([notification1])
   end
 
   it 'syncs the app if a runner does not exist' do
@@ -195,23 +188,18 @@ describe Rpush::Daemon::AppRunner do
 
   describe 'enqueue' do
     let(:notification) { double }
-    let(:batch) { double(notifications: [notification]) }
-
-    before do
-      batch.stub(:each_notification).and_yield(notification)
-    end
 
     it 'enqueues the batch' do
       queue.should_receive(:push) do |queue_payload|
         queue_payload.notification.should eq notification
-        queue_payload.batch.should eq batch
+        queue_payload.batch.should_not be_nil
       end
-      runner.enqueue(batch)
+      runner.enqueue([notification])
     end
 
     it 'reflects the notification has been enqueued' do
       runner.should_receive(:reflect).with(:notification_enqueued, notification)
-      runner.enqueue(batch)
+      runner.enqueue([notification])
     end
   end
 
