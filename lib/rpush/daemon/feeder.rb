@@ -37,7 +37,7 @@ module Rpush
       end
 
       def self.enqueue_notifications
-        batch_size = Rpush.config.batch_size - Rpush::Daemon::AppRunner.cumulative_queue_size
+        batch_size = Rpush.config.batch_size - Rpush::Daemon::AppRunner.num_queued
         return if batch_size <= 0
         notifications = Rpush::Daemon.store.deliverable_notifications(batch_size)
         Rpush::Daemon::AppRunner.enqueue(notifications)

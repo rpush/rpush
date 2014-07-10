@@ -19,7 +19,7 @@ describe Rpush::Daemon::Feeder do
     Rpush.stub(logger: logger)
     Rpush::Daemon.stub(store: store)
     Rpush::Daemon::Feeder.stub(should_stop: true, interruptible_sleeper: interruptible_sleeper)
-    Rpush::Daemon::AppRunner.stub(enqueue: nil, cumulative_queue_size: 0)
+    Rpush::Daemon::AppRunner.stub(enqueue: nil, num_queued: 0)
   end
 
   def start_and_stop
@@ -32,15 +32,15 @@ describe Rpush::Daemon::Feeder do
     start_and_stop
   end
 
-  it 'does not load more notifications if the cumulative queue size is equal to the batch size' do
-    Rpush::Daemon::AppRunner.stub(cumulative_queue_size: Rpush.config.batch_size)
+  it 'does not load more notifications if the total queue size is equal to the batch size' do
+    Rpush::Daemon::AppRunner.stub(num_queued: Rpush.config.batch_size)
     Rpush::Daemon.store.should_not_receive(:deliverable_notifications)
     start_and_stop
   end
 
   it 'limits the batch size if some runners are still processing notifications' do
     Rpush.config.stub(batch_size: 10)
-    Rpush::Daemon::AppRunner.stub(cumulative_queue_size: 6)
+    Rpush::Daemon::AppRunner.stub(num_queued: 6)
     Rpush::Daemon.store.should_receive(:deliverable_notifications).with(4)
     start_and_stop
   end

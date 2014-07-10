@@ -50,6 +50,7 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
 
   before do
     Rpush.stub(logger: logger)
+    Rpush::Daemon::ProcTitle.stub(:update)
     Rpush::Daemon::AppRunner.runners[1] = runner
     Rpush::Daemon::AppRunner.runners[2] = runner
   end
@@ -87,6 +88,7 @@ describe Rpush::Daemon::AppRunner, 'sync' do
     Rpush::Daemon::AppRunner.runners[app.id] = runner
     Rpush.stub(logger: logger)
     Rpush::Daemon.stub(store: store)
+    Rpush::Daemon::ProcTitle.stub(:update)
   end
 
   after { Rpush::Daemon::AppRunner.runners.clear }

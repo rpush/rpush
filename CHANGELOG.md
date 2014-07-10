@@ -8,6 +8,7 @@
   * Signaling HUP now also causes Rpush to immediately check for new notifications.
   * The 'wakeup' config option has been removed.
   * The 'batch_storage_updates' config option has been deprecated, storage backends will now always batch updates where appropriate.
+  * The rpush process title updates with number of queued notifcations and number of dispatchers.
 
 ## 1.0.0 (Feb 9, 2014)
   * Renamed to Rpush (from Rapns). Version number reset to 1.0.0.

@@ -27,6 +27,7 @@ require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 require 'rpush/daemon/ring_buffer'
 require 'rpush/daemon/signal_handler'
+require 'rpush/daemon/proc_title'
 
 require 'rpush/daemon/store/interface'
 

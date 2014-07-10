@@ -25,7 +25,7 @@ module Rpush
 
   CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
                   :check_for_errors, :pid_file, :batch_size, :push, :client, :logger,
-                  :batch_storage_updates, :log_dir]
+                  :batch_storage_updates, :log_dir, :environment]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end
@@ -90,6 +90,7 @@ module Rpush
       # Internal options.
       self.embedded = false
       self.push = false
+      self.environment = Rails.env
     end
   end
 end

@@ -16,6 +16,7 @@ module Rpush
           sync_app_with_id(app_id) unless runners[app_id]
           runners[app_id].enqueue(group) if runners[app_id]
         end
+        ProcTitle.update
       end
 
       def self.sync
@@ -23,6 +24,7 @@ module Rpush
         apps.each { |app| sync_app(app) }
         removed = runners.keys - apps.map(&:id)
         removed.each { |app_id| runners.delete(app_id).stop }
+        ProcTitle.update
       end
 
       def self.sync_app(app)
@@ -50,10 +52,12 @@ module Rpush
         runners.clear
       end
 
-      def self.cumulative_queue_size
-        size = 0
-        runners.values.each { |runner| size += runner.queue_size }
-        size
+      def self.num_dispatchers
+        runners.values.sum(&:num_dispatchers)
+      end
+
+      def self.num_queued
+        runners.values.sum(&:queue_size)
       end
 
       def self.debug
