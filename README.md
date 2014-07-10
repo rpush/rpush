@@ -124,7 +124,7 @@ n.save!
 
 ### Starting Rpush
 
-As a daemon:
+As a daemon (recommended):
 
     cd /path/to/rails/app
     rpush <Rails environment> [options]
