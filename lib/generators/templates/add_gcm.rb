@@ -92,7 +92,7 @@ class AddGcm < ActiveRecord::Migration
     end
 
     if index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi, true)
-        remove_index :rapns_notifications, name: :index_rapns_notifications_multi
+      remove_index :rapns_notifications, name: :index_rapns_notifications_multi
     end
 
     remove_column :rapns_notifications, :app_id
