@@ -47,6 +47,6 @@ describe Rpush::Configuration do
 
   it 'delegate redis_options to Modis' do
     Rpush.config.redis_options = { hi: :mom }
-    Modis.redis_options.should eq({ hi: :mom })
+    Modis.redis_options.should eq(hi: :mom)
   end
 end
