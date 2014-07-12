@@ -17,13 +17,13 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.add_dependency 'multi_json', '~> 1.0'
-  s.add_dependency 'net-http-persistent'
-  s.add_dependency 'activesupport'
+  s.add_runtime_dependency 'multi_json', '~> 1.0'
+  s.add_runtime_dependency 'net-http-persistent'
+  s.add_runtime_dependency 'activesupport'
 
   if defined? JRUBY_VERSION
     s.platform = 'java'
-    s.add_dependency "jruby-openssl"
-    s.add_dependency "activerecord-jdbc-adapter"
+    s.add_runtime_dependency "jruby-openssl"
+    s.add_runtime_dependency "activerecord-jdbc-adapter"
   end
 end

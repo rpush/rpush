@@ -181,6 +181,7 @@ GEM
 
 PLATFORMS
   ruby
+  jruby
 
 DEPENDENCIES
   activerecord-jdbc-adapter (>= 1.2.6)
