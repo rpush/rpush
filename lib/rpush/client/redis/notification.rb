@@ -39,6 +39,7 @@ module Rpush
         attribute :delay_while_idle, :boolean
         attribute :registration_ids, :array
         attribute :uri, :string
+        attribute :priority, :integer
 
         def app
           return nil unless app_id
