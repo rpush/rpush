@@ -170,6 +170,8 @@ module Rpush
         end
 
         def mark_processing(notifications)
+          return if notifications.empty?
+
           ids = []
           notifications.each do |n|
             n.processing = true
