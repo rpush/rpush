@@ -3,7 +3,7 @@ begin
 
   desc 'Run cane to check quality metrics'
   Cane::RakeTask.new(:cane_quality) do |cane|
-    cane.add_threshold 'coverage/covered_percent', :>=, 98
+    cane.add_threshold 'coverage/covered_percent', :>=, 95
     cane.no_style = false
     cane.style_measure = 1000
     cane.no_doc = true
