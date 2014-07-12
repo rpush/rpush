@@ -1,5 +1,6 @@
 ## 2.0.0 (unreleased)
-  * Support running multiple Rpush processes when using ActiveRecord.
+  * Use APNs enhanced binary format version 2.
+  * Support running multiple Rpush processes when using ActiveRecord and Redis.
   * APNs error detection is now performed asynchronously, 'check_for_errors' is therefore deprecated.
   * Deprecated attributes_for_device accessors. Use data instead.
   * Fix signal handling to work with Ruby 2.x. (#40).

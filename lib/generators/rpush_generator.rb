@@ -23,7 +23,7 @@ class RpushGenerator < Rails::Generators::Base
       add_rpush_migration('add_processing_to_rpush_notifications')
     else
       add_rpush_migration('add_rpush')
-      add_rpush_migration('add_processing_to_rpush_notifications')
+      add_rpush_migration('rpush_2_0_0_updates')
     end
   end
 

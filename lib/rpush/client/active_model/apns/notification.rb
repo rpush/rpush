@@ -3,13 +3,23 @@ module Rpush
     module ActiveModel
       module Apns
         module Notification
+          APNS_DEFAULT_EXPIRY = 1.day.to_i
+          APNS_PRIORITY_IMMEDIATE = 10
+          APNS_PRIORITY_CONSERVE_POWER = 5
+          APNS_PRIORITIES = [APNS_PRIORITY_IMMEDIATE, APNS_PRIORITY_CONSERVE_POWER]
+
           def self.included(base)
             base.instance_eval do
               validates :device_token, presence: true
               validates :badge, numericality: true, allow_nil: true
+              validates :priority, inclusion: { in: APNS_PRIORITIES }, allow_nil: true
 
               validates_with Rpush::Client::ActiveModel::Apns::DeviceTokenFormatValidator
               validates_with Rpush::Client::ActiveModel::Apns::BinaryNotificationValidator
+
+              base.const_set('APNS_DEFAULT_EXPIRY', APNS_DEFAULT_EXPIRY) unless base.const_defined?('APNS_DEFAULT_EXPIRY')
+              base.const_set('APNS_PRIORITY_IMMEDIATE', APNS_PRIORITY_IMMEDIATE) unless base.const_defined?('APNS_PRIORITY_IMMEDIATE')
+              base.const_set('APNS_PRIORITY_CONSERVE_POWER', APNS_PRIORITY_CONSERVE_POWER) unless base.const_defined?('APNS_PRIORITY_CONSERVE_POWER')
             end
           end
 
@@ -53,8 +63,25 @@ module Rpush
           end
 
           def to_binary(options = {})
-            id_for_pack = options[:for_validation] ? 0 : id
-            [1, id_for_pack, expiry, 0, 32, device_token, payload_size, payload].pack("cNNccH*na*")
+            frame_id = options[:for_validation] ? 0 : id
+            frame = ""
+            frame << [1, 32, device_token].pack("cnH*")
+            frame << [2, payload.bytesize, payload].pack("cna*")
+            frame << [3, 4, frame_id].pack("cnN")
+            frame << [4, 4, expiry || APNS_DEFAULT_EXPIRY].pack("cnN")
+            frame << [5, 1, priority_for_frame].pack("cnc")
+            [2, frame.bytesize].pack("cN") + frame
+          end
+
+          private
+
+          def priority_for_frame
+            # It is an error to use APNS_PRIORITY_IMMEDIATE for a notification that only contains content-available.
+            if as_json['aps'].keys == ['content-available']
+              APNS_PRIORITY_CONSERVE_POWER
+            else
+              priority || APNS_PRIORITY_IMMEDIATE
+            end
           end
         end
       end

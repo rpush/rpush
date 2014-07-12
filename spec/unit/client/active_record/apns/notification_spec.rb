@@ -143,18 +143,43 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
   end
 end
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, "to_binary" do
-  it "should correctly convert the notification to binary" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  before do
     notification.device_token = "a" * 64
+    notification.id = 1234
+  end
+
+  it 'uses APNS_PRIORITY_CONSERVE_POWER if content-available is the only key' do
+    notification.alert = nil
+    notification.badge = nil
+    notification.sound = nil
+    notification.content_available = true
+    bytes = notification.to_binary.bytes[-4..-1]
+    bytes.first.should eq 5 # priority item ID
+    bytes.last.should eq Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
+  end
+
+  it 'uses APNS_PRIORITY_IMMEDIATE if content-available is not the only key' do
+    notification.alert = "New stuff!"
+    notification.badge = nil
+    notification.sound = nil
+    notification.content_available = true
+    bytes = notification.to_binary.bytes[-4..-1]
+    bytes.first.should eq 5 # priority item ID
+    bytes.last.should eq Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
+  end
+
+  it "should correctly convert the notification to binary" do
     notification.sound = "1.aiff"
     notification.badge = 3
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.data = { hi: :mom }
     notification.expiry = 86_400 # 1 day, \x00\x01Q\x80
+    notification.priority = Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
     notification.app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
-    notification.stub(:id).and_return(1234)
-    notification.to_binary.should eq "\x01\x00\x00\x04\xD2\x00\x01Q\x80\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}"
+    notification.to_binary.should eq "\x02\x00\x00\x00\x99\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04\x00\x01Q\x80\x05\x00\x01\n"
   end
 end
 

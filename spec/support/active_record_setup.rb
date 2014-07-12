@@ -27,9 +27,9 @@ ActiveRecord::Base.configurations = { "test" => db_config[SPEC_ADAPTER] }
 ActiveRecord::Base.establish_connection(db_config[SPEC_ADAPTER])
 
 require 'generators/templates/add_rpush'
-require 'generators/templates/add_processing_to_rpush_notifications'
+require 'generators/templates/rpush_2_0_0_updates'
 
-migrations = [AddRpush, AddProcessingToRpushNotifications]
+migrations = [AddRpush, Rpush200Updates]
 
 unless ENV['TRAVIS']
   migrations.reverse.each do |m|

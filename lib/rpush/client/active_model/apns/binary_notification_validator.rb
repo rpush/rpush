@@ -3,9 +3,11 @@ module Rpush
     module ActiveModel
       module Apns
         class BinaryNotificationValidator < ::ActiveModel::Validator
+          MAX_BYTES = 256
+
           def validate(record)
-            return unless record.payload_size > 256
-            record.errors[:base] << "APN notification cannot be larger than 256 bytes. Try condensing your alert and device attributes."
+            return unless record.payload_size > MAX_BYTES
+            record.errors[:base] << "APN notification cannot be larger than #{MAX_BYTES} bytes. Try condensing your alert and device attributes."
           end
         end
       end
