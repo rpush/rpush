@@ -40,7 +40,6 @@ matrix:
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record
   allow_failures:
-  - rvm: rbx-2
   - rvm: jruby
 env:
   global:
