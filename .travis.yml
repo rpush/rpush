@@ -33,15 +33,18 @@ matrix:
   - rvm: 2.1.2
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record ADAPTER=sqlite3
-  - rvm: rbx-2
+  - rvm: rbx-2.2.10
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record
+  - rvm: rbx-2.2.10
+    gemfile: Gemfile.rails-4
+    env: CLIENT=redis
   - rvm: jruby
     gemfile: Gemfile.rails-4
     env: CLIENT=active_record
   allow_failures:
   - rvm: jruby
-  - rvm: rbx-2
+  - rvm: rbx-2.2.10
   - env: CLIENT=active_record ADAPTER=sqlite3
 env:
   global:
