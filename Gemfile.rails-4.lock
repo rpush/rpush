@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rpush (1.0.0)
+    rpush (2.0.0.beta1)
       activesupport
       multi_json (~> 1.0)
       net-http-persistent
@@ -180,8 +180,8 @@ GEM
     yajl-ruby (1.2.1)
 
 PLATFORMS
+  java
   ruby
-  jruby
 
 DEPENDENCIES
   activerecord-jdbc-adapter (>= 1.2.6)
