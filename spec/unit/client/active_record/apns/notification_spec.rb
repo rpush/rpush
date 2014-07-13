@@ -156,7 +156,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.badge = nil
     notification.sound = nil
     notification.content_available = true
-    bytes = notification.to_binary.bytes[-4..-1]
+    bytes = notification.to_binary.bytes.to_a[-4..-1]
     bytes.first.should eq 5 # priority item ID
     bytes.last.should eq Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
   end
@@ -166,7 +166,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.badge = nil
     notification.sound = nil
     notification.content_available = true
-    bytes = notification.to_binary.bytes[-4..-1]
+    bytes = notification.to_binary.bytes.to_a[-4..-1]
     bytes.first.should eq 5 # priority item ID
     bytes.last.should eq Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
   end

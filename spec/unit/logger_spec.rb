@@ -70,11 +70,13 @@ describe Rpush::Logger do
     logger.info("hi mom")
   end
 
-  it "should not print out the msg if not running in the foreground" do
-    Rpush.config.foreground = false
-    logger = Rpush::Logger.new
-    STDOUT.should_not_receive(:puts).with(/hi mom/)
-    logger.info("hi mom")
+  unless Rpush.jruby? # These tests do not work on JRuby.
+    it "should not print out the msg if not running in the foreground" do
+      Rpush.config.foreground = false
+      logger = Rpush::Logger.new
+      STDOUT.should_not_receive(:puts).with(/hi mom/)
+      logger.info("hi mom")
+    end
   end
 
   it "should prefix log lines with the current time" do
