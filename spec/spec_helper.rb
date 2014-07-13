@@ -1,6 +1,9 @@
 ENV['RAILS_ENV'] = 'test'
 client = (ENV['CLIENT'] || :active_record).to_sym
 
+require 'bundler/setup'
+Bundler.require(:default)
+
 unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
   begin
     require './spec/support/simplecov_helper'
@@ -10,8 +13,6 @@ unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
     puts "Coverage disabled."
   end
 end
-
-require 'timecop'
 
 require 'rpush'
 require 'rpush/daemon'
