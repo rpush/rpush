@@ -41,6 +41,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
       fail "Please update #{__FILE__} for adapter #{SPEC_ADAPTER}"
     end
   end
+
   let(:error) { adapter_error_class.new("db down!") }
   let(:test_double) { TestDouble.new(error, 1) }
 

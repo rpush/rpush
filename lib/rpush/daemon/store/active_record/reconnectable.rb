@@ -1,4 +1,7 @@
 class PGError < StandardError; end unless defined?(PGError)
+module PG
+  class Error < StandardError; end unless defined?(::PG::Error)
+end
 class Mysql; class Error < StandardError; end; end unless defined?(Mysql)
 module Mysql2; class Error < StandardError; end; end unless defined?(Mysql2)
 module ActiveRecord
@@ -17,8 +20,9 @@ module Rpush
     module Store
       class ActiveRecord
         module Reconnectable
-          ADAPTER_ERRORS = [::ActiveRecord::StatementInvalid, PGError, Mysql::Error,
-                            Mysql2::Error, ::ActiveRecord::JDBCError, SQLite3::Exception]
+          ADAPTER_ERRORS = [::ActiveRecord::StatementInvalid, PGError, PG::Error,
+                            Mysql::Error, Mysql2::Error, ::ActiveRecord::JDBCError,
+                            SQLite3::Exception]
 
           def with_database_reconnect_and_retry
             ::ActiveRecord::Base.connection_pool.with_connection do
