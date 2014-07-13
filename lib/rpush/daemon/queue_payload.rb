@@ -3,7 +3,7 @@ module Rpush
     class QueuePayload
       attr_reader :batch, :notification
 
-      def initialize(batch: nil, notification: nil)
+      def initialize(batch, notification = nil)
         @batch = batch
         @notification = notification
       end

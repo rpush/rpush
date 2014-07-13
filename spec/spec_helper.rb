@@ -44,7 +44,7 @@ def after_example_cleanup
   Rpush.logger = nil
   Rpush::Daemon.store = nil
   Rpush::Deprecation.muted do
-    Rpush.config.set_defaults if Rpush.config.kind_of?(Rpush::Configuration)
+    Rpush.config.set_defaults if Rpush.config.is_a?(Rpush::Configuration)
     Rpush.config.client = RPUSH_CLIENT
   end
 end

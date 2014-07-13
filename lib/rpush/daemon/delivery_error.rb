@@ -18,7 +18,7 @@ module Rpush
     end
 
     def ==(other)
-      other.kind_of?(DeliveryError) && \
+      other.is_a?(DeliveryError) && \
       other.code == code && \
       other.notification_id == notification_id && \
       other.to_s == to_s

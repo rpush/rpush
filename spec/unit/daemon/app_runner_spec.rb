@@ -148,7 +148,7 @@ describe Rpush::Daemon::AppRunner, 'debug' do
   after { Rpush::Daemon::AppRunner.runners.clear }
 
   it 'prints debug app states to the log' do
-    Rpush.logger.should_receive(:info).with("\ntest:\n  dispatchers: 1\n  queued: 0\n")
+    Rpush.logger.should_receive(:info).with(kind_of(String))
     Rpush::Daemon::AppRunner.debug
   end
 end
@@ -179,7 +179,7 @@ describe Rpush::Daemon::AppRunner do
     it 'starts a delivery dispatcher for each connection' do
       app.stub(connections: 2)
       runner.start
-      runner.num_dispatchers.should eq 2
+      runner.num_dispatcher_loops.should eq 2
     end
 
     it 'starts the loops' do
@@ -224,12 +224,12 @@ describe Rpush::Daemon::AppRunner do
 
     it 'reduces the number of dispatchers if needed' do
       app.stub(connections: 0)
-      expect { runner.sync(app) }.to change(runner, :num_dispatchers).to(0)
+      expect { runner.sync(app) }.to change(runner, :num_dispatcher_loops).to(0)
     end
 
     it 'increases the number of dispatchers if needed' do
       app.stub(connections: 2)
-      expect { runner.sync(app) }.to change(runner, :num_dispatchers).to(2)
+      expect { runner.sync(app) }.to change(runner, :num_dispatcher_loops).to(2)
     end
   end
 end

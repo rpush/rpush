@@ -8,9 +8,9 @@ Gem::Specification.new do |s|
   s.authors     = ["Ian Leitch"]
   s.email       = ["port001@gmail.com"]
   s.homepage    = "https://github.com/rpush/rpush"
-  s.summary     = %q(The push notification service for Ruby.)
-  s.description = %q(The push notification service for Ruby.)
-  s.license    = "MIT"
+  s.summary     = 'The push notification service for Ruby.'
+  s.description = 'The push notification service for Ruby.'
+  s.license     = 'MIT'
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}`.split("\n")

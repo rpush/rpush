@@ -6,7 +6,7 @@ describe Rpush::Daemon::Dispatcher::Http do
   let(:notification) { double }
   let(:batch) { double }
   let(:http) { double }
-  let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch: batch, notification: notification) }
+  let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch, notification) }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Http.new(app, delivery_class) }
 
   before { Net::HTTP::Persistent.stub(new: http) }

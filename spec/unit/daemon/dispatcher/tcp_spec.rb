@@ -10,7 +10,7 @@ describe Rpush::Daemon::Dispatcher::Tcp do
   let(:host) { 'localhost' }
   let(:port) { 1234 }
   let(:host_proc) { proc { [host, port] } }
-  let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch: batch, notification: notification) }
+  let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch, notification) }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, host: host_proc) }
 
   before { Rpush::Daemon::TcpConnection.stub(new: connection) }

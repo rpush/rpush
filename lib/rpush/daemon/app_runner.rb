@@ -53,7 +53,7 @@ module Rpush
       end
 
       def self.num_dispatchers
-        runners.values.sum(&:num_dispatchers)
+        runners.values.sum(&:num_dispatcher_loops)
       end
 
       def self.num_queued
@@ -72,15 +72,14 @@ module Rpush
       end
 
       def start
-        app.connections.times { dispatchers.push(new_dispatcher_loop) }
+        app.connections.times { dispatcher_loops.push(new_dispatcher_loop) }
         start_loops
         log_info("Started, #{dispatchers_str}.")
       end
 
       def stop
         wait_until_idle
-        dispatchers.stop
-        @dispatchers = nil
+        stop_dispatcher_loops
         stop_loops
       end
 
@@ -90,15 +89,15 @@ module Rpush
 
       def enqueue(notifications)
         if service.batch_deliveries?
-          batch_size = (notifications.size / num_dispatchers).ceil
+          batch_size = (notifications.size / num_dispatcher_loops).ceil
           notifications.in_groups_of(batch_size, false).each do |batch_notifications|
             batch = Batch.new(batch_notifications)
-            queue.push(QueuePayload.new(batch: batch))
+            queue.push(QueuePayload.new(batch))
           end
         else
           batch = Batch.new(notifications)
           notifications.each do |notification|
-            queue.push(QueuePayload.new(batch: batch, notification: notification))
+            queue.push(QueuePayload.new(batch, notification))
             reflect(:notification_enqueued, notification)
           end
         end
@@ -106,7 +105,7 @@ module Rpush
 
       def sync(app)
         @app = app
-        diff = dispatchers.size - app.connections
+        diff = dispatcher_loops.size - app.connections
         return if diff == 0
         if diff > 0
           decrement_dispatchers(diff)
@@ -118,28 +117,34 @@ module Rpush
       end
 
       def decrement_dispatchers(num)
-        num.times { dispatchers.pop }
+        num.times { dispatcher_loops.pop }
       end
 
       def increment_dispatchers(num)
-        num.times { dispatchers.push(new_dispatcher_loop) }
+        num.times { dispatcher_loops.push(new_dispatcher_loop) }
       end
 
       def debug
-        Rpush.logger.info <<-EOS
+        dispatcher_details = {}
 
-#{@app.name}:
-  dispatchers: #{num_dispatchers}
-  queued: #{queue_size}
-        EOS
+        dispatcher_loops.loops.each_with_index do |dispatcher_loop, i|
+          dispatcher_details[i] = {
+            started_at: dispatcher_loop.started_at.iso8601,
+            dispatched: dispatcher_loop.dispatch_count,
+            thread_status: dispatcher_loop.thread_status
+          }
+        end
+
+        runner_details = { dispatchers: dispatcher_details, queued: queue_size }
+        log_info(JSON.pretty_generate(runner_details))
       end
 
       def queue_size
         queue.size
       end
 
-      def num_dispatchers
-        dispatchers.size
+      def num_dispatcher_loops
+        dispatcher_loops.size
       end
 
       private
@@ -152,6 +157,11 @@ module Rpush
       def stop_loops
         @loops.map(&:stop)
         @loops = []
+      end
+
+      def stop_dispatcher_loops
+        dispatcher_loops.stop
+        @dispatcher_loops = nil
       end
 
       def new_dispatcher_loop
@@ -170,11 +180,11 @@ module Rpush
         @queue ||= Queue.new
       end
 
-      def dispatchers
-        @dispatchers ||= Rpush::Daemon::DispatcherLoopCollection.new
+      def dispatcher_loops
+        @dispatcher_loops ||= Rpush::Daemon::DispatcherLoopCollection.new
       end
 
-      def dispatchers_str(count = app.connections)
+      def dispatchers_str(count = num_dispatcher_loops)
         count = count.abs
         str = count == 1 ? 'dispatcher' : 'dispatchers'
         "#{count} #{str}"

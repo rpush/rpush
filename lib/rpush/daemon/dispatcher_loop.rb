@@ -4,14 +4,23 @@ module Rpush
       include Reflectable
       include Loggable
 
+      attr_reader :started_at, :dispatch_count
+
       WAKEUP = :wakeup
 
       def initialize(queue, dispatcher)
         @queue = queue
         @dispatcher = dispatcher
+        @dispatch_count = 0
+      end
+
+      def thread_status
+        @thread ? @thread.status : 'not started'
       end
 
       def start
+        @started_at = Time.now
+
         @thread = Thread.new do
           loop do
             dispatch
@@ -42,6 +51,7 @@ module Rpush
         return if payload == WAKEUP
 
         begin
+          @dispatch_count += 1
           @dispatcher.dispatch(payload)
         rescue StandardError => e
           log_error(e)
