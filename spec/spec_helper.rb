@@ -1,7 +1,4 @@
 ENV['RAILS_ENV'] = 'test'
-
-require 'bundler'
-Bundler.require(:default)
 client = (ENV['CLIENT'] || :active_record).to_sym
 
 unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
@@ -13,6 +10,8 @@ unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
     puts "Coverage disabled."
   end
 end
+
+require 'timecop'
 
 require 'rpush'
 require 'rpush/daemon'
