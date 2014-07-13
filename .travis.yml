@@ -1,4 +1,4 @@
-before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
+before_script: rm Gemfile.*.lock; psql -c 'create database rpush_test;' -U postgres >/dev/null
 language: ruby
 install: bundle install --jobs=4
 services:
