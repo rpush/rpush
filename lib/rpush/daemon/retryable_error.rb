@@ -17,4 +17,6 @@ module Rpush
       "Retryable error for #{@notification_id}, received error #{@code} (#{@description}) - retry after #{@response.header['retry-after']}"
     end
   end
+
+  class RateLimitError < RetryableError; end
 end

@@ -134,7 +134,7 @@ describe Rpush::Daemon::Adm::Delivery do
   describe 'a 429 (Too Many Request) response' do
     let(:http) { double(shutdown: nil) }
     let(:notification) { Rpush::Adm::Notification.create!(app: app, registration_ids: %w(abc xyz), deliver_after: Time.now, collapse_key: 'sync', data: { 'message' => 'test' }) }
-    let(:too_many_request_response) { double(code: 429, header: { 'retry-after' => 3600 }) }
+    let(:rate_limited_response) { double(code: 429, header: { 'retry-after' => 3600 }) }
 
     it 'should retry the entire notification respecting the Retry-After header if none sent out yet' do
       response.stub(code: 429, header: { 'retry-after' => 3600 })
@@ -167,7 +167,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
       # first request to deliver message that returns too many request response
       adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, 'xyz'))
-      http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(too_many_request_response)
+      http.should_receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(rate_limited_response)
 
       store.should_receive(:update_notification).with do |notif|
         notif.registration_ids.include?('abc').should be_true

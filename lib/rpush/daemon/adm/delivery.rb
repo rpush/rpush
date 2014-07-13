@@ -36,10 +36,10 @@ module Rpush
             end
             mark_delivered
           end
+        rescue Rpush::RateLimitError => error
+          handle_rate_limited(error)
         rescue Rpush::RetryableError => error
           handle_retryable(error)
-        rescue Rpush::TooManyRequestsError => error
-          handle_too_many_requests(error)
         rescue StandardError => error
           mark_failed(error)
           raise
@@ -58,7 +58,7 @@ module Rpush
           when 401
             unauthorized(response)
           when 429
-            too_many_requests(response)
+            rate_limited(response)
           when 500
             internal_server_error(current_registration_id)
           when 503
@@ -94,7 +94,7 @@ module Rpush
           end
         end
 
-        def handle_too_many_requests(error)
+        def handle_rate_limited(error)
           if @sent_registration_ids.empty?
             # none sent yet, just resend after the specified retry-after response.header
             retry_delivery(@notification, error.response)
@@ -129,9 +129,9 @@ module Rpush
           fail Rpush::RetryableError.new(response.code.to_i, @notification.id, 'ADM responded with an Unauthorized Error.', response)
         end
 
-        def too_many_requests(response)
+        def rate_limited(response)
           # raise error so the current notification stops sending messages to remaining reg ids
-          fail Rpush::TooManyRequestsError.new(response.code.to_i, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
+          fail Rpush::RateLimitError.new(response.code.to_i, @notification.id, 'Exceeded maximum allowable rate of messages.', response)
         end
 
         def internal_server_error(current_registration_id)
