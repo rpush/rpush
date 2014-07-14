@@ -47,7 +47,6 @@ matrix:
     gemfile: Gemfile.rails-4
     env: CLIENT=redis
   allow_failures:
-  - rvm: jruby-1.7.13
   - env: CLIENT=active_record ADAPTER=sqlite3
 env:
   global:
