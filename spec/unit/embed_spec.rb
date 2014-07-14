@@ -36,8 +36,8 @@ end
 describe Rpush, 'sync' do
   before { Rpush.config.embedded = true }
 
-  it 'syncs the AppRunner' do
-    Rpush::Daemon::AppRunner.should_receive(:sync)
+  it 'syncs' do
+    Rpush::Daemon::Synchronizer.should_receive(:sync)
     Rpush.sync
   end
 end

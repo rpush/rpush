@@ -8,7 +8,7 @@ module Rpush
     Rpush.config.update(config)
 
     Rpush::Daemon.initialize_store
-    Rpush::Daemon::AppRunner.sync
+    Rpush::Daemon::Synchronizer.sync
     Rpush::Daemon::Feeder.start
     Rpush::Daemon::AppRunner.stop
   end

@@ -4,64 +4,73 @@ module Rpush
       extend Reflectable
       include Reflectable
       include Loggable
-
-      class << self
-        attr_reader :runners
-      end
+      include StringHelpers
 
       @runners = {}
 
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
-          sync_app_with_id(app_id) unless runners[app_id]
-          runners[app_id].enqueue(group) if runners[app_id]
+          start_app_with_id(app_id) unless @runners[app_id]
+          @runners[app_id].enqueue(group) if @runners[app_id]
         end
+
         ProcTitle.update
       end
 
-      def self.sync
-        apps = Rpush::Daemon.store.all_apps
-        apps.each { |app| sync_app(app) }
-        removed = runners.keys - apps.map(&:id)
-        removed.each { |app_id| runners.delete(app_id).stop }
-        ProcTitle.update
+      def self.start_app_with_id(app_id)
+        start_app(Rpush::Daemon.store.app(app_id))
       end
 
-      def self.sync_app(app)
-        if runners[app.id]
-          runners[app.id].sync(app)
-        else
-          runner = new(app)
-          begin
-            runners[app.id] = runner
-            runner.start
-          rescue StandardError => e
-            Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
-            Rpush.logger.error(e)
-            reflect(:error, e)
-          end
-        end
+      def self.start_app(app)
+        @runners[app.id] = new(app)
+        @runners[app.id].start
+      rescue StandardError => e
+        @runners.delete(app.id)
+        Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
+        Rpush.logger.error(e)
+        reflect(:error, e)
       end
 
-      def self.sync_app_with_id(app_id)
-        sync_app(Rpush::Daemon.store.app(app_id))
+      def self.stop_app(app_id)
+        @runners.delete(app_id).stop
+      end
+
+      def self.app_running?(app)
+        @runners.key?(app.id)
+      end
+
+      def self.app_ids
+        @runners.keys
       end
 
       def self.stop
-        runners.values.map(&:stop)
-        runners.clear
+        @runners.values.map(&:stop)
+        @runners.clear
       end
 
-      def self.num_dispatchers
-        runners.values.sum(&:num_dispatcher_loops)
+      def self.total_dispatchers
+        @runners.values.sum(&:num_dispatcher_loops)
       end
 
-      def self.num_queued
-        runners.values.sum(&:queue_size)
+      def self.total_queued
+        @runners.values.sum(&:queue_size)
+      end
+
+      def self.num_dispatchers_for_app(app)
+        runner = @runners[app.id]
+        runner ? runner.num_dispatcher_loops : 0
+      end
+
+      def self.decrement_dispatchers(app, num)
+        @runners[app.id].decrement_dispatchers(num)
+      end
+
+      def self.increment_dispatchers(app, num)
+        @runners[app.id].increment_dispatchers(num)
       end
 
       def self.debug
-        runners.values.map(&:debug)
+        @runners.values.map(&:debug)
       end
 
       attr_reader :app
@@ -69,12 +78,12 @@ module Rpush
       def initialize(app)
         @app = app
         @loops = []
+        @dispatcher_loops = []
       end
 
       def start
-        app.connections.times { dispatcher_loops.push(new_dispatcher_loop) }
+        app.connections.times { @dispatcher_loops.push(new_dispatcher_loop) }
         start_loops
-        log_info("Started, #{dispatchers_str}.")
       end
 
       def stop
@@ -103,31 +112,18 @@ module Rpush
         end
       end
 
-      def sync(app)
-        @app = app
-        diff = dispatcher_loops.size - app.connections
-        return if diff == 0
-        if diff > 0
-          decrement_dispatchers(diff)
-          log_info("Stopped #{dispatchers_str(diff)}. #{dispatchers_str} running.")
-        else
-          increment_dispatchers(diff.abs)
-          log_info("Started #{dispatchers_str(diff)}. #{dispatchers_str} running.")
-        end
-      end
-
       def decrement_dispatchers(num)
-        num.times { dispatcher_loops.pop }
+        num.times { @dispatcher_loops.pop.stop }
       end
 
       def increment_dispatchers(num)
-        num.times { dispatcher_loops.push(new_dispatcher_loop) }
+        num.times { @dispatcher_loops.push(new_dispatcher_loop) }
       end
 
       def debug
         dispatcher_details = {}
 
-        dispatcher_loops.loops.each_with_index do |dispatcher_loop, i|
+        @dispatcher_loops.each_with_index do |dispatcher_loop, i|
           dispatcher_details[i] = {
             started_at: dispatcher_loop.started_at.iso8601,
             dispatched: dispatcher_loop.dispatch_count,
@@ -144,7 +140,7 @@ module Rpush
       end
 
       def num_dispatcher_loops
-        dispatcher_loops.size
+        @dispatcher_loops.size
       end
 
       private
@@ -160,8 +156,8 @@ module Rpush
       end
 
       def stop_dispatcher_loops
-        dispatcher_loops.stop
-        @dispatcher_loops = nil
+        @dispatcher_loops.map(&:stop)
+        @dispatcher_loops.clear
       end
 
       def new_dispatcher_loop
@@ -178,16 +174,6 @@ module Rpush
 
       def queue
         @queue ||= Queue.new
-      end
-
-      def dispatcher_loops
-        @dispatcher_loops ||= Rpush::Daemon::DispatcherLoopCollection.new
-      end
-
-      def dispatchers_str(count = num_dispatcher_loops)
-        count = count.abs
-        str = count == 1 ? 'dispatcher' : 'dispatchers'
-        "#{count} #{str}"
       end
     end
   end

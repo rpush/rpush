@@ -8,6 +8,7 @@ require 'rpush/daemon/errors'
 require 'rpush/daemon/constants'
 require 'rpush/daemon/reflectable'
 require 'rpush/daemon/loggable'
+require 'rpush/daemon/string_helpers'
 require 'rpush/daemon/interruptible_sleep'
 require 'rpush/daemon/delivery_error'
 require 'rpush/daemon/retryable_error'
@@ -15,10 +16,10 @@ require 'rpush/daemon/delivery'
 require 'rpush/daemon/feeder'
 require 'rpush/daemon/batch'
 require 'rpush/daemon/queue_payload'
+require 'rpush/daemon/synchronizer'
 require 'rpush/daemon/app_runner'
 require 'rpush/daemon/tcp_connection'
 require 'rpush/daemon/dispatcher_loop'
-require 'rpush/daemon/dispatcher_loop_collection'
 require 'rpush/daemon/dispatcher/http'
 require 'rpush/daemon/dispatcher/tcp'
 require 'rpush/daemon/dispatcher/apns_tcp'
@@ -54,7 +55,7 @@ module Rpush
       Process.daemon if daemonize?
       initialize_store
       write_pid_file
-      AppRunner.sync
+      Synchronizer.sync
 
       # No further store connections will be made from this thread.
       store.release_connection

@@ -6,7 +6,7 @@ module Rpush
 
       attr_reader :started_at, :dispatch_count
 
-      WAKEUP = :wakeup
+      STOP = :stop
 
       def initialize(queue, dispatcher)
         @queue = queue
@@ -23,8 +23,17 @@ module Rpush
 
         @thread = Thread.new do
           loop do
-            dispatch
-            break if @stop
+            payload = @queue.pop
+            if stop_payload?(payload)
+              break if should_stop?(payload)
+
+              # Intended for another dispatcher loop.
+              @queue.push(payload)
+              Thread.pass
+              sleep 0.1
+            else
+              dispatch(payload)
+            end
           end
 
           Rpush::Daemon.store.release_connection
@@ -32,31 +41,27 @@ module Rpush
       end
 
       def stop
-        @stop = true
-      end
-
-      def wakeup
-        @queue.push(WAKEUP) if @thread
-      end
-
-      def wait
+        @queue.push([STOP, object_id]) if @thread
         @thread.join if @thread
         @dispatcher.cleanup
       end
 
-      protected
+      private
 
-      def dispatch
-        payload = @queue.pop
-        return if payload == WAKEUP
+      def stop_payload?(payload)
+        payload.is_a?(Array) && payload.first == STOP
+      end
 
-        begin
-          @dispatch_count += 1
-          @dispatcher.dispatch(payload)
-        rescue StandardError => e
-          log_error(e)
-          reflect(:error, e)
-        end
+      def should_stop?(payload)
+        payload.last == object_id
+      end
+
+      def dispatch(payload)
+        @dispatch_count += 1
+        @dispatcher.dispatch(payload)
+      rescue StandardError => e
+        log_error(e)
+        reflect(:error, e)
       end
     end
   end

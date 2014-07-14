@@ -33,14 +33,14 @@ describe Rpush::Daemon::Feeder do
   end
 
   it 'does not load more notifications if the total queue size is equal to the batch size' do
-    Rpush::Daemon::AppRunner.stub(num_queued: Rpush.config.batch_size)
+    Rpush::Daemon::AppRunner.stub(total_queued: Rpush.config.batch_size)
     Rpush::Daemon.store.should_not_receive(:deliverable_notifications)
     start_and_stop
   end
 
   it 'limits the batch size if some runners are still processing notifications' do
     Rpush.config.stub(batch_size: 10)
-    Rpush::Daemon::AppRunner.stub(num_queued: 6)
+    Rpush::Daemon::AppRunner.stub(total_queued: 6)
     Rpush::Daemon.store.should_receive(:deliverable_notifications).with(4)
     start_and_stop
   end

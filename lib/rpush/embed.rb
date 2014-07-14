@@ -23,7 +23,7 @@ module Rpush
 
   def self.sync
     return unless Rpush.config.embedded
-    Rpush::Daemon::AppRunner.sync
+    Rpush::Daemon::Synchronizer.sync
   end
 
   def self.debug

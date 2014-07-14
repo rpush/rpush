@@ -2,7 +2,8 @@ require 'unit_spec_helper'
 
 describe Rpush, 'push' do
   before do
-    Rpush::Daemon::AppRunner.stub(sync: nil, wait: nil)
+    Rpush::Daemon::Synchronizer.stub(sync: nil)
+    Rpush::Daemon::AppRunner.stub(wait: nil)
     Rpush::Daemon::Feeder.stub(start: nil)
   end
 
@@ -16,8 +17,8 @@ describe Rpush, 'push' do
     Rpush.push
   end
 
-  it 'syncs the app runner' do
-    Rpush::Daemon::AppRunner.should_receive(:sync)
+  it 'syncs' do
+    Rpush::Daemon::Synchronizer.should_receive(:sync)
     Rpush.push
   end
 

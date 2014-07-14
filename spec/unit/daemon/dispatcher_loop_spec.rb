@@ -4,8 +4,6 @@ describe Rpush::Daemon::DispatcherLoop do
   def run_dispatcher_loop
     dispatcher_loop.start
     dispatcher_loop.stop
-    dispatcher_loop.wakeup
-    dispatcher_loop.wait
   end
 
   let(:notification) { double }
@@ -37,20 +35,9 @@ describe Rpush::Daemon::DispatcherLoop do
     run_dispatcher_loop
   end
 
-  it 'instructs the queue to wakeup the thread when told to stop' do
-    queue.should_receive(:push).with(Rpush::Daemon::DispatcherLoop::WAKEUP).and_call_original
-    run_dispatcher_loop
-  end
-
   describe 'stop' do
     before do
       queue.clear
-      queue.push(Rpush::Daemon::DispatcherLoop::WAKEUP)
-    end
-
-    it 'does not attempt to dispatch when a WAKEUP is dequeued' do
-      dispatcher.should_not_receive(:dispatch)
-      run_dispatcher_loop
     end
 
     it 'instructs the dispatcher to cleanup' do

@@ -11,7 +11,8 @@ describe Rpush::Daemon, "when starting" do
   before do
     Rpush.stub(logger: logger)
     Rpush::Daemon::Feeder.stub(:start)
-    Rpush::Daemon::AppRunner.stub(sync: nil, stop: nil)
+    Rpush::Daemon::Synchronizer.stub(sync: nil)
+    Rpush::Daemon::AppRunner.stub(stop: nil)
     Rpush::Daemon.stub(exit: nil, puts: nil)
     Rpush::Daemon::SignalHandler.stub(start: nil, stop: nil, handle_shutdown_signal: nil)
     Process.stub(:daemon)
@@ -87,7 +88,7 @@ describe Rpush::Daemon, "when starting" do
   end
 
   it "syncs apps" do
-    Rpush::Daemon::AppRunner.should_receive(:sync)
+    Rpush::Daemon::Synchronizer.should_receive(:sync)
     Rpush::Daemon.start
   end
 

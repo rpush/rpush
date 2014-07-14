@@ -42,13 +42,13 @@ describe Rpush::Daemon::SignalHandler do
 
   describe 'HUP' do
     before do
-      Rpush::Daemon::AppRunner.stub(:sync)
+      Rpush::Daemon::Synchronizer.stub(:sync)
       Rpush::Daemon::Feeder.stub(:wakeup)
     end
 
-    it 'syncs the AppRunner' do
+    it 'syncs' do
       with_handler_start_stop do
-        Rpush::Daemon::AppRunner.should_receive(:sync)
+        Rpush::Daemon::Synchronizer.should_receive(:sync)
         signal_handler('HUP')
       end
     end
