@@ -29,7 +29,7 @@ Add it to your Gemfile:
 gem 'rpush'
 ```
 
-Generate the migrations, rpush.yml and migrate:
+Generate the migrations, rpush.rb and migrate:
 
 ```
 rails g rpush
