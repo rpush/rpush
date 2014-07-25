@@ -43,7 +43,8 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   let(:error) { adapter_error_class.new("db down!") }
-  let(:test_double) { TestDouble.new(error, 1) }
+  let(:timeout) { ActiveRecord::ConnectionTimeoutError.new("db lazy!") }
+  let(:test_doubles) { [TestDouble.new(error, 1), TestDouble.new(timeout, 1)]  }
 
   before do
     @logger = double("Logger", info: nil, error: nil, warn: nil)
@@ -51,37 +52,37 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
 
     ActiveRecord::Base.stub(:clear_all_connections!)
     ActiveRecord::Base.stub(:establish_connection)
-    test_double.stub(:sleep)
+    test_doubles.each { |td| allow(td).to receive(:sleep) }
   end
 
   it "should log the error raised" do
     Rpush.logger.should_receive(:error).with(error)
-    test_double.perform
+    test_doubles.each(&:perform)
   end
 
   it "should log that the database is being reconnected" do
     Rpush.logger.should_receive(:warn).with("Lost connection to database, reconnecting...")
-    test_double.perform
+    test_doubles.each(&:perform)
   end
 
   it "should log the reconnection attempt" do
     Rpush.logger.should_receive(:warn).with("Attempt 1")
-    test_double.perform
+    test_doubles.each(&:perform)
   end
 
   it "should clear all connections" do
     ActiveRecord::Base.should_receive(:clear_all_connections!)
-    test_double.perform
+    test_doubles.each(&:perform)
   end
 
   it "should establish a new connection" do
     ActiveRecord::Base.should_receive(:establish_connection)
-    test_double.perform
+    test_doubles.each(&:perform)
   end
 
   it "should test out the new connection by performing a count" do
-    Rpush::Client::ActiveRecord::Notification.should_receive(:count)
-    test_double.perform
+    Rpush::Client::ActiveRecord::Notification.should_receive(:count).twice
+    test_doubles.each(&:perform)
   end
 
   context "when the reconnection attempt is not successful" do
@@ -97,19 +98,38 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
       Rpush::Client::ActiveRecord::Notification.instance_variable_set("@error", error)
     end
 
-    it "should log the 2nd attempt" do
-      Rpush.logger.should_receive(:warn).with("Attempt 2")
-      test_double.perform
+    describe "error behaviour" do
+      it "should log the 2nd attempt" do
+        Rpush.logger.should_receive(:warn).with("Attempt 2")
+        test_doubles[0].perform
+      end
+
+      it "should log errors raised when the reconnection is not successful" do
+        Rpush.logger.should_receive(:error).with(error)
+        test_doubles[0].perform
+      end
+
+      it "should sleep to avoid thrashing when the database is down" do
+        expect(test_doubles[0]).to receive(:sleep).with(2)
+        test_doubles[0].perform
+      end
     end
 
-    it "should log errors raised when the reconnection is not successful" do
-      Rpush.logger.should_receive(:error).with(error)
-      test_double.perform
-    end
+    describe "timeout behaviour" do
+      it "should log the 2nd attempt" do
+        Rpush.logger.should_receive(:warn).with("Attempt 2")
+        test_doubles[1].perform
+      end
 
-    it "should sleep to avoid thrashing when the database is down" do
-      test_double.should_receive(:sleep).with(2)
-      test_double.perform
+      it "should log errors raised when the reconnection is not successful" do
+        Rpush.logger.should_receive(:error).with(error)
+        test_doubles[1].perform
+      end
+
+      it "should sleep to avoid thrashing when the database is down" do
+        expect(test_doubles[1]).to receive(:sleep).with(2)
+        test_doubles[1].perform
+      end
     end
   end
 end

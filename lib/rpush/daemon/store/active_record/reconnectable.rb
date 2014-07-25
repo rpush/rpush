@@ -22,7 +22,7 @@ module Rpush
         module Reconnectable
           ADAPTER_ERRORS = [::ActiveRecord::StatementInvalid, PGError, PG::Error,
                             Mysql::Error, Mysql2::Error, ::ActiveRecord::JDBCError,
-                            SQLite3::Exception]
+                            SQLite3::Exception, ::ActiveRecord::ConnectionTimeoutError]
 
           def with_database_reconnect_and_retry
             ::ActiveRecord::Base.connection_pool.with_connection do
