@@ -151,6 +151,20 @@ describe Rpush::Daemon::AppRunner do
       runner.should_receive(:reflect).with(:notification_enqueued, notification)
       runner.enqueue([notification])
     end
+
+    describe 'a service that batches deliveries' do
+      before do
+        runner.send(:service).stub(batch_deliveries?: true)
+      end
+
+      describe '1 notification with more than one dispatcher loop' do
+        it 'does not raise ArgumentError: invalid slice size' do
+          # https://github.com/rpush/rpush/issues/57
+          runner.stub(:num_dispatcher_loops).and_return(2)
+          runner.enqueue([notification])
+        end
+      end
+    end
   end
 
   describe 'stop' do
