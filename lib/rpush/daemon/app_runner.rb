@@ -98,7 +98,7 @@ module Rpush
 
       def enqueue(notifications)
         if service.batch_deliveries?
-          batch_size = (notifications.size / num_dispatcher_loops).ceil
+          batch_size = (notifications.size.to_f / num_dispatcher_loops.to_f).ceil
           notifications.in_groups_of(batch_size, false).each do |batch_notifications|
             batch = Batch.new(batch_notifications)
             queue.push(QueuePayload.new(batch))
