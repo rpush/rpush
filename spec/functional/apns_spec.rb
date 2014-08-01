@@ -92,8 +92,10 @@ describe 'APNs' do
     tuple = "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
     allow(ssl_socket).to receive(:read).and_return(tuple, nil)
     Rpush.apns_feedback
-    feedback = Rpush::Apns::Feedback.all
-    feedback.should_not be_empty
+    feedback = Rpush::Apns::Feedback.all.first
+    feedback.should_not be_nil
+    feedback.app_id.should eq(app.id)
+    feedback.device_token.should eq('834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17')
   end
 
   describe 'delivery failures' do

@@ -273,7 +273,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
       Rpush::Client::ActiveRecord::Apns::Feedback.should_receive(:create!).with(
-        failed_at: time, device_token: 'ab' * 32, app: app)
+        failed_at: time, device_token: 'ab' * 32, app_id: app.id)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end
   end

@@ -10,6 +10,7 @@
   * The 'wakeup' config option has been removed.
   * The 'batch_storage_updates' config option has been deprecated, storage backends will now always batch updates where appropriate.
   * The rpush process title updates with number of queued notifications and number of dispatchers.
+  * Rpush::Apns::Feedback#app has been renamed to app_id and is now an Integer.
 
 ## 1.0.0 (Feb 9, 2014)
   * Renamed to Rpush (from Rapns). Version number reset to 1.0.0.
