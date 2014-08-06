@@ -59,10 +59,20 @@ Rpush.reflect do |on|
   # on.notification_failed do |notification|
   # end
 
+  # Called when the notification delivery failed and only the notification ID
+  # is present in memory.
+  # on.notification_id_failed do |app, notification_id, error_code, error_description|
+  # end
+
   # Called when a notification will be retried at a later date.
   # Call 'deliver_after' on the notification for the next delivery date
   # and 'retries' for the number of times this notification has been retried.
   # on.notification_will_retry do |notification|
+  # end
+
+  # Called when a notification will be retried and only the notification ID
+  # is present in memory.
+  # on.notification_id_will_retry do |app, notification_id, retry_after|
   # end
 
   # Called when a TCP connection is lost and will be reconnected.

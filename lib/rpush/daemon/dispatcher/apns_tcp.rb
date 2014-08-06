@@ -3,6 +3,7 @@ module Rpush
     module Dispatcher
       class ApnsTcp < Rpush::Daemon::Dispatcher::Tcp
         include Loggable
+        include Reflectable
 
         SELECT_TIMEOUT = 10
         ERROR_TUPLE_BYTES = 6
@@ -85,17 +86,24 @@ module Rpush
 
         def handle_disconnect
           log_error('The APNs disconnected without returning an error. Marking all notifications delivered via this connection as failed.')
-          Rpush::Daemon.store.mark_ids_failed(delivered_buffer, nil, 'The APNs disconnected without returning an error. This may indicate you are using an invalid certificate.', Time.now)
+          reason = 'The APNs disconnected without returning an error. This may indicate you are using an invalid certificate.'
+          Rpush::Daemon.store.mark_ids_failed(delivered_buffer, nil, reason, Time.now)
+          delivered_buffer.each { |id| reflect(:notification_id_failed, @app, id, nil, reason) }
         end
 
         def handle_error(code, notification_id)
           failed_pos = delivered_buffer.index(notification_id)
           description = APNS_ERRORS[code.to_i] || "Unknown error code #{code.inspect}. Possible Rpush bug?"
           Rpush::Daemon.store.mark_ids_failed([notification_id], code, description, Time.now)
+          reflect(:notification_id_failed, @app, notification_id, code, description)
 
           if failed_pos
             retry_ids = delivered_buffer[(failed_pos + 1)..-1]
-            Rpush::Daemon.store.mark_ids_retryable(retry_ids, Time.now) if retry_ids.size > 0
+            if retry_ids.size > 0
+              now = Time.now
+              Rpush::Daemon.store.mark_ids_retryable(retry_ids, now)
+              retry_ids.each { |id| reflect(:notification_id_will_retry, @app, id, now) }
+            end
           elsif delivered_buffer.size > 0
             log_error("Delivery sequence unknown for notifications following #{notification_id}.")
           end
