@@ -67,8 +67,8 @@ module Rpush
       shutdown_lock.synchronize { true }
     end
 
-    def self.shutdown(quiet = false)
-      puts "\nShutting down..." unless quiet
+    def self.shutdown
+      puts "\nShutting down..."
 
       shutdown_lock.synchronize do
         Feeder.stop
