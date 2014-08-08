@@ -5,7 +5,7 @@ module Rpush
         def self.included(base)
           base.instance_eval do
             validates :expiry, numericality: true, allow_nil: true
-            validates :app_id, presence: true
+            validates :app, presence: true
           end
         end
 
