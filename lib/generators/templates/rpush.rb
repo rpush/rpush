@@ -111,6 +111,15 @@ Rpush.reflect do |on|
   # on.adm_canonical_id do |old_id, canonical_id|
   # end
 
+  # Called when Failed to deliver to ADM. Check the 'reason' string for further
+  # explanations.
+  #
+  # If the reason is the string 'Unregistered', you should remove
+  # this registration id from your records.
+  # on.adm_failed_to_recipient do |notification, registration_id, reason|
+  # end
+
+
   # Called when an exception is raised.
   # on.error do |error|
   # end

@@ -80,6 +80,15 @@ describe Rpush::Daemon::Adm::Delivery do
       logger.should_receive(:warn).with("[MyApp] bad_request: xyz (InvalidRegistrationId)")
       expect { perform }.to raise_error
     end
+
+    it 'reflects' do
+      response.stub(body: JSON.dump('registrationID' => 'canonical123', 'reason' => 'Unregistered'))
+      notification.stub(registration_ids: ['1'])
+      error = Rpush::DeliveryError.new(nil, notification.id, 'Failed to deliver to all recipients.')
+      delivery.should_receive(:reflect).with(:adm_failed_to_recipient, notification, '1', 'Unregistered')
+      expect { perform }.to raise_error
+    end
+
   end
 
   describe 'a 401 (Unauthorized) response' do

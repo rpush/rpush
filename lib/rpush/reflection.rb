@@ -13,8 +13,9 @@ module Rpush
     REFLECTIONS = [
       :apns_feedback, :notification_enqueued, :notification_delivered,
       :notification_failed, :notification_will_retry, :gcm_delivered_to_recipient,
-      :gcm_failed_to_recipient, :gcm_canonical_id, :gcm_invalid_registration_id,
-      :error, :adm_canonical_id, :tcp_connection_lost, :ssl_certificate_will_expire,
+      :gcm_failed_to_recipient, :gcm_canonical_id, :gcm_invalid_registration_id,  
+      :error, :adm_canonical_id, :adm_failed_to_recipient,
+      :tcp_connection_lost, :ssl_certificate_will_expire,
       :notification_id_will_retry, :notification_id_failed
     ]
 
