@@ -120,8 +120,11 @@ module Rpush
 
           return unless response_body.key?('reason')
 
-          log_warn("bad_request: #{current_registration_id} (#{response_body['reason']})")
-          @failed_registration_ids[current_registration_id] = response_body['reason']
+          reason = response_body['reason']
+          log_warn("bad_request: #{current_registration_id} (#{reason})")
+          @failed_registration_ids[current_registration_id] = reason
+
+          reflect(:adm_failed_to_recipient, @notification, current_registration_id, reason)
         end
 
         def unauthorized(response)
