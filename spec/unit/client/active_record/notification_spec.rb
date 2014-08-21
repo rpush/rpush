@@ -12,4 +12,10 @@ describe Rpush::Client::ActiveRecord::Notification do
     notification.registration_ids = 'a'
     notification.registration_ids.should eq ['a']
   end
+
+  it 'saves its parent App if required' do
+    notification.app = Rpush::Client::ActiveRecord::App.new(name: "aname")
+    expect(notification.app).to be_valid
+    expect(notification).to be_valid
+  end
 end
