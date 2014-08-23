@@ -4,11 +4,7 @@ namespace :test do
 
     def cmd(str, clean_env = true)
       puts "* #{str}"
-      retval = if clean_env
-        Bundler.with_clean_env { `#{str}` }
-      else
-        `#{str}`
-      end
+      retval = clean_env ? Bundler.with_clean_env { `#{str}` } : `#{str}`
       puts retval.strip
       retval
     end

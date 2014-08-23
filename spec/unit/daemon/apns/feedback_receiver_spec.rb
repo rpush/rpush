@@ -14,9 +14,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
   let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, start: nil, stop: nil) }
-  let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
-                        create_apns_feedback: feedback, release_connection: nil)
-  end
+  let(:store) { double(Rpush::Daemon::Store::ActiveRecord, create_apns_feedback: feedback, release_connection: nil) }
 
   before do
     Rpush.config.feedback_poll = poll

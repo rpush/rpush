@@ -38,7 +38,7 @@ module Rpush
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
-          def as_json
+          def as_json # rubocop:disable Metrics/PerceivedComplexity
             json = ActiveSupport::OrderedHash.new
 
             if data && data.key?(MDM_KEY)

@@ -2,10 +2,7 @@ require 'unit_spec_helper'
 
 describe Rpush::Daemon::Wpns::Delivery do
   let(:app) { Rpush::Wpns::App.create!(name: "MyApp") }
-  let(:notification) do Rpush::Wpns::Notification.create!(app: app, alert: "test",
-                                                          uri: "http://some.example/",
-                                                          deliver_after: Time.now)
-  end
+  let(:notification) { Rpush::Wpns::Notification.create!(app: app, alert: "test", uri: "http://some.example/", deliver_after: Time.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}) }
   let(:http) { double(shutdown: nil, request: response) }

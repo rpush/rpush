@@ -224,28 +224,30 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     describe 'all deliveries failed with some as Unavailable or InternalServerError' do
-      let(:body) do {
-        'failure' => 3,
-        'success' => 0,
-        'results' => [
-          { 'error' => 'Unavailable' },
-          { 'error' => 'InvalidDataKey' },
-          { 'error' => 'Unavailable' }
-        ] }
+      let(:body) do
+        { 'failure' => 3,
+          'success' => 0,
+          'results' => [
+            { 'error' => 'Unavailable' },
+            { 'error' => 'InvalidDataKey' },
+            { 'error' => 'Unavailable' }
+          ]
+        }
       end
       let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, InvalidDataKey, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'a notification with some delivery failures'
     end
 
     describe 'some deliveries failed with Unavailable or InternalServerError' do
-      let(:body) do {
-        'failure' => 2,
-        'success' => 1,
-        'results' => [
-          { 'error' => 'Unavailable' },
-          { 'message_id' => '1:000' },
-          { 'error' => 'InternalServerError' }
-        ] }
+      let(:body) do
+        { 'failure' => 2,
+          'success' => 1,
+          'results' => [
+            { 'error' => 'Unavailable' },
+            { 'message_id' => '1:000' },
+            { 'error' => 'InternalServerError' }
+          ]
+        }
       end
       let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'a notification with some delivery failures'

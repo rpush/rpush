@@ -5,9 +5,7 @@ describe Rpush::Daemon::Feeder do
   let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:logger) { double }
   let(:interruptible_sleeper) { double(sleep: nil, stop: nil, start: nil) }
-  let(:store) do double(Rpush::Daemon::Store::ActiveRecord,
-                        deliverable_notifications: [notification], release_connection: nil)
-  end
+  let(:store) { double(Rpush::Daemon::Store::ActiveRecord, deliverable_notifications: [notification], release_connection: nil) }
 
   before do
     Rpush.configure do |config|
