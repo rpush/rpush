@@ -224,7 +224,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     describe 'all deliveries failed with some as Unavailable or InternalServerError' do
-      let(:body) do{
+      let(:body) do {
         'failure' => 3,
         'success' => 0,
         'results' => [
@@ -238,7 +238,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     describe 'some deliveries failed with Unavailable or InternalServerError' do
-      let(:body) do{
+      let(:body) do {
         'failure' => 2,
         'success' => 1,
         'results' => [

@@ -5,9 +5,8 @@ describe 'embedding' do
   let(:app) { Rpush::Apns::App.new }
   let(:notification) { Rpush::Apns::Notification.new }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
-  let(:ssl_socket) do double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
-                                                      write: nil, flush: nil, read: nil, close: nil)
-  end
+  let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil,
+                                                      write: nil, flush: nil, read: nil, close: nil) }
   let(:io_double) { double(select: nil) }
 
   before do
