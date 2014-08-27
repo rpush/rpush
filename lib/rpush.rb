@@ -4,7 +4,7 @@ require 'active_support/all'
 module Rpush
   def self.attr_accessible_available?
     require 'rails'
-    ::Rails::VERSION::STRING < '4'
+    ::Rails::VERSION::STRING < '4' || defined?(::ActiveRecord::MassAssignmentSecurity)
   end
 end
 
