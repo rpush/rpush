@@ -14,6 +14,8 @@ module Rpush
         attribute :client_id, :string
         attribute :client_secret, :string
 
+        index :name
+
         validates :name, presence: true
         validates_numericality_of :connections, greater_than: 0, only_integer: true
       end
