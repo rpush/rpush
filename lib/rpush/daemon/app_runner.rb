@@ -42,6 +42,10 @@ module Rpush
         end
       end
 
+      def self.app_with_id(app_id)
+        @runners[app_id].app
+      end
+
       def self.app_running?(app)
         @runners.key?(app.id)
       end

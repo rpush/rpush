@@ -14,12 +14,19 @@ module Rpush
       end
 
       def self.sync_app(app)
-        unless AppRunner.app_running?(app)
+        if !AppRunner.app_running?(app)
           AppRunner.start_app(app)
-          return
+        elsif certificate_changed?(app)
+          log_info("[#{app.name}] Certificate changed, restarting...")
+          AppRunner.stop_app(app.id)
+          AppRunner.start_app(app)
+        elsif environment_changed?(app)
+          log_info("[#{app.name}] Environment changed, restarting...")
+          AppRunner.stop_app(app.id)
+          AppRunner.start_app(app)
+        else
+          sync_dispatcher_count(app)
         end
-
-        sync_dispatcher_count(app)
       end
 
       def self.sync_dispatcher_count(app)
@@ -37,6 +44,16 @@ module Rpush
 
         num_dispatchers = AppRunner.num_dispatchers_for_app(app)
         log_info("[#{app.name}] #{start_stop_str} #{pluralize(diff.abs, 'dispatcher')}. #{num_dispatchers} running.")
+      end
+
+      def self.certificate_changed?(app)
+        old_app = AppRunner.app_with_id(app.id)
+        app.certificate != old_app.certificate
+      end
+
+      def self.environment_changed?(app)
+        old_app = AppRunner.app_with_id(app.id)
+        app.environment != old_app.environment
       end
     end
   end

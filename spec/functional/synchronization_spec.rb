@@ -16,6 +16,9 @@ describe 'Synchronization' do
     app.name = 'test'
     app.auth_key = 'abc123'
     app.connections = 2
+    app.certificate = TEST_CERT_WITH_PASSWORD
+    app.password = 'fubar'
+    app.environment = 'sandbox'
     app.save!
 
     Rpush.embed
@@ -42,5 +45,24 @@ describe 'Synchronization' do
     app.destroy
     Rpush.sync
     Rpush::Daemon::AppRunner.app_running?(app).should be_false
+  end
+
+  it 'restarts an app when the certificate is changed' do
+    app.certificate = TEST_CERT
+    app.password = nil
+    app.save!
+    Rpush.sync
+
+    running_app = Rpush::Daemon::AppRunner.app_with_id(app.id)
+    expect(running_app.certificate).to eql(TEST_CERT)
+  end
+
+  it 'restarts an app when the environment is changed' do
+    app.environment = 'production'
+    app.save!
+    Rpush.sync
+
+    running_app = Rpush::Daemon::AppRunner.app_with_id(app.id)
+    expect(running_app.environment).to eql('production')
   end
 end

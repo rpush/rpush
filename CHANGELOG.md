@@ -11,6 +11,7 @@
   * The 'batch_storage_updates' config option has been deprecated, storage backends will now always batch updates where appropriate.
   * The rpush process title updates with number of queued notifications and number of dispatchers.
   * Rpush::Apns::Feedback#app has been renamed to app_id and is now an Integer.
+  * An app is restarted when the HUP signal is received if its certificate or environment attribute changed.
 
 ## 1.0.0 (Feb 9, 2014)
   * Renamed to Rpush (from Rapns). Version number reset to 1.0.0.
