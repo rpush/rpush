@@ -32,7 +32,7 @@ module Rpush
 end
 
 describe Rpush::Daemon::AppRunner, 'enqueue' do
-  let(:app) { double(id: 1) }
+  let(:app) { double(id: 1, name: 'Test', connections: 1) }
   let(:notification) { double(app_id: 1) }
   let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start: nil, stop: nil) }
   let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
@@ -53,7 +53,7 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
 
   it 'starts the app if a runner does not exist' do
     notification = double(app_id: 3)
-    new_app = double(Rpush::App, id: 3)
+    new_app = double(Rpush::App, id: 3, name: 'NewApp', connections: 1)
     Rpush::Daemon.store = double(app: new_app)
     Rpush::Daemon::AppRunner.enqueue([notification])
     Rpush::Daemon::AppRunner.app_running?(new_app).should be_true

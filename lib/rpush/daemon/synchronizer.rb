@@ -16,7 +16,6 @@ module Rpush
       def self.sync_app(app)
         unless AppRunner.app_running?(app)
           AppRunner.start_app(app)
-          log_info("[#{app.name}] Started, #{pluralize(app.connections, 'dispatcher')}.")
           return
         end
 
