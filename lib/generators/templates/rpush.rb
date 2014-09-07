@@ -119,7 +119,6 @@ Rpush.reflect do |on|
   # on.adm_failed_to_recipient do |notification, registration_id, reason|
   # end
 
-
   # Called when an exception is raised.
   # on.error do |error|
   # end
