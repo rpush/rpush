@@ -25,19 +25,24 @@ module Rpush
           while readable_io = IO.select([read_io]) # rubocop:disable AssignmentInCondition
             signal = readable_io.first[0].gets.strip
 
-            case signal
-            when 'HUP'
-              Synchronizer.sync
-              Feeder.wakeup
-            when 'USR2'
-              AppRunner.debug
-            when 'INT', 'TERM'
-              Thread.new { Rpush::Daemon.shutdown }
-              break
-            when 'break'
-              break
-            else
-              Rpush.logger.error("Unhandled signal: #{signal}")
+            begin
+              case signal
+              when 'HUP'
+                Synchronizer.sync
+                Feeder.wakeup
+              when 'USR2'
+                AppRunner.debug
+              when 'INT', 'TERM'
+                Thread.new { Rpush::Daemon.shutdown }
+                break
+              when 'break'
+                break
+              else
+                Rpush.logger.error("Unhandled signal: #{signal}")
+              end
+            rescue StandardError => e
+              Rpush.logger.error("Error raised when hndling signal '#{signal}'")
+              Rpush.logger.error(e)
             end
           end
         end

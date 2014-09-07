@@ -69,4 +69,27 @@ describe Rpush::Daemon::SignalHandler do
       end
     end
   end
+
+  describe 'error handing' do
+    let(:error) { StandardError.new('test') }
+
+    before { Rpush.stub(logger: double(error: nil)) }
+
+    it 'logs errors received when handling a signal' do
+      Rpush::Daemon::Synchronizer.stub(:sync).and_raise(error)
+      expect(Rpush.logger).to receive(:error).with(error)
+      with_handler_start_stop do
+        signal_handler('HUP')
+      end
+    end
+
+    it 'does not interrupt processing of further errors' do
+      Rpush::Daemon::Synchronizer.stub(:sync).and_raise(error)
+      expect(Rpush::Daemon::AppRunner).to receive(:debug)
+      with_handler_start_stop do
+        signal_handler('HUP')
+        signal_handler('USR2')
+      end
+    end
+  end
 end
