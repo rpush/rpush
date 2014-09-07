@@ -1,4 +1,4 @@
-## 2.0.0 (unreleased)
+## 2.0.0 (Sept 6, 2014)
   * Use APNs enhanced binary format version 2.
   * Support running multiple Rpush processes when using ActiveRecord and Redis.
   * APNs error detection is now performed asynchronously, 'check_for_errors' is therefore deprecated.
