@@ -51,8 +51,8 @@ module Rpush
     end
 
     def self.start
-      SignalHandler.start
       Process.daemon if daemonize?
+      SignalHandler.start
       initialize_store
       write_pid_file
       Synchronizer.sync
