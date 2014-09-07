@@ -11,11 +11,14 @@
   * **Apple Push Notification Service**
   * **Google Cloud Messaging**
   * **Amazon Device Messaging**
-  * **Windows Phone Push Notification Service**.
+  * **Windows Phone Push Notification Service**
+
+
 * Supported storage backends:
   * ActiveRecord
   * Redis
   * More coming soon!
+
 
 * Seamless Rails (3, 4) integration.
 * Scales vertically (threading) and horizontally (multiple processes).
