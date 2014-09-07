@@ -7,15 +7,20 @@
 
 ### Rpush. The push notification service for Ruby.
 
-* Supports:
+* Supported services:
   * **Apple Push Notification Service**
   * **Google Cloud Messaging**
   * **Amazon Device Messaging**
   * **Windows Phone Push Notification Service**.
+* Supported storage backends:
+  * ActiveRecord
+  * Redis
+  * More coming soon!
+
 * Seamless Rails (3, 4) integration.
-* Scalable - choose the number of persistent connections for each app.
-* Designed for uptime - signal -HUP to add, update apps.
-* Run as a daemon or inside an [existing processs](https://github.com/rpush/rpush/wiki/Embedding-API).
+* Scales vertically (threading) and horizontally (multiple processes).
+* Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
+* Run as a daemon or inside an [existing process](https://github.com/rpush/rpush/wiki/Embedding-API).
 * Use in a scheduler for low-workload deployments ([Push API](https://github.com/rpush/rpush/wiki/Push-API)).
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
 * Works with MRI, JRuby and Rubinius.
@@ -122,31 +127,40 @@ n.alert = "..."
 n.save!
 ```
 
-### Starting Rpush
+### Running Rpush
 
-As a daemon (recommended):
+It is recommended to run Rpush as a separate process in most cases, though embedding and manual modes are provided for low-workload environments.
+
+#### As a daemon (recommended):
 
     cd /path/to/rails/app
     rpush <Rails environment> [options]
 
-Inside an existing process (see [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API)):
+#### Embedded inside an existing process
 
 ```ruby
+# Call this during startup of your application, for example, by adding it to the end of config/initializers/rpush.rb
 Rpush.embed
 ```
 
-In a scheduler (see [Push API](https://github.com/rpush/rpush/wiki/Push-API)):
+See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
+
+#### Manually (in a scheduler)
 
 ```ruby
 Rpush.push
 Rpush.apns_feedback
 ```
 
+See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
+
+### Configuration
+
 See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options, or run `rpush --help`.
 
 ### Updating Rpush
 
-After updating you should run `rails g rpush` to check for any new migrations.
+If you're using ActiveRecord, you should run `rails g rpush` after upgrading Rpush to check for any new migrations.
 
 ### Wiki
 
