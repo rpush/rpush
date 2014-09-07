@@ -8,19 +8,17 @@
 ### Rpush. The push notification service for Ruby.
 
 * Supported services:
-  * **Apple Push Notification Service**
-  * **Google Cloud Messaging**
-  * **Amazon Device Messaging**
-  * **Windows Phone Push Notification Service**
-
+  * [**Apple Push Notification Service**](#apple-push-notification-service)
+  * [**Google Cloud Messaging**](#google-cloud-messaging)
+  * [**Amazon Device Messaging**](#amazon-device-messaging)
+  * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
 
 * Supported storage backends:
-  * ActiveRecord
-  * Redis
-  * More coming soon!
+  * **ActiveRecord**
+  * **Redis**
+  * More coming!
 
-
-* Seamless Rails (3, 4) integration.
+* Seamless Rails integration (3 & 4) .
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
 * Run as a daemon or inside an [existing process](https://github.com/rpush/rpush/wiki/Embedding-API).
