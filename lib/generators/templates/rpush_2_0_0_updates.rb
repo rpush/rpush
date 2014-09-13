@@ -37,6 +37,6 @@ class Rpush200Updates < ActiveRecord::Migration
   end
 
   def self.postgresql?
-    adapter_name =~ /postgresql/
+    adapter_name =~ /postgresql|postgis/
   end
 end
