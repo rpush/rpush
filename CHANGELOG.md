@@ -1,3 +1,7 @@
+## 2.0.1 (Sept 13, 2014)
+  * Add ssl_certificate_revoked reflection (#68).
+  * Fix for Postgis support in 2.0.0 migration (#70).
+
 ## 2.0.0 (Sept 6, 2014)
   * Use APNs enhanced binary format version 2.
   * Support running multiple Rpush processes when using ActiveRecord and Redis.
