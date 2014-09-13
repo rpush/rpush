@@ -106,6 +106,10 @@ Rpush.reflect do |on|
   # on.ssl_certificate_will_expire do |app, expiration_time|
   # end
 
+  # Called when an SSL certificate has been revoked.
+  # on.ssl_certificate_revoked do |app, error|
+  # end
+
   # Called when the ADM returns a canonical registration ID.
   # You will need to replace old_id with canonical_id in your records.
   # on.adm_canonical_id do |old_id, canonical_id|

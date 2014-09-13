@@ -113,6 +113,23 @@ describe Rpush::Daemon::TcpConnection do
         end
       end
     end
+
+    describe 'certificate revocation' do
+      let(:cert_revoked_error) { OpenSSL::SSL::SSLError.new('certificate revoked') }
+      before do
+        ssl_socket.stub(:connect).and_raise(cert_revoked_error)
+      end
+
+      it 'reflects that the certificate has been revoked' do
+        connection.should_receive(:reflect).with(:ssl_certificate_revoked, app, cert_revoked_error)
+        expect { connection.connect }.to raise_error(cert_revoked_error)
+      end
+
+      it 'logs that the certificate has been revoked' do
+        logger.should_receive(:warn).with('[Connection 0] Certificate has been revoked.')
+        expect { connection.connect }.to raise_error(cert_revoked_error)
+      end
+    end
   end
 
   describe "when shuting down the connection" do
