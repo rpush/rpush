@@ -1,7 +1,7 @@
 [![Build Status](https://secure.travis-ci.org/rpush/rpush.png?branch=master)](http://travis-ci.org/rpush/rpush)
 [![Code Climate](https://codeclimate.com/github/rpush/rpush.png)](https://codeclimate.com/github/rpush/rpush)
 [![Code Coverage](https://codeclimate.com/github/rpush/rpush/coverage.png)](https://codeclimate.com/github/rpush/rpush)
-[![Gem Version](https://badge.fury.io/rb/rpush.png)](http://badge.fury.io/rb/rpush)
+[![Gem Version](https://badge.fury.io/rb/rpush.svg)](http://badge.fury.io/rb/rpush)
 
 <img src="https://raw.github.com/rpush/rpush/master/logo.png" align="right" width="200px" />
 
