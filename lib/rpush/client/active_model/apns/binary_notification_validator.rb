@@ -3,7 +3,7 @@ module Rpush
     module ActiveModel
       module Apns
         class BinaryNotificationValidator < ::ActiveModel::Validator
-          MAX_BYTES = 256
+          MAX_BYTES = 2048
 
           def validate(record)
             return unless record.payload_size > MAX_BYTES

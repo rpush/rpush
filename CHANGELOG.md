@@ -1,3 +1,6 @@
+## 2.1.0 (unreleased)
+  * Bump APNs max payload size to 2048 for iOS 8.
+
 ## 2.0.1 (Sept 13, 2014)
   * Add ssl_certificate_revoked reflection (#68).
   * Fix for Postgis support in 2.0.0 migration (#70).

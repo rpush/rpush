@@ -18,9 +18,9 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
 
   it "should validate the length of the binary conversion of the notification" do
     notification.device_token = "a" * 64
-    notification.alert = "way too long!" * 100
+    notification.alert = "way too long!" * 200
     notification.valid?.should be_false
-    notification.errors[:base].include?("APN notification cannot be larger than 256 bytes. Try condensing your alert and device attributes.").should be_true
+    notification.errors[:base].include?("APN notification cannot be larger than 2048 bytes. Try condensing your alert and device attributes.").should be_true
   end
 
   it "should default the sound to 'default'" do
