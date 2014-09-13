@@ -108,8 +108,8 @@ module Rpush
         ssl_socket.sync = true
         ssl_socket.connect
         [tcp_socket, ssl_socket]
-      rescue => error
-        if error.message =~ /certificate revoked/
+      rescue StandardError => error
+        if error.message =~ /certificate revoked/i
           log_warn('Certificate has been revoked.')
           reflect(:ssl_certificate_revoked, @app, error)
         end
