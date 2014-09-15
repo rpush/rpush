@@ -124,7 +124,7 @@ app.save!
 n = Rpush::Wpns::Notification.new
 n.app = Rpush::Wpns::App.find_by_name("windows_phone_app")
 n.uri = "http://..."
-n.alert = "..."
+n.data = {title:"MyApp", body:"Hello world", param:"user_param1"}
 n.save!
 ```
 

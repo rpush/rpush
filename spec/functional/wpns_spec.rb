@@ -12,7 +12,7 @@ describe 'WPNs' do
 
     notification.app = app
     notification.uri = 'http://sn1.notify.live.net/'
-    notification.alert = 'test'
+    notification.data = {title:"MyApp",body:"test",param:"new_user"}
     notification.save!
 
     Net::HTTP::Persistent.stub(new: http)

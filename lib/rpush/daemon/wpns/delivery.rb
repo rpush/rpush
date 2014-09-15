@@ -106,16 +106,21 @@ module Rpush
         end
 
         def notification_to_xml
-          msg = @notification.alert.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
-          <<-EOF
-<?xml version="1.0" encoding="utf-8"?>
-<wp:Notification xmlns:wp="WPNotification">
-  <wp:Toast>
-    <wp:Text1>#{msg}</wp:Text1>
-  </wp:Toast>
-</wp:Notification>
-          EOF
+        title = @notification.data['title'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+          .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+        body  = @notification.data['body'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+          .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+        param = @notification.data['param'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+          .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+        
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+          <wp:Notification xmlns:wp=\"WPNotification\">
+            <wp:Toast>
+              <wp:Text1>#{title}</wp:Text1>
+              <wp:Text2>#{body}</wp:Text2>
+              <wp:Param>#{param}</wp:Param>
+            </wp:Toast>
+          </wp:Notification>"
         end
       end
     end
