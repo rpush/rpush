@@ -106,12 +106,12 @@ module Rpush
         end
 
         def notification_to_xml
-        title = @notification.data['title'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-          .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
-        body  = @notification.data['body'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-          .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
-        param = @notification.data['param'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-          .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          title = @notification.data['title'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;") if @notification.data['title'].present?
+          body = @notification.data['body'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;") if @notification.data['body'].present?
+          param = @notification.data['param'].gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;") if @notification.data['param'].present?
         
         "<?xml version=\"1.0\" encoding=\"utf-8\"?>
           <wp:Notification xmlns:wp=\"WPNotification\">
