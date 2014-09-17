@@ -38,6 +38,12 @@ module Rpush
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
+          URL_ARGS_KEY = '__rpush_url_args__'
+          def url_args=(array)
+            return unless array
+            self.data = (data || {}).merge(URL_ARGS_KEY => array)
+          end
+
           def as_json # rubocop:disable Metrics/PerceivedComplexity
             json = ActiveSupport::OrderedHash.new
 
@@ -53,8 +59,12 @@ module Rpush
                 json['aps']['content-available'] = 1
               end
 
+              if data && data[URL_ARGS_KEY]
+                json['aps']['url-args'] = data[URL_ARGS_KEY]
+              end
+
               if data
-                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY }
+                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == URL_ARGS_KEY }
                 non_aps_attributes.each { |k, v| json[k.to_s] = v }
               end
             end
