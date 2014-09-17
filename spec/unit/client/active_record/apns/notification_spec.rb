@@ -160,6 +160,11 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'url-args' do
     notification.as_json.key?('url-args').should be_false
   end
 
+  it 'also allows to pass strings as url-args' do
+    notification.url_args = 'url-arg-1'
+    notification.as_json['aps']['url-args'].should eq ['url-arg-1']
+  end
+
   it 'does not overwrite existing attributes for the device' do
     notification.data = { hi: :mom }
     notification.url_args = ['url-arg-1']

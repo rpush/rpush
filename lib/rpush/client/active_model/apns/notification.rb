@@ -39,9 +39,11 @@ module Rpush
           end
 
           URL_ARGS_KEY = '__rpush_url_args__'
-          def url_args=(array)
-            return unless array
-            self.data = (data || {}).merge(URL_ARGS_KEY => array)
+          def url_args=(url_args)
+            return unless url_args
+
+            url_args = url_args.is_a?(Array) ? url_args : [url_args.to_s]
+            self.data = (data || {}).merge(URL_ARGS_KEY => url_args)
           end
 
           def as_json # rubocop:disable Metrics/PerceivedComplexity
