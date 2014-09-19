@@ -48,6 +48,7 @@ module Rpush
               json['aps']['alert'] = alert if alert
               json['aps']['badge'] = badge if badge
               json['aps']['sound'] = sound if sound
+              json['aps']['category'] = category if category
               json['aps']['url-args'] = url_args if url_args
 
               if data && data[CONTENT_AVAILABLE_KEY]
