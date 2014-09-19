@@ -40,6 +40,7 @@ module Rpush
         attribute :registration_ids, :array
         attribute :uri, :string
         attribute :priority, :integer
+        attribute :url_args, :array
 
         def app
           return nil unless app_id

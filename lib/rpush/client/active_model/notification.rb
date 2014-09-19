@@ -13,10 +13,6 @@ module Rpush
           multi_json_dump(as_json)
         end
 
-        def payload_size
-          payload.bytesize
-        end
-
         def payload_data_size
           multi_json_dump(as_json['data']).bytesize
         end

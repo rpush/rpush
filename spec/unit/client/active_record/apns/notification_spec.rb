@@ -143,6 +143,38 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
   end
 end
 
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'url-args' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  it 'includes url-args in the payload' do
+    notification.url_args = ['url-arg-1']
+    notification.as_json['aps']['url-args'].should eq ['url-arg-1']
+  end
+
+  it 'does not include url-args in the payload if not set' do
+    notification.as_json['aps'].key?('url-args').should be_false
+  end
+
+  it 'does not include url-args as a non-aps attribute' do
+    notification.url_args = ['url-arg-1']
+    notification.as_json.key?('url-args').should be_false
+  end
+
+  it 'does not overwrite existing attributes for the device' do
+    notification.data = { hi: :mom }
+    notification.url_args = ['url-arg-1']
+    notification.as_json['aps']['url-args'].should eq ['url-arg-1']
+    notification.as_json['hi'].should eq 'mom'
+  end
+
+  it 'does not overwrite the url_args flag when setting attributes for the device' do
+    notification.url_args = ['url-arg-1']
+    notification.data = { hi: :mom }
+    notification.as_json['aps']['url-args'].should eq ['url-arg-1']
+    notification.as_json['hi'].should eq 'mom'
+  end
+end
+
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
 
@@ -207,7 +239,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
     end
 
     notification.to_binary(for_validation: true).bytesize.should be > 256
-    notification.payload_size.should be < 256
+    notification.payload.bytesize.should be < 256
     notification.should be_valid
   end
 end

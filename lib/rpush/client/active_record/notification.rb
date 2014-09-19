@@ -7,15 +7,16 @@ module Rpush
 
         self.table_name = 'rpush_notifications'
 
-        # TODO: Dump using multi json.
         serialize :registration_ids
+        serialize :url_args
 
         belongs_to :app, class_name: 'Rpush::Client::ActiveRecord::App'
 
         if Rpush.attr_accessible_available?
           attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry, :delivered,
                           :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
-                          :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids, :uri
+                          :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids,
+                          :uri, :url_args
         end
 
         def data=(attrs)

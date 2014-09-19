@@ -1,5 +1,6 @@
 ## 2.1.0 (unreleased)
   * Bump APNs max payload size to 2048 for iOS 8.
+  * Add url_args for Safari Push Notification Support (#77).
 
 ## 2.0.1 (Sept 13, 2014)
   * Add ssl_certificate_revoked reflection (#68).

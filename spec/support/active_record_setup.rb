@@ -28,8 +28,9 @@ ActiveRecord::Base.establish_connection(db_config[SPEC_ADAPTER])
 
 require 'generators/templates/add_rpush'
 require 'generators/templates/rpush_2_0_0_updates'
+require 'generators/templates/rpush_2_1_0_updates'
 
-migrations = [AddRpush, Rpush200Updates]
+migrations = [AddRpush, Rpush200Updates, Rpush210Updates]
 
 unless ENV['TRAVIS']
   migrations.reverse.each do |m|
