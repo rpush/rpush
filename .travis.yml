@@ -46,8 +46,12 @@ matrix:
   - rvm: jruby-1.7.15
     gemfile: Gemfile.rails-4
     env: CLIENT=redis
+  - rvm: 2.2.0-preview1
+    gemfile: Gemfile.rails-4
+    env: CLIENT=active_record
   allow_failures:
   - env: CLIENT=active_record ADAPTER=sqlite3
+  - rvm: 2.2.0-preview1
 env:
   global:
     secure: NmFJ2Wk0W4mCce7pLXNcuQEd7Omr+XQxXyVlOQMtve6wwLv+R6r49Rgx7EkkbHd6OhspYoprtGsOPYE1c1fGOXn9Cd9Lf+SXNMmLnhXlvXWY1GDv2ULzL1cbu9dtc7KoHXkFmWYGqjuHzB5IkBFNqSKWaF4L4iM4Oh6MFE4kZ2M=
