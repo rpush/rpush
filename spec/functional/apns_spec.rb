@@ -122,7 +122,8 @@ describe 'APNs' do
       it 'does not mark prior notifications as failed' do
         notifications.each { |n| wait_for_notification_to_deliver(n) }
         fail_notification(notification2)
-        sleep 1
+        wait_for_notification_to_fail(notification2)
+
         notification1.reload
         notification1.delivered.should be_true
       end
