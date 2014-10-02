@@ -4,7 +4,7 @@ client = (ENV['CLIENT'] || :active_record).to_sym
 require 'bundler/setup'
 Bundler.require(:default)
 
-unless ENV['TRAVIS'] && ENV['QUALITY'] == 'false'
+if !ENV['TRAVIS'] || (ENV['TRAVIS'] && ENV['QUALITY'] == 'true')
   begin
     require './spec/support/simplecov_helper'
     include SimpleCovHelper
