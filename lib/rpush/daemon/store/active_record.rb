@@ -166,7 +166,7 @@ module Rpush
         end
 
         def ready_for_delivery
-          Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now)
+          Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now).order('created_at ASC')
         end
 
         def mark_processing(notifications)
