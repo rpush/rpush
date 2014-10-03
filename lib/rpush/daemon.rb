@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 require 'thread'
 require 'socket'
 require 'pathname'
