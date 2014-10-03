@@ -1,6 +1,6 @@
 module Rpush
   def self.apns_feedback
-    Rpush.require_for_daemon
+    require 'rpush/daemon'
     Rpush::Daemon.initialize_store
 
     Rpush::Apns::App.all.each do |app|

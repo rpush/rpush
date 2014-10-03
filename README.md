@@ -140,7 +140,7 @@ It is recommended to run Rpush as a separate process in most cases, though embed
 #### Embedded inside an existing process
 
 ```ruby
-# Call this during startup of your application, for example, by adding it to the end of config/initializers/rpush.rb
+# Call this during startup of your application, for example, by adding it to the end of config/rpush.rb
 Rpush.embed
 ```
 

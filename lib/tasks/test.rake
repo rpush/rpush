@@ -21,8 +21,20 @@ namespace :test do
     begin
       Dir.chdir(path)
       cmd('echo "gem \'rake\'" >> Gemfile')
+      cmd('echo "gem \'pg\'" >> Gemfile')
       cmd("echo \"gem 'rpush', :path => '#{rpush_root}'\" >> Gemfile")
       cmd('bundle install')
+
+      File.open('config/database.yml', 'w') do |fd|
+        fd.write(<<-YML)
+development:
+  adapter: postgresql
+  database: rpush_rails_test
+  pool: 5
+  timeout: 5000
+        YML
+      end
+
       cmd('bundle exec rails g rpush')
       cmd('bundle exec rake db:migrate')
     ensure

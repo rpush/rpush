@@ -1,30 +1,30 @@
- # Rpush configuration. Options set here are overridden by command-line options.
-
- Rpush.configure do |config|
+Rpush.configure do |config|
 
   # Supported clients are :active_record and :redis.
-  # config.client = :active_record
+  config.client = :active_record
 
   # Options passed to Redis.new
   # config.redis_options = {}
 
-  # Run in the foreground?
-  # config.foreground = false
-
   # Frequency in seconds to check for new notifications.
-  # config.push_poll = 2
+  config.push_poll = 2
 
   # Frequency in seconds to check for feedback
-  # config.feedback_poll = 60
+  config.feedback_poll = 60
 
   # The maximum number of notifications to load from the store every `push_poll` seconds.
   # If some notifications are still enqueued internally, Rpush will load the batch_size less
   # the number enqueued. An exception to this is if the service is able to receive multiple
   # notification payloads over the connection with a single write, such as APNs.
-  # config.batch_size = 100
+  config.batch_size = 100
 
-  # Path to write PID file. Relative to Rails root unless absolute.
-  # config.pid_file = '/path/to/rpush.pid'
+  # Path to write PID file. Relative to current directory unless absolute.
+  config.pid_file = 'tmp/rpush.pid'
+
+  # Path to log file. Relative to current directory unless absolute.
+  config.log_file = 'log/rpush.log'
+
+  config.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::INFO
 
   # Define a custom logger.
   # config.logger = MyLogger.new

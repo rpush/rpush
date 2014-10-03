@@ -33,7 +33,8 @@ class Rpush200Updates < ActiveRecord::Migration
   end
 
   def self.adapter_name
-    ActiveRecord::Base.configurations[Rails.env]['adapter']
+    env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
+    ActiveRecord::Base.configurations[env]['adapter']
   end
 
   def self.postgresql?

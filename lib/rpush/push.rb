@@ -1,6 +1,6 @@
 module Rpush
   def self.push(options = {})
-    Rpush.require_for_daemon
+    require 'rpush/daemon'
 
     config = Rpush::ConfigurationWithoutDefaults.new
     options.each { |k, v| config.send("#{k}=", v) }

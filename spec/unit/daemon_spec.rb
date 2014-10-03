@@ -78,7 +78,7 @@ describe Rpush::Daemon, "when starting" do
   it "logs an error if the PID file could not be written" do
     Rpush.config.pid_file = '/rails_root/rpush.pid'
     File.stub(:open).and_raise(Errno::ENOENT)
-    logger.should_receive(:error).with("Failed to write PID to '/rails_root/rpush.pid': #<Errno::ENOENT: No such file or directory>")
+    logger.should_receive(:error).with(%r{Failed to write PID to '/rails_root/rpush\.pid'})
     Rpush::Daemon.start
   end
 

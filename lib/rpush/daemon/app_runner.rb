@@ -1,6 +1,8 @@
 module Rpush
   module Daemon
     class AppRunner
+      extend Term::ANSIColor
+
       extend Reflectable
       include Reflectable
       include Loggable
@@ -24,9 +26,10 @@ module Rpush
       end
 
       def self.start_app(app)
+        Rpush.logger.info("[#{app.name}] Starting #{pluralize(app.connections, 'dispatcher')}... ", true)
         @runners[app.id] = new(app)
         @runners[app.id].start
-        log_info("[#{app.name}] Started, #{pluralize(app.connections, 'dispatcher')}.")
+        puts green('✔') if Rpush.config.foreground
       rescue StandardError => e
         @runners.delete(app.id)
         Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")

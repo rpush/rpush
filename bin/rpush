@@ -1,45 +1,4 @@
 #!/usr/bin/env ruby
 
-require 'optparse'
 require 'rpush'
-
-environment = ARGV[0]
-
-config = Rpush::ConfigurationWithoutDefaults.new
-
-options = ARGV.options do |opts|
-  opts.banner = 'Usage: rpush <Rails environment> [options]'
-  opts.on('-f', '--foreground', 'Run in the foreground.') { config.foreground = true }
-  opts.on('-P N', '--db-poll N', Integer, "Frequency in seconds to check for new notifications.") { |n| config.push_poll = n }
-  opts.on('-F N', '--feedback-poll N', Integer, "Frequency in seconds to check for feedback.") { |n| config.feedback_poll = n }
-  opts.on('-e', '--no-error-checks', 'Disable APNs error checking after notification delivery.') { config.check_for_errors = false } # deprecated
-  opts.on('-p PATH', '--pid-file PATH', String, 'Path to write PID file. Relative to Rails root unless absolute.') { |path| config.pid_file = path }
-  opts.on('-b N', '--batch-size N', Integer, 'Storage backend notification batch size.') { |n| config.batch_size = n }
-  opts.on('-B', '--[no-]batch-storage-updates', 'Perform storage updates in batches.') { |v| config.batch_storage_updates = v } # deprecated
-  opts.on('-v', '--version', 'Print the version.') do
-    puts "rpush #{Rpush::VERSION}"
-    exit
-  end
-  opts.on('-h', '--help', 'You\'re looking at it.') do
-    hidden_switches = %w(-e --no-error-checks)
-    puts opts.to_s.split("\n").delete_if do |line|
-      hidden_switches.any? { |s| line =~ /#{s}/ }
-    end.join("\n")
-    exit
-  end
-end
-
-if environment.nil? || environment =~ /^-/
-  puts options.to_s
-  exit 1
-end
-
-options.parse!
-
-ENV['RAILS_ENV'] = environment
-load 'config/environment.rb'
-load 'config/initializers/rpush.rb' if File.exist?('config/initializers/rpush.rb')
-
-Rpush.config.update(config)
-Rpush.require_for_daemon
-Rpush::Daemon.start
+Rpush::CLI.start(ARGV)

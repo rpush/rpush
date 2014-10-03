@@ -11,12 +11,12 @@ describe Rpush::Logger do
     @logger_class = defined?(ActiveSupport::BufferedLogger) ? ActiveSupport::BufferedLogger : ActiveSupport::Logger
     @logger = double(@logger_class.name, info: nil, error: nil, level: 0, auto_flushing: 1, :auto_flushing= => nil)
     @logger_class.stub(:new).and_return(@logger)
-    Rails.logger = @logger
+    Rails.stub(logger: @logger)
     File.stub(open: log)
     FileUtils.stub(mkdir_p: nil)
     STDERR.stub(:puts)
     Rpush.config.foreground = true
-    Rpush.config.log_dir = Rails.root
+    Rpush.config.log_file = 'log/rpush.log'
   end
 
   it "disables logging if the log file cannot be opened" do
@@ -112,8 +112,8 @@ describe Rpush::Logger do
   end
 
   it 'defaults auto_flushing to true if the Rails logger does not respond to auto_flushing' do
-    rails_logger = double(info: nil, error: nil, level: 0)
-    Rails.logger = rails_logger
+    Rails.stub(logger: double(info: nil, error: nil, level: 0))
+    Rpush::Logger.new
     @logger.auto_flushing.should be_true
   end
 end

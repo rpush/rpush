@@ -21,7 +21,7 @@ describe Rpush::Deprecatable do
   end
 
   it 'warns the method is deprecated when called' do
-    Rpush::Deprecation.should_receive(:warn).with("deprecated_method is deprecated and will be removed from Rpush 4.0.")
+    Rpush::Deprecation.should_receive(:warn).with(/deprecated_method is deprecated and will be removed from Rpush 4\.0\./)
     klass.deprecated_method
   end
 

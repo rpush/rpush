@@ -9,7 +9,7 @@ module Rpush
         total_dispatchers = AppRunner.total_dispatchers
         dispatchers_str = total_dispatchers == 1 ? 'dispatcher' : 'dispatchers'
         total_queued = AppRunner.total_queued
-        format("rpush | %s | %d queued | %d %s", Rpush.config.environment, total_queued, total_dispatchers, dispatchers_str)
+        format("rpush | %d queued | %d %s", total_queued, total_dispatchers, dispatchers_str)
       end
     end
   end
