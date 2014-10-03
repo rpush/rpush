@@ -7,7 +7,7 @@ begin
     cane.no_style = false
     cane.style_measure = 1000
     cane.no_doc = true
-    cane.abc_max = 20
+    cane.abc_max = 22
   end
 
   namespace :spec do

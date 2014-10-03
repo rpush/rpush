@@ -38,13 +38,6 @@ describe Rpush::Configuration do
     config.pid_file.should eq '/tmp/rpush.pid'
   end
 
-  it 'does not allow foreground to be set to false if the platform is JRuby' do
-    config.foreground = true
-    Rpush.stub(:jruby? => true)
-    config.foreground = false
-    config.foreground.should be_true
-  end
-
   it 'delegate redis_options to Modis' do
     Rpush.config.redis_options = { hi: :mom }
     Modis.redis_options.should eq(hi: :mom)

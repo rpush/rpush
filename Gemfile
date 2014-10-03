@@ -2,17 +2,16 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'rspec', '= 2.14.1'
-gem 'rails', '~> 3.2'
+gem 'rails', '~> 4.1'
 gem 'database_cleaner'
 gem 'timecop'
-gem 'rpush-redis', '0.3.0'
+gem 'rpush-redis', '0.1.0'
 
 platform :mri do
   gem 'cane'
   gem 'codeclimate-test-reporter', require: nil
   gem 'simplecov', require: false
   gem 'rubocop', require: false
-  gem 'byebug'
 end
 
 platform :ruby do

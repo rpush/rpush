@@ -1,4 +1,4 @@
-class RpushGenerator < Rails::Generators::Base
+class RpushMigrationGenerator < Rails::Generators::Base
   include Rails::Generators::Migration
   source_root File.expand_path('../templates', __FILE__)
 
@@ -28,20 +28,14 @@ class RpushGenerator < Rails::Generators::Base
     add_rpush_migration('rpush_2_1_0_updates')
   end
 
-   def copy_config
-    copy_file 'rpush.rb', 'config/initializers/rpush.rb'
-  end
-
   protected
-
-  def add_rpush_migration(template)
-    if !has_migration?(template)
-      migration_template "#{template}.rb", "db/migrate/#{template}.rb"
-    end
-  end
 
   def has_migration?(template)
     migration_dir = File.expand_path('db/migrate')
     self.class.migration_exists?(migration_dir, template)
+   end
+
+  def add_rpush_migration(template)
+      migration_template "#{template}.rb", "db/migrate/#{template}.rb"
   end
 end

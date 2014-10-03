@@ -61,7 +61,7 @@ describe Rpush::Daemon::AppRunner, 'enqueue' do
 end
 
 describe Rpush::Daemon::AppRunner, 'start_app' do
-  let(:app) { double(id: 1, name: 'test') }
+  let(:app) { double(id: 1, name: 'test', connections: 1) }
   let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start: nil, stop: nil) }
   let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
 

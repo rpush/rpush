@@ -23,11 +23,10 @@ require 'rpush/daemon/store/redis'
 
 require 'support/active_record_setup'
 
-RAILS_ROOT = '/tmp/rails_root'
+RPUSH_ROOT = '/tmp/rails_root'
 
 Rpush.configure do |config|
   config.client = client
-  config.log_dir = RAILS_ROOT
 end
 
 RPUSH_CLIENT = Rpush.config.client
@@ -51,7 +50,8 @@ end
 
 RSpec.configure do |config|
   config.before(:each) do
-    Rails.stub(root: RAILS_ROOT)
+    Rpush.config.log_file = File.join(RPUSH_ROOT, 'rpush.log')
+    Rpush.stub(root: RPUSH_ROOT)
   end
 
   config.after(:each) do

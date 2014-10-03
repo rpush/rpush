@@ -1,6 +1,6 @@
 module Rpush
   def self.embed(options = {})
-    Rpush.require_for_daemon
+    require 'rpush/daemon'
 
     if @embed_thread
       STDERR.puts 'Rpush.embed can only be run once inside this process.'

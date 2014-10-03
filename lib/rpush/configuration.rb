@@ -23,9 +23,10 @@ module Rpush
     @client_initialized = true
   end
 
-  CONFIG_ATTRS = [:foreground, :push_poll, :feedback_poll, :embedded,
-                  :check_for_errors, :pid_file, :batch_size, :push, :client, :logger,
-                  :batch_storage_updates, :log_dir, :environment]
+  CONFIG_ATTRS = [:push_poll, :feedback_poll, :embedded, :pid_file, :batch_size,
+                  :push, :client, :logger, :log_file, :foreground, :log_level,
+                  # Deprecated
+                  :log_dir]
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end
@@ -33,8 +34,7 @@ module Rpush
   class Configuration < Struct.new(*CONFIG_ATTRS)
     include Deprecatable
 
-    deprecated(:batch_storage_updates=, '2.1.0', 'Updates are now always batched by the storage backends.')
-    deprecated(:check_for_errors=, '2.1.0', 'APNs error detection is now performed asynchronously and does not require pauses.')
+    deprecated(:log_dir=, '2.3.0', 'Please use log_file instead.')
 
     delegate :redis_options, :redis_options=, to: :Modis
 
@@ -52,7 +52,15 @@ module Rpush
 
     def pid_file=(path)
       if path && !Pathname.new(path).absolute?
-        super(File.join(Rails.root, path))
+        super(File.join(Rpush.root, path))
+      else
+        super
+      end
+    end
+
+    def log_file=(path)
+      if path && !Pathname.new(path).absolute?
+        super(File.join(Rpush.root, path))
       else
         super
       end
@@ -62,35 +70,19 @@ module Rpush
       super(logger)
     end
 
-    def foreground=(bool)
-      if Rpush.jruby?
-        # The JVM does not support fork().
-        super(true)
-      else
-        super
-      end
-    end
-
     def set_defaults
-      if Rpush.jruby?
-        # The JVM does not support fork().
-        self.foreground = true
-      else
-        self.foreground = false
-      end
-
       self.push_poll = 2
       self.feedback_poll = 60
       self.batch_size = 100
-      self.pid_file = nil
       self.client = :active_record
       self.logger = nil
-      self.log_dir = Rails.root
+      self.log_file = 'log/rpush.log'
+      self.pid_file = 'tmp/rpush.pid'
+      self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::INFO
 
       # Internal options.
       self.embedded = false
       self.push = false
-      self.environment = Rails.env
     end
   end
 end

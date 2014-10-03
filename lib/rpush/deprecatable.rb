@@ -14,7 +14,8 @@ module Rpush
         warning << " #{msg}" if msg
         class_eval(<<-RUBY, __FILE__, __LINE__)
           def #{method_name}(*args, &blk)
-            Rpush::Deprecation.warn(#{warning.inspect})
+            trace = "\n\nCALLED FROM:\n" + caller.join("\n")
+            Rpush::Deprecation.warn(#{warning.inspect} + trace)
             #{method_name_as_var}_without_warning(*args, &blk)
           end
         RUBY

@@ -13,37 +13,37 @@ matrix:
     gemfile: Gemfile
     env: CLIENT=active_record
   - rvm: 2.0.0
-    gemfile: Gemfile.rails-4
-    env: CLIENT=active_record
-  - rvm: 2.1.3
-    gemfile: Gemfile.rails-4
-    env: CLIENT=active_record
-  - rvm: 2.0.0
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.1.3
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.0.0
-    gemfile: Gemfile.rails-4
+    gemfile: Gemfile.rails-3
     env: CLIENT=redis
   - rvm: 2.1.3
-    gemfile: Gemfile.rails-4
+    gemfile: Gemfile.rails-3
     env: CLIENT=redis
-  - rvm: rbx-2.2.10
-    gemfile: Gemfile.rails-4
+  - rvm: 2.0.0
+    gemfile: Gemfile.rails-3
+    env: CLIENT=active_record
+  - rvm: 2.1.3
+    gemfile: Gemfile.rails-3
     env: CLIENT=active_record
   - rvm: rbx-2.2.10
-    gemfile: Gemfile.rails-4
+    gemfile: Gemfile
+    env: CLIENT=active_record
+  - rvm: rbx-2.2.10
+    gemfile: Gemfile
     env: CLIENT=redis
   - rvm: jruby-1.7.16
-    gemfile: Gemfile.rails-4
+    gemfile: Gemfile
     env: CLIENT=active_record
   - rvm: jruby-1.7.16
-    gemfile: Gemfile.rails-4
+    gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.2.0-preview1
-    gemfile: Gemfile.rails-4
+    gemfile: Gemfile
     env: CLIENT=active_record
   allow_failures:
   - rvm: 2.2.0-preview1
