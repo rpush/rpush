@@ -22,6 +22,8 @@ module Rpush
     option 'pid-file', type: :string, aliases: '-p'
     desc 'start', 'Start Rpush'
     def start
+      check_ruby_version
+
       if detect_rails? && options[:rails_env]
         STDOUT.write "* Booting Rails '#{options[:rails_env]}' environment... "
         STDOUT.flush
@@ -38,6 +40,7 @@ module Rpush
     desc 'stop', 'Stop Rpush'
     option 'pid-file', type: :string, aliases: '-p'
     def stop
+      check_ruby_version
       load_config
       ensure_pid_file
 
@@ -66,6 +69,7 @@ module Rpush
     desc 'init', 'Initialize Rpush into the current directory.'
     option 'active-record', type: :boolean, desc: 'Install ActiveRecord migrations.'
     def init
+      check_ruby_version
       require 'rails/generators'
 
       puts "* #{green('Installing config...')}"
@@ -119,6 +123,10 @@ module Rpush
         load options[:config]
         Rpush.config.update(options)
       end
+    end
+
+    def check_ruby_version
+      STDERR.puts(yellow('WARNING: ') + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3'
     end
   end
 end
