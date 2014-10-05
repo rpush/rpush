@@ -135,7 +135,7 @@ module Rpush
     end
 
     def check_ruby_version
-      STDERR.puts(yellow('WARNING: ') + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3'
+      STDERR.puts(yellow('WARNING: ') + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3' && RUBY_ENGINE == 'ruby'
     end
   end
 end
