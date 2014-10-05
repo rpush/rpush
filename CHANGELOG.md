@@ -1,3 +1,6 @@
+## 2.2.0 (unreleased)
+  * Add 'rpush push' command-line command for one-off use.
+
 ## 2.1.0 (Oct 4, 2014)
   * Bump APNs max payload size to 2048 for iOS 8.
   * Add 'category' for iOS 8.

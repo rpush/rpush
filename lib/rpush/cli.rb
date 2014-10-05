@@ -67,7 +67,7 @@ module Rpush
     end
 
     desc 'init', 'Initialize Rpush into the current directory.'
-    option 'active-record', type: :boolean, desc: 'Install ActiveRecord migrations.'
+    option 'active-record', type: :boolean, desc: 'Install ActiveRecord migrations'
     def init
       check_ruby_version
       require 'rails/generators'
@@ -97,6 +97,14 @@ module Rpush
       puts "  - Review and update your configuration in #{default_config_path}."
       puts "  - Create your first app, see https://github.com/rpush/rpush for examples."
       puts "  - Run 'rpush help' for commands and options."
+    end
+
+    desc 'push', 'Deliver all pending notifications and then exit'
+    def push
+      check_ruby_version
+      load_config
+
+      Rpush.push
     end
 
     private
