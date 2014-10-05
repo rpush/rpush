@@ -28,10 +28,9 @@ module Rpush
             begin
               case signal
               when 'HUP'
-                Synchronizer.sync
-                Feeder.wakeup
+                handle_hup
               when 'USR2'
-                AppRunner.debug
+                handle_usr2
               when 'INT', 'TERM'
                 Thread.new { Rpush::Daemon.shutdown }
                 break
@@ -46,6 +45,17 @@ module Rpush
             end
           end
         end
+      end
+
+      def self.handle_hup
+        Rpush.logger.info("Received HUP signal.")
+        Synchronizer.sync
+        Feeder.wakeup
+      end
+
+      def self.handle_usr2
+        Rpush.logger.info("Received USR2 signal.")
+        AppRunner.debug
       end
 
       def self.trap_signals?
