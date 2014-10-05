@@ -172,6 +172,8 @@ You should run `rails init` after upgrading Rpush to check for configuration and
 ### Wiki
 
 ### General
+* [Using Redis](https://github.com/rpush/rpush/wiki/Using-Redis)
+* [Using ActiveRecord](https://github.com/rpush/rpush/wiki/Using-ActiveRecord)
 * [Configuration](https://github.com/rpush/rpush/wiki/Configuration)
 * [Moving from Rapns](https://github.com/rpush/rpush/wiki/Moving-from-Rapns-to-Rpush)
 * [Deploying to Heroku](https://github.com/rpush/rpush/wiki/Heroku)
