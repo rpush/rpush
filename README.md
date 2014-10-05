@@ -9,16 +9,16 @@
 
 * Supported services:
   * [**Apple Push Notification Service**](#apple-push-notification-service)
+    * Including Safari Push Notifications.
   * [**Google Cloud Messaging**](#google-cloud-messaging)
   * [**Amazon Device Messaging**](#amazon-device-messaging)
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
 
 * Supported storage backends:
-  * **ActiveRecord**
-  * **Redis**
-  * More coming!
+  * [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord)
+  * [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis)
 
-* Seamless Rails integration (3 & 4) .
+* Optional Rails integration (version 3 & 4).
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
 * Run as a daemon or inside an [existing process](https://github.com/rpush/rpush/wiki/Embedding-API).
@@ -35,11 +35,11 @@ Add it to your Gemfile:
 gem 'rpush'
 ```
 
-Generate the migrations, rpush.rb and migrate:
+Initialize Rpush into your project. Rails will be detected automatically.
 
 ```
-rails g rpush
-rake db:migrate
+cd /path/to/project
+rpush init
 ```
 
 ### Create an App & Notification
@@ -66,6 +66,8 @@ n.alert = "hi mom!"
 n.data = { foo: :bar }
 n.save!
 ```
+
+The `url_args` attribute is available for Safari Push Notifications.
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
@@ -134,8 +136,12 @@ It is recommended to run Rpush as a separate process in most cases, though embed
 
 #### As a daemon (recommended):
 
-    cd /path/to/rails/app
-    rpush <Rails environment> [options]
+```
+cd /path/to/project
+rpush start
+```
+
+See `rpush help` for all available commands and options.
 
 #### Embedded inside an existing process
 
@@ -157,11 +163,11 @@ See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
 
 ### Configuration
 
-See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options, or run `rpush --help`.
+See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options.
 
 ### Updating Rpush
 
-If you're using ActiveRecord, you should run `rails g rpush` after upgrading Rpush to check for any new migrations.
+You should run `rails init` after upgrading Rpush to check for configuration and migration changes.
 
 ### Wiki
 
@@ -191,8 +197,6 @@ If you're using ActiveRecord, you should run `rails g rpush` after upgrading Rpu
 
 ### Contributing
 
-Fork as usual and go crazy!
-
 When running specs, please note that the ActiveRecord adapter can be changed by setting the `ADAPTER` environment variable. For example: `ADAPTER=postgresql rake`.
 
 Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
@@ -200,3 +204,5 @@ Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
 Note that the database username is changed at runtime to be the currently logged in user's name. So if you're testing
 with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rpush_test'
 mysql database.
+
+To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `:active_record` or `:redis`.
