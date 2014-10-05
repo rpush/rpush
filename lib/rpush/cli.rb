@@ -94,6 +94,7 @@ module Rpush
 
       puts "\n* #{green('Next steps:')}"
       puts "  - Run 'db:migrate'." if install_migrations
+      puts "  - Review and update your configuration in #{default_config_path}."
       puts "  - Create your first app, see https://github.com/rpush/rpush for examples."
       puts "  - Run 'rpush help' for commands and options."
     end
