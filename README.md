@@ -167,7 +167,7 @@ See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a lis
 
 ### Updating Rpush
 
-You should run `rails init` after upgrading Rpush to check for configuration and migration changes.
+You should run `rpush init` after upgrading Rpush to check for configuration and migration changes.
 
 ### Wiki
 
