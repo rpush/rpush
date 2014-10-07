@@ -14,8 +14,8 @@ describe Rpush::Client::ActiveRecord::Wpns::Notification do
   end
 
   it "should be invalid if there's no message" do
-    notification = Rpush::Client::ActiveRecord::Wpns::Notification.new(alert: "")
+    notification = Rpush::Client::ActiveRecord::Wpns::Notification.new(data: {})
     notification.valid?
-    notification.errors[:alert].include?("can't be blank").should be_true
+    notification.errors[:data].include?("can't be blank").should be_true
   end
 end
