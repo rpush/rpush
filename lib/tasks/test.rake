@@ -33,9 +33,6 @@ pool: 5
 timeout: 5000
       YML
     end
-
-    cmd('bundle exec rails g rpush')
-    cmd('bundle exec rake db:migrate')
   ensure
     Dir.chdir(pwd)
   end
@@ -57,8 +54,6 @@ task :build_standalone do
     cmd('echo "gem \'rpush-redis\'" >> Gemfile')
     cmd("echo \"gem 'rpush', :path => '#{rpush_root}'\" >> Gemfile")
     cmd('bundle install')
-
-    cmd('bundle exec rpush init')
   ensure
     Dir.chdir(pwd)
   end

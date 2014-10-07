@@ -90,7 +90,7 @@ module Rpush
         install_migrations = answer == 'y'
       end
 
-      Rails::Generators.invoke('rpush_migration') if install_migrations
+      Rails::Generators.invoke('rpush_migration', ['--force']) if install_migrations
 
       puts "\n* #{green('Next steps:')}"
       puts "  - Run 'db:migrate'." if install_migrations
