@@ -1,3 +1,5 @@
+require 'pathname'
+
 module Rpush
   def self.config
     @config ||= Rpush::Configuration.new
