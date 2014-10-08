@@ -1,4 +1,5 @@
-## 2.2.0 (unreleased)
+## 2.2.0 (Oct 7, 2014)
+  * Numerous command-line fixes, sorry folks!
   * Add 'rpush push' command-line command for one-off use.
 
 ## 2.1.0 (Oct 4, 2014)
