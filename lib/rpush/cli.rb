@@ -118,7 +118,7 @@ module Rpush
     end
 
     def ensure_pid_file
-      return  if Rpush.config.pid_file.blank?
+      return unless Rpush.config.pid_file.blank?
 
       STDERR.puts(red('ERROR: ') + 'config.pid_file is not set.')
       exit 1
