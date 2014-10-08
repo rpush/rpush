@@ -16,23 +16,16 @@ module Rpush
     end
 
     class_option :config, type: :string, aliases: '-c', default: default_config_path
-    class_option :rails_env, type: :string, aliases: '-e', default: 'development'
+    class_option 'rails-env', type: :string, aliases: '-e', default: 'development'
 
     option :foreground, type: :boolean, aliases: '-f', default: false
     option 'pid-file', type: :string, aliases: '-p'
     desc 'start', 'Start Rpush'
     def start
+      underscore_option_names
       check_ruby_version
+      configure_rpush
 
-      if detect_rails? && options[:rails_env]
-        STDOUT.write "* Booting Rails '#{options[:rails_env]}' environment... "
-        STDOUT.flush
-        ENV['RAILS_ENV'] = options[:rails_env]
-        load 'config/environment.rb'
-        puts green('✔')
-      end
-
-      load_config
       require 'rpush/daemon'
       Rpush::Daemon.start
     end
@@ -40,9 +33,10 @@ module Rpush
     desc 'stop', 'Stop Rpush'
     option 'pid-file', type: :string, aliases: '-p'
     def stop
+      underscore_option_names
       check_ruby_version
-      load_config
-      ensure_pid_file
+      configure_rpush
+      ensure_pid_file_set
 
       if File.exist?(Rpush.config.pid_file)
         pid = File.read(Rpush.config.pid_file).strip.to_i
@@ -69,6 +63,7 @@ module Rpush
     desc 'init', 'Initialize Rpush into the current directory.'
     option 'active-record', type: :boolean, desc: 'Install ActiveRecord migrations'
     def init
+      underscore_option_names
       check_ruby_version
       require 'rails/generators'
 
@@ -76,9 +71,9 @@ module Rpush
       $RPUSH_CONFIG_PATH = default_config_path # rubocop:disable Style/GlobalVars
       Rails::Generators.invoke('rpush_config')
 
-      install_migrations = options['active-record']
+      install_migrations = options['active_record']
 
-      unless options.key?('active-record')
+      unless options.key?('active_record')
         has_answer = false
         until has_answer
           STDOUT.write "\n* #{green('Install ActiveRecord migrations?')} [y/n]: "
@@ -101,30 +96,36 @@ module Rpush
 
     desc 'push', 'Deliver all pending notifications and then exit'
     def push
+      underscore_option_names
       check_ruby_version
-      load_config
+      configure_rpush
+      Rpush.config.foreground = true
 
       Rpush.push
     end
 
     private
 
-    def detect_rails?
-      self.class.detect_rails?
+    def configure_rpush
+      load_rails_environment || load_standalone
     end
 
-    def default_config_path
-      self.class.default_config_path
+    def load_rails_environment
+      if detect_rails? && options['rails_env']
+        STDOUT.write "* Booting Rails '#{options[:rails_env]}' environment... "
+        STDOUT.flush
+        ENV['RAILS_ENV'] = options['rails_env']
+        load 'config/environment.rb'
+        Rpush.config.update(options)
+        puts green('✔')
+
+        return true
+      end
+
+      false
     end
 
-    def ensure_pid_file
-      return unless Rpush.config.pid_file.blank?
-
-      STDERR.puts(red('ERROR: ') + 'config.pid_file is not set.')
-      exit 1
-    end
-
-    def load_config
+    def load_standalone
       if !File.exist?(options[:config])
         STDERR.puts(red('ERROR: ') + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
         exit 1
@@ -134,8 +135,40 @@ module Rpush
       end
     end
 
+    def detect_rails?
+      self.class.detect_rails?
+    end
+
+    def default_config_path
+      self.class.default_config_path
+    end
+
+    def ensure_pid_file_set
+      return unless Rpush.config.pid_file.blank?
+
+      STDERR.puts(red('ERROR: ') + 'config.pid_file is not set.')
+      exit 1
+    end
+
     def check_ruby_version
       STDERR.puts(yellow('WARNING: ') + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3' && RUBY_ENGINE == 'ruby'
+    end
+
+    def underscore_option_names
+      # Underscore option names so that they map directly to Configuration options.
+      new_options = options.dup
+
+      options.each do |k, v|
+        new_k = k.to_s.tr('-', '_')
+
+        if k != new_k
+          new_options.delete(k)
+          new_options[new_k] = v
+        end
+      end
+
+      new_options.freeze
+      self.options = new_options
     end
   end
 end
