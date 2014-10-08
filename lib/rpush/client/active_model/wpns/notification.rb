@@ -9,6 +9,12 @@ module Rpush
               validates :uri, format: { with: %r{https?://[\S]+} }
               validates :data, presence: true
             end
+            def alert=(value)
+              return unless value
+              data = self.data || {}
+              data['title'] = value
+              self.data = data
+            end
           end
         end
       end
