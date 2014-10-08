@@ -143,6 +143,23 @@ rpush start
 
 See `rpush help` for all available commands and options.
 
+#### One-off, manual
+
+On the command-line:
+
+```
+rpush push
+```
+
+In your code:
+
+```ruby
+Rpush.push
+Rpush.apns_feedback
+```
+
+See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
+
 #### Embedded inside an existing process
 
 ```ruby
@@ -151,15 +168,6 @@ Rpush.embed
 ```
 
 See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
-
-#### Manually (in a scheduler)
-
-```ruby
-Rpush.push
-Rpush.apns_feedback
-```
-
-See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
 
 ### Configuration
 
