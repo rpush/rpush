@@ -106,16 +106,22 @@ module Rpush
         end
 
         def notification_to_xml
-          msg = @notification.alert.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
+          title = clean_param_string(@notification.data['title']) if @notification.data['title'].present?
+          body = clean_param_string(@notification.data['body']) if @notification.data['body'].present?
+          param = clean_param_string(@notification.data['param']) if @notification.data['param'].present?
+        "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+          <wp:Notification xmlns:wp=\"WPNotification\">
+            <wp:Toast>
+              <wp:Text1>#{title}</wp:Text1>
+              <wp:Text2>#{body}</wp:Text2>
+              <wp:Param>#{param}</wp:Param>
+            </wp:Toast>
+          </wp:Notification>"
+        end
+
+        def clean_param_string(string)
+          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
             .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
-          <<-EOF
-<?xml version="1.0" encoding="utf-8"?>
-<wp:Notification xmlns:wp="WPNotification">
-  <wp:Toast>
-    <wp:Text1>#{msg}</wp:Text1>
-  </wp:Toast>
-</wp:Notification>
-          EOF
         end
       end
     end

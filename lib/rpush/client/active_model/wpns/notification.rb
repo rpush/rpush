@@ -7,7 +7,13 @@ module Rpush
             base.instance_eval do
               validates :uri, presence: true
               validates :uri, format: { with: %r{https?://[\S]+} }
-              validates :alert, presence: true
+              validates :data, presence: true
+            end
+            def alert=(value)
+              return unless value
+              data = self.data || {}
+              data['title'] = value
+              self.data = data
             end
           end
         end
