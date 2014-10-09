@@ -1,5 +1,6 @@
 ## 2.3.0 (unreleased)
   * Add 'version' CLI command.
+  * Rpush::Wpns::Notification now supports setting the 'data' attribute.
 
 ## 2.2.0 (Oct 7, 2014)
   * Numerous command-line fixes, sorry folks!
