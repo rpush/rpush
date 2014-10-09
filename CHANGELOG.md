@@ -1,3 +1,6 @@
+## 2.3.0 (unreleased)
+  * Add 'version' CLI command.
+
 ## 2.2.0 (Oct 7, 2014)
   * Numerous command-line fixes, sorry folks!
   * Add 'rpush push' command-line command for one-off use.

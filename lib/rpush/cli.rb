@@ -60,7 +60,7 @@ module Rpush
       end
     end
 
-    desc 'init', 'Initialize Rpush into the current directory.'
+    desc 'init', 'Initialize Rpush into the current directory'
     option 'active-record', type: :boolean, desc: 'Install ActiveRecord migrations'
     def init
       underscore_option_names
@@ -102,6 +102,11 @@ module Rpush
       Rpush.config.foreground = true
 
       Rpush.push
+    end
+
+    desc 'version', 'Print Rpush version'
+    def version
+      puts Rpush::VERSION
     end
 
     private
