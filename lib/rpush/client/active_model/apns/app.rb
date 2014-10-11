@@ -25,7 +25,7 @@ module Rpush
                 pkey = OpenSSL::PKey::RSA.new(certificate, password)
                 result = x509 && pkey
               rescue OpenSSL::OpenSSLError
-                errors.add :certificate, 'Certificate value must contain a certificate and a private key.'
+                errors.add :certificate, 'value must contain a certificate and a private key.'
               end
             end
             result

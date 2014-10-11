@@ -4,7 +4,7 @@ describe Rpush::Client::ActiveRecord::App do
   it 'does not validate an app with an invalid certificate' do
     app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'test', environment: 'development', certificate: 'foo')
     app.valid?
-    app.errors[:certificate].should eq ['Certificate value must contain a certificate and a private key.']
+    app.errors[:certificate].should eq ['value must contain a certificate and a private key.']
   end
 
   it 'validates a certificate without a password' do
@@ -24,6 +24,6 @@ describe Rpush::Client::ActiveRecord::App do
     app = Rpush::Client::ActiveRecord::Apns::App.new name: 'test', environment: 'development',
                                                      certificate: TEST_CERT_WITH_PASSWORD, password: 'incorrect'
     app.valid?
-    app.errors[:certificate].should eq ["Certificate value must contain a certificate and a private key."]
+    app.errors[:certificate].should eq ['value must contain a certificate and a private key.']
   end
 end
