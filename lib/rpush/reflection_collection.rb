@@ -1,13 +1,5 @@
 module Rpush
-  def self.reflect
-    yield reflections if block_given?
-  end
-
-  def self.reflections
-    @reflections ||= Reflections.new
-  end
-
-  class Reflections
+  class ReflectionCollection
     class NoSuchReflectionError < StandardError; end
 
     REFLECTIONS = [

@@ -25,10 +25,10 @@ module Rpush
     @client_initialized = true
   end
 
-  CONFIG_ATTRS = [:push_poll, :feedback_poll, :embedded, :pid_file, :batch_size,
-                  :push, :client, :logger, :log_file, :foreground, :log_level,
-                  # Deprecated
-                  :log_dir]
+  CURRENT_ATTRS = [:push_poll, :feedback_poll, :embedded, :pid_file, :batch_size,
+                   :push, :client, :logger, :log_file, :foreground, :log_level, :plugin]
+  DEPRECATED_ATTRS = [:log_dir]
+  CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
   end
@@ -81,6 +81,7 @@ module Rpush
       self.log_file = 'log/rpush.log'
       self.pid_file = 'tmp/rpush.pid'
       self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::INFO
+      self.plugin = OpenStruct.new
 
       # Internal options.
       self.embedded = false

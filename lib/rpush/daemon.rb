@@ -8,7 +8,6 @@ require 'net/http/persistent'
 
 require 'rpush/daemon/errors'
 require 'rpush/daemon/constants'
-require 'rpush/daemon/reflectable'
 require 'rpush/daemon/loggable'
 require 'rpush/daemon/string_helpers'
 require 'rpush/daemon/interruptible_sleep'
