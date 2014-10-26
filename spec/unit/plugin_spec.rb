@@ -3,13 +3,8 @@ require 'unit_spec_helper'
 describe Rpush::Plugin do
   include Rpush::Reflectable
 
-  after do
-    # Rpush.plugins.values.each(&:unload)
-    Rpush.instance_variable_set('@plugins', {})
-  end
-
   it 'can only be initialized once' do
-    plugin = double(Rpush::Plugin)
+    plugin = double(Rpush::Plugin, unload: nil)
     expect(Rpush::Plugin).to receive(:new).once.and_return(plugin)
     Rpush.plugin(:test)
     Rpush.plugin(:test)

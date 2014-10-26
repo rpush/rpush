@@ -46,6 +46,8 @@ def after_example_cleanup
     Rpush.config.set_defaults if Rpush.config.is_a?(Rpush::Configuration)
     Rpush.config.client = RPUSH_CLIENT
   end
+  Rpush.plugins.values.each(&:unload)
+  Rpush.instance_variable_set('@plugins', {})
 end
 
 RSpec.configure do |config|

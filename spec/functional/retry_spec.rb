@@ -7,7 +7,7 @@ describe 'Retries' do
   let(:http) { double(Net::HTTP::Persistent, request: response, shutdown: nil) }
 
   before do
-    Rpush::Daemon.initialize_store
+    Rpush::Daemon.common_init
 
     app.name = 'test'
     app.auth_key = 'abc123'

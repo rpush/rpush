@@ -22,7 +22,7 @@ describe Rpush::Daemon, "when starting" do
   unless Rpush.jruby?
     it "forks into a daemon if the foreground option is false" do
       Rpush.config.foreground = false
-      Rpush::Daemon.initialize_store
+      Rpush::Daemon.common_init
       Process.should_receive(:daemon)
       Rpush::Daemon.start
     end
@@ -61,6 +61,14 @@ describe Rpush::Daemon, "when starting" do
     Rpush.config.client = :active_record
     Rpush::Daemon.start
     Rpush::Daemon.store.should be_kind_of(Rpush::Daemon::Store::ActiveRecord)
+  end
+
+  it 'initializes plugins' do
+    plugin = Rpush.plugin(:test)
+    did_init = false
+    plugin.init { did_init = true }
+    Rpush::Daemon.common_init
+    expect(did_init).to be_true
   end
 
   it 'logs an error if the store cannot be loaded' do

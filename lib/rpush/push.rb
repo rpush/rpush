@@ -7,7 +7,7 @@ module Rpush
     config.push = true
     Rpush.config.update(config)
 
-    Rpush::Daemon.initialize_store
+    Rpush::Daemon.common_init
     Rpush::Daemon::Synchronizer.sync
     Rpush::Daemon::Feeder.start
     # TODO: Wait until there are no more notifications.

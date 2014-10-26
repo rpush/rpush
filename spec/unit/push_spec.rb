@@ -12,8 +12,8 @@ describe Rpush, 'push' do
     Rpush.config.push.should be_true
   end
 
-  it 'initializes the store' do
-    Rpush::Daemon.should_receive(:initialize_store)
+  it 'initializes the daemon' do
+    Rpush::Daemon.should_receive(:common_init)
     Rpush.push
   end
 

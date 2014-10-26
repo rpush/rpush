@@ -9,8 +9,8 @@ module Rpush
   end
 
   class Plugin
-    attr_reader :config
-    attr_accessor :name, :url, :description
+    attr_reader :name, :config, :init_block
+    attr_accessor :url, :description
 
     def initialize(name)
       @name = name
@@ -18,6 +18,7 @@ module Rpush
       @description = nil
       @config = OpenStruct.new
       @reflection_collection = Rpush::ReflectionCollection.new
+      @init_block = -> {}
     end
 
     def reflect
@@ -31,7 +32,13 @@ module Rpush
       Rpush.config.plugin.send("#{@name}=", @config)
     end
 
+    def init(&block) # rubocop:disable Style/TrivialAccessors
+      @init_block = block
+    end
+
     def unload
+      Rpush.reflection_stack.delete(@reflection_collection)
+      Rpush.config.plugin.send("#{name}=", nil)
     end
   end
 end

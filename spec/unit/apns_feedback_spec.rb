@@ -8,8 +8,8 @@ describe Rpush, 'apns_feedback' do
     Rpush::Daemon::Apns::FeedbackReceiver.stub(new: receiver)
   end
 
-  it 'initializes the store' do
-    Rpush::Daemon.should_receive(:initialize_store)
+  it 'initializes the daemon' do
+    Rpush::Daemon.should_receive(:common_init)
     Rpush.apns_feedback
   end
 

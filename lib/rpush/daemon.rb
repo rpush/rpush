@@ -55,9 +55,9 @@ module Rpush
 
     def self.start
       Process.daemon if daemonize?
-      SignalHandler.start
-      initialize_store
       write_pid_file
+      SignalHandler.start
+      common_init
       Synchronizer.sync
 
       # No further store connections will be made from this thread.
@@ -96,7 +96,14 @@ module Rpush
       @shutdown_lock
     end
 
-    def self.initialize_store
+    def self.common_init
+      init_store
+      init_plugins
+    end
+
+    protected
+
+    def self.init_store
       return if store
       begin
         name = Rpush.config.client.to_s
@@ -109,7 +116,9 @@ module Rpush
       end
     end
 
-    protected
+    def self.init_plugins
+      Rpush.plugins.values.map(&:init_block).each(&:call)
+    end
 
     def self.daemonize?
       !(Rpush.config.push || Rpush.config.foreground || Rpush.config.embedded || Rpush.jruby?)
