@@ -117,7 +117,10 @@ module Rpush
     end
 
     def self.init_plugins
-      Rpush.plugins.values.map(&:init_block).each(&:call)
+      Rpush.plugins.each do |name, plugin|
+        plugin.init_block.call()
+        Rpush.logger.info("[plugin:#{name}] Loaded.")
+      end
     end
 
     def self.daemonize?
