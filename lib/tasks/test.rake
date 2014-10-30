@@ -27,10 +27,10 @@ task :build_rails do
     File.open('config/database.yml', 'w') do |fd|
       fd.write(<<-YML)
 development:
-adapter: postgresql
-database: rpush_rails_test
-pool: 5
-timeout: 5000
+  adapter: postgresql
+  database: rpush_rails_test
+  pool: 5
+  timeout: 5000
       YML
     end
   ensure
