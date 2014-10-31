@@ -1,11 +1,10 @@
 # encoding: UTF-8
 
 require 'thor'
-require 'term/ansicolor'
+require 'ansi/code'
 
 module Rpush
   class CLI < Thor
-    include Term::ANSIColor
 
     def self.detect_rails?
       ['bin/rails', 'script/rails'].any? { |path| File.exist?(path) }
@@ -53,7 +52,7 @@ module Rpush
           end
         end
 
-        puts green('✔')
+        puts ANSI.green{ '✔' }
       else
         STDERR.puts("* Rpush isn't running? #{Rpush.config.pid_file} does not exist.")
         return
@@ -67,7 +66,7 @@ module Rpush
       check_ruby_version
       require 'rails/generators'
 
-      puts "* #{green('Installing config...')}"
+      puts "* #{ANSI.green{'Installing config...'}}"
       $RPUSH_CONFIG_PATH = default_config_path # rubocop:disable Style/GlobalVars
       Rails::Generators.invoke('rpush_config')
 
@@ -76,7 +75,7 @@ module Rpush
       unless options.key?('active_record')
         has_answer = false
         until has_answer
-          STDOUT.write "\n* #{green('Install ActiveRecord migrations?')} [y/n]: "
+          STDOUT.write "\n* #{ANSI.green{'Install ActiveRecord migrations?'}} [y/n]: "
           STDOUT.flush
           answer = STDIN.gets.chomp.downcase
           has_answer = %w(y n).include?(answer)
@@ -87,7 +86,7 @@ module Rpush
 
       Rails::Generators.invoke('rpush_migration', ['--force']) if install_migrations
 
-      puts "\n* #{green('Next steps:')}"
+      puts "\n* #{ANSI.green{ 'Next steps:' }}"
       puts "  - Run 'db:migrate'." if install_migrations
       puts "  - Review and update your configuration in #{default_config_path}."
       puts "  - Create your first app, see https://github.com/rpush/rpush for examples."
@@ -122,7 +121,7 @@ module Rpush
         ENV['RAILS_ENV'] = options['rails_env']
         load 'config/environment.rb'
         Rpush.config.update(options)
-        puts green('✔')
+        puts ANSI.green{ '✔' }
 
         return true
       end
@@ -132,7 +131,7 @@ module Rpush
 
     def load_standalone
       if !File.exist?(options[:config])
-        STDERR.puts(red('ERROR: ') + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
+        STDERR.puts(ANSI.red{ 'ERROR: ' } + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
         exit 1
       else
         load options[:config]
@@ -151,12 +150,12 @@ module Rpush
     def ensure_pid_file_set
       return unless Rpush.config.pid_file.blank?
 
-      STDERR.puts(red('ERROR: ') + 'config.pid_file is not set.')
+      STDERR.puts(ANSI.red{ 'ERROR: ' } + 'config.pid_file is not set.')
       exit 1
     end
 
     def check_ruby_version
-      STDERR.puts(yellow('WARNING: ') + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3' && RUBY_ENGINE == 'ruby'
+      STDERR.puts(ANSI.yellow{'WARNING: '} + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3' && RUBY_ENGINE == 'ruby'
     end
 
     def underscore_option_names
