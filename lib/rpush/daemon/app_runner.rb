@@ -3,7 +3,6 @@
 module Rpush
   module Daemon
     class AppRunner
-      extend Term::ANSIColor
 
       extend Reflectable
       include Reflectable
@@ -31,7 +30,7 @@ module Rpush
         Rpush.logger.info("[#{app.name}] Starting #{pluralize(app.connections, 'dispatcher')}... ", true)
         @runners[app.id] = new(app)
         @runners[app.id].start
-        puts green('✔') if Rpush.config.foreground
+        puts ANSI.green{ '✔' } if Rpush.config.foreground
       rescue StandardError => e
         @runners.delete(app.id)
         Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
