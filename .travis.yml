@@ -48,11 +48,11 @@ matrix:
   - rvm: jruby-1.7.16
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: 2.2.0-preview1
+  - rvm: 2.2.0-preview2
     gemfile: Gemfile
     env: CLIENT=active_record
   allow_failures:
-  - rvm: 2.2.0-preview1
+  - rvm: 2.2.0-preview2
   - rvm: 1.9.3
 
 env:
