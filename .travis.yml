@@ -9,25 +9,25 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: 2.1.4
+  - rvm: 2.1.5
     gemfile: Gemfile
     env: CLIENT=active_record
   - rvm: 2.0.0
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: 2.1.4
+  - rvm: 2.1.5
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.0.0
     gemfile: Gemfile.rails-3
     env: CLIENT=redis
-  - rvm: 2.1.4
+  - rvm: 2.1.5
     gemfile: Gemfile.rails-3
     env: CLIENT=redis
   - rvm: 2.0.0
     gemfile: Gemfile.rails-3
     env: CLIENT=active_record
-  - rvm: 2.1.4
+  - rvm: 2.1.5
     gemfile: Gemfile.rails-3
     env: CLIENT=active_record
   - rvm: 1.9.3
