@@ -9,6 +9,12 @@ before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 
 install: tools/cached-bundle install --deployment
 
+env:
+  global:
+    - AMAZON_S3_BUCKET=rpush
+    - AMAZON_ACCESS_KEY_ID=AKIAIWENGKCRZZX7NGOQ
+    - secure: "JZSnurdpqClRgy2s99xFaOymuCDaCh8rZmHgj8Wj/KRFNDuEFVq7CgUjAg24shL4aB+uE/sgBemfsuvJLcWT27/7bi1h/idepNdB36l+GhdJj5CovtqPGX9rXv6vp1s0tELgjxTcx17IQ1oZ5iqTozg9UWWpCXtOBB70/aJvTn8="
+
 matrix:
   fast_finish: true
   include:
