@@ -6,7 +6,7 @@ describe Rpush::Daemon, "when starting" do
 
   let(:certificate) { double }
   let(:password) { double }
-  let(:logger) { double(:logger, info: nil, error: nil, warn: nil) }
+  let(:logger) { double(:logger, info: nil, error: nil, warn: nil, internal_logger: nil) }
 
   before do
     Rpush.stub(logger: logger)

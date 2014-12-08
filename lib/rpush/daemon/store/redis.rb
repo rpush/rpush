@@ -103,6 +103,9 @@ module Rpush
         def release_connection
         end
 
+        def reopen_log
+        end
+
         private
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists

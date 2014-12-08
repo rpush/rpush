@@ -40,7 +40,7 @@ module Rpush
                 Rpush.logger.error("Unhandled signal: #{signal}")
               end
             rescue StandardError => e
-              Rpush.logger.error("Error raised when hndling signal '#{signal}'")
+              Rpush.logger.error("Error raised when handling signal '#{signal}'")
               Rpush.logger.error(e)
             end
           end
@@ -50,6 +50,7 @@ module Rpush
       def self.handle_hup
         Rpush.logger.reopen
         Rpush.logger.info('Received HUP signal.')
+        Rpush::Daemon.store.reopen_log
         Synchronizer.sync
         Feeder.wakeup
       end

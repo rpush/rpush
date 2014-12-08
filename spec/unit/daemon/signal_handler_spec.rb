@@ -44,6 +44,7 @@ describe Rpush::Daemon::SignalHandler do
     before do
       Rpush::Daemon::Synchronizer.stub(:sync)
       Rpush::Daemon::Feeder.stub(:wakeup)
+      Rpush::Daemon.stub(store: double(reopen_log: nil))
     end
 
     it 'syncs' do
@@ -73,7 +74,10 @@ describe Rpush::Daemon::SignalHandler do
   describe 'error handing' do
     let(:error) { StandardError.new('test') }
 
-    before { Rpush.stub(logger: double(error: nil, info: nil, reopen: nil)) }
+    before do
+      Rpush.stub(logger: double(error: nil, info: nil, reopen: nil))
+      Rpush::Daemon.stub(store: double(reopen_log: nil))
+    end
 
     it 'logs errors received when handling a signal' do
       Rpush::Daemon::Synchronizer.stub(:sync).and_raise(error)

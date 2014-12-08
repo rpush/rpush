@@ -6,7 +6,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:store) { Rpush::Daemon::Store::ActiveRecord.new }
   let(:time) { Time.now.utc }
-  let(:logger) { double(Rpush::Logger, error: nil) }
+  let(:logger) { double(Rpush::Logger, error: nil, internal_logger: nil) }
 
   before do
     Rpush.stub(logger: logger)

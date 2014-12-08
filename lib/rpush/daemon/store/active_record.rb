@@ -10,6 +10,14 @@ module Rpush
 
         DEFAULT_MARK_OPTIONS = { persist: true }
 
+        def initialize
+          reopen_log
+        end
+
+        def reopen_log
+          ::ActiveRecord::Base.logger = Rpush.logger.internal_logger
+        end
+
         def app(id)
           Rpush::Client::ActiveRecord::App.find(id)
         end

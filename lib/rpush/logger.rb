@@ -1,13 +1,15 @@
 module Rpush
   class Logger
+    attr_reader :internal_logger
+
     def initialize
       if Rpush.config.logger
-        @logger = Rpush.config.logger
+        @internal_logger = Rpush.config.logger
       else
-        @logger = setup_logger(open_logfile)
+        @internal_logger = setup_logger(open_logfile)
       end
     rescue Errno::ENOENT, Errno::EPERM => e
-      @logger = nil
+      @internal_logger = nil
       error(e)
       error('Logging disabled.')
     end
@@ -28,8 +30,8 @@ module Rpush
       if Rpush.config.logger
         Rpush.config.logger.reopen if Rpush.config.logger.respond_to?(:reopen)
       else
-        @logger.close
-        @logger = setup_logger(open_logfile)
+        @internal_logger.close
+        @internal_logger = setup_logger(open_logfile)
       end
     end
 
@@ -71,7 +73,7 @@ module Rpush
       formatted_msg << msg
 
       log_foreground(io, formatted_msg, inline)
-      @logger.send(where, formatted_msg) if @logger
+      @internal_logger.send(where, formatted_msg) if @internal_logger
     end
 
     def log_foreground(io, formatted_msg, inline)
