@@ -36,10 +36,10 @@ matrix:
   - rvm: 1.9.3
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: rbx-2.2.10
+  - rvm: rbx-2.4.1
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: rbx-2.2.10
+  - rvm: rbx-2.4.1
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: jruby-1.7.16
