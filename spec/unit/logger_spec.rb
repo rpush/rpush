@@ -21,7 +21,6 @@ describe Rpush::Logger do
 
   it "disables logging if the log file cannot be opened" do
     File.stub(:open).and_raise(Errno::ENOENT)
-    STDERR.should_receive(:puts).with(/No such file or directory/)
     STDERR.should_receive(:puts).with(/Logging disabled/)
     Rpush::Logger.new
   end
