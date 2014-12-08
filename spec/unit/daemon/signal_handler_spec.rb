@@ -73,7 +73,7 @@ describe Rpush::Daemon::SignalHandler do
   describe 'error handing' do
     let(:error) { StandardError.new('test') }
 
-    before { Rpush.stub(logger: double(error: nil, info: nil)) }
+    before { Rpush.stub(logger: double(error: nil, info: nil, reopen: nil)) }
 
     it 'logs errors received when handling a signal' do
       Rpush::Daemon::Synchronizer.stub(:sync).and_raise(error)

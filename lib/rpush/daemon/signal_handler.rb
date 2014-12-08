@@ -48,13 +48,14 @@ module Rpush
       end
 
       def self.handle_hup
-        Rpush.logger.info("Received HUP signal.")
+        Rpush.logger.reopen
+        Rpush.logger.info('Received HUP signal.')
         Synchronizer.sync
         Feeder.wakeup
       end
 
       def self.handle_usr2
-        Rpush.logger.info("Received USR2 signal.")
+        Rpush.logger.info('Received USR2 signal.')
         AppRunner.debug
       end
 

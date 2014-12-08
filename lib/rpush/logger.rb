@@ -4,10 +4,7 @@ module Rpush
       if Rpush.config.logger
         @logger = Rpush.config.logger
       else
-        FileUtils.mkdir_p(File.dirname(Rpush.config.log_file))
-        log = File.open(Rpush.config.log_file, 'a')
-        log.sync = true
-        @logger = setup_logger(log)
+        @logger = setup_logger(open_logfile)
       end
     rescue Errno::ENOENT, Errno::EPERM => e
       @logger = nil
@@ -27,7 +24,23 @@ module Rpush
       log(:warn, msg, inline, 'WARNING', STDERR)
     end
 
+    def reopen
+      if Rpush.config.logger
+        Rpush.config.logger.reopen if Rpush.config.logger.respond_to?(:reopen)
+      else
+        @logger.close
+        @logger = setup_logger(open_logfile)
+      end
+    end
+
     private
+
+    def open_logfile
+      FileUtils.mkdir_p(File.dirname(Rpush.config.log_file))
+      log = File.open(Rpush.config.log_file, 'a')
+      log.sync = true
+      log
+    end
 
     def setup_logger(log)
       if ActiveSupport.const_defined?('BufferedLogger')
