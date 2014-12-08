@@ -1,10 +1,14 @@
 module Rpush
   class Logger
     def initialize
-      FileUtils.mkdir_p(File.dirname(Rpush.config.log_file))
-      log = File.open(Rpush.config.log_file, 'a')
-      log.sync = true
-      setup_logger(log)
+      if Rpush.config.logger
+        @logger = Rpush.config.logger
+      else
+        FileUtils.mkdir_p(File.dirname(Rpush.config.log_file))
+        log = File.open(Rpush.config.log_file, 'a')
+        log.sync = true
+        @logger = setup_logger(log)
+      end
     rescue Errno::ENOENT, Errno::EPERM => e
       @logger = nil
       error(e)
@@ -26,13 +30,12 @@ module Rpush
     private
 
     def setup_logger(log)
-      if Rpush.config.logger
-        @logger = Rpush.config.logger
-      elsif ActiveSupport.const_defined?('BufferedLogger')
-        @logger = ActiveSupport::BufferedLogger.new(log, Rpush.config.log_level)
-        @logger.auto_flushing = auto_flushing
+      if ActiveSupport.const_defined?('BufferedLogger')
+        logger = ActiveSupport::BufferedLogger.new(log, Rpush.config.log_level)
+        logger.auto_flushing = auto_flushing
+        logger
       else
-        @logger = ActiveSupport::Logger.new(log, Rpush.config.log_level)
+        ActiveSupport::Logger.new(log, Rpush.config.log_level)
       end
     end
 
