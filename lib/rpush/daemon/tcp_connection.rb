@@ -128,7 +128,7 @@ module Rpush
       end
 
       def certificate_msg(msg)
-        time = @ssl_context.cert.not_after.utc.strftime("%Y-%m-%d %H:%M:%S UTC")
+        time = @ssl_context.cert.not_after.utc.strftime('%Y-%m-%d %H:%M:%S UTC')
         "Certificate #{msg} at #{time}."
       end
 

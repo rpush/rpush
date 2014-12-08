@@ -6,7 +6,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
     @time ||= Time.now.utc
     @calls ||= -1
     @calls += 1
-    (@time + @calls.seconds).strftime("%Y%m%d%H%M%S")
+    (@time + @calls.seconds).strftime('%Y%m%d%H%M%S')
   end
 
   def copy_migration

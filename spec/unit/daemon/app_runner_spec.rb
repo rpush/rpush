@@ -80,7 +80,8 @@ end
 describe Rpush::Daemon::AppRunner, 'debug' do
   let(:app) do
     double(Rpush::AppRunnerSpecService::App, id: 1, name: 'test', connections: 1,
-      environment: 'development', certificate: TEST_CERT, service_name: 'app_runner_spec_service')
+                                             environment: 'development', certificate: TEST_CERT,
+                                             service_name: 'app_runner_spec_service')
   end
   let(:logger) { double(Rpush::Logger, info: nil) }
   let(:store) { double(all_apps: [app], release_connection: nil) }
@@ -102,7 +103,8 @@ end
 describe Rpush::Daemon::AppRunner do
   let(:app) do
     double(Rpush::AppRunnerSpecService::App, environment: :sandbox,
-      connections: 1, service_name: 'app_runner_spec_service', name: 'test')
+                                             connections: 1, service_name: 'app_runner_spec_service',
+                                             name: 'test')
   end
   let(:runner) { Rpush::Daemon::AppRunner.new(app) }
   let(:logger) { double(Rpush::Logger, info: nil) }

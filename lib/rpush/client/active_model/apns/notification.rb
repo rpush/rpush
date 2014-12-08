@@ -38,7 +38,7 @@ module Rpush
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
-          def as_json # rubocop:disable Metrics/PerceivedComplexity
+          def as_json # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             json = ActiveSupport::OrderedHash.new
 
             if data && data.key?(MDM_KEY)
@@ -64,7 +64,7 @@ module Rpush
             json
           end
 
-          def to_binary(options = {})
+          def to_binary(options = {}) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             frame_payload = payload
             frame_id = options[:for_validation] ? 0 : id
             frame = ""

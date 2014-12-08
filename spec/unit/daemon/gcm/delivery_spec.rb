@@ -291,7 +291,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
       notification.deliver_after = now + 2**3
-      Rpush.logger.should_receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2**3).strftime("%Y-%m-%d %H:%M:%S")} (retry 3).")
+      Rpush.logger.should_receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2**3).strftime('%Y-%m-%d %H:%M:%S')} (retry 3).")
       perform
     end
 

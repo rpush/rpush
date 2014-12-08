@@ -70,7 +70,7 @@ module Rpush
         end
 
         def create_feedback(failed_at, device_token)
-          formatted_failed_at = failed_at.strftime("%Y-%m-%d %H:%M:%S UTC")
+          formatted_failed_at = failed_at.strftime('%Y-%m-%d %H:%M:%S UTC')
           log_info("[FeedbackReceiver] Delivery failed at #{formatted_failed_at} for #{device_token}.")
 
           feedback = Rpush::Daemon.store.create_apns_feedback(failed_at, device_token, @app)

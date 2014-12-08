@@ -19,9 +19,9 @@ module Rpush
 
     def ==(other)
       other.is_a?(DeliveryError) && \
-      other.code == code && \
-      other.notification_id == notification_id && \
-      other.to_s == to_s
+        other.code == code && \
+        other.notification_id == notification_id && \
+        other.to_s == to_s
     end
   end
 end

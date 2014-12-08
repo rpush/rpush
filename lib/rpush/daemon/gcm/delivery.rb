@@ -136,7 +136,7 @@ module Rpush
         end
 
         def retry_message
-          "Notification #{@notification.id} will be retried after #{@notification.deliver_after.strftime("%Y-%m-%d %H:%M:%S")} (retry #{@notification.retries})."
+          "Notification #{@notification.id} will be retried after #{@notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} (retry #{@notification.retries})."
         end
 
         def do_post
@@ -155,7 +155,7 @@ module Rpush
           @registration_ids = registration_ids
         end
 
-        def process(failure_partitions = {})
+        def process(failure_partitions = {}) # rubocop:disable Metrics/AbcSize
           @successes = []
           @failures = Failures.new
           failure_partitions.each_key do |category|

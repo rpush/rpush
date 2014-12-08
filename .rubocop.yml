@@ -19,3 +19,6 @@ ClassLength:
 
 CyclomaticComplexity:
   Enabled: false
+
+Metrics/AbcSize:
+  Max: 30

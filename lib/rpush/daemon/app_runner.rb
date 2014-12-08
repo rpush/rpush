@@ -3,7 +3,6 @@
 module Rpush
   module Daemon
     class AppRunner
-
       extend Reflectable
       include Reflectable
       include Loggable
@@ -30,7 +29,7 @@ module Rpush
         Rpush.logger.info("[#{app.name}] Starting #{pluralize(app.connections, 'dispatcher')}... ", true)
         @runners[app.id] = new(app)
         @runners[app.id].start
-        puts ANSI.green{ '✔' } if Rpush.config.foreground
+        puts ANSI.green { '✔' } if Rpush.config.foreground
       rescue StandardError => e
         @runners.delete(app.id)
         Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")
@@ -89,6 +88,7 @@ module Rpush
       end
 
       attr_reader :app
+      delegate :size, to: :queue, prefix: true
 
       def initialize(app)
         @app = app
@@ -148,10 +148,6 @@ module Rpush
 
         runner_details = { dispatchers: dispatcher_details, queued: queue_size }
         log_info(JSON.pretty_generate(runner_details))
-      end
-
-      def queue_size
-        queue.size
       end
 
       def num_dispatcher_loops
