@@ -7,6 +7,7 @@ def cmd(str, clean_env = true)
   retval
 end
 
+desc 'Build Rails app bundled with Rpush'
 task :build_rails do
   rpush_root = Dir.pwd
   path = '/tmp/rpush/rails_test'
@@ -40,6 +41,7 @@ development:
   puts "Built into #{path}"
 end
 
+desc 'Build blank app bundled with Rpush'
 task :build_standalone do
   rpush_root = Dir.pwd
   path = '/tmp/rpush/standalone_test'
