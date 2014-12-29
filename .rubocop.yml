@@ -20,5 +20,8 @@ ClassLength:
 CyclomaticComplexity:
   Enabled: false
 
+Style/SignalException:
+  Enabled: false
+
 Metrics/AbcSize:
   Max: 30

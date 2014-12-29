@@ -8,21 +8,8 @@ module Rpush
   def self.configure
     if block_given?
       yield config
-      initialize_client
+      config.initialize_client
     end
-  end
-
-  def self.initialize_client
-    return if @client_initialized
-    require "rpush/client/#{config.client}"
-    client_module = Rpush::Client.const_get(config.client.to_s.camelize)
-    Rpush.send(:include, client_module)
-
-    [:Apns, :Gcm, :Wpns, :Adm].each do |service|
-      Rpush.const_set(service, client_module.const_get(service))
-    end
-
-    @client_initialized = true
   end
 
   CURRENT_ATTRS = [:push_poll, :feedback_poll, :embedded, :pid_file, :batch_size,
@@ -30,15 +17,15 @@ module Rpush
   DEPRECATED_ATTRS = [:log_dir]
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
-  class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS)
-  end
+  class ConfigurationError < StandardError; end
+  class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS); end
 
   class Configuration < Struct.new(*CONFIG_ATTRS)
     include Deprecatable
 
     deprecated(:log_dir=, '2.3.0', 'Please use log_file instead.')
 
-    delegate :redis_options, :redis_options=, to: :Modis
+    delegate :redis_options, to: '::Modis'
 
     def initialize
       super
@@ -72,11 +59,19 @@ module Rpush
       super(logger)
     end
 
+    def client=(client)
+      super
+      initialize_client
+    end
+
+    def redis_options=(options)
+      Modis.redis_options = options if client == :redis
+    end
+
     def set_defaults
       self.push_poll = 2
       self.feedback_poll = 60
       self.batch_size = 100
-      self.client = :active_record
       self.logger = nil
       self.log_file = 'log/rpush.log'
       self.pid_file = 'tmp/rpush.pid'
@@ -86,6 +81,20 @@ module Rpush
       # Internal options.
       self.embedded = false
       self.push = false
+    end
+
+    def initialize_client
+      return if @client_initialized
+      raise ConfigurationError, 'Rpush.config.client is not set.' unless client
+      require "rpush/client/#{client}"
+      client_module = Rpush::Client.const_get(client.to_s.camelize)
+      Rpush.send(:include, client_module)
+
+      [:Apns, :Gcm, :Wpns, :Adm].each do |service|
+        Rpush.const_set(service, client_module.const_get(service))
+      end
+
+      @client_initialized = true
     end
   end
 end

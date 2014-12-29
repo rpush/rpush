@@ -3,6 +3,7 @@
   * Rpush::Wpns::Notification now supports setting the 'data' attribute.
   * ActiveRecord is now directed to the configured Rpush logger (#104).
   * Logs are reopened when the HUP signal is received (#95).
+  * Fix setting config.redis_options (#114).
 
 ## 2.2.0 (Oct 7, 2014)
   * Numerous command-line fixes, sorry folks!
