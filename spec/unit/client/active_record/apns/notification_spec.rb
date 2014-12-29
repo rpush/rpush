@@ -76,7 +76,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
   end
 
   it "should not include the sound key if the sound is not present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: false)
+    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: nil)
     notification.as_json["aps"].key?("sound").should be_false
   end
 
