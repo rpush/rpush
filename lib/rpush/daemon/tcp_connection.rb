@@ -6,7 +6,12 @@ module Rpush
       include Reflectable
       include Loggable
 
-      attr_accessor :last_write
+      OSX_TCP_KEEPALIVE = 0x10 # Defined in <netinet/tcp.h>
+      KEEPALIVE_INTERVAL = 5
+      KEEPALIVE_IDLE = 5
+      KEEPALIVE_MAX_FAIL_PROBES = 1
+
+      attr_accessor :last_touch
 
       def self.idle_period
         30.minutes
@@ -18,7 +23,7 @@ module Rpush
         @port = port
         @certificate = app.certificate
         @password = app.password
-        written
+        touch
       end
 
       def connect
@@ -47,20 +52,24 @@ module Rpush
 
         begin
           write_data(data)
-        rescue Errno::EPIPE, Errno::ETIMEDOUT, OpenSSL::SSL::SSLError, IOError => e
+        rescue Errno::EADDRNOTAVAIL, Errno::EPIPE, Errno::ETIMEDOUT, OpenSSL::SSL::SSLError, IOError => e
           retry_count += 1
 
           if retry_count == 1
-            log_error("Lost connection to #{@host}:#{@port} (#{e.class.name}), reconnecting...")
+            log_error("Lost connection to #{@host}:#{@port} (#{e.class.name}, #{e.message}), reconnecting...")
             reflect(:tcp_connection_lost, @app, e)
           end
 
           if retry_count <= 3
-            reconnect
+            begin
+              reconnect
+            rescue StandardError => e
+              log_error(e)
+            end
             sleep 1
             retry
           else
-            raise TcpConnectionError, "#{@app.name} tried #{retry_count - 1} times to reconnect but failed (#{e.class.name})."
+            raise TcpConnectionError, "#{@app.name} tried #{retry_count - 1} times to reconnect but failed (#{e.class.name}, #{e.message})."
           end
         end
       end
@@ -78,17 +87,17 @@ module Rpush
       end
 
       def idle_period_exceeded?
-        Time.now - last_write > self.class.idle_period
+        Time.now - last_touch > self.class.idle_period
       end
 
       def write_data(data)
         @ssl_socket.write(data)
         @ssl_socket.flush
-        written
+        touch
       end
 
-      def written
-        self.last_write = Time.now
+      def touch
+        self.last_touch = Time.now
       end
 
       def setup_ssl_context
@@ -99,11 +108,25 @@ module Rpush
       end
 
       def connect_socket
+        touch
         check_certificate_expiration
 
         tcp_socket = TCPSocket.new(@host, @port)
-        tcp_socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
-        tcp_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+        tcp_socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
+        tcp_socket.setsockopt(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true)
+
+        # Linux
+        if [:SOL_TCP, :TCP_KEEPIDLE, :TCP_KEEPINTVL, :TCP_KEEPCNT].all? { |c| Socket.const_defined?(c) }
+          tcp_socket.setsockopt(Socket::SOL_TCP, Socket::TCP_KEEPIDLE, KEEPALIVE_IDLE)
+          tcp_socket.setsockopt(Socket::SOL_TCP, Socket::TCP_KEEPINTVL, KEEPALIVE_INTERVAL)
+          tcp_socket.setsockopt(Socket::SOL_TCP, Socket::TCP_KEEPCNT, KEEPALIVE_MAX_FAIL_PROBES)
+        end
+
+        # OSX
+        if RUBY_PLATFORM =~ /darwin/
+          tcp_socket.setsockopt(Socket::IPPROTO_TCP, OSX_TCP_KEEPALIVE, KEEPALIVE_IDLE)
+        end
+
         ssl_socket = OpenSSL::SSL::SSLSocket.new(tcp_socket, @ssl_context)
         ssl_socket.sync = true
         ssl_socket.connect

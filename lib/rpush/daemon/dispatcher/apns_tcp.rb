@@ -78,7 +78,7 @@ module Rpush
             handle_disconnect
           end
 
-          log_error('Error received, reconnecting...')
+          log_warn('Reconnecting...')
           connection.reconnect
         ensure
           delivered_buffer.clear
@@ -98,7 +98,7 @@ module Rpush
         def handle_error(code, notification_id)
           failed_pos = delivered_buffer.index(notification_id)
           description = APNS_ERRORS[code.to_i] || "Unknown error code #{code.inspect}. Possible Rpush bug?"
-          log_error("#{description} (#{code})")
+          log_error(description + " (#{code})")
           Rpush::Daemon.store.mark_ids_failed([notification_id], code, description, Time.now)
           reflect(:notification_id_failed, @app, notification_id, code, description)
 

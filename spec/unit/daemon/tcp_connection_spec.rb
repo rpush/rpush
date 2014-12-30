@@ -72,12 +72,12 @@ describe Rpush::Daemon::TcpConnection do
     end
 
     it "sets the socket option TCP_NODELAY" do
-      tcp_socket.should_receive(:setsockopt).with(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, 1)
+      tcp_socket.should_receive(:setsockopt).with(Socket::IPPROTO_TCP, Socket::TCP_NODELAY, true)
       connection.connect
     end
 
     it "sets the socket option SO_KEEPALIVE" do
-      tcp_socket.should_receive(:setsockopt).with(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, 1)
+      tcp_socket.should_receive(:setsockopt).with(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
       connection.connect
     end
 
@@ -170,16 +170,16 @@ describe Rpush::Daemon::TcpConnection do
     before do
       connection.stub(:sleep)
       connection.connect
-      ssl_socket.stub(:write).and_raise(error_type)
+      ssl_socket.stub(:write).and_raise(error)
     end
 
     it 'reflects the connection has been lost' do
-      connection.should_receive(:reflect).with(:tcp_connection_lost, app, kind_of(error_type))
+      connection.should_receive(:reflect).with(:tcp_connection_lost, app, kind_of(error.class))
       expect { connection.write(nil) }.to raise_error(Rpush::Daemon::TcpConnectionError)
     end
 
     it "logs that the connection has been lost once only" do
-      logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error_type.name}), reconnecting...").once
+      logger.should_receive(:error).with("[Connection 0] Lost connection to gateway.push.apple.com:2195 (#{error.class.name}, #{error.message}), reconnecting...").once
       expect { connection.write(nil) }.to raise_error(Rpush::Daemon::TcpConnectionError)
     end
 
@@ -191,7 +191,7 @@ describe Rpush::Daemon::TcpConnection do
     it "raises a TcpConnectionError after 3 attempts at reconnecting" do
       expect do
         connection.write(nil)
-      end.to raise_error(Rpush::Daemon::TcpConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error_type.name}).")
+      end.to raise_error(Rpush::Daemon::TcpConnectionError, "Connection 0 tried 3 times to reconnect but failed (#{error.class.name}, #{error.message}).")
     end
 
     it "sleeps 1 second before retrying the connection" do
@@ -203,32 +203,32 @@ describe Rpush::Daemon::TcpConnection do
   describe "when write raises an Errno::EPIPE" do
     it_should_behave_like "when the write fails"
 
-    def error_type
-      Errno::EPIPE
+    def error
+      Errno::EPIPE.new('an message')
     end
   end
 
   describe "when write raises an Errno::ETIMEDOUT" do
     it_should_behave_like "when the write fails"
 
-    def error_type
-      Errno::ETIMEDOUT
+    def error
+      Errno::ETIMEDOUT.new('an message')
     end
   end
 
   describe "when write raises an OpenSSL::SSL::SSLError" do
     it_should_behave_like "when the write fails"
 
-    def error_type
-      OpenSSL::SSL::SSLError
+    def error
+      OpenSSL::SSL::SSLError.new('an message')
     end
   end
 
   describe "when write raises an IOError" do
     it_should_behave_like "when the write fails"
 
-    def error_type
-      IOError
+    def error
+      IOError.new('an message')
     end
   end
 
@@ -270,11 +270,11 @@ describe Rpush::Daemon::TcpConnection do
       connection.write('blah')
     end
 
-    it 'resets the last write time' do
+    it 'resets the last touch time' do
       now = Time.now
       Time.stub(now: now)
       connection.write('blah')
-      connection.last_write.should eq now
+      connection.last_touch.should eq now
     end
 
     it 'does not reconnect if the connection has not been idle for more than the defined period' do
