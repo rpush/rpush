@@ -92,7 +92,6 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
     notification.data = { omg: { ilike: :hashes } }
     notification.as_json["omg"]["ilike"].should eq "hashes"
   end
-
 end
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do

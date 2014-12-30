@@ -59,5 +59,4 @@ describe 'WPNs' do
       notification_with_alert.reload
     end.to_not change(notification_with_alert, :delivered).to(true)
   end
-
 end

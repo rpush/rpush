@@ -85,15 +85,20 @@ module Rpush
         end
 
         def handle_disconnect
-          log_error('The APNs disconnected without returning an error. Marking all notifications delivered via this connection as failed.')
-          reason = 'The APNs disconnected without returning an error. This may indicate you are using an invalid certificate.'
-          Rpush::Daemon.store.mark_ids_failed(delivered_buffer, nil, reason, Time.now)
-          delivered_buffer.each { |id| reflect(:notification_id_failed, @app, id, nil, reason) }
+          if delivered_buffer.size == 0
+            log_error("The APNs disconnected before any notifications could be delivered. This usually indicates you are using an invalid certificate.")
+          else
+            log_error("The APNs disconnected without returning an error. Marking #{delivered_buffer.size} notifications delivered via this connection as failed.")
+            reason = 'The APNs disconnected without returning an error. This can indicate you are using an invalid certificate or a network event caused the connection to terminate.'
+            Rpush::Daemon.store.mark_ids_failed(delivered_buffer, nil, reason, Time.now)
+            delivered_buffer.each { |id| reflect(:notification_id_failed, @app, id, nil, reason) }
+          end
         end
 
         def handle_error(code, notification_id)
           failed_pos = delivered_buffer.index(notification_id)
           description = APNS_ERRORS[code.to_i] || "Unknown error code #{code.inspect}. Possible Rpush bug?"
+          log_error("#{description} (#{code})")
           Rpush::Daemon.store.mark_ids_failed([notification_id], code, description, Time.now)
           reflect(:notification_id_failed, @app, notification_id, code, description)
 

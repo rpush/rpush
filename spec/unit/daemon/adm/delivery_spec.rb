@@ -87,7 +87,6 @@ describe Rpush::Daemon::Adm::Delivery do
       delivery.should_receive(:reflect).with(:adm_failed_to_recipient, notification, '1', 'Unregistered')
       expect { perform }.to raise_error
     end
-
   end
 
   describe 'a 401 (Unauthorized) response' do

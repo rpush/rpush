@@ -2,7 +2,6 @@ require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record'
 
 describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
-
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
   let(:poll) { 60 }

@@ -1,7 +1,6 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Delivery do
-
   class DeliverySpecDelivery < Rpush::Daemon::Delivery
     def initialize(batch)
       @batch = batch
