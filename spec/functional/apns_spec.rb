@@ -1,14 +1,16 @@
 require 'functional_spec_helper'
 
 describe 'APNs' do
-  let(:timeout) { 10 }
   let(:app) { create_app }
-  let!(:notification) { create_notification }
   let(:tcp_socket) { double(TCPSocket, setsockopt: nil, close: nil) }
   let(:ssl_socket) { double(OpenSSL::SSL::SSLSocket, :sync= => nil, connect: nil, write: nil, flush: nil, read: nil, close: nil) }
   let(:io_double) { double(select: nil) }
+  let(:delivered_ids) { [] }
+  let(:failed_ids) { [] }
+  let(:retry_ids) { [] }
 
   before do
+    Rpush.config.push_poll = 0.5
     stub_tcp_connection
   end
 
@@ -36,31 +38,20 @@ describe 'APNs' do
     stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
   end
 
+  def wait
+    sleep 0.1
+  end
+
   def wait_for_notification_to_deliver(notification)
-    Timeout.timeout(timeout) do
-      until notification.delivered
-        sleep 0.1
-        notification.reload
-      end
-    end
+    timeout { wait until delivered_ids.include?(notification.id) }
   end
 
   def wait_for_notification_to_fail(notification)
-    Timeout.timeout(timeout) do
-      while notification.delivered
-        sleep 0.1
-        notification.reload
-      end
-    end
+    timeout { wait until failed_ids.include?(notification.id) }
   end
 
   def wait_for_notification_to_retry(notification)
-    Timeout.timeout(timeout) do
-      until !notification.delivered && !notification.failed && !notification.deliver_after.nil?
-        sleep 0.1
-        notification.reload
-      end
-    end
+    timeout { wait until retry_ids.include?(notification.id) }
   end
 
   def fail_notification(notification)
@@ -79,7 +70,12 @@ describe 'APNs' do
     end
   end
 
+  def timeout(&blk)
+    Timeout.timeout(10, &blk)
+  end
+
   it 'delivers a notification successfully' do
+    notification = create_notification
     expect do
       Rpush.push
       notification.reload
@@ -87,6 +83,7 @@ describe 'APNs' do
   end
 
   it 'receives feedback' do
+    app
     tuple = "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
     allow(ssl_socket).to receive(:read).and_return(tuple, nil)
     Rpush.apns_feedback
@@ -97,10 +94,33 @@ describe 'APNs' do
   end
 
   describe 'delivery failures' do
-    before { Rpush.embed }
-    after { Timeout.timeout(timeout) { Rpush.shutdown } }
+    before do
+      Rpush.reflect do |on|
+        on.notification_delivered do |n|
+          delivered_ids << n.id
+        end
+
+        on.notification_id_failed do |_, n_id|
+          failed_ids << n_id
+        end
+
+        on.notification_id_will_retry do |_, n_id|
+          retry_ids << n_id
+        end
+      end
+
+      Rpush.embed
+    end
+
+    after do
+      Rpush.reflection_stack.clear
+      Rpush.reflection_stack.push(Rpush::ReflectionCollection.new)
+
+      timeout { Rpush.shutdown }
+    end
 
     it 'fails to deliver a notification' do
+      notification = create_notification
       wait_for_notification_to_deliver(notification)
       fail_notification(notification)
       wait_for_notification_to_fail(notification)
@@ -111,7 +131,7 @@ describe 'APNs' do
       let(:notification2) { create_notification }
       let(:notification3) { create_notification }
       let(:notification4) { create_notification }
-      let!(:notifications) { [notification1, notification2, notification3, notification4] }
+      let(:notifications) { [notification1, notification2, notification3, notification4] }
 
       it 'marks the correct notification as failed' do
         notifications.each { |n| wait_for_notification_to_deliver(n) }
@@ -124,21 +144,16 @@ describe 'APNs' do
         fail_notification(notification2)
         wait_for_notification_to_fail(notification2)
 
+        expect(failed_ids).to_not include(notification1.id)
         notification1.reload
         notification1.delivered.should be_true
       end
 
-      # Unreliable.
-      # it 'marks notifications following the failed one as retryable' do
-      #   Rpush.config.push_poll = 1_000_000
-      #
-      #   notifications.each { |n| wait_for_notification_to_deliver(n) }
-      #   fail_notification(notification2)
-      #
-      #   [notification3, notification4].each do |n|
-      #     wait_for_notification_to_retry(n)
-      #   end
-      # end
+      it 'marks notifications following the failed one as retryable' do
+        notifications.each { |n| wait_for_notification_to_deliver(n) }
+        fail_notification(notification2)
+        [notification3, notification4].each { |n| wait_for_notification_to_retry(n) }
+      end
 
       describe 'without an error response' do
         it 'marks all notifications as failed' do
