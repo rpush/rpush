@@ -74,3 +74,4 @@ matrix:
     env: CLIENT=redis
   allow_failures:
     - rvm: 1.9.3
+    - rvm: jruby-1.7.18
