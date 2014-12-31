@@ -47,7 +47,6 @@ module Rpush
 
         def ok(response)
           results = process_response(response)
-
           handle_successes(results.successes)
 
           if results.failures.any?
@@ -178,13 +177,13 @@ module Rpush
               end
             end
           end
-          failures.total_fail = failures.count == @registration_ids.count
+          failures.all_failed = failures.count == @registration_ids.count
         end
       end
 
       class Failures < Hash
         include Enumerable
-        attr_writer :total_fail, :description
+        attr_writer :all_failed, :description
 
         def initialize
           super[:all] = []
@@ -202,10 +201,14 @@ module Rpush
           @description ||= describe
         end
 
+        def any?
+          self[:all].any?
+        end
+
         private
 
         def describe
-          if @total_fail
+          if @all_failed
             error_description = "Failed to deliver to all recipients."
           else
             index_list = map { |item| item[:index] }
