@@ -1,3 +1,5 @@
+# encoding: UTF-8
+
 module Rpush
   module Daemon
     module Apns
