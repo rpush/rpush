@@ -34,7 +34,7 @@ end
 describe Rpush::Daemon::AppRunner, 'enqueue' do
   let(:app) { double(id: 1, name: 'Test', connections: 1) }
   let(:notification) { double(app_id: 1) }
-  let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start: nil, stop: nil) }
+  let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start_dispatchers: nil, start_loops: nil, stop: nil) }
   let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
 
   before do
@@ -62,7 +62,7 @@ end
 
 describe Rpush::Daemon::AppRunner, 'start_app' do
   let(:app) { double(id: 1, name: 'test', connections: 1) }
-  let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start: nil, stop: nil) }
+  let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start_dispatchers: nil, stop: nil) }
   let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
 
   before do
@@ -71,7 +71,7 @@ describe Rpush::Daemon::AppRunner, 'start_app' do
 
   it 'logs an error if the runner could not be started' do
     Rpush::Daemon::AppRunner.should_receive(:new).with(app).and_return(runner)
-    runner.stub(:start).and_raise(StandardError)
+    runner.stub(:start_dispatchers).and_raise(StandardError)
     Rpush.logger.should_receive(:error)
     Rpush::Daemon::AppRunner.start_app(app)
   end
@@ -124,18 +124,18 @@ describe Rpush::Daemon::AppRunner do
   describe 'start' do
     it 'starts a delivery dispatcher for each connection' do
       app.stub(connections: 2)
-      runner.start
+      runner.start_dispatchers
       runner.num_dispatcher_loops.should eq 2
     end
 
     it 'starts the dispatcher loop' do
       dispatcher_loop.should_receive(:start)
-      runner.start
+      runner.start_dispatchers
     end
 
     it 'starts the loops' do
       service_loop.should_receive(:start)
-      runner.start
+      runner.start_loops
     end
   end
 
@@ -171,7 +171,10 @@ describe Rpush::Daemon::AppRunner do
   end
 
   describe 'stop' do
-    before { runner.start }
+    before do
+      runner.start_dispatchers
+      runner.start_loops
+    end
 
     it 'stops the delivery dispatchers' do
       dispatcher_loop.should_receive(:stop)

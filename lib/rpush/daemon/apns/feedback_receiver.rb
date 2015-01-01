@@ -22,7 +22,7 @@ module Rpush
 
         def start
           return if Rpush.config.push
-          log_info("APNs Feedback Receiver started.")
+          Rpush.logger.info("[#{@app.name}] Starting feedback receiver... ", true)
           @interruptible_sleep.start
 
           @thread = Thread.new do
@@ -34,6 +34,8 @@ module Rpush
 
             Rpush::Daemon.store.release_connection
           end
+
+          puts ANSI.green { '✔' } if Rpush.config.foreground
         end
 
         def stop
