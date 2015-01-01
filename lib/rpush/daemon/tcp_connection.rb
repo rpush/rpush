@@ -12,6 +12,7 @@ module Rpush
       KEEPALIVE_MAX_FAIL_PROBES = 1
 
       attr_accessor :last_touch
+      attr_reader :host, :port
 
       def self.idle_period
         30.minutes

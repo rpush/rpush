@@ -5,6 +5,7 @@
   * Logs are reopened when the HUP signal is received (#95).
   * Fix setting config.redis_options (#114).
   * Increase frequency of TCP keepalive probes on Linux.
+  * APNs notifications are no longer marked as failed when a dropped connection is detected, as it's impossible to know exactly how many actually failed (if any).
 
 ## 2.2.0 (Oct 7, 2014)
   * Numerous command-line fixes, sorry folks!

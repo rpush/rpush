@@ -60,9 +60,11 @@ module Rpush
 
         def check_for_error
           begin
+            # On Linux, select returns nil from a dropped connection.
+            # On OS X, Errno::EBADF is raised following a Errno::EADDRNOTAVAIL from the write call.
             return unless connection.select(SELECT_TIMEOUT)
           rescue Errno::EBADF
-            # Connection closed, daemon is shutting down.
+            # Connection closed.
             return
           end
 
@@ -78,21 +80,14 @@ module Rpush
             handle_disconnect
           end
 
-          log_warn('Reconnecting...')
+          log_error("Lost connection to #{connection.host}:#{connection.port}, reconnecting...")
           connection.reconnect
         ensure
           delivered_buffer.clear
         end
 
         def handle_disconnect
-          if delivered_buffer.size == 0
-            log_error("The APNs disconnected before any notifications could be delivered. This usually indicates you are using an invalid certificate.")
-          else
-            log_error("The APNs disconnected without returning an error. Marking #{delivered_buffer.size} notifications delivered via this connection as failed.")
-            reason = 'The APNs disconnected without returning an error. This can indicate you are using an invalid certificate or a network event caused the connection to terminate.'
-            Rpush::Daemon.store.mark_ids_failed(delivered_buffer, nil, reason, Time.now)
-            delivered_buffer.each { |id| reflect(:notification_id_failed, @app, id, nil, reason) }
-          end
+          log_error("The APNs disconnected before any notifications could be delivered. This usually indicates you are using an invalid certificate.") if delivered_buffer.size == 0
         end
 
         def handle_error(code, notification_id)

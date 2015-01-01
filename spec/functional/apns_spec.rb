@@ -154,15 +154,6 @@ describe 'APNs' do
         fail_notification(notification2)
         [notification3, notification4].each { |n| wait_for_notification_to_retry(n) }
       end
-
-      describe 'without an error response' do
-        it 'marks all notifications as failed' do
-          notifications.each { |n| wait_for_notification_to_deliver(n) }
-          ssl_socket.stub(read: nil)
-          enable_io_select
-          notifications.each { |n| wait_for_notification_to_fail(n) }
-        end
-      end
     end
   end
 end
