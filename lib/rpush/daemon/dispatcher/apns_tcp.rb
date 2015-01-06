@@ -81,7 +81,7 @@ module Rpush
           end
 
           log_error("Lost connection to #{connection.host}:#{connection.port}, reconnecting...")
-          connection.reconnect
+          connection.reconnect_with_rescue
         ensure
           delivered_buffer.clear
         end

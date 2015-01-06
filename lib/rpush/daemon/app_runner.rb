@@ -27,10 +27,10 @@ module Rpush
 
       def self.start_app(app)
         Rpush.logger.info("[#{app.name}] Starting #{pluralize(app.connections, 'dispatcher')}... ", true)
-        @runners[app.id] = new(app)
-        @runners[app.id].start_dispatchers
+        runner = @runners[app.id] = new(app)
+        runner.start_dispatchers
         puts ANSI.green { '✔' } if Rpush.config.foreground
-        @runners[app.id].start_loops
+        runner.start_loops
       rescue StandardError => e
         @runners.delete(app.id)
         Rpush.logger.error("[#{app.name}] Exception raised during startup. Notifications will not be delivered for this app.")

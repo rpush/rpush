@@ -59,4 +59,13 @@ describe 'WPNs' do
       notification_with_alert.reload
     end.to_not change(notification_with_alert, :delivered).to(true)
   end
+
+  it 'retries notification that fail due to a SocketError' do
+    expect(http).to receive(:request).and_raise(SocketError.new).twice
+    expect(notification_with_data.deliver_after).to be_nil
+    expect do
+      Rpush.push
+      notification_with_data.reload
+    end.to change(notification_with_data, :deliver_after).to(kind_of(Time))
+  end
 end

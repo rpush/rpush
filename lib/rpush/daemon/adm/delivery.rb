@@ -40,6 +40,9 @@ module Rpush
           handle_rate_limited(error)
         rescue Rpush::RetryableError => error
           handle_retryable(error)
+        rescue SocketError => error
+          mark_retryable(@notification, Time.now + 10.seconds, error)
+          raise
         rescue StandardError => error
           mark_failed(error)
           raise

@@ -62,17 +62,19 @@ module Rpush
           end
 
           if retry_count <= 3
-            begin
-              reconnect
-            rescue StandardError => e
-              log_error(e)
-            end
+            reconnect_with_rescue
             sleep 1
             retry
           else
             raise TcpConnectionError, "#{@app.name} tried #{retry_count - 1} times to reconnect but failed (#{e.class.name}, #{e.message})."
           end
         end
+      end
+
+      def reconnect_with_rescue
+        reconnect
+      rescue StandardError => e
+        log_error(e)
       end
 
       def reconnect

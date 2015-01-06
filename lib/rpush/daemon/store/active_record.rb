@@ -61,6 +61,8 @@ module Rpush
         end
 
         def mark_ids_retryable(ids, deliver_after)
+          return if ids.empty?
+
           with_database_reconnect_and_retry do
             Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?, delivered = ?, delivered_at = ?, failed = ?, failed_at = ?, retries = retries + 1, deliver_after = ?', false, false, nil, false, nil, deliver_after])
           end
@@ -80,6 +82,8 @@ module Rpush
         end
 
         def mark_batch_delivered(notifications)
+          return if notifications.empty?
+
           now = Time.now
           ids = []
           notifications.each do |n|
@@ -119,6 +123,8 @@ module Rpush
         end
 
         def mark_ids_failed(ids, code, description, time)
+          return if ids.empty?
+
           with_database_reconnect_and_retry do
             Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?, delivered = ?, delivered_at = NULL, failed = ?, failed_at = ?, error_code = ?, error_description = ?', false, false, true, time, code, description])
           end

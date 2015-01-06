@@ -5,7 +5,7 @@ module Rpush
       class Delivery < Rpush::Daemon::Delivery
         include MultiJsonHelper
 
-        host = ENV["RPUSH_GCM_HOST"] || "https://android.googleapis.com"
+        host = 'https://android.googleapis.com'
         GCM_URI = URI.parse("#{host}/gcm/send")
         UNAVAILABLE_STATES = %w(Unavailable InternalServerError)
         INVALID_REGISTRATION_ID_STATES = %w(InvalidRegistration MismatchSenderId NotRegistered InvalidPackageName)
@@ -19,6 +19,9 @@ module Rpush
 
         def perform
           handle_response(do_post)
+        rescue SocketError => error
+          mark_retryable(@notification, Time.now + 10.seconds, error)
+          raise
         rescue StandardError => error
           mark_failed(error)
           raise

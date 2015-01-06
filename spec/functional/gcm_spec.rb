@@ -36,4 +36,13 @@ describe 'GCM' do
       notification.reload
     end.to_not change(notification, :delivered).to(true)
   end
+
+  it 'retries notification that fail due to a SocketError' do
+    expect(http).to receive(:request).and_raise(SocketError.new)
+    expect(notification.deliver_after).to be_nil
+    expect do
+      Rpush.push
+      notification.reload
+    end.to change(notification, :deliver_after).to(kind_of(Time))
+  end
 end

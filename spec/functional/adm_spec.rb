@@ -5,6 +5,9 @@ describe 'ADM' do
   let(:notification) { Rpush::Adm::Notification.new }
   let(:response) { double(Net::HTTPResponse, code: 200) }
   let(:http) { double(Net::HTTP::Persistent, request: response, shutdown: nil) }
+  let(:delivered_ids) { [] }
+  let(:failed_ids) { [] }
+  let(:retry_ids) { [] }
 
   before do
     app.name = 'test'
@@ -36,5 +39,14 @@ describe 'ADM' do
       Rpush.push
       notification.reload
     end.to_not change(notification, :delivered).to(true)
+  end
+
+  it 'retries notification that fail due to a SocketError' do
+    expect(http).to receive(:request).and_raise(SocketError.new)
+    expect(notification.deliver_after).to be_nil
+    expect do
+      Rpush.push
+      notification.reload
+    end.to change(notification, :deliver_after).to(kind_of(Time))
   end
 end

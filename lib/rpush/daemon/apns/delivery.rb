@@ -12,6 +12,9 @@ module Rpush
           @connection.write(batch_to_binary)
           mark_batch_delivered
           describe_deliveries
+        rescue Rpush::Daemon::TcpConnectionError => error
+          mark_batch_retryable(Time.now + 10.seconds, error)
+          raise
         rescue StandardError => error
           mark_batch_failed(error)
           raise
