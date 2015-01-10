@@ -20,9 +20,7 @@ module Rpush
     option 'pid-file', type: :string, aliases: '-p'
     desc 'start', 'Start Rpush'
     def start
-      underscore_option_names
-      check_ruby_version
-      configure_rpush
+      config_setup
 
       require 'rpush/daemon'
       Rpush::Daemon.start
@@ -31,9 +29,7 @@ module Rpush
     desc 'stop', 'Stop Rpush'
     option 'pid-file', type: :string, aliases: '-p'
     def stop
-      underscore_option_names
-      check_ruby_version
-      configure_rpush
+      config_setup
       ensure_pid_file_set
 
       if File.exist?(Rpush.config.pid_file)
@@ -94,9 +90,7 @@ module Rpush
 
     desc 'push', 'Deliver all pending notifications and then exit'
     def push
-      underscore_option_names
-      check_ruby_version
-      configure_rpush
+      config_setup
       Rpush.config.foreground = true
 
       Rpush.push
@@ -108,7 +102,13 @@ module Rpush
     end
 
     private
-
+      
+    def config_setup
+      underscore_option_names
+      check_ruby_version
+      configure_rpush
+    end
+    
     def configure_rpush
       load_rails_environment || load_standalone
     end
