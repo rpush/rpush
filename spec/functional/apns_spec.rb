@@ -133,11 +133,9 @@ describe 'APNs' do
     describe 'with a failed connection' do
       it 'retries all notifications' do
         Rpush::Daemon::TcpConnection.any_instance.stub(sleep: nil)
-        expect(ssl_socket).to receive(:write).exactly(4).times.and_raise(Errno::EPIPE)
+        expect(ssl_socket).to receive(:write).at_least(1).times.and_raise(Errno::EPIPE)
         notifications = nil
-        ActiveRecord::Base.transaction do
-          notifications = 2.times.map { create_notification }
-        end
+        notifications = 2.times.map { create_notification }
         notifications.each { |n| wait_for_notification_to_retry(n) }
       end
     end
