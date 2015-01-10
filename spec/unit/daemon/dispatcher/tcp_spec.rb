@@ -16,12 +16,6 @@ describe Rpush::Daemon::Dispatcher::Tcp do
   before { Rpush::Daemon::TcpConnection.stub(new: connection) }
 
   describe 'dispatch' do
-    it 'lazily connects the socket' do
-      Rpush::Daemon::TcpConnection.should_receive(:new).with(app, host, port).and_return(connection)
-      connection.should_receive(:connect)
-      dispatcher.dispatch(queue_payload)
-    end
-
     it 'delivers the notification' do
       delivery_class.should_receive(:new).with(app, connection, notification, batch).and_return(delivery)
       delivery.should_receive(:perform)
@@ -31,7 +25,6 @@ describe Rpush::Daemon::Dispatcher::Tcp do
 
   describe 'cleanup' do
     it 'closes the connection' do
-      dispatcher.dispatch(queue_payload) # lazily initialize connection
       connection.should_receive(:close)
       dispatcher.cleanup
     end

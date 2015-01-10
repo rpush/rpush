@@ -28,7 +28,7 @@ module Rpush
 
         def dispatch(payload)
           @dispatch_mutex.synchronize do
-            @delivery_class.new(@app, connection, payload.batch).perform
+            @delivery_class.new(@app, @connection, payload.batch).perform
             record_batch(payload.batch)
           end
         end
@@ -62,13 +62,13 @@ module Rpush
           begin
             # On Linux, select returns nil from a dropped connection.
             # On OS X, Errno::EBADF is raised following a Errno::EADDRNOTAVAIL from the write call.
-            return unless connection.select(SELECT_TIMEOUT)
-          rescue Errno::EBADF
+            return unless @connection.select(SELECT_TIMEOUT)
+          rescue SystemCallError
             # Connection closed.
             return
           end
 
-          tuple = connection.read(ERROR_TUPLE_BYTES)
+          tuple = @connection.read(ERROR_TUPLE_BYTES)
           @dispatch_mutex.synchronize { handle_error_response(tuple) }
         end
 
@@ -80,8 +80,8 @@ module Rpush
             handle_disconnect
           end
 
-          log_error("Lost connection to #{connection.host}:#{connection.port}, reconnecting...")
-          connection.reconnect_with_rescue
+          log_error("Lost connection to #{@connection.host}:#{@connection.port}, reconnecting...")
+          @connection.reconnect_with_rescue
         ensure
           delivered_buffer.clear
         end

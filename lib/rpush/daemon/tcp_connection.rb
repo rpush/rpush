@@ -10,6 +10,7 @@ module Rpush
       KEEPALIVE_INTERVAL = 5
       KEEPALIVE_IDLE = 5
       KEEPALIVE_MAX_FAIL_PROBES = 1
+      TCP_ERRORS = [SystemCallError, OpenSSL::OpenSSLError, IOError]
 
       attr_accessor :last_touch
       attr_reader :host, :port
@@ -24,12 +25,14 @@ module Rpush
         @port = port
         @certificate = app.certificate
         @password = app.password
+        @connected = false
         touch
       end
 
       def connect
         @ssl_context = setup_ssl_context
         @tcp_socket, @ssl_socket = connect_socket
+        @connected = true
       end
 
       def close
@@ -39,21 +42,22 @@ module Rpush
       end
 
       def read(num_bytes)
-        @ssl_socket.read(num_bytes)
+        @ssl_socket.read(num_bytes) if @ssl_socket
       end
 
       def select(timeout)
-        IO.select([@ssl_socket], nil, nil, timeout)
+        IO.select([@ssl_socket], nil, nil, timeout) if @ssl_socket
       end
 
       def write(data)
+        connect unless @connected
         reconnect_idle if idle_period_exceeded?
 
         retry_count = 0
 
         begin
           write_data(data)
-        rescue Errno::EADDRNOTAVAIL, Errno::EPIPE, Errno::ETIMEDOUT, OpenSSL::SSL::SSLError, IOError => e
+        rescue *TCP_ERRORS => e
           retry_count += 1
 
           if retry_count == 1
@@ -134,12 +138,12 @@ module Rpush
         ssl_socket.sync = true
         ssl_socket.connect
         [tcp_socket, ssl_socket]
-      rescue StandardError => error
+      rescue *TCP_ERRORS => error
         if error.message =~ /certificate revoked/i
           log_warn('Certificate has been revoked.')
           reflect(:ssl_certificate_revoked, @app, error)
         end
-        raise
+        raise TcpConnectionError, "#{error.class.name}, #{error.message}"
       end
 
       def check_certificate_expiration
