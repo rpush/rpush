@@ -102,13 +102,13 @@ module Rpush
     end
 
     private
-      
+
     def config_setup
       underscore_option_names
       check_ruby_version
       configure_rpush
     end
-    
+
     def configure_rpush
       load_rails_environment || load_standalone
     end
