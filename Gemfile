@@ -5,7 +5,7 @@ gem 'rspec', '= 2.14.1'
 gem 'rails', '~> 4.1'
 gem 'database_cleaner'
 gem 'timecop'
-gem 'rpush-redis', '0.1.0'
+gem 'rpush-redis', '0.4.1'
 
 platform :mri do
   gem 'cane'
