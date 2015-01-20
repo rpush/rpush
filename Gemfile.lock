@@ -96,7 +96,7 @@ GEM
     mime-types (2.4.3)
     mini_portile (0.6.2)
     minitest (5.5.1)
-    modis (1.4.0)
+    modis (1.4.1)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
       connection_pool (>= 2)
