@@ -1,4 +1,4 @@
-## 2.3.0 (unreleased)
+## 2.3.0 (Jan 19, 2015)
   * Add 'version' CLI command.
   * Rpush::Wpns::Notification now supports setting the 'data' attribute.
   * ActiveRecord is now directed to the configured Rpush logger (#104).
