@@ -23,7 +23,7 @@ module Rpush
           super
           @dispatch_mutex = Mutex.new
           @stop_error_receiver = false
-          start_error_receiver
+          @connection.on_connect { start_error_receiver }
         end
 
         def dispatch(payload)
@@ -70,6 +70,8 @@ module Rpush
 
           tuple = @connection.read(ERROR_TUPLE_BYTES)
           @dispatch_mutex.synchronize { handle_error_response(tuple) }
+        rescue StandardError => e
+          log_error(e)
         end
 
         def handle_error_response(tuple)

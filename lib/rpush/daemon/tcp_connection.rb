@@ -26,13 +26,29 @@ module Rpush
         @certificate = app.certificate
         @password = app.password
         @connected = false
+        @connection_callbacks = []
         touch
+      end
+
+      def on_connect(&blk)
+        raise 'already connected' if @connected
+        @connection_callbacks << blk
       end
 
       def connect
         @ssl_context = setup_ssl_context
         @tcp_socket, @ssl_socket = connect_socket
         @connected = true
+
+        @connection_callbacks.each do |blk|
+          begin
+            blk.call
+          rescue StandardError => e
+            log_error(e)
+          end
+        end
+
+        @connection_callbacks.clear
       end
 
       def close
