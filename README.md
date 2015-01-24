@@ -14,9 +14,11 @@
   * [**Amazon Device Messaging**](#amazon-device-messaging)
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
 
+
 * Supported storage backends:
   * [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord)
   * [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis)
+
 
 * Optional Rails integration (version 3 & 4).
 * Scales vertically (threading) and horizontally (multiple processes).
