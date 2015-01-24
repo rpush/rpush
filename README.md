@@ -135,7 +135,7 @@ It is recommended to run Rpush as a separate process in most cases, though embed
 
 See `rpush help` for all available commands and options.
 
-#### As a daemon:
+#### As a daemon
 
 ```
 cd /path/to/project
