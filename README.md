@@ -15,19 +15,15 @@
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
 
 
-* Supported storage backends:
-  * [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord)
-  * [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis)
-
-
-
-* Optional Rails integration (version 3 & 4).
+* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord) or [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) for storage.
+* Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
+[**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd).
+* Seamless integration with your projects, including **Rails**.
+* Run as a [daemon](https://github.com/rpush/rpush#as-a-daemon-recommended), inside a [job queue](https://github.com/rpush/rpush/wiki/Push-API), on the [command-line](https://github.com/rpush/rpush#on-the-command-line) or [embedded](https://github.com/rpush/rpush/wiki/Embedding-API) in another process.
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
-* Run as a daemon or inside an [existing process](https://github.com/rpush/rpush/wiki/Embedding-API).
-* Use in a scheduler for low-workload deployments ([Push API](https://github.com/rpush/rpush/wiki/Push-API)).
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
-* Works with MRI, JRuby and Rubinius.
+* Works with **MRI**, **JRuby** and **Rubinius**.
 
 
 ### Getting Started
@@ -38,7 +34,7 @@ Add it to your Gemfile:
 gem 'rpush'
 ```
 
-Initialize Rpush into your project. Rails will be detected automatically.
+Initialize Rpush into your project. **Rails will be detected automatically.**
 
 ```
 cd /path/to/project
@@ -137,24 +133,22 @@ n.save!
 
 It is recommended to run Rpush as a separate process in most cases, though embedding and manual modes are provided for low-workload environments.
 
-#### As a daemon (recommended):
+See `rpush help` for all available commands and options.
+
+#### As a daemon:
 
 ```
 cd /path/to/project
 rpush start
 ```
 
-See `rpush help` for all available commands and options.
-
-#### One-off, manual
-
-On the command-line:
+#### On the command-line
 
 ```
 rpush push
 ```
 
-In your code:
+#### In a scheduled job
 
 ```ruby
 Rpush.push
