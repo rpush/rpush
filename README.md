@@ -20,6 +20,7 @@
   * [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis)
 
 
+
 * Optional Rails integration (version 3 & 4).
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
