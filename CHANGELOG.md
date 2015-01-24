@@ -1,3 +1,6 @@
+## 2.3.1 (Jan 24, 2015)
+  * Fix CPU thrashing while waiting for an APNs connection be established (#119).
+
 ## 2.3.0 (Jan 19, 2015)
   * Add 'version' CLI command.
   * Rpush::Wpns::Notification now supports setting the 'data' attribute.
