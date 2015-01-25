@@ -5,15 +5,21 @@ module Rpush
     class InterruptibleSleep
       def initialize(duration)
         @duration = duration
-        @obj = Object.new
-        @obj.extend(MonitorMixin)
-        @condition = @obj.new_cond
         @stop = false
+
+        @wakeup_obj = Object.new
+        @wakeup_obj.extend(MonitorMixin)
+        @wakeup_condition = @wakeup_obj.new_cond
+
+        @sleep_obj = Object.new
+        @sleep_obj.extend(MonitorMixin)
+        @sleep_condition = @sleep_obj.new_cond
       end
 
       def sleep
         return if @stop
-        @obj.synchronize { @condition.wait(100_000) }
+        goto_sleep
+        wait_for_wakeup
       end
 
       def start
@@ -21,6 +27,7 @@ module Rpush
 
         @thread = Thread.new do
           loop do
+            wait_for_sleeper
             break if @stop
             Kernel.sleep(@duration)
             wakeup
@@ -35,7 +42,21 @@ module Rpush
       end
 
       def wakeup
-        @obj.synchronize { @condition.signal }
+        @wakeup_obj.synchronize { @wakeup_condition.signal }
+      end
+
+      private
+
+      def goto_sleep
+        @sleep_obj.synchronize { @sleep_condition.signal }
+      end
+
+      def wait_for_wakeup
+        @wakeup_obj.synchronize { @wakeup_condition.wait(@duration * 2) }
+      end
+
+      def wait_for_sleeper
+        @sleep_obj.synchronize { @sleep_condition.wait }
       end
     end
   end
