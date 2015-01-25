@@ -106,6 +106,15 @@ module Rpush
         def reopen_log
         end
 
+        def pending_delivery_count
+          Modis.with_connection do |redis|
+            pending = redis.zrange(Rpush::Client::Redis::Notification.absolute_pending_namespace, 0, -1)
+            retryable = redis.zrangebyscore(Rpush::Client::Redis::Notification.absolute_retryable_namespace, 0, Time.now.to_i)
+
+            pending.count + retryable.count
+          end
+        end
+
         private
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
@@ -133,6 +142,7 @@ module Rpush
         end
 
         def pending_notification_ids(limit)
+          limit = [0, limit - 1].max # 'zrange key 0 1' will return 2 values, not 1.
           pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
 
           Modis.with_connection do |redis|

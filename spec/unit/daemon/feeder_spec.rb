@@ -44,10 +44,9 @@ describe Rpush::Daemon::Feeder do
   end
 
   it 'enqueues notifications without looping if in push mode' do
-    Rpush.config.push = true
     Rpush::Daemon::Feeder.should_not_receive(:feed_forever)
-    Rpush::Daemon::Feeder.should_receive(:enqueue_notifications)
-    start_and_stop
+    Rpush::Daemon::Feeder.should_receive(:feed_all)
+    Rpush::Daemon::Feeder.start(true)
   end
 
   it "enqueues the notifications" do

@@ -3,9 +3,15 @@ module Rpush
     class Feeder
       extend Reflectable
 
-      def self.start
+      def self.start(push_mode = false)
         self.should_stop = false
-        Rpush.config.push ? enqueue_notifications : feed_forever
+
+        @thread = Thread.new do
+          push_mode ? feed_all : feed_forever
+          Rpush::Daemon.store.release_connection
+        end
+
+        @thread.join
       end
 
       def self.stop
@@ -22,18 +28,16 @@ module Rpush
         attr_accessor :should_stop
       end
 
+      def self.feed_all
+        enqueue_notifications until Rpush::Daemon.store.pending_delivery_count == 0
+      end
+
       def self.feed_forever
-        @thread = Thread.new do
-          loop do
-            enqueue_notifications
-            interruptible_sleeper.sleep
-            break if should_stop
-          end
-
-          Rpush::Daemon.store.release_connection
+        loop do
+          enqueue_notifications
+          interruptible_sleeper.sleep
+          break if should_stop
         end
-
-        @thread.join
       end
 
       def self.enqueue_notifications

@@ -165,6 +165,10 @@ module Rpush
           Rpush.logger.error(e)
         end
 
+        def pending_delivery_count
+          ready_for_delivery.count
+        end
+
         private
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists

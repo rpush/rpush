@@ -9,8 +9,7 @@ module Rpush
 
     Rpush::Daemon.common_init
     Rpush::Daemon::Synchronizer.sync
-    Rpush::Daemon::Feeder.start
-    # TODO: Wait until there are no more notifications.
+    Rpush::Daemon::Feeder.start(true) # non-blocking
     Rpush::Daemon::AppRunner.stop
   end
 end
