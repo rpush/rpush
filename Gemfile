@@ -14,6 +14,10 @@ platform :mri do
   gem 'rubocop', require: false
 end
 
+platform :mri_21, :mri_22 do
+  gem 'stackprof'
+end
+
 platform :ruby do
   gem 'pg'
   gem 'mysql2'
