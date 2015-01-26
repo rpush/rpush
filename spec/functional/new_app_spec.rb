@@ -30,8 +30,8 @@ describe 'New app loading' do
   end
 
   def stub_tcp_connection
-    Rpush::Daemon::TcpConnection.any_instance.stub(connect_socket: [tcp_socket, ssl_socket])
-    Rpush::Daemon::TcpConnection.any_instance.stub(setup_ssl_context: double.as_null_object)
+    allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(connect_socket: [tcp_socket, ssl_socket])
+    allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(setup_ssl_context: double.as_null_object)
     stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
   end
 
@@ -39,6 +39,6 @@ describe 'New app loading' do
     notification = create_notification
     Rpush.push
     notification.reload
-    expect(notification.delivered).to be_true
+    expect(notification.delivered).to eq(true)
   end
 end

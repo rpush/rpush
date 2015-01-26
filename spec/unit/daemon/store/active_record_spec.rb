@@ -9,35 +9,35 @@ describe Rpush::Daemon::Store::ActiveRecord do
   let(:logger) { double(Rpush::Logger, error: nil, internal_logger: nil) }
 
   before do
-    Rpush.stub(logger: logger)
-    Time.stub(now: time)
+    allow(Rpush).to receive_messages(logger: logger)
+    allow(Time).to receive_messages(now: time)
   end
 
   it 'can update a notification' do
-    notification.should_receive(:save!)
+    expect(notification).to receive(:save!)
     store.update_notification(notification)
   end
 
   it 'can update a app' do
-    app.should_receive(:save!)
+    expect(app).to receive(:save!)
     store.update_app(app)
   end
 
   it 'can release a connection' do
-    ActiveRecord::Base.connection.should_receive(:close)
+    expect(ActiveRecord::Base.connection).to receive(:close)
     store.release_connection
   end
 
   it 'logs errors raised when trying to release the connection' do
     e = StandardError.new
-    ActiveRecord::Base.connection.stub(:close).and_raise(e)
-    Rpush.logger.should_receive(:error).with(e)
+    allow(ActiveRecord::Base.connection).to receive(:close).and_raise(e)
+    expect(Rpush.logger).to receive(:error).with(e)
     store.release_connection
   end
 
   describe 'deliverable_notifications' do
     it 'checks for new notifications with the ability to reconnect the database' do
-      store.should_receive(:with_database_reconnect_and_retry)
+      expect(store).to receive(:with_database_reconnect_and_retry)
       store.deliverable_notifications(Rpush.config.batch_size)
     end
 
@@ -45,43 +45,43 @@ describe Rpush::Daemon::Store::ActiveRecord do
       Rpush.config.batch_size = 5000
       Rpush.config.push = false
       relation = double.as_null_object
-      relation.should_receive(:limit).with(5000)
-      relation.stub(to_a: [])
-      store.stub(ready_for_delivery: relation)
+      expect(relation).to receive(:limit).with(5000)
+      allow(relation).to receive_messages(to_a: [])
+      allow(store).to receive_messages(ready_for_delivery: relation)
       store.deliverable_notifications(Rpush.config.batch_size)
     end
 
     it 'does not load notification in batches if in push mode' do
       Rpush.config.push = true
       relation = double.as_null_object
-      relation.should_not_receive(:limit)
-      Rpush::Notification.stub(ready_for_delivery: relation)
+      expect(relation).not_to receive(:limit)
+      allow(Rpush::Notification).to receive_messages(ready_for_delivery: relation)
       store.deliverable_notifications(Rpush.config.batch_size)
     end
 
     it 'loads an undelivered notification without deliver_after set' do
       notification.update_attributes!(delivered: false, deliver_after: nil)
-      store.deliverable_notifications(Rpush.config.batch_size).should eq [notification]
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
     end
 
     it 'loads an notification with a deliver_after time in the past' do
       notification.update_attributes!(delivered: false, deliver_after: 1.hour.ago)
-      store.deliverable_notifications(Rpush.config.batch_size).should eq [notification]
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
     end
 
     it 'does not load an notification with a deliver_after time in the future' do
       notification.update_attributes!(delivered: false, deliver_after: 1.hour.from_now)
-      store.deliverable_notifications(Rpush.config.batch_size).should be_empty
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
 
     it 'does not load a previously delivered notification' do
       notification.update_attributes!(delivered: true, delivered_at: time)
-      store.deliverable_notifications(Rpush.config.batch_size).should be_empty
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
 
     it "does not enqueue a notification that has previously failed delivery" do
       notification.update_attributes!(delivered: false, failed: true)
-      store.deliverable_notifications(Rpush.config.batch_size).should be_empty
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
   end
 
@@ -100,12 +100,12 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'saves the notification without validation' do
-      notification.should_receive(:save!).with(validate: false)
+      expect(notification).to receive(:save!).with(validate: false)
       store.mark_retryable(notification, time)
     end
 
     it 'does not save the notification if persist: false' do
-      notification.should_not_receive(:save!)
+      expect(notification).not_to receive(:save!)
       store.mark_retryable(notification, time, persist: false)
     end
   end
@@ -115,8 +115,8 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the attributes on the object for use in reflections' do
       store.mark_batch_retryable([notification], deliver_after)
-      notification.deliver_after.should eq deliver_after
-      notification.retries.should eq 1
+      expect(notification.deliver_after).to eq deliver_after
+      expect(notification.retries).to eq 1
     end
 
     it 'increments the retired count' do
@@ -149,12 +149,12 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'saves the notification without validation' do
-      notification.should_receive(:save!).with(validate: false)
+      expect(notification).to receive(:save!).with(validate: false)
       store.mark_delivered(notification, time)
     end
 
     it 'does not save the notification if persist: false' do
-      notification.should_not_receive(:save!)
+      expect(notification).not_to receive(:save!)
       store.mark_delivered(notification, time, persist: false)
     end
   end
@@ -162,8 +162,8 @@ describe Rpush::Daemon::Store::ActiveRecord do
   describe 'mark_batch_delivered' do
     it 'sets the attributes on the object for use in reflections' do
       store.mark_batch_delivered([notification])
-      notification.delivered_at.should eq time
-      notification.delivered.should be_true
+      expect(notification.delivered_at).to eq time
+      expect(notification.delivered).to be_truthy
     end
 
     it 'marks the notifications as delivered' do
@@ -184,7 +184,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   describe 'mark_failed' do
     it 'marks the notification as not delivered' do
       store.mark_failed(notification, nil, '', time)
-      notification.delivered.should be_false
+      expect(notification.delivered).to eq(false)
     end
 
     it 'marks the notification as failed' do
@@ -214,12 +214,12 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'saves the notification without validation' do
-      notification.should_receive(:save!).with(validate: false)
+      expect(notification).to receive(:save!).with(validate: false)
       store.mark_failed(notification, nil, '', time)
     end
 
     it 'does not save the notification if persist: false' do
-      notification.should_not_receive(:save!)
+      expect(notification).not_to receive(:save!)
       store.mark_failed(notification, nil, '', time, persist: false)
     end
   end
@@ -227,18 +227,18 @@ describe Rpush::Daemon::Store::ActiveRecord do
   describe 'mark_batch_failed' do
     it 'sets the attributes on the object for use in reflections' do
       store.mark_batch_failed([notification], 123, 'an error')
-      notification.failed_at.should eq time
-      notification.delivered_at.should be_nil
-      notification.delivered.should be_false
-      notification.failed.should be_true
-      notification.error_code.should eq 123
-      notification.error_description.should eq 'an error'
+      expect(notification.failed_at).to eq time
+      expect(notification.delivered_at).to be_nil
+      expect(notification.delivered).to eq(false)
+      expect(notification.failed).to be_truthy
+      expect(notification.error_code).to eq 123
+      expect(notification.error_description).to eq 'an error'
     end
 
     it 'marks the notification as not delivered' do
       store.mark_batch_failed([notification], nil, '')
       notification.reload
-      notification.delivered.should be_false
+      expect(notification.delivered).to be_falsey
     end
 
     it 'marks the notification as failed' do
@@ -272,7 +272,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      Rpush::Client::ActiveRecord::Apns::Feedback.should_receive(:create!).with(
+      expect(Rpush::Client::ActiveRecord::Apns::Feedback).to receive(:create!).with(
         failed_at: time, device_token: 'ab' * 32, app_id: app.id)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end
@@ -287,27 +287,27 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the given attributes' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.device_token.should eq 'ab' * 32
+      expect(new_notification.device_token).to eq 'ab' * 32
     end
 
     it 'sets the given data' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.data['data'].should be_true
+      expect(new_notification.data['data']).to be_truthy
     end
 
     it 'sets the given registration IDs' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.registration_ids.should eq registration_ids
+      expect(new_notification.registration_ids).to eq registration_ids
     end
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.deliver_after.to_s.should eq deliver_after.to_s
+      expect(new_notification.deliver_after.to_s).to eq deliver_after.to_s
     end
 
     it 'saves the new notification' do
       new_notification = store.create_gcm_notification(*args)
-      new_notification.new_record?.should be_false
+      expect(new_notification.new_record?).to be_falsey
     end
   end
 
@@ -320,29 +320,29 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the given attributes' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.app_id.should eq app.id
-      new_notification.collapse_key.should eq 'ckey'
-      new_notification.delay_while_idle.should be_true
+      expect(new_notification.app_id).to eq app.id
+      expect(new_notification.collapse_key).to eq 'ckey'
+      expect(new_notification.delay_while_idle).to be_truthy
     end
 
     it 'sets the given data' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.data['data'].should be_true
+      expect(new_notification.data['data']).to be_truthy
     end
 
     it 'sets the given registration IDs' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.registration_ids.should eq registration_ids
+      expect(new_notification.registration_ids).to eq registration_ids
     end
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.deliver_after.to_s.should eq deliver_after.to_s
+      expect(new_notification.deliver_after.to_s).to eq deliver_after.to_s
     end
 
     it 'saves the new notification' do
       new_notification = store.create_adm_notification(*args)
-      new_notification.new_record?.should be_false
+      expect(new_notification.new_record?).to be_falsey
     end
   end
 end

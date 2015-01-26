@@ -14,10 +14,10 @@ describe Rpush::Daemon::Feeder do
       config.push = false
     end
 
-    Rpush.stub(logger: logger)
-    Rpush::Daemon.stub(store: store)
-    Rpush::Daemon::Feeder.stub(should_stop: true, interruptible_sleeper: interruptible_sleeper)
-    Rpush::Daemon::AppRunner.stub(enqueue: nil, num_queued: 0)
+    allow(Rpush).to receive_messages(logger: logger)
+    allow(Rpush::Daemon).to receive_messages(store: store)
+    allow(Rpush::Daemon::Feeder).to receive_messages(should_stop: true, interruptible_sleeper: interruptible_sleeper)
+    allow(Rpush::Daemon::AppRunner).to receive_messages(enqueue: nil, num_queued: 0)
   end
 
   def start_and_stop
@@ -26,67 +26,67 @@ describe Rpush::Daemon::Feeder do
   end
 
   it 'loads deliverable notifications' do
-    Rpush::Daemon.store.should_receive(:deliverable_notifications).with(Rpush.config.batch_size)
+    expect(Rpush::Daemon.store).to receive(:deliverable_notifications).with(Rpush.config.batch_size)
     start_and_stop
   end
 
   it 'does not load more notifications if the total queue size is equal to the batch size' do
-    Rpush::Daemon::AppRunner.stub(total_queued: Rpush.config.batch_size)
-    Rpush::Daemon.store.should_not_receive(:deliverable_notifications)
+    allow(Rpush::Daemon::AppRunner).to receive_messages(total_queued: Rpush.config.batch_size)
+    expect(Rpush::Daemon.store).not_to receive(:deliverable_notifications)
     start_and_stop
   end
 
   it 'limits the batch size if some runners are still processing notifications' do
-    Rpush.config.stub(batch_size: 10)
-    Rpush::Daemon::AppRunner.stub(total_queued: 6)
-    Rpush::Daemon.store.should_receive(:deliverable_notifications).with(4)
+    allow(Rpush.config).to receive_messages(batch_size: 10)
+    allow(Rpush::Daemon::AppRunner).to receive_messages(total_queued: 6)
+    expect(Rpush::Daemon.store).to receive(:deliverable_notifications).with(4)
     start_and_stop
   end
 
   it 'enqueues notifications without looping if in push mode' do
-    Rpush::Daemon::Feeder.should_not_receive(:feed_forever)
-    Rpush::Daemon::Feeder.should_receive(:feed_all)
+    expect(Rpush::Daemon::Feeder).not_to receive(:feed_forever)
+    expect(Rpush::Daemon::Feeder).to receive(:feed_all)
     Rpush::Daemon::Feeder.start(true)
   end
 
   it "enqueues the notifications" do
-    Rpush::Daemon::AppRunner.should_receive(:enqueue).with([notification])
+    expect(Rpush::Daemon::AppRunner).to receive(:enqueue).with([notification])
     start_and_stop
   end
 
   it "logs errors" do
     e = StandardError.new("bork")
-    Rpush::Daemon.store.stub(:deliverable_notifications).and_raise(e)
-    Rpush.logger.should_receive(:error).with(e)
+    allow(Rpush::Daemon.store).to receive(:deliverable_notifications).and_raise(e)
+    expect(Rpush.logger).to receive(:error).with(e)
     start_and_stop
   end
 
   describe 'stop' do
     it 'interrupts sleep' do
-      interruptible_sleeper.should_receive(:stop)
+      expect(interruptible_sleeper).to receive(:stop)
       start_and_stop
     end
 
     it 'releases the store connection' do
-      Rpush::Daemon.store.should_receive(:release_connection)
+      expect(Rpush::Daemon.store).to receive(:release_connection)
       start_and_stop
     end
   end
 
   it 'enqueues notifications when started' do
-    Rpush::Daemon::Feeder.should_receive(:enqueue_notifications).at_least(:once)
-    Rpush::Daemon::Feeder.stub(:loop).and_yield
+    expect(Rpush::Daemon::Feeder).to receive(:enqueue_notifications).at_least(:once)
+    allow(Rpush::Daemon::Feeder).to receive(:loop).and_yield
     start_and_stop
   end
 
   it 'sleeps' do
-    interruptible_sleeper.should_receive(:sleep)
+    expect(interruptible_sleeper).to receive(:sleep)
     start_and_stop
   end
 
   describe 'wakeup' do
     it 'interrupts sleep' do
-      interruptible_sleeper.should_receive(:wakeup)
+      expect(interruptible_sleeper).to receive(:wakeup)
       Rpush::Daemon::Feeder.start
       Rpush::Daemon::Feeder.wakeup
     end

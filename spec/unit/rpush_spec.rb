@@ -2,7 +2,7 @@ require 'unit_spec_helper'
 
 describe Rpush do
   it "lazy initializes the logger" do
-    Rpush::Logger.should_receive(:new)
+    expect(Rpush::Logger).to receive(:new)
     Rpush.logger
   end
 end

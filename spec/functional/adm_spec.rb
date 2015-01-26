@@ -20,11 +20,11 @@ describe 'ADM' do
     notification.data = { message: 'test' }
     notification.save!
 
-    Net::HTTP::Persistent.stub(new: http)
+    allow(Net::HTTP::Persistent).to receive_messages(new: http)
   end
 
   it 'delivers a notification successfully' do
-    response.stub(body: JSON.dump(registrationID: notification.registration_ids.first.to_s))
+    allow(response).to receive_messages(body: JSON.dump(registrationID: notification.registration_ids.first.to_s))
 
     expect do
       Rpush.push
@@ -33,12 +33,10 @@ describe 'ADM' do
   end
 
   it 'fails to deliver a notification successfully' do
-    response.stub(code: 400, body: JSON.dump(reason: 'error', registrationID: notification.registration_ids.first.to_s))
-
-    expect do
-      Rpush.push
-      notification.reload
-    end.to_not change(notification, :delivered).to(true)
+    allow(response).to receive_messages(code: 400, body: JSON.dump(reason: 'error', registrationID: notification.registration_ids.first.to_s))
+    Rpush.push
+    notification.reload
+    expect(notification.delivered).to eq(false)
   end
 
   it 'retries notification that fail due to a SocketError' do

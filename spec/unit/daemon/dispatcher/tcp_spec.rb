@@ -13,19 +13,19 @@ describe Rpush::Daemon::Dispatcher::Tcp do
   let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch, notification) }
   let(:dispatcher) { Rpush::Daemon::Dispatcher::Tcp.new(app, delivery_class, host: host_proc) }
 
-  before { Rpush::Daemon::TcpConnection.stub(new: connection) }
+  before { allow(Rpush::Daemon::TcpConnection).to receive_messages(new: connection) }
 
   describe 'dispatch' do
     it 'delivers the notification' do
-      delivery_class.should_receive(:new).with(app, connection, notification, batch).and_return(delivery)
-      delivery.should_receive(:perform)
+      expect(delivery_class).to receive(:new).with(app, connection, notification, batch).and_return(delivery)
+      expect(delivery).to receive(:perform)
       dispatcher.dispatch(queue_payload)
     end
   end
 
   describe 'cleanup' do
     it 'closes the connection' do
-      connection.should_receive(:close)
+      expect(connection).to receive(:close)
       dispatcher.cleanup
     end
   end

@@ -2,19 +2,19 @@ require 'unit_spec_helper'
 
 describe Rpush, 'embed' do
   before do
-    Rpush::Daemon.stub(start: nil, shutdown: nil)
-    Kernel.stub(:at_exit)
+    allow(Rpush::Daemon).to receive_messages(start: nil, shutdown: nil)
+    allow(Kernel).to receive(:at_exit)
   end
 
   after { Rpush.shutdown }
 
   it 'sets the embedded config option to true' do
     Rpush.embed
-    Rpush.config.embedded.should be_true
+    expect(Rpush.config.embedded).to eq(true)
   end
 
   it 'starts the daemon' do
-    Rpush::Daemon.should_receive(:start)
+    expect(Rpush::Daemon).to receive(:start)
     Rpush.embed
   end
 
@@ -28,7 +28,7 @@ describe Rpush, 'shutdown' do
   before { Rpush.config.embedded = true }
 
   it 'shuts down the daemon' do
-    Rpush::Daemon.should_receive(:shutdown)
+    expect(Rpush::Daemon).to receive(:shutdown)
     Rpush.shutdown
   end
 end
@@ -37,7 +37,7 @@ describe Rpush, 'sync' do
   before { Rpush.config.embedded = true }
 
   it 'syncs' do
-    Rpush::Daemon::Synchronizer.should_receive(:sync)
+    expect(Rpush::Daemon::Synchronizer).to receive(:sync)
     Rpush.sync
   end
 end
@@ -46,7 +46,7 @@ describe Rpush, 'debug' do
   before { Rpush.config.embedded = true }
 
   it 'debugs the AppRunner' do
-    Rpush::Daemon::AppRunner.should_receive(:debug)
+    expect(Rpush::Daemon::AppRunner).to receive(:debug)
     Rpush.debug
   end
 end

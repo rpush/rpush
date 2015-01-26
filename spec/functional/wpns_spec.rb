@@ -21,11 +21,11 @@ describe 'WPNs' do
     notification_with_alert.alert = "Hello world!"
     notification_with_alert.save!
 
-    Net::HTTP::Persistent.stub(new: http)
+    allow(Net::HTTP::Persistent).to receive_messages(new: http)
   end
 
   it 'delivers a notification with data successfully' do
-    response.stub(to_hash: { 'x-notificationstatus' => ['Received'] })
+    allow(response).to receive_messages(to_hash: { 'x-notificationstatus' => ['Received'] })
 
     expect do
       Rpush.push
@@ -34,16 +34,16 @@ describe 'WPNs' do
   end
 
   it 'fails to deliver a notification with data successfully' do
-    response.stub(code: 400)
+    allow(response).to receive_messages(code: 400)
 
     expect do
       Rpush.push
       notification_with_data.reload
-    end.to_not change(notification_with_data, :delivered).to(true)
+    end.to change(notification_with_data, :failed_at)
   end
 
   it 'delivers a notification with an alert successfully' do
-    response.stub(to_hash: { 'x-notificationstatus' => ['Received'] })
+    allow(response).to receive_messages(to_hash: { 'x-notificationstatus' => ['Received'] })
 
     expect do
       Rpush.push
@@ -52,12 +52,12 @@ describe 'WPNs' do
   end
 
   it 'fails to deliver a notification with an alert successfully' do
-    response.stub(code: 400)
+    allow(response).to receive_messages(code: 400)
 
     expect do
       Rpush.push
       notification_with_alert.reload
-    end.to_not change(notification_with_alert, :delivered).to(true)
+    end.to change(notification_with_alert, :failed_at)
   end
 
   it 'retries notification that fail due to a SocketError' do

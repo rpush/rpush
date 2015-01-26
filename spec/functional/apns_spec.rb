@@ -33,8 +33,8 @@ describe 'APNs' do
   end
 
   def stub_tcp_connection
-    Rpush::Daemon::TcpConnection.any_instance.stub(connect_socket: [tcp_socket, ssl_socket])
-    Rpush::Daemon::TcpConnection.any_instance.stub(setup_ssl_context: double.as_null_object)
+    allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(connect_socket: [tcp_socket, ssl_socket])
+    allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(setup_ssl_context: double.as_null_object)
     stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
   end
 
@@ -55,13 +55,13 @@ describe 'APNs' do
   end
 
   def fail_notification(notification)
-    ssl_socket.stub(read: [8, 4, notification.id].pack('ccN'))
+    allow(ssl_socket).to receive_messages(read: [8, 4, notification.id].pack('ccN'))
     enable_io_select
   end
 
   def enable_io_select
     called = false
-    io_double.stub(:select) do
+    allow(io_double).to receive(:select) do
       if called
         nil
       else
@@ -88,9 +88,9 @@ describe 'APNs' do
     allow(ssl_socket).to receive(:read).and_return(tuple, nil)
     Rpush.apns_feedback
     feedback = Rpush::Apns::Feedback.all.first
-    feedback.should_not be_nil
-    feedback.app_id.should eq(app.id)
-    feedback.device_token.should eq('834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17')
+    expect(feedback).not_to be_nil
+    expect(feedback.app_id).to eq(app.id)
+    expect(feedback.device_token).to eq('834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17')
   end
 
   describe 'delivery failures' do
@@ -132,7 +132,7 @@ describe 'APNs' do
 
     describe 'with a failed connection' do
       it 'retries all notifications' do
-        Rpush::Daemon::TcpConnection.any_instance.stub(sleep: nil)
+        allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(sleep: nil)
         expect(ssl_socket).to receive(:write).at_least(1).times.and_raise(Errno::EPIPE)
         notifications = 2.times.map { create_notification }
         notifications.each { |n| wait_for_notification_to_retry(n) }
@@ -159,7 +159,7 @@ describe 'APNs' do
 
         expect(failed_ids).to_not include(notification1.id)
         notification1.reload
-        notification1.delivered.should be_true
+        expect(notification1.delivered).to eq(true)
       end
 
       it 'marks notifications following the failed one as retryable' do

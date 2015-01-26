@@ -2,33 +2,33 @@ require 'unit_spec_helper'
 
 describe Rpush, 'push' do
   before do
-    Rpush::Daemon::Synchronizer.stub(sync: nil)
-    Rpush::Daemon::AppRunner.stub(wait: nil)
-    Rpush::Daemon::Feeder.stub(start: nil)
+    allow(Rpush::Daemon::Synchronizer).to receive_messages(sync: nil)
+    allow(Rpush::Daemon::AppRunner).to receive_messages(wait: nil)
+    allow(Rpush::Daemon::Feeder).to receive_messages(start: nil)
   end
 
   it 'sets the push config option to true' do
     Rpush.push
-    Rpush.config.push.should be_true
+    expect(Rpush.config.push).to eq(true)
   end
 
   it 'initializes the daemon' do
-    Rpush::Daemon.should_receive(:common_init)
+    expect(Rpush::Daemon).to receive(:common_init)
     Rpush.push
   end
 
   it 'syncs' do
-    Rpush::Daemon::Synchronizer.should_receive(:sync)
+    expect(Rpush::Daemon::Synchronizer).to receive(:sync)
     Rpush.push
   end
 
   it 'starts the feeder' do
-    Rpush::Daemon::Feeder.should_receive(:start)
+    expect(Rpush::Daemon::Feeder).to receive(:start)
     Rpush.push
   end
 
   it 'stops on the app runner' do
-    Rpush::Daemon::AppRunner.should_receive(:stop)
+    expect(Rpush::Daemon::AppRunner).to receive(:stop)
     Rpush.push
   end
 

@@ -7,24 +7,24 @@ describe Rpush::Daemon::ServiceConfigMethods do
   end
 
   it 'returns the delivery class' do
-    ServiceConfigMethodsSpec.delivery_class.should eq ServiceConfigMethodsSpec::Delivery
+    expect(ServiceConfigMethodsSpec.delivery_class).to eq ServiceConfigMethodsSpec::Delivery
   end
 
   it 'instantiates loops' do
     loop_class = Class.new
     app = double
     loop_instance = loop_class.new
-    loop_class.should_receive(:new).with(app).and_return(loop_instance)
+    expect(loop_class).to receive(:new).with(app).and_return(loop_instance)
     ServiceConfigMethodsSpec.loops loop_class
-    ServiceConfigMethodsSpec.loop_instances(app).should eq [loop_instance]
+    expect(ServiceConfigMethodsSpec.loop_instances(app)).to eq [loop_instance]
   end
 
   it 'returns a new dispatcher' do
     ServiceConfigMethodsSpec.dispatcher :http, an: :option
     app = double
     dispatcher = double
-    Rpush::Daemon::Dispatcher::Http.should_receive(:new).with(app, ServiceConfigMethodsSpec::Delivery, an: :option).and_return(dispatcher)
-    ServiceConfigMethodsSpec.new_dispatcher(app).should eq dispatcher
+    expect(Rpush::Daemon::Dispatcher::Http).to receive(:new).with(app, ServiceConfigMethodsSpec::Delivery, an: :option).and_return(dispatcher)
+    expect(ServiceConfigMethodsSpec.new_dispatcher(app)).to eq dispatcher
   end
 
   it 'raises a NotImplementedError for an unknown dispatcher type' do

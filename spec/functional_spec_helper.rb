@@ -3,9 +3,8 @@ require 'spec_helper'
 require 'database_cleaner'
 DatabaseCleaner.strategy = :truncation
 
-def functional_example?(example)
-  path = example.metadata[:example_group][:file_path]
-  path =~ /spec\/functional/
+def functional_example?(metadata)
+  metadata[:file_path] =~ /spec\/functional/
 end
 
 RSpec.configure do |config|
@@ -14,10 +13,10 @@ RSpec.configure do |config|
       redis.keys('rpush:*').each { |key| redis.del(key) }
     end
 
-    Rpush.config.logger = ::Logger.new(STDOUT) if functional_example?(example)
+    Rpush.config.logger = ::Logger.new(STDOUT) if functional_example?(self.class.metadata)
   end
 
   config.after(:each) do
-    DatabaseCleaner.clean if functional_example?(example)
+    DatabaseCleaner.clean if functional_example?(self.class.metadata)
   end
 end

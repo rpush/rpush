@@ -4,8 +4,8 @@ describe Rpush do
   let(:config) { Rpush.config }
 
   before do
-    Rpush.stub(require: nil)
-    Rpush.stub(config: config)
+    allow(Rpush).to receive_messages(require: nil)
+    allow(Rpush).to receive_messages(config: config)
   end
 
   it 'yields a configure block' do
@@ -30,17 +30,17 @@ describe Rpush::Configuration do
 
   it 'sets the pid_file relative if not absolute' do
     config.pid_file = 'tmp/rpush.pid'
-    config.pid_file.should eq '/tmp/rails_root/tmp/rpush.pid'
+    expect(config.pid_file).to eq '/tmp/rails_root/tmp/rpush.pid'
   end
 
   it 'does not alter an absolute pid_file path' do
     config.pid_file = '/tmp/rpush.pid'
-    config.pid_file.should eq '/tmp/rpush.pid'
+    expect(config.pid_file).to eq '/tmp/rpush.pid'
   end
 
   it 'delegate redis_options to Modis' do
     Rpush.config.client = :redis
     Rpush.config.redis_options = { hi: :mom }
-    Modis.redis_options.should eq(hi: :mom)
+    expect(Modis.redis_options).to eq(hi: :mom)
   end
 end

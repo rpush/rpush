@@ -44,7 +44,7 @@ describe 'Synchronization' do
   it 'stops a deleted app' do
     app.destroy
     Rpush.sync
-    Rpush::Daemon::AppRunner.app_running?(app).should be_false
+    expect(Rpush::Daemon::AppRunner.app_running?(app)).to eq(false)
   end
 
   it 'restarts an app when the certificate is changed' do

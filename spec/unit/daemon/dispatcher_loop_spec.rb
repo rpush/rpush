@@ -14,24 +14,24 @@ describe Rpush::Daemon::DispatcherLoop do
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, release_connection: nil) }
 
   before do
-    Rpush::Daemon.stub(store: store)
+    allow(Rpush::Daemon).to receive_messages(store: store)
     queue.push([notification, batch])
   end
 
   it 'logs errors' do
     logger = double
-    Rpush.stub(logger: logger)
+    allow(Rpush).to receive_messages(logger: logger)
     error = StandardError.new
-    dispatcher.stub(:dispatch).and_raise(error)
-    Rpush.logger.should_receive(:error).with(error)
+    allow(dispatcher).to receive(:dispatch).and_raise(error)
+    expect(Rpush.logger).to receive(:error).with(error)
     run_dispatcher_loop
   end
 
   it 'reflects an exception' do
-    Rpush.stub(logger: double(error: nil))
+    allow(Rpush).to receive_messages(logger: double(error: nil))
     error = StandardError.new
-    dispatcher.stub(:dispatch).and_raise(error)
-    dispatcher_loop.should_receive(:reflect).with(:error, error)
+    allow(dispatcher).to receive(:dispatch).and_raise(error)
+    expect(dispatcher_loop).to receive(:reflect).with(:error, error)
     run_dispatcher_loop
   end
 
@@ -41,12 +41,12 @@ describe Rpush::Daemon::DispatcherLoop do
     end
 
     it 'instructs the dispatcher to cleanup' do
-      dispatcher.should_receive(:cleanup)
+      expect(dispatcher).to receive(:cleanup)
       run_dispatcher_loop
     end
 
     it 'releases the store connection' do
-      Rpush::Daemon.store.should_receive(:release_connection)
+      expect(Rpush::Daemon.store).to receive(:release_connection)
       run_dispatcher_loop
     end
   end

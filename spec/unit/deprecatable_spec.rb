@@ -17,16 +17,16 @@ describe Rpush::Deprecatable do
   let(:klass) { HasDeprecatedMethod.new }
 
   before do
-    Rpush::Deprecation.stub(:warn)
+    allow(Rpush::Deprecation).to receive(:warn)
   end
 
   it 'warns the method is deprecated when called' do
-    Rpush::Deprecation.should_receive(:warn).with(/deprecated_method is deprecated and will be removed from Rpush 4\.0\./)
+    expect(Rpush::Deprecation).to receive(:warn).with(/deprecated_method is deprecated and will be removed from Rpush 4\.0\./)
     klass.deprecated_method
   end
 
   it 'calls the original method' do
     klass.deprecated_method
-    klass.original_called?.should be_true
+    expect(klass.original_called?).to eq(true)
   end
 end

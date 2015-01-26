@@ -20,7 +20,7 @@ describe Rpush::Plugin do
     plugin.configure do |config|
       config.is_configured = true
     end
-    expect(Rpush.config.plugin.test.is_configured).to be_true
+    expect(Rpush.config.plugin.test.is_configured).to eq(true)
   end
 
   it 'can hook up reflections' do

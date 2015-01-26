@@ -22,25 +22,21 @@ describe 'Retries' do
       redis.del(Rpush::Client::Redis::Notification.absolute_pending_namespace)
     end
 
-    Net::HTTP::Persistent.stub(new: http)
-    response.stub(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))
+    allow(Net::HTTP::Persistent).to receive_messages(new: http)
+    allow(response).to receive_messages(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))
   end
 
   it 'delivers a notification due to be retried' do
     Rpush::Daemon.store.mark_retryable(notification, Time.now - 1.minute)
-
-    expect do
-      Rpush.push
-      notification.reload
-    end.to change(notification, :delivered).to(true)
+    Rpush.push
+    notification.reload
+    expect(notification.delivered).to eq(true)
   end
 
   it 'does not deliver a notification not due to be retried' do
     Rpush::Daemon.store.mark_retryable(notification, Time.now + 1.minute)
-
-    expect do
-      Rpush.push
-      notification.reload
-    end.to_not change(notification, :delivered).to(true)
+    Rpush.push
+    notification.reload
+    expect(notification.delivered).to eq(false)
   end
 end

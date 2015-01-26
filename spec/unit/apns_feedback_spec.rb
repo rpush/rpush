@@ -5,17 +5,17 @@ describe Rpush, 'apns_feedback' do
   let(:receiver) { double(check_for_feedback: nil) }
 
   before do
-    Rpush::Daemon::Apns::FeedbackReceiver.stub(new: receiver)
+    allow(Rpush::Daemon::Apns::FeedbackReceiver).to receive(:new) { receiver }
   end
 
   it 'initializes the daemon' do
-    Rpush::Daemon.should_receive(:common_init)
+    expect(Rpush::Daemon).to receive(:common_init)
     Rpush.apns_feedback
   end
 
   it 'checks feedback for each app' do
-    Rpush::Daemon::Apns::FeedbackReceiver.should_receive(:new).with(app).and_return(receiver)
-    receiver.should_receive(:check_for_feedback)
+    expect(Rpush::Daemon::Apns::FeedbackReceiver).to receive(:new).with(app).and_return(receiver)
+    expect(receiver).to receive(:check_for_feedback)
     Rpush.apns_feedback
   end
 end

@@ -53,7 +53,7 @@ end
 RSpec.configure do |config|
   config.before(:each) do
     Rpush.config.log_file = File.join(RPUSH_ROOT, 'rpush.log')
-    Rpush.stub(root: RPUSH_ROOT)
+    allow(Rpush).to receive(:root) { RPUSH_ROOT }
   end
 
   config.after(:each) do

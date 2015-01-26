@@ -4,7 +4,7 @@
    it 'yields reflections for configuration' do
      did_yield = false
      Rpush.reflect { did_yield = true }
-     did_yield.should be_true
+     expect(did_yield).to eq(true)
    end
  end
 
@@ -15,7 +15,7 @@
        on.error { did_yield = true }
      end
      Rpush.reflection_stack[0].__dispatch(:error)
-     did_yield.should be_true
+     expect(did_yield).to eq(true)
    end
 
    it 'raises an error when trying to dispatch and unknown reflection' do

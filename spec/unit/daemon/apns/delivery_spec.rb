@@ -10,42 +10,42 @@ describe Rpush::Daemon::Apns::Delivery do
   let(:delivery) { Rpush::Daemon::Apns::Delivery.new(app, connection, batch) }
 
   before do
-    batch.stub(:each_notification) do |&blk|
+    allow(batch).to receive(:each_notification) do |&blk|
       [notification1, notification2].each(&blk)
     end
-    Rpush.stub(logger: logger)
+    allow(Rpush).to receive_messages(logger: logger)
   end
 
   it 'writes the binary batch' do
-    notification1.stub(to_binary: 'binary1')
-    notification2.stub(to_binary: 'binary2')
-    connection.should_receive(:write).with('binary1binary2')
+    allow(notification1).to receive_messages(to_binary: 'binary1')
+    allow(notification2).to receive_messages(to_binary: 'binary2')
+    expect(connection).to receive(:write).with('binary1binary2')
     delivery.perform
   end
 
   it 'logs the notification deliveries' do
-    notification1.stub(id: 666, device_token: 'abc123')
-    notification2.stub(id: 42, device_token: 'abc456')
-    logger.should_receive(:info).with('[MyApp] 666 sent to abc123')
-    logger.should_receive(:info).with('[MyApp] 42 sent to abc456')
+    allow(notification1).to receive_messages(id: 666, device_token: 'abc123')
+    allow(notification2).to receive_messages(id: 42, device_token: 'abc456')
+    expect(logger).to receive(:info).with('[MyApp] 666 sent to abc123')
+    expect(logger).to receive(:info).with('[MyApp] 42 sent to abc456')
     delivery.perform
   end
 
   it 'marks all notifications as delivered' do
-    delivery.should_receive(:mark_batch_delivered)
+    expect(delivery).to receive(:mark_batch_delivered)
     delivery.perform
   end
 
   it 'notifies the batch all notifications have been processed' do
-    batch.should_receive(:all_processed)
+    expect(batch).to receive(:all_processed)
     delivery.perform
   end
 
   describe 'when an error is raised' do
     it 'marks all notifications as failed' do
       error = StandardError.new
-      connection.stub(:write).and_raise(error)
-      delivery.should_receive(:mark_batch_failed).with(error)
+      allow(connection).to receive(:write).and_raise(error)
+      expect(delivery).to receive(:mark_batch_failed).with(error)
       expect { delivery.perform }.to raise_error(error)
     end
   end

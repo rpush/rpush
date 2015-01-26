@@ -9,19 +9,19 @@ describe Rpush::Reflectable do
   let(:test_reflectable) { TestReflectable.new }
 
   before do
-    Rpush.reflection_stack[0].stub(:__dispatch)
-    Rpush.stub(logger: logger)
+    allow(Rpush.reflection_stack[0]).to receive(:__dispatch)
+    allow(Rpush).to receive_messages(logger: logger)
   end
 
   it 'dispatches the given reflection' do
-    Rpush.reflection_stack[0].should_receive(:__dispatch).with(:error)
+    expect(Rpush.reflection_stack[0]).to receive(:__dispatch).with(:error)
     test_reflectable.reflect(:error)
   end
 
   it 'logs errors raised by the reflection' do
     error = StandardError.new
-    Rpush.reflection_stack[0].stub(:__dispatch).and_raise(error)
-    Rpush.logger.should_receive(:error).with(error)
+    allow(Rpush.reflection_stack[0]).to receive(:__dispatch).and_raise(error)
+    expect(Rpush.logger).to receive(:error).with(error)
     test_reflectable.reflect(:error)
   end
 end
