@@ -192,7 +192,6 @@ GEM
     timecop (0.7.1)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    yajl-ruby (1.2.1)
 
 PLATFORMS
   java
@@ -211,7 +210,7 @@ DEPENDENCIES
   jruby-openssl
   mysql2
   pg
-  rails (~> 4.1)
+  rails (~> 4.2)
   rake
   rpush!
   rpush-redis (= 0.4.1)
@@ -220,4 +219,3 @@ DEPENDENCIES
   simplecov
   sqlite3
   timecop
-  yajl-ruby

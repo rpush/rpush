@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gem 'rake'
 gem 'rspec', '= 2.14.1'
-gem 'rails', '~> 4.1'
+gem 'rails', '~> 4.2'
 gem 'database_cleaner'
 gem 'timecop'
 gem 'rpush-redis', '0.4.1'
@@ -17,7 +17,6 @@ end
 platform :ruby do
   gem 'pg'
   gem 'mysql2'
-  gem 'yajl-ruby'
   gem 'sqlite3'
 end
 
