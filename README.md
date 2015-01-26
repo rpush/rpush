@@ -152,6 +152,8 @@ $ rpush start
 $ rpush push
 ```
 
+Rpush will deliver all pending notifications and then exit.
+
 #### In a scheduled job
 
 ```ruby
@@ -164,11 +166,10 @@ See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
 #### Embedded inside an existing process
 
 ```ruby
-# Call this during startup of your application, for example, by adding it to the end of config/rpush.rb
 Rpush.embed
 ```
 
-See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
+Call this during startup of your application, for example, by adding it to the end of `config/rpush.rb`. See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
 
 ### Configuration
 
@@ -178,7 +179,7 @@ See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a lis
 
 You should run `rpush init` after upgrading Rpush to check for configuration and migration changes.
 
-### Wiki
+### From The Wiki
 
 ### General
 * [Using Redis](https://github.com/rpush/rpush/wiki/Using-Redis)
