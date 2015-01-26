@@ -34,13 +34,13 @@ Rpush aims to be the defacto gem for sending push notifications in Ruby. Its cor
 
 Add it to your Gemfile:
 
-```ruby
+```sh
 gem 'rpush'
 ```
 
 Initialize Rpush into your project. **Rails will be detected automatically.**
 
-```
+```sh
 cd /path/to/project
 rpush init
 ```
@@ -141,14 +141,14 @@ See `rpush help` for all available commands and options.
 
 #### As a daemon
 
-```
+```sh
 cd /path/to/project
 rpush start
 ```
 
 #### On the command-line
 
-```
+```sh
 rpush push
 ```
 
