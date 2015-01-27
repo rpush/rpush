@@ -9,8 +9,6 @@ services:
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 
-#install: tools/cached-bundle install --deployment
-
 env:
   global:
     - AMAZON_S3_BUCKET=rpush
