@@ -1,5 +1,7 @@
 ## (unreleased)
+  Bug fixes:
   * Rpush.push nows delivers all pending notifications before returning.
+  * Require thor >= 0.18.1 (#121).
 
 ## 2.3.1 (Jan 24, 2015)
   * Fix CPU thrashing while waiting for an APNs connection be established (#119).

@@ -7,7 +7,7 @@ PATH
       multi_json (~> 1.0)
       net-http-persistent
       railties
-      thor
+      thor (>= 0.18.1, < 2.0)
 
 GEM
   remote: https://rubygems.org/
