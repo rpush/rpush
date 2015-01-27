@@ -1,5 +1,6 @@
 ## (unreleased)
   Bug fixes:
+  * Internal sleep mechanism would sometimes no wait for the full duration specified.
   * Rpush.push nows delivers all pending notifications before returning.
   * Require thor >= 0.18.1 (#121).
 
