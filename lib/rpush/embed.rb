@@ -9,6 +9,7 @@ module Rpush
     config = Rpush::ConfigurationWithoutDefaults.new
     options.each { |k, v| config.send("#{k}=", v) }
     config.embedded = true
+    config.foreground = true
     Rpush.config.update(config)
     Kernel.at_exit { shutdown }
     @embed_thread = Thread.new { Rpush::Daemon.start }
