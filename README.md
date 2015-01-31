@@ -166,7 +166,13 @@ See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
 #### Embedded inside an existing process
 
 ```ruby
-Rpush.embed
+if defined?(Rails)
+  ActiveSupport.on_load(:after_initialize) do
+    Rpush.embed
+  end
+else
+  Rpush.embed
+end
 ```
 
 Call this during startup of your application, for example, by adding it to the end of `config/rpush.rb`. See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
