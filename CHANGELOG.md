@@ -1,4 +1,4 @@
-## (unreleased)
+## 2.3.2 (Jan 30, 2015)
   Bug fixes:
   * Internal sleep mechanism would sometimes no wait for the full duration specified.
   * Rpush.push nows delivers all pending notifications before returning.
