@@ -93,6 +93,7 @@ module Rpush
         end
 
         def handle_error(code, notification_id)
+          notification_id = Rpush::Daemon.store.translate_integer_notification_id(notification_id)
           failed_pos = delivered_buffer.index(notification_id)
           description = APNS_ERRORS[code.to_i] || "Unknown error code #{code.inspect}. Possible Rpush bug?"
           log_error(description + " (#{code})")

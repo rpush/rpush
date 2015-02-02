@@ -66,7 +66,7 @@ module Rpush
 
           def to_binary(options = {}) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             frame_payload = payload
-            frame_id = options[:for_validation] ? 0 : id
+            frame_id = options[:for_validation] ? 0 : send(options.fetch(:id_attribute, :id))
             frame = ""
             frame << [1, 32, device_token].pack("cnH*")
             frame << [2, frame_payload.bytesize, frame_payload].pack("cna*")

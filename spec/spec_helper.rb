@@ -31,6 +31,11 @@ def redis?
   client == :redis
 end
 
+def mongoid?
+  client == :mongoid
+end
+
+require 'support/mongoid_setup' if mongoid?
 require 'support/active_record_setup' if active_record?
 
 RPUSH_ROOT = '/tmp/rails_root'

@@ -66,6 +66,8 @@ GEM
     ast (2.0.0)
     astrolabe (1.3.0)
       parser (>= 2.2.0.pre.3, < 3.0)
+    bson (2.3.0)
+    bson (2.3.0-java)
     builder (3.2.2)
     cane (2.6.2)
       parallel
@@ -110,6 +112,17 @@ GEM
       hiredis (>= 0.5)
       msgpack-jruby
       redis (>= 3.0)
+    mongoid (4.0.1)
+      activemodel (~> 4.0)
+      moped (~> 2.0.0)
+      origin (~> 2.1)
+      tzinfo (>= 0.3.37)
+    mongoid-autoinc (4.0.0)
+      mongoid (~> 4.0)
+    moped (2.0.3)
+      bson (~> 2.2)
+      connection_pool (~> 2.0)
+      optionable (~> 0.2.0)
     msgpack (0.5.11)
     msgpack-jruby (1.4.1-java)
     multi_json (1.10.1)
@@ -118,6 +131,8 @@ GEM
     nokogiri (1.6.6.2)
       mini_portile (~> 0.6.0)
     nokogiri (1.6.6.2-java)
+    optionable (0.2.0)
+    origin (2.1.1)
     parallel (1.3.3)
     parser (2.2.0.2)
       ast (>= 1.1, < 3.0)
@@ -153,6 +168,9 @@ GEM
     rainbow (2.0.0)
     rake (10.4.2)
     redis (3.2.0)
+    rpush-mongoid (0.1.0)
+      mongoid (~> 4.0.0)
+      mongoid-autoinc (~> 4.0.0)
     rpush-redis (0.4.1)
       modis (~> 1.4, >= 1.4.1)
     rspec (3.2.0)
@@ -218,6 +236,7 @@ DEPENDENCIES
   rails (~> 4.2)
   rake
   rpush!
+  rpush-mongoid (= 0.1.0)
   rpush-redis (= 0.4.1)
   rspec
   rubocop

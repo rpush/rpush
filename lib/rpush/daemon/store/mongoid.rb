@@ -1,23 +1,20 @@
 module Rpush
   module Daemon
     module Store
-      class Redis
+      class Mongoid
         DEFAULT_MARK_OPTIONS = { persist: true }
 
         def app(app_id)
-          Rpush::Client::Redis::App.find(app_id)
+          Rpush::Client::Mongoid::App.find(app_id)
         end
 
         def all_apps
-          Rpush::Client::Redis::App.all
+          Rpush::Client::Mongoid::App.all
         end
 
         def deliverable_notifications(limit)
-          retryable_ids = retryable_notification_ids
-          limit -= retryable_ids.size
-          pending_ids = limit > 0 ? pending_notification_ids(limit) : []
-          ids = retryable_ids + pending_ids
-          ids.map { |id| Rpush::Client::Redis::Notification.find(id) }
+          relation = ready_for_delivery.limit(limit)
+          claim_notifications(relation)
         end
 
         def mark_delivered(notification, time, opts = {})
@@ -49,7 +46,7 @@ module Rpush
         end
 
         def mark_ids_failed(ids, code, description, time)
-          ids.each { |id| mark_failed(Rpush::Client::Redis::Notification.find(id), code, description, time) }
+          ids.each { |id| mark_failed(Rpush::Client::Mongoid::Notification.find(id), code, description, time) }
         end
 
         def mark_retryable(notification, deliver_after, opts = {})
@@ -64,10 +61,6 @@ module Rpush
           return unless opts[:persist]
 
           notification.save!(validate: false)
-          namespace = Rpush::Client::Redis::Notification.absolute_retryable_namespace
-          Modis.with_connection do |redis|
-            redis.zadd(namespace, deliver_after.to_i, notification.id)
-          end
         end
 
         def mark_batch_retryable(notifications, deliver_after)
@@ -75,20 +68,20 @@ module Rpush
         end
 
         def mark_ids_retryable(ids, deliver_after)
-          ids.each { |id| mark_retryable(Rpush::Client::Redis::Notification.find(id), deliver_after) }
+          ids.each { |id| mark_retryable(Rpush::Client::Mongoid::Notification.find(id), deliver_after) }
         end
 
         def create_apns_feedback(failed_at, device_token, app)
-          Rpush::Client::Redis::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app_id: app.id)
+          Rpush::Client::Mongoid::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app: app)
         end
 
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
-          notification = Rpush::Client::Redis::Gcm::Notification.new
+          notification = Rpush::Client::Mongoid::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
-          notification = Rpush::Client::Redis::Adm::Notification.new
+          notification = Rpush::Client::Mongoid::Adm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
@@ -107,19 +100,28 @@ module Rpush
         end
 
         def pending_delivery_count
-          Modis.with_connection do |redis|
-            pending = redis.zrange(Rpush::Client::Redis::Notification.absolute_pending_namespace, 0, -1)
-            retryable = redis.zrangebyscore(Rpush::Client::Redis::Notification.absolute_retryable_namespace, 0, Time.now.to_i)
-
-            pending.count + retryable.count
-          end
+          ready_for_delivery.count
         end
 
         def translate_integer_notification_id(id)
-          id
+          Rpush::Client::Mongoid::Notification.find_by(integer_id: id).id
         end
 
         private
+
+        def ready_for_delivery
+          Rpush::Client::Mongoid::Notification.where(processing: false, delivered: false, failed: false).or({ deliver_after: nil }, :deliver_after.lt => Time.now)
+        end
+
+        def mark_processing(notifications)
+          Rpush::Client::Mongoid::Notification.where(id: notifications.map(&:id)).update_all(processing: true)
+        end
+
+        def claim_notifications(relation)
+          ids = relation.map(:id)
+          relation.where('$isolated' => 1).in(id: ids).update_all(processing: true, processing_pid: Process.pid)
+          Rpush::Client::Mongoid::Notification.where(processing: true, processing_pid: Process.pid).in(id: ids).asc('created_at')
+        end
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
           notification.assign_attributes(attrs)
@@ -130,37 +132,9 @@ module Rpush
           notification.save!
           notification
         end
-
-        def retryable_notification_ids
-          retryable_ns = Rpush::Client::Redis::Notification.absolute_retryable_namespace
-
-          Modis.with_connection do |redis|
-            retryable_results = redis.multi do
-              now = Time.now.to_i
-              redis.zrangebyscore(retryable_ns, 0, now)
-              redis.zremrangebyscore(retryable_ns, 0, now)
-            end
-
-            retryable_results.first
-          end
-        end
-
-        def pending_notification_ids(limit)
-          limit = [0, limit - 1].max # 'zrange key 0 1' will return 2 values, not 1.
-          pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
-
-          Modis.with_connection do |redis|
-            pending_results = redis.multi do
-              redis.zrange(pending_ns, 0, limit)
-              redis.zremrangebyrank(pending_ns, 0, limit)
-            end
-
-            pending_results.first
-          end
-        end
       end
     end
   end
 end
 
-Rpush::Daemon::Store::Interface.check(Rpush::Daemon::Store::Redis)
+Rpush::Daemon::Store::Interface.check(Rpush::Daemon::Store::Mongoid)
