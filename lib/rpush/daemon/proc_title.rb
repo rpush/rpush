@@ -2,6 +2,7 @@ module Rpush
   module Daemon
     class ProcTitle
       def self.update
+        return if Rpush.config.embedded || Rpush.config.push
         $0 = proc_title
       end
 
