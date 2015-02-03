@@ -75,7 +75,7 @@ module Rpush
       self.logger = nil
       self.log_file = 'log/rpush.log'
       self.pid_file = 'tmp/rpush.pid'
-      self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::INFO
+      self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::DEBUG
       self.plugin = OpenStruct.new
       self.foreground = false
 

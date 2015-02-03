@@ -3,12 +3,9 @@ module Rpush
     attr_reader :internal_logger
 
     def initialize
-      if Rpush.config.logger
-        @internal_logger = Rpush.config.logger
-      else
-        @internal_logger = setup_logger(open_logfile)
-      end
-    rescue Errno::ENOENT, Errno::EPERM => e
+      @internal_logger = Rpush.config.logger || setup_logger(open_logfile)
+      @internal_logger.level = Rpush.config.log_level
+    rescue SystemCallError => e
       @internal_logger = nil
       error(e)
       error('Logging disabled.')
@@ -46,11 +43,11 @@ module Rpush
 
     def setup_logger(log)
       if ActiveSupport.const_defined?('BufferedLogger')
-        logger = ActiveSupport::BufferedLogger.new(log, Rpush.config.log_level)
+        logger = ActiveSupport::BufferedLogger.new(log)
         logger.auto_flushing = auto_flushing
         logger
       else
-        ActiveSupport::Logger.new(log, Rpush.config.log_level)
+        ActiveSupport::Logger.new(log)
       end
     end
 

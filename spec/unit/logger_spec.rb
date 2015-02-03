@@ -5,11 +5,11 @@ module Rails
 end
 
 describe Rpush::Logger do
-  let(:log) { double(:sync= => true) }
+  let(:log) { double(:sync= => true, :level= => nil) }
 
   before do
     @logger_class = defined?(ActiveSupport::BufferedLogger) ? ActiveSupport::BufferedLogger : ActiveSupport::Logger
-    @logger = double(@logger_class.name, info: nil, error: nil, level: 0, auto_flushing: true, :auto_flushing= => nil)
+    @logger = double(@logger_class.name, info: nil, error: nil, level: 0, :level= => nil, auto_flushing: true, :auto_flushing= => nil)
     allow(@logger_class).to receive(:new).and_return(@logger)
     allow(Rails).to receive_messages(logger: @logger)
     allow(File).to receive_messages(open: log)
@@ -41,7 +41,7 @@ describe Rpush::Logger do
   end
 
   it 'uses the user-defined logger' do
-    my_logger = double
+    my_logger = double(:level= => nil)
     Rpush.config.logger = my_logger
     logger = Rpush::Logger.new
     expect(my_logger).to receive(:info)
@@ -51,7 +51,7 @@ describe Rpush::Logger do
 
   it 'uses ActiveSupport::BufferedLogger if a user-defined logger is not set' do
     if ActiveSupport.const_defined?('BufferedLogger')
-      expect(ActiveSupport::BufferedLogger).to receive(:new).with(log, Rails.logger.level)
+      expect(ActiveSupport::BufferedLogger).to receive(:new).with(log)
       Rpush::Logger.new
     end
   end
@@ -59,7 +59,16 @@ describe Rpush::Logger do
   it 'uses ActiveSupport::Logger if BufferedLogger does not exist' do
     stub_const('ActiveSupport::Logger', double)
     allow(ActiveSupport).to receive_messages(:const_defined? => false)
-    expect(ActiveSupport::Logger).to receive(:new).with(log, Rails.logger.level)
+    expect(ActiveSupport::Logger).to receive(:new).with(log).and_return(log)
+    Rpush::Logger.new
+  end
+
+  it 'sets the log level on the logger' do
+    stub_const('ActiveSupport::Logger', double)
+    allow(ActiveSupport).to receive_messages(:const_defined? => false)
+    expect(ActiveSupport::Logger).to receive(:new).with(log).and_return(log)
+    Rpush.config.log_level = ::Logger::Severity::ERROR
+    expect(log).to receive(:level=).with(::Logger::Severity::ERROR)
     Rpush::Logger.new
   end
 

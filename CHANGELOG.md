@@ -1,3 +1,7 @@
+## 2.3.3 (unreleased)
+  Bug fixes:
+  * Fix setting the log level when using Rails 4+ or without Rails (#124).
+
 ## 2.3.2 (Jan 30, 2015)
   Bug fixes:
   * Internal sleep mechanism would sometimes no wait for the full duration specified.
