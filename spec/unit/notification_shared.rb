@@ -18,7 +18,7 @@ shared_examples_for "an Notification subclass" do
 
     it "raises an ArgumentError if something other than a Hash is assigned" do
       expect do
-        notification.data = Array.new
+        notification.data = []
       end.to raise_error(ArgumentError, "must be a Hash")
     end
 

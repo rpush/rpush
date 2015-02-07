@@ -18,9 +18,9 @@ module Rpush
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
-  class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS); end
+  class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS); end # rubocop:disable Style/StructInheritance
 
-  class Configuration < Struct.new(*CONFIG_ATTRS)
+  class Configuration < Struct.new(*CONFIG_ATTRS) # rubocop:disable Style/StructInheritance
     include Deprecatable
 
     deprecated(:log_dir=, '2.3.0', 'Please use log_file instead.')
