@@ -18,4 +18,4 @@ describe Rpush::Client::ActiveRecord::Notification do
     expect(notification.app).to be_valid
     expect(notification).to be_valid
   end
-end
+end if active_record?

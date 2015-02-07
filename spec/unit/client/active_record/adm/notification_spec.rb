@@ -40,4 +40,4 @@ describe Rpush::Client::ActiveRecord::Adm::Notification do
     notification.expiry = 100
     expect(notification.as_json['expiresAfter']).to eq 100
   end
-end
+end if active_record?

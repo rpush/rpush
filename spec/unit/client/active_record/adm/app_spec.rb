@@ -55,4 +55,4 @@ describe Rpush::Client::ActiveRecord::Adm::App do
       expect(subject.access_token_expired?).to eq(false)
     end
   end
-end
+end if active_record?

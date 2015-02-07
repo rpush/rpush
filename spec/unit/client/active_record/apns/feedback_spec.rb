@@ -6,4 +6,4 @@ describe Rpush::Client::ActiveRecord::Apns::Feedback do
     expect(notification.valid?).to be_falsey
     expect(notification.errors[:device_token]).to include('is invalid')
   end
-end
+end if active_record?

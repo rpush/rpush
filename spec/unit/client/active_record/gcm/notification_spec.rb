@@ -31,4 +31,4 @@ describe Rpush::Client::ActiveRecord::Gcm::Notification do
     notification.expiry = 100
     expect(notification.as_json['time_to_live']).to eq 100
   end
-end
+end if active_record?

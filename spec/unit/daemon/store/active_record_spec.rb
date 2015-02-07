@@ -345,4 +345,4 @@ describe Rpush::Daemon::Store::ActiveRecord do
       expect(new_notification.new_record?).to be_falsey
     end
   end
-end
+end if active_record?

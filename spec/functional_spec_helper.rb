@@ -11,12 +11,12 @@ RSpec.configure do |config|
   config.before(:each) do
     Modis.with_connection do |redis|
       redis.keys('rpush:*').each { |key| redis.del(key) }
-    end
+    end if redis?
 
     Rpush.config.logger = ::Logger.new(STDOUT) if functional_example?(self.class.metadata)
   end
 
   config.after(:each) do
-    DatabaseCleaner.clean if functional_example?(self.class.metadata)
+    DatabaseCleaner.clean if active_record? && functional_example?(self.class.metadata)
   end
 end

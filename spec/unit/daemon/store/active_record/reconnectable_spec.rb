@@ -132,4 +132,4 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
       end
     end
   end
-end
+end if active_record?

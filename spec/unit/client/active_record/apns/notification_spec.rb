@@ -30,7 +30,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
   it "should default the expiry to 1 day" do
     expect(notification.expiry).to eq 1.day.to_i
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, "when assigning the device token" do
   it "should strip spaces from the given string" do
@@ -42,7 +42,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "when assigning the de
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new(device_token: "<omg>")
     expect(notification.device_token).to eq "omg"
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
   it "should include the alert if present" do
@@ -92,7 +92,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
     notification.data = { omg: { ilike: :hashes } }
     expect(notification.as_json["omg"]["ilike"]).to eq "hashes"
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
   let(:magic) { 'abc123' }
@@ -108,7 +108,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
     notification.mdm = magic
     expect(notification.as_json.key?('aps')).to be_falsey
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
@@ -140,7 +140,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
     expect(notification.as_json['aps']['content-available']).to eq 1
     expect(notification.as_json['hi']).to eq 'mom'
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'url-args' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
@@ -153,7 +153,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'url-args' do
   it 'does not include url-args in the payload if not set' do
     expect(notification.as_json['aps'].key?('url-args')).to be_falsey
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'category' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
@@ -166,7 +166,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'category' do
   it 'does not include category in the payload if not set' do
     expect(notification.as_json['aps'].key?('category')).to be_falsey
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
@@ -206,7 +206,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     expect(notification.to_binary).to eq "\x02\x00\x00\x00\x99\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04\x00\x01Q\x80\x05\x00\x01\n"
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #31" do
   it 'does not confuse a JSON looking string as JSON' do
@@ -221,7 +221,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #31" do
     notification.alert = "{\"one\":2}"
     expect(notification.alert).to eq('one' => 2)
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
   it "should limit payload size to 256 bytes but not the entire packet" do
@@ -235,7 +235,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
     expect(notification.payload.bytesize).to be < 256
     expect(notification).to be_valid
   end
-end
+end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, "multi_json usage" do
   describe Rpush::Client::ActiveRecord::Apns::Notification, "alert" do
@@ -253,4 +253,4 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "multi_json usage" do
       notification.alert
     end
   end
-end
+end if active_record?

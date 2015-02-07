@@ -26,4 +26,4 @@ describe Rpush::Client::ActiveRecord::App do
     app.valid?
     expect(app.errors[:certificate]).to eq ['value must contain a certificate and a private key.']
   end
-end
+end if active_record?

@@ -1,5 +1,7 @@
 ENV['RAILS_ENV'] = 'test'
-client = (ENV['CLIENT'] || :active_record).to_sym
+def client
+  (ENV['CLIENT'] || :active_record).to_sym
+end
 
 require 'bundler/setup'
 Bundler.require(:default)
@@ -21,7 +23,15 @@ require 'rpush/client/active_record'
 require 'rpush/daemon/store/active_record'
 require 'rpush/daemon/store/redis'
 
-require 'support/active_record_setup'
+def active_record?
+  client == :active_record
+end
+
+def redis?
+  client == :redis
+end
+
+require 'support/active_record_setup' if active_record?
 
 RPUSH_ROOT = '/tmp/rails_root'
 
@@ -30,10 +40,6 @@ Rpush.configure do |config|
 end
 
 RPUSH_CLIENT = Rpush.config.client
-
-def active_record?
-  Rpush.config.client == :active_record
-end
 
 path = File.join(File.dirname(__FILE__), 'support')
 TEST_CERT = File.read(File.join(path, 'cert_without_password.pem'))

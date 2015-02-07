@@ -13,9 +13,9 @@ RSpec.configure do |config|
   config.before(:each) do
     Modis.with_connection do |redis|
       redis.keys('rpush:*').each { |key| redis.del(key) }
-    end
+    end if redis?
 
-    if unit_example?(self.class.metadata)
+    if active_record? && unit_example?(self.class.metadata)
       connection = ActiveRecord::Base.connection
 
       if rails4?
@@ -29,7 +29,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    if unit_example?(self.class.metadata)
+    if active_record? && unit_example?(self.class.metadata)
       connection = ActiveRecord::Base.connection
 
       if rails4?

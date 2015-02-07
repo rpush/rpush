@@ -18,4 +18,4 @@ describe Rpush::Client::ActiveRecord::Wpns::Notification do
     notification.valid?
     expect(notification.errors[:data]).to include("can't be blank")
   end
-end
+end if active_record?

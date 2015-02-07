@@ -27,4 +27,4 @@ describe Rpush::Client::ActiveRecord::App do
       expect { app.valid? }.to raise_error(NameError)
     end
   end
-end
+end if active_record?
