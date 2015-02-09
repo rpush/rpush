@@ -3,7 +3,7 @@ module Rpush
     class ProcTitle
       def self.update
         return if Rpush.config.embedded || Rpush.config.push
-        $0 = proc_title
+        Process.respond_to?(:setproctitle) ? Process.setproctitle(proc_title) : $0 = proc_title
       end
 
       def self.proc_title

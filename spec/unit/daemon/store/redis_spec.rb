@@ -1,10 +1,10 @@
 require 'unit_spec_helper'
-require 'rpush/daemon/store/mongoid'
+require 'rpush/daemon/store/redis'
 
-describe Rpush::Daemon::Store::Mongoid do
-  let(:app) { Rpush::Client::Mongoid::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
-  let(:notification) { Rpush::Client::Mongoid::Apns::Notification.create!(device_token: "a" * 64, app: app) }
-  let(:store) { Rpush::Daemon::Store::Mongoid.new }
+describe Rpush::Daemon::Store::Redis do
+  let(:app) { Rpush::Client::Redis::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.create!(device_token: "a" * 64, app: app) }
+  let(:store) { Rpush::Daemon::Store::Redis.new }
   let(:time) { Time.now.utc }
   let(:logger) { double(Rpush::Logger, error: nil, internal_logger: nil) }
 
@@ -24,15 +24,17 @@ describe Rpush::Daemon::Store::Mongoid do
   end
 
   it 'finds an app by ID' do
+    app
     expect(store.app(app.id)).to eq(app)
   end
 
   it 'finds all apps' do
+    app
     expect(store.all_apps).to eq([app])
   end
 
   it 'translates an Integer notification ID' do
-    expect(store.translate_integer_notification_id(notification.integer_id)).to eq(notification.id)
+    expect(store.translate_integer_notification_id(notification.id)).to eq(notification.id)
   end
 
   it 'returns the pending notification count' do
@@ -42,11 +44,9 @@ describe Rpush::Daemon::Store::Mongoid do
 
   describe 'deliverable_notifications' do
     it 'loads notifications in batches' do
-      Rpush.config.batch_size = 5000
-      relation = double.as_null_object
-      expect(relation).to receive(:limit).with(5000)
-      allow(relation).to receive_messages(to_a: [])
-      allow(store).to receive_messages(ready_for_delivery: relation)
+      Rpush.config.batch_size = 100
+      allow(store).to receive_messages(pending_notification_ids: [1, 2, 3, 4])
+      expect(Rpush::Client::Redis::Notification).to receive(:find).exactly(4).times
       store.deliverable_notifications(Rpush.config.batch_size)
     end
 
@@ -61,17 +61,23 @@ describe Rpush::Daemon::Store::Mongoid do
     end
 
     it 'does not load an notification with a deliver_after time in the future' do
-      notification.update_attributes!(delivered: false, deliver_after: 1.hour.from_now)
+      notification
+      notification = store.deliverable_notifications(Rpush.config.batch_size).first
+      store.mark_retryable(notification, 1.hour.from_now)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
 
     it 'does not load a previously delivered notification' do
-      notification.update_attributes!(delivered: true, delivered_at: time)
+      notification
+      notification = store.deliverable_notifications(Rpush.config.batch_size).first
+      store.mark_delivered(notification, Time.now)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
 
     it "does not enqueue a notification that has previously failed delivery" do
-      notification.update_attributes!(delivered: false, failed: true)
+      notification
+      notification = store.deliverable_notifications(Rpush.config.batch_size).first
+      store.mark_failed(notification, 0, "failed", Time.now)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
   end
@@ -98,6 +104,17 @@ describe Rpush::Daemon::Store::Mongoid do
     it 'does not save the notification if persist: false' do
       expect(notification).not_to receive(:save!)
       store.mark_retryable(notification, time, persist: false)
+    end
+  end
+
+  describe 'mark_ids_retryable' do
+    let(:deliver_after) { time + 10.seconds }
+
+    it 'sets the deliver after timestamp' do
+      expect do
+        store.mark_ids_retryable([notification.id], deliver_after)
+        notification.reload
+      end.to change { notification.deliver_after.try(:utc).to_s }.to(deliver_after.utc.to_s)
     end
   end
 
@@ -215,6 +232,15 @@ describe Rpush::Daemon::Store::Mongoid do
     end
   end
 
+  describe 'mark_ids_failed' do
+    it 'marks the notification as failed' do
+      expect do
+        store.mark_ids_failed([notification.id], nil, '', Time.now)
+        notification.reload
+      end.to change(notification, :failed).to(true)
+    end
+  end
+
   describe 'mark_batch_failed' do
     it 'sets the attributes on the object for use in reflections' do
       store.mark_batch_failed([notification], 123, 'an error')
@@ -263,8 +289,8 @@ describe Rpush::Daemon::Store::Mongoid do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      expect(Rpush::Client::Mongoid::Apns::Feedback).to receive(:create!).with(
-        failed_at: time, device_token: 'ab' * 32, app: app)
+      expect(Rpush::Client::Redis::Apns::Feedback).to receive(:create!).with(
+        failed_at: time, device_token: 'ab' * 32, app_id: app.id)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end
   end
@@ -336,4 +362,4 @@ describe Rpush::Daemon::Store::Mongoid do
       expect(new_notification.new_record?).to be_falsey
     end
   end
-end if mongoid?
+end if redis?

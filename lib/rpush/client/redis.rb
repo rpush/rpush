@@ -1,3 +1,5 @@
+
+# :nocov:
 begin
   require 'modis'
   require 'redis'
