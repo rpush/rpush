@@ -91,11 +91,7 @@ module Rpush
       client_module = Rpush::Client.const_get(client.to_s.camelize)
       Rpush.send(:include, client_module)
 
-      # [:Apns, :Gcm, :Wpns, :Adm].each do |service|
-      #   Rpush.const_set(service, client_module.const_get(service))
-      # end
-
-      [:Apns].each do |service|
+      [:Apns, :Gcm, :Wpns, :Adm].each do |service|
         Rpush.const_set(service, client_module.const_get(service))
       end
 
