@@ -28,6 +28,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   end
 
   it 'finds all apps' do
+    app
     expect(store.all_apps).to eq([app])
   end
 
