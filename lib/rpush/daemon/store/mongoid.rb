@@ -25,8 +25,15 @@ module Rpush
         end
 
         def mark_batch_delivered(notifications)
+          return if notifications.empty?
+
           now = Time.now
-          notifications.each { |n| mark_delivered(n, now) }
+          ids = []
+          notifications.each do |n|
+            mark_delivered(n, now, persist: false)
+            ids << n.id
+          end
+          Rpush::Client::Mongoid::Notification.in(id: ids).update_all(processing: false, delivered: true, delivered_at: now)
         end
 
         def mark_failed(notification, code, description, time, opts = {})
@@ -42,11 +49,18 @@ module Rpush
 
         def mark_batch_failed(notifications, code, description)
           now = Time.now
-          notifications.each { |n| mark_failed(n, code, description, now) }
+          ids = []
+          notifications.each do |n|
+            mark_failed(n, code, description, now, persist: false)
+            ids << n.id
+          end
+          mark_ids_failed(ids, code, description, now)
         end
 
         def mark_ids_failed(ids, code, description, time)
-          ids.each { |id| mark_failed(Rpush::Client::Mongoid::Notification.find(id), code, description, time) }
+          return if ids.empty?
+
+          Rpush::Client::Mongoid::Notification.in(id: ids).update_all(processing: false, delivered: false, delivered_at: nil, failed: true, failed_at: time, error_code: code, error_description: description)
         end
 
         def mark_retryable(notification, deliver_after, opts = {})
@@ -64,11 +78,18 @@ module Rpush
         end
 
         def mark_batch_retryable(notifications, deliver_after)
-          notifications.each { |n| mark_retryable(n, deliver_after) }
+          ids = []
+          notifications.each do |n|
+            mark_retryable(n, deliver_after, persist: false)
+            ids << n.id
+          end
+          mark_ids_retryable(ids, deliver_after)
         end
 
         def mark_ids_retryable(ids, deliver_after)
-          ids.each { |id| mark_retryable(Rpush::Client::Mongoid::Notification.find(id), deliver_after) }
+          return if ids.empty?
+
+          Rpush::Client::Mongoid::Notification.in(id: ids).update_all(processing: false, delivered: false, delivered_at: nil, failed: false, failed_at: nil, deliver_after: deliver_after, '$inc' => { retries: 1 })
         end
 
         def create_apns_feedback(failed_at, device_token, app)
@@ -111,10 +132,6 @@ module Rpush
 
         def ready_for_delivery
           Rpush::Client::Mongoid::Notification.where(processing: false, delivered: false, failed: false).or({ deliver_after: nil }, :deliver_after.lt => Time.now)
-        end
-
-        def mark_processing(notifications)
-          Rpush::Client::Mongoid::Notification.where(id: notifications.map(&:id)).update_all(processing: true)
         end
 
         def claim_notifications(relation)

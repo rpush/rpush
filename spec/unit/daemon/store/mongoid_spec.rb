@@ -1,10 +1,10 @@
 require 'unit_spec_helper'
-require 'rpush/daemon/store/active_record'
+require 'rpush/daemon/store/mongoid'
 
-describe Rpush::Daemon::Store::ActiveRecord do
-  let(:app) { Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.create!(device_token: "a" * 64, app: app) }
-  let(:store) { Rpush::Daemon::Store::ActiveRecord.new }
+describe Rpush::Daemon::Store::Mongoid do
+  let(:app) { Rpush::Client::Mongoid::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification) { Rpush::Client::Mongoid::Apns::Notification.create!(device_token: "a" * 64, app: app) }
+  let(:store) { Rpush::Daemon::Store::Mongoid.new }
   let(:time) { Time.now.utc }
   let(:logger) { double(Rpush::Logger, error: nil, internal_logger: nil) }
 
@@ -32,7 +32,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
   end
 
   it 'translates an Integer notification ID' do
-    expect(store.translate_integer_notification_id(notification.id)).to eq(notification.id)
+    expect(store.translate_integer_notification_id(notification.integer_id)).to eq(notification.id)
   end
 
   it 'returns the pending notification count' do
@@ -40,24 +40,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
     expect(store.pending_delivery_count).to eq(1)
   end
 
-  it 'can release a connection' do
-    expect(ActiveRecord::Base.connection).to receive(:close)
-    store.release_connection
-  end
-
-  it 'logs errors raised when trying to release the connection' do
-    e = StandardError.new
-    allow(ActiveRecord::Base.connection).to receive(:close).and_raise(e)
-    expect(Rpush.logger).to receive(:error).with(e)
-    store.release_connection
-  end
-
   describe 'deliverable_notifications' do
-    it 'checks for new notifications with the ability to reconnect the database' do
-      expect(store).to receive(:with_database_reconnect_and_retry)
-      store.deliverable_notifications(Rpush.config.batch_size)
-    end
-
     it 'loads notifications in batches' do
       Rpush.config.batch_size = 5000
       Rpush.config.push = false
@@ -281,8 +264,8 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      expect(Rpush::Client::ActiveRecord::Apns::Feedback).to receive(:create!).with(
-        failed_at: time, device_token: 'ab' * 32, app_id: app.id)
+      expect(Rpush::Client::Mongoid::Apns::Feedback).to receive(:create!).with(
+        failed_at: time, device_token: 'ab' * 32, app: app)
       store.create_apns_feedback(time, 'ab' * 32, app)
     end
   end
@@ -301,7 +284,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the given data' do
       new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.data['data']).to be_truthy
+      expect(new_notification.data).to eq(data: true)
     end
 
     it 'sets the given registration IDs' do
@@ -311,7 +294,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.deliver_after.to_s).to eq deliver_after.to_s
+      expect(new_notification.deliver_after.utc.to_s).to eq deliver_after.to_s
     end
 
     it 'saves the new notification' do
@@ -336,7 +319,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the given data' do
       new_notification = store.create_adm_notification(*args)
-      expect(new_notification.data['data']).to be_truthy
+      expect(new_notification.data).to eq(data: true)
     end
 
     it 'sets the given registration IDs' do
@@ -346,7 +329,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
 
     it 'sets the deliver_after timestamp' do
       new_notification = store.create_adm_notification(*args)
-      expect(new_notification.deliver_after.to_s).to eq deliver_after.to_s
+      expect(new_notification.deliver_after.utc.to_s).to eq deliver_after.to_s
     end
 
     it 'saves the new notification' do
@@ -354,4 +337,4 @@ describe Rpush::Daemon::Store::ActiveRecord do
       expect(new_notification.new_record?).to be_falsey
     end
   end
-end if active_record?
+end if mongoid?

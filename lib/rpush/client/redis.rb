@@ -1,6 +1,6 @@
-# :nocov:
 begin
   require 'modis'
+  require 'redis'
 rescue LoadError
   puts
   str = "* Please add 'rpush-redis' to your Gemfile to use the Redis client. *"
@@ -9,8 +9,6 @@ rescue LoadError
   puts "*" * str.size
   puts
 end
-
-require 'redis'
 
 require 'rpush/client/active_model'
 
