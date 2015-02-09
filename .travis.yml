@@ -91,3 +91,4 @@ matrix:
   allow_failures:
     - rvm: 1.9.3
     - rvm: jruby-1.7.19
+      env: CLIENT=active_record
