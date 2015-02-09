@@ -36,7 +36,7 @@ module Rpush
         loop do
           enqueue_notifications
           interruptible_sleeper.sleep
-          break if should_stop
+          return if should_stop
         end
       end
 
