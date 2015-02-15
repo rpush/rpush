@@ -4,6 +4,7 @@
 
   Bug fixes:
   * Fix setting the log level when using Rails 4+ or without Rails (#124).
+  * Fix the possibility for excessive error logging when using APNs (#128).
 
 ## 2.3.2 (Jan 30, 2015)
   Bug fixes:
