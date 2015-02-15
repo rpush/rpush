@@ -30,6 +30,15 @@ class RpushMigrationGenerator < Rails::Generators::Base
 
   protected
 
+  def set_migration_assigns!(destination)
+    super(destination)
+
+    # If a migration exists with the same name, re-use the timestamp.
+    if existing_destination = has_migration?(File.basename(destination).sub(/\.rb$/, ''))
+      @migration_number = existing_destination.scan(/(\d+)_/).flatten.first
+    end
+  end
+
   def has_migration?(template)
     migration_dir = File.expand_path('db/migrate')
     self.class.migration_exists?(migration_dir, template)
