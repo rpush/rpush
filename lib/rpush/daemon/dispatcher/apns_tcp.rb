@@ -63,7 +63,7 @@ module Rpush
             # On Linux, select returns nil from a dropped connection.
             # On OS X, Errno::EBADF is raised following a Errno::EADDRNOTAVAIL from the write call.
             return unless @connection.select(SELECT_TIMEOUT)
-          rescue SystemCallError
+          rescue SystemCallError, IOError
             # Connection closed.
             return
           end
