@@ -7,6 +7,11 @@ def cmd(str, clean_env = true)
   retval
 end
 
+def add_ruby_dot_files
+  cmd("echo '#{RUBY_ENGINE}-#{RUBY_VERSION}' > .ruby-version")
+  cmd("echo 'rpush_test' > .ruby-gemset")
+end
+
 desc 'Build Rails app bundled with Rpush'
 task :build_rails do
   rpush_root = Dir.pwd
@@ -20,10 +25,10 @@ task :build_rails do
 
   begin
     Dir.chdir(path)
+    add_ruby_dot_files
     cmd('echo "gem \'rake\'" >> Gemfile')
     cmd('echo "gem \'pg\'" >> Gemfile')
-    cmd("echo \"gem 'rpush', :path => '#{rpush_root}'\" >> Gemfile")
-    cmd('bundle install')
+    cmd("echo \"gem 'rpush', path: '#{rpush_root}'\" >> Gemfile")
 
     File.open('config/database.yml', 'w') do |fd|
       fd.write(<<-YML)
@@ -51,11 +56,11 @@ task :build_standalone do
 
   begin
     Dir.chdir(path)
+    add_ruby_dot_files
     cmd('echo "source \'https://rubygems.org\'" >> Gemfile')
     cmd('echo "gem \'rake\'" >> Gemfile')
     cmd('echo "gem \'rpush-redis\'" >> Gemfile')
-    cmd("echo \"gem 'rpush', :path => '#{rpush_root}'\" >> Gemfile")
-    cmd('bundle install')
+    cmd("echo \"gem 'rpush', path: '#{rpush_root}'\" >> Gemfile")
   ensure
     Dir.chdir(pwd)
   end
