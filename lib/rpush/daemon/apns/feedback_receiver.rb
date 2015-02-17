@@ -19,7 +19,7 @@ module Rpush
           @host, @port = HOSTS[@app.environment.to_sym]
           @certificate = app.certificate
           @password = app.password
-          @interruptible_sleep = InterruptibleSleep.new(Rpush.config.feedback_poll)
+          @interruptible_sleep = InterruptibleSleep.new(Rpush.config.apns.feedback_receiver.frequency)
         end
 
         def start

@@ -9,9 +9,6 @@ Rpush.configure do |config|
   # Frequency in seconds to check for new notifications.
   config.push_poll = 2
 
-  # Frequency in seconds to check for feedback
-  config.feedback_poll = 60
-
   # The maximum number of notifications to load from the store every `push_poll` seconds.
   # If some notifications are still enqueued internally, Rpush will load the batch_size less
   # the number enqueued. An exception to this is if the service is able to receive multiple
@@ -28,6 +25,8 @@ Rpush.configure do |config|
 
   # Define a custom logger.
   # config.logger = MyLogger.new
+
+  # config.apns.feedback_receiver.frequency = 60
 
  end
 

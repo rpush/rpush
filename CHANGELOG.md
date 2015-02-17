@@ -1,6 +1,7 @@
 ## 2.4.0 (unreleased)
   Features:
   * Support for MongoDB (using Mongoid).
+  * config.feedback_poll is now deprecated, use config.apns.feedback_receiver.frequency instead.
 
   Bug fixes:
   * Fix setting the log level when using Rails 4+ or without Rails (#124).

@@ -4,7 +4,7 @@ require 'rpush/daemon/store/active_record'
 describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
-  let(:poll) { 60 }
+  let(:frequency) { 60 }
   let(:certificate) { double }
   let(:password) { double }
   let(:app) { double(name: 'my_app', password: password, certificate: certificate, environment: 'production') }
@@ -16,7 +16,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, create_apns_feedback: feedback, release_connection: nil) }
 
   before do
-    Rpush.config.feedback_poll = poll
+    Rpush.config.apns.feedback_receiver.frequency = frequency
     allow(Rpush::Daemon::InterruptibleSleep).to receive_messages(new: sleeper)
     allow(Rpush).to receive_messages(logger: logger)
     allow(Rpush::Daemon::TcpConnection).to receive_messages(new: connection)
@@ -33,8 +33,8 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     end
   end
 
-  it 'initializes the sleeper with the feedback polling duration' do
-    expect(Rpush::Daemon::InterruptibleSleep).to receive(:new).with(poll).and_return(sleeper)
+  it 'initializes the sleeper with the feedback polling frequency' do
+    expect(Rpush::Daemon::InterruptibleSleep).to receive(:new).with(frequency).and_return(sleeper)
     Rpush::Daemon::Apns::FeedbackReceiver.new(app)
   end
 
