@@ -11,7 +11,7 @@ module Rpush
 
       batch_deliveries true
       dispatcher :apns_tcp, host: proc { |app| HOSTS[app.environment.to_sym] }
-      loops Rpush::Daemon::Apns::FeedbackReceiver, if: -> { !Rpush.config.push }
+      loops Rpush::Daemon::Apns::FeedbackReceiver, if: -> { Rpush.config.apns.feedback_receiver.enabled && !Rpush.config.push }
     end
   end
 end

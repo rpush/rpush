@@ -22,9 +22,10 @@ module Rpush
   class ConfigurationError < StandardError; end
   class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS); end # rubocop:disable Style/StructInheritance
 
-  class ApnsFeedbackReceiverConfiguration < Struct.new(:frequency) # rubocop:disable Style/StructInheritance
+  class ApnsFeedbackReceiverConfiguration < Struct.new(:frequency, :enabled) # rubocop:disable Style/StructInheritance
     def initialize
       super
+      self.enabled = true
       self.frequency = 60
     end
   end
