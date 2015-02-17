@@ -16,7 +16,7 @@ module Rpush
   end
 
   CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :log_level, :plugin, :apns]
-  DEPRECATED_ATTRS = [:log_dir, :feedback_poll]
+  DEPRECATED_ATTRS = [:feedback_poll]
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
@@ -39,8 +39,6 @@ module Rpush
 
   class Configuration < Struct.new(*CONFIG_ATTRS) # rubocop:disable Style/StructInheritance
     include Deprecatable
-
-    deprecated(:log_dir=, '2.3.0', 'Please use log_file instead.')
 
     delegate :redis_options, to: '::Modis'
 
