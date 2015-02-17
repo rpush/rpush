@@ -33,7 +33,9 @@ describe Rpush, 'push' do
   end
 
   it 'overrides the default config options with those given as a hash' do
-    Rpush.config.batch_size = 20
-    expect { Rpush.push(batch_size: 10) }.to change(Rpush.config, :batch_size).to(10)
+    Rpush::Deprecation.muted do
+      Rpush.config.batch_size = 20
+      expect { Rpush.push(batch_size: 10) }.to change(Rpush.config, :batch_size).to(10)
+    end
   end
 end

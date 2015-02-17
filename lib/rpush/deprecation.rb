@@ -16,5 +16,11 @@ module Rpush
       return if Rpush::Deprecation.muted?
       STDERR.puts "DEPRECATION WARNING: #{msg}"
     end
+
+    def self.warn_with_backtrace(msg)
+      return if Rpush::Deprecation.muted?
+      trace = "\n\nCALLED FROM:\n" + caller.join("\n")
+      warn(msg + trace)
+    end
   end
 end

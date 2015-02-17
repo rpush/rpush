@@ -2,6 +2,11 @@ module Rpush
   def self.embed(options = {})
     require 'rpush/daemon'
 
+    if !options.empty?
+      warning = "Passing configuration options directly to Rpush.embed is deprecated and will be removed from Rpush 2.5.0. Please setup configuration using Rpush.configure { |config| ... } before calling embed."
+      Rpush::Deprecation.warn_with_backtrace(warning)
+    end
+
     if @embed_thread
       STDERR.puts 'Rpush.embed can only be run once inside this process.'
     end

@@ -19,8 +19,10 @@ describe Rpush, 'embed' do
   end
 
   it 'overrides the default config options with those given as a hash' do
-    Rpush.config.push_poll = 4
-    expect { Rpush.embed(push_poll: 2) }.to change(Rpush.config, :push_poll).to(2)
+    Rpush::Deprecation.muted do
+      Rpush.config.push_poll = 4
+      expect { Rpush.embed(push_poll: 2) }.to change(Rpush.config, :push_poll).to(2)
+    end
   end
 end
 
