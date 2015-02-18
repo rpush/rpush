@@ -19,7 +19,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 
 #### Feature Highlights
 
-* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord) or [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) for storage.
+* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord), [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) or [**MongoDB**](https://github.com/rpush/rpush/wiki/Using-Mongodb) for storage.
 * Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
 [**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd).
 * Seamless integration with your projects, including **Rails**.

@@ -1,14 +1,15 @@
-## 2.4.0 (unreleased)
+## 2.4.0 (Fed 18, 2015)
   Features:
   * Support for MongoDB (using Mongoid).
   * config.feedback_poll is now deprecated, use config.apns.feedback_receiver.frequency instead.
-  * Add config.apns.feedback_receiver.enabled to optionally enabled the APNs feedback receiver (#129).
+  * Add config.apns.feedback_receiver.enabled to optionally enable the APNs feedback receiver (#129).
   * Passing configuration options directly to Rpush.embed and Rpush.push is now deprecated.
 
   Bug fixes:
   * Fix setting the log level when using Rails 4+ or without Rails (#124).
   * Fix the possibility for excessive error logging when using APNs (#128).
   * Re-use timestamp when replacing a migration with the same name (#91).
+  * Ensure App/Notification type is updated during 2.0 upgrade migration (#102).
 
 ## 2.3.2 (Jan 30, 2015)
   Bug fixes:
