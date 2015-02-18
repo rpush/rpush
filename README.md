@@ -223,4 +223,4 @@ Note that the database username is changed at runtime to be the currently logged
 with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rpush_test'
 mysql database.
 
-To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `:active_record` or `:redis`.
+To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `:active_record`, `:redis` or `:mongoid`.
