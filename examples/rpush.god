@@ -5,7 +5,7 @@ rails_shared = '/var/www/my_site/shared'
 God.watch do |w|
   w.name = 'rpush'
 
-  w.start = "cd #{rails_root} && bundle exec rpush #{rails_env}"
+  w.start = "cd #{rails_root} && bundle exec rpush start -f -e #{rails_env}"
   w.stop = "kill -INT `cat #{rails_shared}/pids/rpush.pid`"
 
   w.uid = 'deploy'
