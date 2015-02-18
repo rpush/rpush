@@ -1,4 +1,18 @@
 class Rpush200Updates < ActiveRecord::Migration
+  module Rpush
+    class App < ActiveRecord::Base
+      self.table_name = 'rpush_apps'
+    end
+
+    class Notification < ActiveRecord::Base
+      self.table_name = 'rpush_notifications'
+    end
+  end
+
+  def self.update_type(model, from, to)
+    model.where(type: from).update_all(type: to)
+  end
+
   def self.up
     add_column :rpush_notifications, :processing, :boolean, null: false, default: false
     add_column :rpush_notifications, :priority, :integer, null: true
@@ -16,9 +30,19 @@ class Rpush200Updates < ActiveRecord::Migration
     else
       change_column :rpush_feedback, :app_id, :integer
     end
+
+    [:Apns, :Gcm, :Wpns, :Adm].each do |service|
+      update_type(Rpush200Updates::Rpush::App, "Rpush::#{service}::App", "Rpush::Client::ActiveRecord::#{service}::App")
+      update_type(Rpush200Updates::Rpush::Notification, "Rpush::#{service}::Notification", "Rpush::Client::ActiveRecord::#{service}::Notification")
+    end
   end
 
   def self.down
+    [:Apns, :Gcm, :Wpns, :Adm].each do |service|
+      update_type(Rpush200Updates::Rpush::App, "Rpush::Client::ActiveRecord::#{service}::App", "Rpush::#{service}::App")
+      update_type(Rpush200Updates::Rpush::Notification, "Rpush::Client::ActiveRecord::#{service}::Notification", "Rpush::#{service}::Notification")
+    end
+
     change_column :rpush_feedback, :app_id, :string
     rename_column :rpush_feedback, :app_id, :app
 
