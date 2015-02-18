@@ -4,7 +4,7 @@ describe Rpush::Daemon::Feeder do
   let!(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
   let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 64, app: app) }
   let(:logger) { double }
-  let(:interruptible_sleeper) { double(sleep: nil, stop: nil, start: nil) }
+  let(:interruptible_sleeper) { double(sleep: nil, stop: nil) }
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, deliverable_notifications: [notification], release_connection: nil) }
 
   before do
@@ -86,7 +86,7 @@ describe Rpush::Daemon::Feeder do
 
   describe 'wakeup' do
     it 'interrupts sleep' do
-      expect(interruptible_sleeper).to receive(:wakeup)
+      expect(interruptible_sleeper).to receive(:stop)
       Rpush::Daemon::Feeder.start
       Rpush::Daemon::Feeder.wakeup
     end

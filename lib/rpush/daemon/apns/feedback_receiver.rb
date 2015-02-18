@@ -19,19 +19,18 @@ module Rpush
           @host, @port = HOSTS[@app.environment.to_sym]
           @certificate = app.certificate
           @password = app.password
-          @interruptible_sleep = InterruptibleSleep.new(Rpush.config.apns.feedback_receiver.frequency)
+          @interruptible_sleep = InterruptibleSleep.new
         end
 
         def start
           return if Rpush.config.push
           Rpush.logger.info("[#{@app.name}] Starting feedback receiver... ", true)
-          @interruptible_sleep.start
 
           @thread = Thread.new do
             loop do
               break if @stop
               check_for_feedback
-              @interruptible_sleep.sleep
+              @interruptible_sleep.sleep(Rpush.config.apns.feedback_receiver.frequency)
             end
 
             Rpush::Daemon.store.release_connection

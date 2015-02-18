@@ -21,7 +21,7 @@ module Rpush
       end
 
       def self.wakeup
-        interruptible_sleeper.wakeup
+        interruptible_sleeper.stop
       end
 
       class << self
@@ -35,7 +35,7 @@ module Rpush
       def self.feed_forever
         loop do
           enqueue_notifications
-          interruptible_sleeper.sleep
+          interruptible_sleeper.sleep(Rpush.config.push_poll)
           return if should_stop
         end
       end
@@ -51,10 +51,7 @@ module Rpush
       end
 
       def self.interruptible_sleeper
-        return @interruptible_sleeper if @interruptible_sleeper
-        @interruptible_sleeper = InterruptibleSleep.new(Rpush.config.push_poll)
-        @interruptible_sleeper.start
-        @interruptible_sleeper
+        @interruptible_sleeper ||= InterruptibleSleep.new
       end
     end
   end

@@ -12,7 +12,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:logger) { double(error: nil, info: nil) }
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
   let(:feedback) { double }
-  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, start: nil, stop: nil) }
+  let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, stop: nil) }
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, create_apns_feedback: feedback, release_connection: nil) }
 
   before do
@@ -34,7 +34,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
 
   it 'initializes the sleeper with the feedback polling frequency' do
-    expect(Rpush::Daemon::InterruptibleSleep).to receive(:new).with(frequency).and_return(sleeper)
+    expect(Rpush::Daemon::InterruptibleSleep).to receive_messages(new: sleeper)
     Rpush::Daemon::Apns::FeedbackReceiver.new(app)
   end
 
