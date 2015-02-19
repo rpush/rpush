@@ -15,6 +15,10 @@ end
 
 require 'timecop'
 
+if defined? JRUBY_VERSION
+  require 'activerecord-jdbc-adapter'
+end
+
 require 'rpush'
 require 'rpush/daemon'
 require 'rpush/client/redis'
