@@ -3,9 +3,6 @@ def client
   (ENV['CLIENT'] || :active_record).to_sym
 end
 
-require 'bundler/setup'
-Bundler.require(:default)
-
 if !ENV['TRAVIS'] || (ENV['TRAVIS'] && ENV['QUALITY'] == 'true')
   begin
     require './spec/support/simplecov_helper'
@@ -15,6 +12,8 @@ if !ENV['TRAVIS'] || (ENV['TRAVIS'] && ENV['QUALITY'] == 'true')
     puts "Coverage disabled."
   end
 end
+
+require 'timecop'
 
 require 'rpush'
 require 'rpush/daemon'
