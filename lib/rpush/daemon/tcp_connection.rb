@@ -156,7 +156,7 @@ module Rpush
         [tcp_socket, ssl_socket]
       rescue *TCP_ERRORS => error
         if error.message =~ /certificate revoked/i
-          log_warn('Certificate has been revoked.')
+          log_error('Certificate has been revoked.')
           reflect(:ssl_certificate_revoked, @app, error)
         end
         raise TcpConnectionError, "#{error.class.name}, #{error.message}"

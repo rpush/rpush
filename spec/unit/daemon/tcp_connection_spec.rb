@@ -126,7 +126,7 @@ describe Rpush::Daemon::TcpConnection do
       end
 
       it 'logs that the certificate has been revoked' do
-        expect(logger).to receive(:warn).with('[Connection 0] Certificate has been revoked.')
+        expect(logger).to receive(:error).with('[Connection 0] Certificate has been revoked.')
         expect { connection.connect }.to raise_error(Rpush::Daemon::TcpConnectionError, 'OpenSSL::SSL::SSLError, certificate revoked')
       end
     end
