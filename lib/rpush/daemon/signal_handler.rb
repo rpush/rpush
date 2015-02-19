@@ -1,6 +1,8 @@
 module Rpush
   module Daemon
     class SignalHandler
+      extend Loggable
+
       class << self
         attr_reader :thread
       end
@@ -18,6 +20,11 @@ module Rpush
       def self.stop
         @write_io.puts('break') if @write_io
         @thread.join if @thread
+      rescue StandardError => e
+        log_error(e)
+        reflect(:error, e)
+      ensure
+        @thread = nil
       end
 
       def self.start_handler(read_io)

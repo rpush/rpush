@@ -44,6 +44,11 @@ module Rpush
         @queue.push([STOP, object_id]) if @thread
         @thread.join if @thread
         @dispatcher.cleanup
+      rescue StandardError => e
+        log_error(e)
+        reflect(:error, e)
+      ensure
+        @thread = nil
       end
 
       private

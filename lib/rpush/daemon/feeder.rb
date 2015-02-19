@@ -2,6 +2,7 @@ module Rpush
   module Daemon
     class Feeder
       extend Reflectable
+      extend Loggable
 
       def self.start(push_mode = false)
         self.should_stop = false
@@ -12,12 +13,22 @@ module Rpush
         end
 
         @thread.join
+      rescue StandardError => e
+        log_error(e)
+        reflect(:error, e)
+      ensure
+        @thread = nil
       end
 
       def self.stop
         self.should_stop = true
         interruptible_sleeper.stop
         @thread.join if @thread
+      rescue StandardError => e
+        log_error(e)
+        reflect(:error, e)
+      ensure
+        @thread = nil
       end
 
       def self.wakeup

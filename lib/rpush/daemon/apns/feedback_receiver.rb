@@ -43,6 +43,11 @@ module Rpush
           @stop = true
           @interruptible_sleep.stop
           @thread.join if @thread
+        rescue StandardError => e
+          log_error(e)
+          reflect(:error, e)
+        ensure
+          @thread = nil
         end
 
         def check_for_feedback

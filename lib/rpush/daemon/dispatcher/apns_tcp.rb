@@ -37,6 +37,11 @@ module Rpush
           @stop_error_receiver = true
           super
           @error_receiver_thread.join if @error_receiver_thread
+        rescue StandardError => e
+          log_error(e)
+          reflect(:error, e)
+        ensure
+          @error_receiver_thread = nil
         end
 
         private

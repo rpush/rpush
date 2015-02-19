@@ -24,6 +24,10 @@ module Rpush
     return unless Rpush.config.embedded
     Rpush::Daemon.shutdown
     @embed_thread.join if @embed_thread
+  rescue StandardError => e
+    STDERR.puts(e.message)
+    STDERR.puts(e.backtrace.join("\n"))
+  ensure
     @embed_thread = nil
   end
 
