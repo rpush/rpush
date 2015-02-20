@@ -7,6 +7,8 @@
 
 ### Rpush. The push notification service for Ruby.
 
+[![Join the chat at https://gitter.im/rpush/rpush](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rpush/rpush?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its core goals are ease of use, reliability and a rich feature set. Rpush provides numerous advanced features not found in others gems, giving you greater control & insight as your project grows. These are a few of the reasons why companies worldwide rely on Rpush to deliver their notifications.
 
 #### Supported Services
