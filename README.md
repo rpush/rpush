@@ -21,7 +21,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 
 * Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord), [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) or [**MongoDB**](https://github.com/rpush/rpush/wiki/Using-Mongodb) for storage.
 * Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
-[**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd).
+[**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd) or [write your own](https://github.com/rpush/rpush/wiki/Writing-a-Plugin).
 * Seamless integration with your projects, including **Rails**.
 * Run as a [daemon](https://github.com/rpush/rpush#as-a-daemon-recommended), inside a [job queue](https://github.com/rpush/rpush/wiki/Push-API), on the [command-line](https://github.com/rpush/rpush#on-the-command-line) or [embedded](https://github.com/rpush/rpush/wiki/Embedding-API) in another process.
 * Scales vertically (threading) and horizontally (multiple processes).
@@ -198,6 +198,7 @@ You should run `rpush init` after upgrading Rpush to check for configuration and
 * [Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)
 * [Push API](https://github.com/rpush/rpush/wiki/Push-API)
 * [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API)
+* [Writing a Plugin](https://github.com/rpush/rpush/wiki/Writing-a-Plugin)
 * [Implementing your own storage backend](https://github.com/rpush/rpush/wiki/Implementing-your-own-storage-backend)
 * [Upgrading from 2.x to 3.0](https://github.com/rpush/rpush/wiki/Upgrading-from-version-2.x-to-3.0)
 
