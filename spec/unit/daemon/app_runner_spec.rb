@@ -94,9 +94,8 @@ describe Rpush::Daemon::AppRunner, 'debug' do
 
   after { Rpush::Daemon::AppRunner.stop_app(app.id) }
 
-  it 'prints debug app states to the log' do
-    expect(Rpush.logger).to receive(:info).with(kind_of(String))
-    Rpush::Daemon::AppRunner.debug
+  it 'returns the app runner status' do
+    expect(Rpush::Daemon::AppRunner.status.key?(:app_runners)).to eq(true)
   end
 end
 

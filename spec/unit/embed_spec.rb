@@ -44,11 +44,11 @@ describe Rpush, 'sync' do
   end
 end
 
-describe Rpush, 'debug' do
+describe Rpush, 'status' do
   before { Rpush.config.embedded = true }
 
-  it 'debugs the AppRunner' do
-    expect(Rpush::Daemon::AppRunner).to receive(:debug)
-    Rpush.debug
+  it 'returns the AppRunner status' do
+    expect(Rpush::Daemon::AppRunner).to receive_messages(status: { status: true })
+    expect(Rpush.status).to eq(status: true)
   end
 end

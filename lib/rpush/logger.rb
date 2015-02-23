@@ -11,6 +11,10 @@ module Rpush
       error('Logging disabled.')
     end
 
+    def debug(msg, inline = false)
+      log(:debug, msg, inline)
+    end
+
     def info(msg, inline = false)
       log(:info, msg, inline)
     end

@@ -36,8 +36,14 @@ module Rpush
     Rpush::Daemon::Synchronizer.sync
   end
 
-  def self.debug
+  def self.status
     return unless Rpush.config.embedded
-    Rpush::Daemon::AppRunner.debug
+    status = Rpush::Daemon::AppRunner.status
+    Rpush.logger.info(JSON.pretty_generate(status))
+    status
+  end
+
+  def self.debug
+    status
   end
 end

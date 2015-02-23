@@ -14,10 +14,7 @@ if !ENV['TRAVIS'] || (ENV['TRAVIS'] && ENV['QUALITY'] == 'true')
 end
 
 require 'timecop'
-
-if defined? JRUBY_VERSION
-  require 'activerecord-jdbc-adapter'
-end
+require 'activerecord-jdbc-adapter' if defined? JRUBY_VERSION
 
 require 'rpush'
 require 'rpush/daemon'

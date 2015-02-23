@@ -30,28 +30,23 @@ module Rpush
     option 'pid-file', type: :string, aliases: '-p'
     def stop
       config_setup
-      ensure_pid_file_set
+      pid = rpush_process_pid
+      return unless pid
 
-      if File.exist?(Rpush.config.pid_file)
-        pid = File.read(Rpush.config.pid_file).strip.to_i
-        STDOUT.write "* Stopping Rpush (pid #{pid})... "
-        STDOUT.flush
-        Process.kill('TERM', pid)
+      STDOUT.write "* Stopping Rpush (pid #{pid})... "
+      STDOUT.flush
+      Process.kill('TERM', pid)
 
-        loop do
-          begin
-            Process.getpgid(pid)
-            sleep 0.05
-          rescue Errno::ESRCH
-            break
-          end
+      loop do
+        begin
+          Process.getpgid(pid)
+          sleep 0.05
+        rescue Errno::ESRCH
+          break
         end
-
-        puts ANSI.green { '✔' }
-      else
-        STDERR.puts("* Rpush isn't running? #{Rpush.config.pid_file} does not exist.")
-        return
       end
+
+      puts ANSI.green { '✔' }
     end
 
     desc 'init', 'Initialize Rpush into the current directory'
@@ -94,6 +89,15 @@ module Rpush
       Rpush.config.foreground = true
 
       Rpush.push
+    end
+
+    desc 'status', 'Show the internal status of the running Rpush instance.'
+    def status
+      require 'rpush/daemon'
+      rpc = Rpush::Daemon::Rpc::Client.new(rpush_process_pid)
+      status = rpc.status
+      rpc.close
+      puts humanize_json(status)
     end
 
     desc 'version', 'Print Rpush version'
@@ -146,13 +150,6 @@ module Rpush
       self.class.default_config_path
     end
 
-    def ensure_pid_file_set
-      return unless Rpush.config.pid_file.blank?
-
-      STDERR.puts(ANSI.red { 'ERROR: ' } + 'config.pid_file is not set.')
-      exit 1
-    end
-
     def check_ruby_version
       STDERR.puts(ANSI.yellow { 'WARNING: ' } + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3' && RUBY_ENGINE == 'ruby'
     end
@@ -172,6 +169,43 @@ module Rpush
 
       new_options.freeze
       self.options = new_options
+    end
+
+    def rpush_process_pid
+      if Rpush.config.pid_file.blank?
+        STDERR.puts(ANSI.red { 'ERROR: ' } + 'config.pid_file is not set.')
+        exit 1
+      end
+
+      unless File.exist?(Rpush.config.pid_file)
+        STDERR.puts("* Rpush isn't running? #{Rpush.config.pid_file} does not exist.")
+        exit 1
+      end
+
+      File.read(Rpush.config.pid_file).strip.to_i
+    end
+
+    def humanize_json(node, str = '', depth = 0) # rubocop:disable Metrics/PerceivedComplexity
+      if node.is_a?(Hash)
+        node = node.sort_by { |_, v| [Array, Hash].include?(v.class) ? 1 : 0 }
+        node.each do |k, v|
+          if [Array, Hash].include?(v.class)
+            str << "\n#{'  ' * depth}#{k}:\n"
+            humanize_json(v, str, depth + 1)
+          else
+            str << "#{'  ' * depth}#{k}: #{v}\n"
+          end
+        end
+      elsif node.is_a?(Array)
+        node.each do |v|
+          str << "\n" if v.is_a?(Hash)
+          humanize_json(v, str, depth)
+        end
+      else
+        str << "#{'  ' * depth}#{node}\n"
+      end
+
+      str
     end
   end
 end

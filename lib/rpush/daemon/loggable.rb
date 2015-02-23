@@ -1,6 +1,10 @@
 module Rpush
   module Daemon
     module Loggable
+      def log_debug(msg)
+        Rpush.logger.debug(app_prefix(msg))
+      end
+
       def log_info(msg)
         Rpush.logger.info(app_prefix(msg))
       end

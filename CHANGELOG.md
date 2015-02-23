@@ -1,3 +1,7 @@
+## 2.5.0 (unreleased)
+  Features:
+  * Add 'rpush status' to inspect running Rpush internal status.
+
 ## 2.4.0 (Fed 18, 2015)
   Features:
   * Support for MongoDB (using Mongoid).

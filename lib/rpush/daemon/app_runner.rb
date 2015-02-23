@@ -84,8 +84,8 @@ module Rpush
         @runners[app.id].increment_dispatchers(num)
       end
 
-      def self.debug
-        @runners.values.map(&:debug)
+      def self.status
+        { app_runners: @runners.values.map(&:status) }
       end
 
       attr_reader :app
@@ -140,7 +140,7 @@ module Rpush
         num.times { @dispatcher_loops.push(new_dispatcher_loop) }
       end
 
-      def debug
+      def status
         dispatcher_details = {}
 
         @dispatcher_loops.each_with_index do |dispatcher_loop, i|
@@ -151,8 +151,7 @@ module Rpush
           }
         end
 
-        runner_details = { dispatchers: dispatcher_details, queued: queue_size }
-        log_info(JSON.pretty_generate(runner_details))
+        { app_name: @app.name, dispatchers: dispatcher_details, queued: queue_size }
       end
 
       def num_dispatcher_loops

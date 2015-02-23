@@ -30,6 +30,10 @@ require 'rpush/daemon/ring_buffer'
 require 'rpush/daemon/signal_handler'
 require 'rpush/daemon/proc_title'
 
+require 'rpush/daemon/rpc'
+require 'rpush/daemon/rpc/server'
+require 'rpush/daemon/rpc/client'
+
 require 'rpush/daemon/store/interface'
 
 require 'rpush/daemon/apns/delivery'
@@ -57,6 +61,7 @@ module Rpush
       SignalHandler.start
       common_init
       Synchronizer.sync
+      Rpc::Server.start
 
       # No further store connections will be made from this thread.
       store.release_connection
@@ -81,6 +86,7 @@ module Rpush
       Rpush.logger.info('Shutting down... ', true)
 
       shutdown_lock.synchronize do
+        Rpc::Server.stop
         Feeder.stop
         AppRunner.stop
         delete_pid_file

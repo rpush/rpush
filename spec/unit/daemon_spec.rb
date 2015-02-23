@@ -13,6 +13,8 @@ describe Rpush::Daemon, "when starting" do
     allow(Rpush::Daemon::Feeder).to receive(:start)
     allow(Rpush::Daemon::Synchronizer).to receive(:sync)
     allow(Rpush::Daemon::AppRunner).to receive(:stop)
+    allow(Rpush::Daemon::Rpc::Server).to receive(:start)
+    allow(Rpush::Daemon::Rpc::Server).to receive(:stop)
     allow(Rpush::Daemon).to receive(:exit)
     allow(Rpush::Daemon).to receive(:puts)
     allow(Rpush::Daemon::SignalHandler).to receive(:start)
