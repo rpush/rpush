@@ -34,7 +34,11 @@ module Rpush
         end
 
         def stop
-          @server.close if @server
+          begin
+            @server.close if @server
+          rescue StandardError # rubocop:disable Lint/HandleExceptions
+          end
+
           @thread.join if @thread
         rescue StandardError => e
           log_debug(e)
