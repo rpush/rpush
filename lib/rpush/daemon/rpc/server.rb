@@ -25,7 +25,8 @@ module Rpush
               loop do
                 read_loop(@server.accept)
               end
-            rescue SystemCallError, IOError # rubocop:disable Lint/HandleExceptions
+            rescue SystemCallError, IOError => e
+              log_debug(e)
             ensure
               File.unlink(Rpc.socket_path) if File.exist?(Rpc.socket_path)
             end
