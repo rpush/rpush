@@ -18,15 +18,19 @@ module Rpush
         end
 
         def start
-          @server = UNIXServer.open(Rpc.socket_path)
+          @stop = false
 
-          @thread = Thread.new do
+          @thread = Thread.new(UNIXServer.open(Rpc.socket_path)) do |server|
             begin
               loop do
-                read_loop(@server.accept)
+                socket = server.accept
+                break if @stop
+                read_loop(socket)
               end
-            rescue SystemCallError, IOError => e
-              log_debug(e)
+
+              server.close
+            rescue StandardError => e
+              log_error(e)
             ensure
               File.unlink(Rpc.socket_path) if File.exist?(Rpc.socket_path)
             end
@@ -34,14 +38,11 @@ module Rpush
         end
 
         def stop
-          begin
-            @server.close if @server
-          rescue StandardError # rubocop:disable Lint/HandleExceptions
-          end
-
+          @stop = true
+          UNIXSocket.new(Rpc.socket_path)
           @thread.join if @thread
         rescue StandardError => e
-          log_debug(e)
+          log_error(e)
         end
 
         private
