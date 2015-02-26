@@ -42,6 +42,7 @@ RPUSH_ROOT = '/tmp/rails_root'
 
 Rpush.configure do |config|
   config.client = client
+  config.log_level = ::Logger::Severity::DEBUG
 end
 
 RPUSH_CLIENT = Rpush.config.client
