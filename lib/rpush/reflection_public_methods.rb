@@ -1,9 +1,11 @@
 module Rpush
-  def self.reflect
-    yield reflection_stack[0] if block_given?
+  @reflection_stack ||= [ReflectionCollection.new]
+
+  class << self
+    attr_reader :reflection_stack
   end
 
-  def self.reflection_stack
-    @reflection_stack ||= [ReflectionCollection.new]
+  def self.reflect
+    yield reflection_stack[0] if block_given?
   end
 end

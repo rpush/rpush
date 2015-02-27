@@ -17,30 +17,28 @@ module Rpush
       class_eval(<<-RUBY, __FILE__, __LINE__)
         def #{reflection}(*args, &blk)
           raise "block required" unless block_given?
-          reflections[:#{reflection}] = blk
+          @reflections[:#{reflection}] = blk
         end
       RUBY
     end
 
-    def __dispatch(reflection, *args)
-      reflection = reflection.to_sym
-
-      unless REFLECTIONS.include?(reflection)
-        fail NoSuchReflectionError, reflection
-      end
-
-      if DEPRECATIONS.key?(reflection)
-        replacement, removal_version = DEPRECATIONS[reflection]
-        Rpush::Deprecation.warn("#{reflection} is deprecated and will be removed in version #{removal_version}. Use #{replacement} instead.")
-      end
-
-      reflections[reflection].call(*args) if reflections[reflection]
+    def initialize
+      @reflections = {}
     end
 
-    private
+    def __dispatch(reflection, *args)
+      blk = @reflections[reflection]
 
-    def reflections
-      @reflections ||= {}
+      if blk
+        blk.call(*args)
+
+        if DEPRECATIONS.key?(reflection)
+          replacement, removal_version = DEPRECATIONS[reflection]
+          Rpush::Deprecation.warn("#{reflection} is deprecated and will be removed in version #{removal_version}. Use #{replacement} instead.")
+        end
+      elsif !REFLECTIONS.include?(reflection)
+        raise NoSuchReflectionError, reflection
+      end
     end
   end
 end
