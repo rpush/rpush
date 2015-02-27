@@ -9,6 +9,7 @@ services:
   - mongodb
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
+before_install: gem update bundler
 
 env:
   global:
