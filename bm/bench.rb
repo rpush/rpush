@@ -7,9 +7,6 @@ require 'stackprof'
 
 $LOAD_PATH.unshift('.')
 require 'lib/rpush'
-require 'lib/rpush/client/redis'
-
-#require 'spec/support/active_record_setup'
 
 puts "Profiler enabled." if ENV['PROFILE']
 
