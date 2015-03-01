@@ -21,7 +21,7 @@ module Rpush
 
         def data=(attrs)
           return unless attrs
-		  attrs = JSON.parse(attrs) if attrs.is_a?(String)
+          attrs = JSON.parse(attrs) if attrs.is_a?(String)
           fail ArgumentError, "must be a Hash" unless attrs.is_a?(Hash)
           write_attribute(:data, multi_json_dump(attrs.merge(data || {})))
         end
