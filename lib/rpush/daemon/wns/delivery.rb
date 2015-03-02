@@ -167,11 +167,11 @@ module Rpush
               <binding template='ToastText02'>
                 <text id='1'>#{title}</text>
                 <text id='2'>#{body}</text>
+                <param>#{param}</param>
               </binding>
             </visual>
           </toast>"
         end
-#                <launch>#{param}</launch>
 
         def clean_param_string(string)
           string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
