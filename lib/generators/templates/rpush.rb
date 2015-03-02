@@ -123,6 +123,12 @@ Rpush.reflect do |on|
   # on.adm_failed_to_recipient do |notification, registration_id, reason|
   # end
 
+  # Called when Failed to deliver to WNS. Check the 'reason' string for further
+  # explanations.
+  # You should remove this uri from your records
+  # on.wns_invalid_channel do |notification, uri, reason|
+  # end
+
   # Called when an exception is raised.
   # on.error do |error|
   # end
