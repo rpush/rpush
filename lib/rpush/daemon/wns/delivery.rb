@@ -10,8 +10,7 @@ module Rpush
         # Data used to request authorization tokens.
         ACCESS_TOKEN_REQUEST_DATA = { "grant_type" => "client_credentials", "scope" => "notify.windows.com" }
 
-        # TODO: MAX_RETRIES = 14
-        MAX_RETRIES = 0
+        MAX_RETRIES = 14
 
         FAILURE_MESSAGES = {
           400 => 'One or more headers were specified incorrectly or conflict with another header.',
@@ -31,8 +30,6 @@ module Rpush
           @http = http
           @notification = notification
           @batch = batch
-          # TODO: remove debug
-          @http.debug_output = $stdout
         end
 
         def perform
@@ -130,8 +127,7 @@ module Rpush
         end
 
         def retry_notification(reason)
-          # TODO: reenable timeout
-          deliver_after = Time.now #+ (60 * 60)
+          deliver_after = Time.now + (60 * 60)
           mark_retryable(@notification, deliver_after)
           log_warn("#{reason} " + retry_message)
         end
