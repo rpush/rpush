@@ -11,7 +11,7 @@ module Rpush
         DEFAULT_MARK_OPTIONS = { persist: true }
 
         def initialize
-          reopen_log
+          reopen_log unless Rpush.config.embedded
         end
 
         def reopen_log

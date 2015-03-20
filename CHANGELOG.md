@@ -1,6 +1,7 @@
 ## 2.5.0 (unreleased)
   Features:
   * Add 'rpush status' to inspect running Rpush internal status.
+  * ActiveRecord logging is no longer redirected to rpush.log when embedded (#138).
 
 ## 2.4.0 (Fed 18, 2015)
   Features:
