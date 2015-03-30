@@ -3,6 +3,7 @@ module Rpush
     module Mongoid
       class Notification
         include ::Mongoid::Document
+        include ::Mongoid::Timestamps
         include ::Mongoid::Autoinc
         include Rpush::MultiJsonHelper
         include Rpush::Client::ActiveModel::Notification
