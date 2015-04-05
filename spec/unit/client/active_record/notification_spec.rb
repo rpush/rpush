@@ -14,7 +14,7 @@ describe Rpush::Client::ActiveRecord::Notification do
   end
   
   it 'allows assignment of many registration IDs from string to parse' do
-    notification.registration_ids = '[a,b]'
+    notification.registration_ids = '["a","b"]'
     expect(notification.registration_ids).to eq %w(a b)
   end
 
