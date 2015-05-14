@@ -85,7 +85,7 @@ app.save!
 ```ruby
 n = Rpush::Gcm::Notification.new
 n.app = Rpush::Gcm::App.find_by_name("android_app")
-n.registration_ids = ["token", "..."]
+n.registration_ids = ["..."]
 n.data = { message: "hi mom!" }
 n.save!
 ```
