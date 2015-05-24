@@ -217,7 +217,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #31" do
 
   it 'does confuse a JSON looking string as JSON if the alert_is_json attribute is not present' do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new
-    allow(notification).to receive_messages(:has_attribute? => false)
+    allow(notification).to receive_messages(has_attribute?: false)
     notification.alert = "{\"one\":2}"
     expect(notification.alert).to eq('one' => 2)
   end

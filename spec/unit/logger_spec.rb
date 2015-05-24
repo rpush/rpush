@@ -58,14 +58,14 @@ describe Rpush::Logger do
 
   it 'uses ActiveSupport::Logger if BufferedLogger does not exist' do
     stub_const('ActiveSupport::Logger', double)
-    allow(ActiveSupport).to receive_messages(:const_defined? => false)
+    allow(ActiveSupport).to receive_messages(const_defined?: false)
     expect(ActiveSupport::Logger).to receive(:new).with(log).and_return(log)
     Rpush::Logger.new
   end
 
   it 'sets the log level on the logger' do
     stub_const('ActiveSupport::Logger', double)
-    allow(ActiveSupport).to receive_messages(:const_defined? => false)
+    allow(ActiveSupport).to receive_messages(const_defined?: false)
     expect(ActiveSupport::Logger).to receive(:new).with(log).and_return(log)
     Rpush.config.log_level = ::Logger::Severity::ERROR
     expect(log).to receive(:level=).with(::Logger::Severity::ERROR)

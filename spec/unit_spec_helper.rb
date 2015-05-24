@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'rails'
 
 def unit_example?(metadata)
-  metadata[:file_path] =~ /spec\/unit/
+  metadata[:file_path] =~ %r{spec/unit}
 end
 
 def rails4?
