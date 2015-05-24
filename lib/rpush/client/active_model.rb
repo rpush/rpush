@@ -19,3 +19,6 @@ require 'rpush/client/active_model/gcm/notification'
 
 require 'rpush/client/active_model/wpns/app'
 require 'rpush/client/active_model/wpns/notification'
+
+require 'rpush/client/active_model/wns/app'
+require 'rpush/client/active_model/wns/notification'
