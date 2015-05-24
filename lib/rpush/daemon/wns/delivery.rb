@@ -106,7 +106,7 @@ module Rpush
             msg = FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
           end
           reflect(:wns_invalid_channel, @notification, @notification.uri, "#{code}. #{msg}")
-          mark_failed(Rpush::DeliveryError.new(code, @notification.id, msg))
+          handle_failure(code, msg)
         end
 
         def not_acceptable
@@ -134,11 +134,13 @@ module Rpush
 
         def do_post
           body = notification_to_xml
-          post = Net::HTTP::Post.new(URI.parse(@notification.uri), "Content-Length" => body.length.to_s,
-                                                                   "Content-Type" => "text/xml",
-                                                                   "X-WNS-Type" => "wns/toast",
-                                                                   "X-WNS-RequestForStatus" => "true",
-                                                                   "Authorization" => "Bearer #{access_token}")
+          uri = URI.parse(@notification.uri)
+          post = Net::HTTP::Post.new(uri.request_uri,
+                                     "Content-Length" => body.length.to_s,
+                                     "Content-Type" => "text/xml",
+                                     "X-WNS-Type" => "wns/toast",
+                                     "X-WNS-RequestForStatus" => "true",
+                                     "Authorization" => "Bearer #{access_token}")
           post.body = body
           @http.request(URI.parse(@notification.uri), post)
         end
