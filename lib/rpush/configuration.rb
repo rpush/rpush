@@ -1,4 +1,5 @@
 require 'pathname'
+require 'ostruct'
 
 module Rpush
   class << self
