@@ -46,11 +46,11 @@ describe Rpush::Daemon::Wns::Delivery do
   describe "an 200 response without an access token" do
     before do
       allow(app).to receive_messages(access_token_expired?: true)
-      allow(response).to receive_messages(to_hash: {}, code: 200, body: JSON::dump({access_token: "dummy_access_token", expires_in: 60}))
+      allow(response).to receive_messages(to_hash: {}, code: 200, body: JSON.dump(access_token: "dummy_access_token", expires_in: 60))
     end
 
     it 'set the access token for the app' do
-      expect(delivery).to receive(:update_access_token).with({"access_token" => "dummy_access_token", "expires_in" => 60})
+      expect(delivery).to receive(:update_access_token).with("access_token" => "dummy_access_token", "expires_in" => 60)
       expect(store).to receive(:update_app).with app
       perform
     end
@@ -77,10 +77,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
     it "marks the notification as failed if the notification is suppressed" do
       allow(response).to receive_messages(body: JSON.dump("faliure" => 0))
-      allow(response).to receive_messages(to_hash: {
-        "X-WNS-Status" => ["dropped"],
-        "X-WNS-Error-Description" => ""
-      })
+      allow(response).to receive_messages(to_hash: { "X-WNS-Status" => ["dropped"], "X-WNS-Error-Description" => "" })
       error = Rpush::DeliveryError.new(200, notification.id, 'Notification was received but suppressed by the service ().')
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
@@ -95,19 +92,6 @@ describe Rpush::Daemon::Wns::Delivery do
       perform_with_rescue
     end
   end
-
-=begin
-  # This case it's quite particular since it doesn't get any error, instead retry the
-  # notification MAX_RETRIES times.
-  describe "an 401 response" do
-    before { allow(response).to receive_messages(code: 401) }
-    it "marks notifications as failed" do
-      error = Rpush::DeliveryError.new(nil, notification.id, '')
-      expect(delivery).to receive(:mark_failed).with(error)
-      perform_with_rescue
-    end
-  end
-=end
 
   describe "an 404 response" do
     before { allow(response).to receive_messages(code: 404) }

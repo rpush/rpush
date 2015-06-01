@@ -3,7 +3,6 @@ module Rpush
     module Wns
       # https://msdn.microsoft.com/en-us/library/windows/apps/hh465435.aspx
       class Delivery < Rpush::Daemon::Delivery
-
         # Oauth2.0 token endpoint. This endpoint is used to request authorization tokens.
         WPN_TOKEN_URI = URI.parse('https://login.live.com/accesstoken.srf')
 
@@ -22,7 +21,7 @@ module Rpush
           410 => 'The channel expired.',
           413 => 'The notification payload exceeds the 5000 byte size limit.',
           500 => 'An internal failure caused notification delivery to fail.',
-          503 => 'The server is currently unavailable.',
+          503 => 'The server is currently unavailable.'
         }
 
         def initialize(app, http, notification, batch)
@@ -152,7 +151,7 @@ module Rpush
             device_connection:    headers["X-WNS-DeviceConnectionStatus"],
             msg_id:               headers["X-WNS-Msg-ID"],
             error_description:    headers["X-WNS-Error-Description"],
-            debug_trace:          headers["X-WNS-Debug-Trace"],
+            debug_trace:          headers["X-WNS-Debug-Trace"]
           }
         end
 

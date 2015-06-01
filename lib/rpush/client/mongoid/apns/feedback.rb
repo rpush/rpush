@@ -12,7 +12,7 @@ module Rpush
 
           validates :device_token, presence: true
           validates :failed_at, presence: true
-          
+
           index device_token: 1
           index app_id: 1
 

@@ -36,12 +36,12 @@ module Rpush
         field :integer_id, type: Integer
         increments :integer_id, model_name: name
         index integer_id: 1
-        
+
         index delivered: 1, failed: 1, deliver_after: 1, processing: 1
         index delivered: 1, failed: 1
         index device_token: 1
         index app_id: 1
-        
+
         belongs_to :app
       end
     end
