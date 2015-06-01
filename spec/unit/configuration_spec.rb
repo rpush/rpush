@@ -43,11 +43,4 @@ describe Rpush::Configuration do
     Rpush.config.redis_options = { hi: :mom }
     expect(Modis.redis_options).to eq(hi: :mom)
   end
-
-  it 'deprecates feedback_poll=' do
-    expect(Rpush::Deprecation).to receive(:warn).with(/feedback_poll= is deprecated/)
-    expect do
-      Rpush.config.feedback_poll = 123
-    end.to change { Rpush.config.apns.feedback_receiver.frequency }.to(123)
-  end
 end

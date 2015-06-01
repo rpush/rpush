@@ -17,7 +17,7 @@ module Rpush
   end
 
   CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :log_level, :plugin, :apns]
-  DEPRECATED_ATTRS = [:feedback_poll]
+  DEPRECATED_ATTRS = []
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
@@ -97,11 +97,6 @@ module Rpush
     def redis_options=(options)
       Modis.redis_options = options if client == :redis
     end
-
-    def feedback_poll=(frequency)
-      apns.feedback_receiver.frequency = frequency
-    end
-    deprecated(:feedback_poll=, '2.5.0', 'Please use apns.feedback_receiver.frequency= instead.')
 
     def initialize_client
       return if @client_initialized
