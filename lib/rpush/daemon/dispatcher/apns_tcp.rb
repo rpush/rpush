@@ -35,6 +35,12 @@ module Rpush
         end
 
         def cleanup
+          if Rpush.config.push
+            # In push mode only a single batch is sent, followed my immediate shutdown.
+            # Allow the error receiver time to handle any errors.
+            sleep 1
+          end
+
           @stop_error_receiver = true
           super
           @error_receiver_thread.join if @error_receiver_thread
