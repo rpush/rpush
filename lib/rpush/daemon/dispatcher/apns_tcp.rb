@@ -16,6 +16,7 @@ module Rpush
           6 => 'Missing topic size',
           7 => 'Missing payload size',
           8 => 'Invalid token',
+          10 => 'Shutdown',
           255 => 'None (unknown error)'
         }
 
