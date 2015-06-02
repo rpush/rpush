@@ -21,7 +21,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 * Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
 [**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd) or [write your own](https://github.com/rpush/rpush/wiki/Writing-a-Plugin).
 * Seamless integration with your projects, including **Rails**.
-* Run as a [daemon](https://github.com/rpush/rpush#as-a-daemon-recommended), inside a [job queue](https://github.com/rpush/rpush/wiki/Push-API), on the [command-line](https://github.com/rpush/rpush#on-the-command-line) or [embedded](https://github.com/rpush/rpush/wiki/Embedding-API) in another process.
+* Run as a [daemon](https://github.com/rpush/rpush#as-a-daemon), inside a [job queue](https://github.com/rpush/rpush/wiki/Push-API), on the [command-line](https://github.com/rpush/rpush#on-the-command-line) or [embedded](https://github.com/rpush/rpush/wiki/Embedding-API) in another process.
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
