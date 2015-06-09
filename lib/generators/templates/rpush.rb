@@ -29,7 +29,7 @@ Rpush.configure do |config|
   # config.apns.feedback_receiver.enabled = true
   # config.apns.feedback_receiver.frequency = 60
 
- end
+end
 
 Rpush.reflect do |on|
 
