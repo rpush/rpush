@@ -7,7 +7,7 @@ module Rpush
 
         begin
           @thread.join
-        rescue StandardError # rubocop:disable Lint/HandleExceptions
+        rescue StandardError
           @thread = nil
         end
       end

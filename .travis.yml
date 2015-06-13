@@ -26,7 +26,7 @@ matrix:
   - rvm: 2.1.5
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: 2.2.1
+  - rvm: 2.2.2
     gemfile: Gemfile
     env: CLIENT=active_record
   - rvm: 2.0.0
@@ -35,7 +35,7 @@ matrix:
   - rvm: 2.1.5
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: 2.2.1
+  - rvm: 2.2.2
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.0.0
@@ -44,7 +44,7 @@ matrix:
   - rvm: 2.1.5
     gemfile: Gemfile
     env: CLIENT=mongoid
-  - rvm: 2.2.1
+  - rvm: 2.2.2
     gemfile: Gemfile
     env: CLIENT=mongoid
   - rvm: 2.0.0
@@ -53,7 +53,7 @@ matrix:
   - rvm: 2.1.5
     gemfile: Gemfile.rails-3
     env: CLIENT=redis
-  - rvm: 2.2.1
+  - rvm: 2.2.2
     gemfile: Gemfile.rails-3
     env: CLIENT=redis
   - rvm: 2.0.0
@@ -62,28 +62,28 @@ matrix:
   - rvm: 2.1.5
     gemfile: Gemfile.rails-3
     env: CLIENT=active_record
-  - rvm: 2.2.1
+  - rvm: 2.2.2
     gemfile: Gemfile.rails-3
     env: CLIENT=active_record
-  - rvm: rbx-2.5.2
+  - rvm: rbx-2.5.6
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: rbx-2.5.2
+  - rvm: rbx-2.5.6
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: rbx-2.5.2
+  - rvm: rbx-2.5.6
     gemfile: Gemfile
     env: CLIENT=mongoid
-  - rvm: jruby-1.7.19
+  - rvm: jruby-1.7.20.1
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: jruby-1.7.19
+  - rvm: jruby-1.7.20.1
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: jruby-1.7.19
+  - rvm: jruby-1.7.20.1
     gemfile: Gemfile
     env: CLIENT=mongoid
   allow_failures:
     - rvm: 1.9.3
-    - rvm: jruby-1.7.19
+    - rvm: jruby-1.7.20.1
       env: CLIENT=active_record

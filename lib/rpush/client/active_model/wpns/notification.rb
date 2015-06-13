@@ -3,17 +3,22 @@ module Rpush
     module ActiveModel
       module Wpns
         module Notification
-          def self.included(base)
-            base.instance_eval do
-              validates :uri, presence: true
-              validates :uri, format: { with: %r{https?://[\S]+} }
-              validates :data, presence: true
-            end
+          module InstanceMethods
             def alert=(value)
               return unless value
               data = self.data || {}
               data['title'] = value
               self.data = data
+            end
+          end
+
+          def self.included(base)
+            base.instance_eval do
+              include InstanceMethods
+
+              validates :uri, presence: true
+              validates :uri, format: { with: %r{https?://[\S]+} }
+              validates :data, presence: true
             end
           end
         end

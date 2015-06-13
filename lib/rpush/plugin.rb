@@ -32,7 +32,7 @@ module Rpush
       Rpush.config.plugin.send("#{@name}=", @config)
     end
 
-    def init(&block) # rubocop:disable Style/TrivialAccessors
+    def init(&block)
       @init_block = block
     end
 
