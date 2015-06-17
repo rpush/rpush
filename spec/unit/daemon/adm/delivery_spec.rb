@@ -78,14 +78,14 @@ describe Rpush::Daemon::Adm::Delivery do
     it 'logs that the notification was not delivered' do
       allow(response).to receive_messages(body: JSON.dump('reason' => 'InvalidRegistrationId'))
       expect(logger).to receive(:warn).with("[MyApp] bad_request: xyz (InvalidRegistrationId)")
-      expect { perform }.to raise_error
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
 
     it 'reflects' do
       allow(response).to receive_messages(body: JSON.dump('registrationID' => 'canonical123', 'reason' => 'Unregistered'))
       allow(notification).to receive_messages(registration_ids: ['1'])
       expect(delivery).to receive(:reflect).with(:adm_failed_to_recipient, notification, '1', 'Unregistered')
-      expect { perform }.to raise_error
+      expect { perform }.to raise_error(Rpush::DeliveryError)
     end
   end
 

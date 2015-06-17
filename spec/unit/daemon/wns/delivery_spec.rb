@@ -1,14 +1,14 @@
 require 'unit_spec_helper'
 
-describe Rpush::Daemon::Wpns::Delivery do
-  let(:app) { Rpush::Wpns::App.create!(name: "MyApp") }
-  let(:notification) { Rpush::Wpns::Notification.create!(app: app, data: { title: "MyApp", body: "Example notification", param: "/param1" }, uri: "http://some.example/", deliver_after: Time.now) }
+describe Rpush::Daemon::Wns::Delivery do
+  let(:app) { Rpush::Wns::App.create!(name: "MyApp", client_id: "someclient", client_secret: "somesecret", access_token: "access_token", access_token_expiration: Time.now + (60 * 10)) }
+  let(:notification) { Rpush::Wns::Notification.create!(app: app, data: { title: "MyApp", body: "Example notification", param: "/param1" }, uri: "http://some.example/", deliver_after: Time.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}) }
   let(:http) { double(shutdown: nil, request: response) }
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil, notification_processed: nil) }
-  let(:delivery) { Rpush::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
+  let(:delivery) { Rpush::Daemon::Wns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(create_wpns_notification: double(id: 2)) }
 
   def perform
@@ -27,7 +27,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   end
 
   shared_examples_for "an notification with some delivery faliures" do
-    let(:new_notification) { Rpush::Wpns::Notification.where('id != ?', notification.id).first }
+    let(:new_notification) { Rpush::Wns::Notification.where('id != ?', notification.id).first }
 
     before { allow(response).to receive_messages(body: JSON.dump(body)) }
 
@@ -43,29 +43,42 @@ describe Rpush::Daemon::Wpns::Delivery do
     end
   end
 
-  describe "an 200 response" do
+  describe "an 200 response without an access token" do
+    before do
+      allow(app).to receive_messages(access_token_expired?: true)
+      allow(response).to receive_messages(to_hash: {}, code: 200, body: JSON.dump(access_token: "dummy_access_token", expires_in: 60))
+    end
+
+    it 'set the access token for the app' do
+      expect(delivery).to receive(:update_access_token).with("access_token" => "dummy_access_token", "expires_in" => 60)
+      expect(store).to receive(:update_app).with app
+      perform
+    end
+  end
+
+  describe "an 200 response with a valid access token" do
     before do
       allow(response).to receive_messages(code: 200)
     end
 
     it "marks the notification as delivered if delivered successfully to all devices" do
       allow(response).to receive_messages(body: JSON.dump("failure" => 0))
-      allow(response).to receive_messages(to_hash: { "x-notificationstatus" => ["Received"] })
+      allow(response).to receive_messages(to_hash: { "X-WNS-Status" => ["received"] })
       expect(batch).to receive(:mark_delivered).with(notification)
       perform
     end
 
     it "retries the notification when the queue is full" do
       allow(response).to receive_messages(body: JSON.dump("failure" => 0))
-      allow(response).to receive_messages(to_hash: { "x-notificationstatus" => ["QueueFull"] })
+      allow(response).to receive_messages(to_hash: { "X-WNS-Status" => ["channelthrottled"] })
       expect(batch).to receive(:mark_retryable).with(notification, Time.now + (60 * 10))
       perform
     end
 
     it "marks the notification as failed if the notification is suppressed" do
       allow(response).to receive_messages(body: JSON.dump("faliure" => 0))
-      allow(response).to receive_messages(to_hash: { "x-notificationstatus" => ["Suppressed"] })
-      error = Rpush::DeliveryError.new(200, notification.id, 'Notification was received but suppressed by the service.')
+      allow(response).to receive_messages(to_hash: { "X-WNS-Status" => ["dropped"], "X-WNS-Error-Description" => "" })
+      error = Rpush::DeliveryError.new(200, notification.id, 'Notification was received but suppressed by the service ().')
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
     end
@@ -74,16 +87,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 400 response" do
     before { allow(response).to receive_messages(code: 400) }
     it "marks notifications as failed" do
-      error = Rpush::DeliveryError.new(400, notification.id, 'Bad XML or malformed notification URI.')
-      expect(delivery).to receive(:mark_failed).with(error)
-      perform_with_rescue
-    end
-  end
-
-  describe "an 401 response" do
-    before { allow(response).to receive_messages(code: 401) }
-    it "marks notifications as failed" do
-      error = Rpush::DeliveryError.new(401, notification.id, 'Unauthorized to send a notification to this app.')
+      error = Rpush::DeliveryError.new(400, notification.id, 'One or more headers were specified incorrectly or conflict with another header.')
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
     end
@@ -92,7 +96,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 404 response" do
     before { allow(response).to receive_messages(code: 404) }
     it "marks notifications as failed" do
-      error = Rpush::DeliveryError.new(404, notification.id, 'Not Found')
+      error = Rpush::DeliveryError.new(404, notification.id, 'The channel URI is not valid or is not recognized by WNS.')
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
     end
@@ -101,7 +105,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   describe "an 405 response" do
     before { allow(response).to receive_messages(code: 405) }
     it "marks notifications as failed" do
-      error = Rpush::DeliveryError.new(405, notification.id, 'Method Not Allowed')
+      error = Rpush::DeliveryError.new(405, notification.id, 'Invalid method (GET, CREATE); only POST (Windows or Windows Phone) or DELETE (Windows Phone only) is allowed.')
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
     end

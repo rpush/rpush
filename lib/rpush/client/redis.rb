@@ -30,6 +30,9 @@ require 'rpush/client/redis/adm/notification'
 require 'rpush/client/redis/wpns/app'
 require 'rpush/client/redis/wpns/notification'
 
+require 'rpush/client/redis/wns/app'
+require 'rpush/client/redis/wns/notification'
+
 Modis.configure do |config|
   config.namespace = :rpush
 end

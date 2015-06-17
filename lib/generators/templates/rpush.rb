@@ -29,7 +29,7 @@ Rpush.configure do |config|
   # config.apns.feedback_receiver.enabled = true
   # config.apns.feedback_receiver.frequency = 60
 
- end
+end
 
 Rpush.reflect do |on|
 
@@ -121,6 +121,12 @@ Rpush.reflect do |on|
   # If the reason is the string 'Unregistered', you should remove
   # this registration id from your records.
   # on.adm_failed_to_recipient do |notification, registration_id, reason|
+  # end
+
+  # Called when Failed to deliver to WNS. Check the 'reason' string for further
+  # explanations.
+  # You should remove this uri from your records
+  # on.wns_invalid_channel do |notification, uri, reason|
   # end
 
   # Called when an exception is raised.

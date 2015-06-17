@@ -46,6 +46,9 @@ require 'rpush/daemon/gcm'
 require 'rpush/daemon/wpns/delivery'
 require 'rpush/daemon/wpns'
 
+require 'rpush/daemon/wns/delivery'
+require 'rpush/daemon/wns'
+
 require 'rpush/daemon/adm/delivery'
 require 'rpush/daemon/adm'
 

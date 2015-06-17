@@ -64,7 +64,7 @@ module Rpush
             json
           end
 
-          def to_binary(options = {}) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+          def to_binary(options = {})
             frame_payload = payload
             frame_id = options[:for_validation] ? 0 : send(options.fetch(:id_attribute, :id))
             frame = ""

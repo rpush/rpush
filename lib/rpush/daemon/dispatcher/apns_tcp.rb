@@ -16,6 +16,7 @@ module Rpush
           6 => 'Missing topic size',
           7 => 'Missing payload size',
           8 => 'Invalid token',
+          10 => 'APNs closed connection (possible maintenance)',
           255 => 'None (unknown error)'
         }
 
@@ -34,6 +35,12 @@ module Rpush
         end
 
         def cleanup
+          if Rpush.config.push
+            # In push mode only a single batch is sent, followed my immediate shutdown.
+            # Allow the error receiver time to handle any errors.
+            sleep 1
+          end
+
           @stop_error_receiver = true
           super
           @error_receiver_thread.join if @error_receiver_thread

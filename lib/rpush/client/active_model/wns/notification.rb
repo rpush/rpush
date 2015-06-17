@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveModel
-      module Wpns
+      module Wns
         module Notification
           module InstanceMethods
             def alert=(value)

@@ -4,7 +4,7 @@ require 'database_cleaner'
 DatabaseCleaner.strategy = :truncation
 
 def functional_example?(metadata)
-  metadata[:file_path] =~ /spec\/functional/
+  metadata[:file_path] =~ %r{/spec/functional/}
 end
 
 def timeout(&blk)

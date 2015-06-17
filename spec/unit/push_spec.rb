@@ -31,11 +31,4 @@ describe Rpush, 'push' do
     expect(Rpush::Daemon::AppRunner).to receive(:stop)
     Rpush.push
   end
-
-  it 'overrides the default config options with those given as a hash' do
-    Rpush::Deprecation.muted do
-      Rpush.config.batch_size = 20
-      expect { Rpush.push(batch_size: 10) }.to change(Rpush.config, :batch_size).to(10)
-    end
-  end
 end

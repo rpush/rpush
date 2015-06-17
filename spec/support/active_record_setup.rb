@@ -33,7 +33,7 @@ require 'generators/templates/rpush_2_1_0_updates'
 migrations = [AddRpush, Rpush200Updates, Rpush210Updates]
 
 unless ENV['TRAVIS']
-  migrations.reverse.each do |m|
+  migrations.reverse_each do |m|
     begin
       m.down
     rescue ActiveRecord::StatementInvalid => e

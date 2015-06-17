@@ -27,5 +27,8 @@ require 'rpush/client/mongoid/gcm/app'
 require 'rpush/client/mongoid/wpns/notification'
 require 'rpush/client/mongoid/wpns/app'
 
+require 'rpush/client/mongoid/wns/notification'
+require 'rpush/client/mongoid/wns/app'
+
 require 'rpush/client/mongoid/adm/notification'
 require 'rpush/client/mongoid/adm/app'

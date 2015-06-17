@@ -16,7 +16,7 @@ describe Rpush::Daemon::Gcm::Delivery do
   end
 
   def perform_with_rescue
-    expect { perform }.to raise_error
+    expect { perform }.to raise_error(StandardError)
   end
 
   before do

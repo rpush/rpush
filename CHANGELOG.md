@@ -2,6 +2,12 @@
   Features:
   * Add 'rpush status' to inspect running Rpush internal status.
   * ActiveRecord logging is no longer redirected to rpush.log when embedded (#138).
+  * Support for WNS (Windows RT) (#137).
+  * Indexes added to some Mongoid fields (#151).
+
+  Bug fixes:
+  * Fix for handling APNs error when using `rpush push` or `Rpush.push`.
+  * Fix backwards compatibility issue with ActiveRecord (#144).
 
 ## 2.4.0 (Fed 18, 2015)
   Features:

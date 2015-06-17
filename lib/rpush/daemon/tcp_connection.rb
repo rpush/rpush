@@ -166,7 +166,7 @@ module Rpush
         cert = @ssl_context.cert
         if certificate_expired?
           log_error(certificate_msg('expired'))
-          fail Rpush::CertificateExpiredError.new(@app, cert.not_after)
+          raise Rpush::CertificateExpiredError.new(@app, cert.not_after)
         elsif certificate_expires_soon?
           log_warn(certificate_msg('will expire'))
           reflect(:ssl_certificate_will_expire, @app, cert.not_after)

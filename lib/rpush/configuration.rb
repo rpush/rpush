@@ -1,4 +1,5 @@
 require 'pathname'
+require 'ostruct'
 
 module Rpush
   class << self
@@ -16,7 +17,7 @@ module Rpush
   end
 
   CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :log_level, :plugin, :apns]
-  DEPRECATED_ATTRS = [:feedback_poll]
+  DEPRECATED_ATTRS = []
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
@@ -97,11 +98,6 @@ module Rpush
       Modis.redis_options = options if client == :redis
     end
 
-    def feedback_poll=(frequency)
-      apns.feedback_receiver.frequency = frequency
-    end
-    deprecated(:feedback_poll=, '2.5.0', 'Please use apns.feedback_receiver.frequency= instead.')
-
     def initialize_client
       return if @client_initialized
       raise ConfigurationError, 'Rpush.config.client is not set.' unless client
@@ -110,7 +106,7 @@ module Rpush
       client_module = Rpush::Client.const_get(client.to_s.camelize)
       Rpush.send(:include, client_module) unless Rpush.ancestors.include?(client_module)
 
-      [:Apns, :Gcm, :Wpns, :Adm].each do |service|
+      [:Apns, :Gcm, :Wpns, :Wns, :Adm].each do |service|
         Rpush.const_set(service, client_module.const_get(service)) unless Rpush.const_defined?(service)
       end
 
