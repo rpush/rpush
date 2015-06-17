@@ -81,7 +81,7 @@ module Rpush
 
           return if current_registration_id == response_body['registrationID']
 
-          reflect(:adm_canonical_id, current_registration_id, response_body['registrationID'])
+          reflect(:adm_canonical_id, @notification, current_registration_id, response_body['registrationID'])
         end
 
         def handle_retryable(error)

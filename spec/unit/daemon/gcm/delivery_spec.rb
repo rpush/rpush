@@ -105,7 +105,7 @@ describe Rpush::Daemon::Gcm::Delivery do
 
       allow(response).to receive_messages(body: JSON.dump(body))
       allow(notification).to receive_messages(registration_ids: %w(1 2 3))
-      expect(delivery).to receive(:reflect).with(:gcm_canonical_id, '2', 'canonical123')
+      expect(delivery).to receive(:reflect).with(:gcm_canonical_id, notification, '2', 'canonical123')
       perform
     end
 
