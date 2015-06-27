@@ -119,8 +119,8 @@ module Rpush
         def handle_error(code, notification_id)
           notification_id = Rpush::Daemon.store.translate_integer_notification_id(notification_id)
           failed_pos = delivered_buffer.index(notification_id)
-          description = APNS_ERRORS[code.to_i] || "Unknown error code #{code.inspect}. Possible Rpush bug?"
-          log_error(description + " (#{code})")
+          description = APNS_ERRORS[code.to_i] ? "#{APNS_ERRORS[code.to_i]} (#{code})" : "Unknown error code #{code.inspect}. Possible Rpush bug?"
+          log_error("Notification #{notification_id} failed with error: " + description)
           Rpush::Daemon.store.mark_ids_failed([notification_id], code, description, Time.now)
           reflect(:notification_id_failed, @app, notification_id, code, description)
 
@@ -129,6 +129,9 @@ module Rpush
             if retry_ids.size > 0
               now = Time.now
               Rpush::Daemon.store.mark_ids_retryable(retry_ids, now)
+              notifications_str = 'Notification'
+              notifications_str += 's' if retry_ids.size > 1
+              log_warn("#{notifications_str} #{retry_ids.join(', ')} will be retried due to the failure of notification #{notification_id}.")
               retry_ids.each { |id| reflect(:notification_id_will_retry, @app, id, now) }
             end
           elsif delivered_buffer.size > 0
