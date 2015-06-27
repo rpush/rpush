@@ -13,6 +13,7 @@ platform :mri do
   gem 'codeclimate-test-reporter', require: nil
   gem 'simplecov', require: false
   gem 'rubocop', require: false
+  gem 'byebug'
 end
 
 platform :mri_21, :mri_22 do

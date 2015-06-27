@@ -69,10 +69,13 @@ GEM
     bson (3.1.1)
     bson (3.1.1-java)
     builder (3.2.2)
+    byebug (5.0.0)
+      columnize (= 0.9.0)
     cane (2.6.2)
       parallel
     codeclimate-test-reporter (0.4.7)
       simplecov (>= 0.7.1, < 1.0.0)
+    columnize (0.9.0)
     connection_pool (2.2.0)
     database_cleaner (1.4.1)
     diff-lcs (1.2.5)
@@ -222,6 +225,7 @@ DEPENDENCIES
   activerecord-jdbcmysql-adapter
   activerecord-jdbcpostgresql-adapter
   activerecord-jdbcsqlite3-adapter
+  byebug
   cane
   codeclimate-test-reporter
   database_cleaner

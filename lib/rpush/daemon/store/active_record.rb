@@ -11,6 +11,7 @@ module Rpush
         DEFAULT_MARK_OPTIONS = { persist: true }
 
         def initialize
+          @using_oracle = adapter_name =~ /oracle/
           reopen_log unless Rpush.config.embedded
         end
 
@@ -31,7 +32,7 @@ module Rpush
             Rpush::Client::ActiveRecord::Notification.transaction do
               relation = ready_for_delivery
               relation = relation.limit(limit)
-              notifications = relation.lock(true).to_a
+              notifications = claim(relation)
               mark_processing(notifications)
               notifications
             end
@@ -188,7 +189,8 @@ module Rpush
         end
 
         def ready_for_delivery
-          Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now).order('created_at ASC')
+          relation = Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now)
+          @using_oracle ? relation : relation.order('created_at ASC')
         end
 
         def mark_processing(notifications)
@@ -200,6 +202,16 @@ module Rpush
             ids << n.id
           end
           Rpush::Client::ActiveRecord::Notification.where(id: ids).update_all(['processing = ?', true])
+        end
+
+        def claim(relation)
+          notifications = relation.lock(true).to_a
+          @using_oracle ? notification.sort_by(&:created_at) : notifications
+        end
+
+        def adapter_name
+          env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
+          Hash[::ActiveRecord::Base.configurations[env].map { |k, v| [k.to_sym, v] }][:adapter]
         end
       end
     end
