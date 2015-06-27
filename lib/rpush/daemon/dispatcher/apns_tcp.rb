@@ -38,6 +38,7 @@ module Rpush
           if Rpush.config.push
             # In push mode only a single batch is sent, followed my immediate shutdown.
             # Allow the error receiver time to handle any errors.
+            @reconnect_disabled = true
             sleep 1
           end
 
@@ -75,12 +76,12 @@ module Rpush
             # On Linux, select returns nil from a dropped connection.
             # On OS X, Errno::EBADF is raised following a Errno::EADDRNOTAVAIL from the write call.
             return unless @connection.select(SELECT_TIMEOUT)
-          rescue SystemCallError, IOError
-            # Connection closed.
+            tuple = @connection.read(ERROR_TUPLE_BYTES)
+          rescue *TcpConnection::TCP_ERRORS
+            reconnect unless @stop_error_receiver
             return
           end
 
-          tuple = @connection.read(ERROR_TUPLE_BYTES)
           @dispatch_mutex.synchronize { handle_error_response(tuple) }
         rescue StandardError => e
           log_error(e)
@@ -94,10 +95,21 @@ module Rpush
             handle_disconnect
           end
 
-          log_error("Lost connection to #{@connection.host}:#{@connection.port}, reconnecting...")
-          @connection.reconnect_with_rescue
+          if Rpush.config.push
+            # Only attempt to handle a single error in Push mode.
+            @stop_error_receiver = true
+            return
+          end
+
+          reconnect
         ensure
           delivered_buffer.clear
+        end
+
+        def reconnect
+          return if @reconnect_disabled
+          log_error("Lost connection to #{@connection.host}:#{@connection.port}, reconnecting...")
+          @connection.reconnect_with_rescue
         end
 
         def handle_disconnect
