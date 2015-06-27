@@ -25,7 +25,7 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: 2.1.5
+  - rvm: 2.1.6
     gemfile: Gemfile
     env: CLIENT=active_record
   - rvm: 2.2.2
@@ -34,7 +34,7 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: 2.1.5
+  - rvm: 2.1.6
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.2.2
@@ -43,7 +43,7 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile
     env: CLIENT=mongoid
-  - rvm: 2.1.5
+  - rvm: 2.1.6
     gemfile: Gemfile
     env: CLIENT=mongoid
   - rvm: 2.2.2
@@ -52,7 +52,7 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile.rails-3
     env: CLIENT=redis
-  - rvm: 2.1.5
+  - rvm: 2.1.6
     gemfile: Gemfile.rails-3
     env: CLIENT=redis
   - rvm: 2.2.2
@@ -61,7 +61,7 @@ matrix:
   - rvm: 2.0.0
     gemfile: Gemfile.rails-3
     env: CLIENT=active_record
-  - rvm: 2.1.5
+  - rvm: 2.1.6
     gemfile: Gemfile.rails-3
     env: CLIENT=active_record
   - rvm: 2.2.2
