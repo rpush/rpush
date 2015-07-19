@@ -4,12 +4,12 @@ describe Rpush::Daemon::Wns::Delivery do
   let(:app) { Rpush::Wns::App.create!(name: "MyApp", client_id: "someclient", client_secret: "somesecret", access_token: "access_token", access_token_expiration: Time.now + (60 * 10)) }
   let(:notification) { Rpush::Wns::Notification.create!(app: app, data: { title: "MyApp", body: "Example notification", param: "/param1" }, uri: "http://some.example/", deliver_after: Time.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
-  let(:response) { double(code: 200, header: {}) }
+  let(:response) { double(code: 200, header: {}, body: '') }
   let(:http) { double(shutdown: nil, request: response) }
   let(:now) { Time.parse('2012-10-14 00:00:00') }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil, notification_processed: nil) }
   let(:delivery) { Rpush::Daemon::Wns::Delivery.new(app, http, notification, batch) }
-  let(:store) { double(create_wpns_notification: double(id: 2)) }
+  let(:store) { double(create_wpns_notification: double(id: 2), update_app: nil) }
 
   def perform
     delivery.perform
