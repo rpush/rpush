@@ -119,24 +119,32 @@ module Rpush
         def handle_error(code, notification_id)
           notification_id = Rpush::Daemon.store.translate_integer_notification_id(notification_id)
           failed_pos = delivered_buffer.index(notification_id)
-          description = APNS_ERRORS[code.to_i] ? "#{APNS_ERRORS[code.to_i]} (#{code})" : "Unknown error code #{code.inspect}. Possible Rpush bug?"
+          description = description_for_code(code)
           log_error("Notification #{notification_id} failed with error: " + description)
           Rpush::Daemon.store.mark_ids_failed([notification_id], code, description, Time.now)
           reflect(:notification_id_failed, @app, notification_id, code, description)
 
           if failed_pos
             retry_ids = delivered_buffer[(failed_pos + 1)..-1]
-            if retry_ids.size > 0
-              now = Time.now
-              Rpush::Daemon.store.mark_ids_retryable(retry_ids, now)
-              notifications_str = 'Notification'
-              notifications_str += 's' if retry_ids.size > 1
-              log_warn("#{notifications_str} #{retry_ids.join(', ')} will be retried due to the failure of notification #{notification_id}.")
-              retry_ids.each { |id| reflect(:notification_id_will_retry, @app, id, now) }
-            end
+            retry_notification_ids(retry_ids, notification_id)
           elsif delivered_buffer.size > 0
             log_error("Delivery sequence unknown for notifications following #{notification_id}.")
           end
+        end
+
+        def description_for_code(code)
+          APNS_ERRORS[code.to_i] ? "#{APNS_ERRORS[code.to_i]} (#{code})" : "Unknown error code #{code.inspect}. Possible Rpush bug?"
+        end
+
+        def retry_notification_ids(ids, notification_id)
+          return if ids.size == 0
+
+          now = Time.now
+          Rpush::Daemon.store.mark_ids_retryable(ids, now)
+          notifications_str = 'Notification'
+          notifications_str += 's' if ids.size > 1
+          log_warn("#{notifications_str} #{ids.join(', ')} will be retried due to the failure of notification #{notification_id}.")
+          ids.each { |id| reflect(:notification_id_will_retry, @app, id, now) }
         end
       end
     end
