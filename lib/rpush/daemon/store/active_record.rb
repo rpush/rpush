@@ -206,7 +206,7 @@ module Rpush
 
         def claim(relation)
           notifications = relation.lock(true).to_a
-          @using_oracle ? notification.sort_by(&:created_at) : notifications
+          @using_oracle ? notifications.sort_by(&:created_at) : notifications
         end
 
         def adapter_name
