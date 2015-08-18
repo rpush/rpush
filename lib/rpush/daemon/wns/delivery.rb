@@ -158,13 +158,11 @@ module Rpush
         def notification_to_xml
           title = clean_param_string(@notification.data['title']) if @notification.data['title'].present?
           body = clean_param_string(@notification.data['body']) if @notification.data['body'].present?
-          param = clean_param_string(@notification.data['param']) if @notification.data['param'].present?
           "<toast>
             <visual version='1' lang='en-US'>
               <binding template='ToastText02'>
                 <text id='1'>#{title}</text>
                 <text id='2'>#{body}</text>
-                <param>#{param}</param>
               </binding>
             </visual>
           </toast>"
