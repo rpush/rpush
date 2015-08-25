@@ -44,7 +44,7 @@ module Rpush
           when 503
             service_unavailable(response)
           else
-            fail Rpush::DeliveryError.new(response.code, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
+            fail Rpush::DeliveryError.new(response.code.to_i, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
           end
         end
 
