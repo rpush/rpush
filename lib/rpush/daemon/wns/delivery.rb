@@ -145,7 +145,7 @@ module Rpush
         end
 
         def status_from_response(response)
-          headers = response.to_hash
+          headers = response.to_hash.inject({}) {|h, v| h[v[0].downcase] = v[1]; h}
           {
             notification:         headers["x-wns-status"],
             device_connection:    headers["x-wns-deviceconnectionstatus"],
