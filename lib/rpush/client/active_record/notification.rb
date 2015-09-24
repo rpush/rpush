@@ -19,6 +19,10 @@ module Rpush
                           :uri, :url_args, :category, :content_available
         end
 
+        def content_available=(content_available)
+          write_attribute(:content_available, content_available)))
+        end
+
         def data=(attrs)
           return unless attrs
           fail ArgumentError, "must be a Hash" unless attrs.is_a?(Hash)
