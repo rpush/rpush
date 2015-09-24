@@ -22,6 +22,7 @@ module Rpush
             }
             json['collapse_key'] = collapse_key if collapse_key
             json['time_to_live'] = expiry if expiry
+            json['content_available'] = content_available if content_available
             json
           end
         end
