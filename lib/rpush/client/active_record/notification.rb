@@ -20,7 +20,7 @@ module Rpush
         end
 
         def content_available=(content_available)
-          write_attribute(:content_available, content_available)))
+          write_attribute(:content_available, content_available)
         end
 
         def data=(attrs)
