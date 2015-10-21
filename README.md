@@ -119,6 +119,8 @@ For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 ```ruby
 app = Rpush::Wpns::App.new
 app.name = "windows_phone_app"
+app.client_id = # Get this from your apps dashboard https://dev.windows.com
+app.client_secret = # Get this from your apps dashboard https://dev.windows.com
 app.connections = 1
 app.save!
 ```
