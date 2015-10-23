@@ -10,7 +10,7 @@
   * Fix for handling APNs error when using `rpush push` or `Rpush.push`.
   * Fix backwards compatibility issue with ActiveRecord (#144).
 
-## 2.4.0 (Fed 18, 2015)
+## 2.4.0 (Feb 18, 2015)
   Features:
   * Support for MongoDB (using Mongoid).
   * config.feedback_poll is now deprecated, use config.apns.feedback_receiver.frequency instead.
