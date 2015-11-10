@@ -45,7 +45,7 @@ module Rpush
           @thread.join if @thread
         rescue StandardError => e
           log_error(e)
-          reflect(:error, e)
+          reflect(:error, e, @app)
         ensure
           @thread = nil
         end
@@ -64,7 +64,7 @@ module Rpush
             end
           rescue StandardError => e
             log_error(e)
-            reflect(:error, e)
+            reflect(:error, e, @app)
           ensure
             connection.close if connection
           end
