@@ -31,4 +31,9 @@ describe Rpush::Client::ActiveRecord::Gcm::Notification do
     notification.expiry = 100
     expect(notification.as_json['time_to_live']).to eq 100
   end
+
+  it 'includes content_available in the payload' do
+    notification.content_available = true
+    expect(notification.as_json['content_available']).to eq true
+  end
 end if active_record?
