@@ -76,16 +76,20 @@ matrix:
   - rvm: rbx-2.5.8
     gemfile: Gemfile
     env: CLIENT=mongoid
-  - rvm: jruby-1.7.20.1
+  - rvm: jruby-1.7.23
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: jruby-1.7.20.1
+  - rvm: jruby-1.7.23
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: jruby-1.7.20.1
+  - rvm: jruby-1.7.23
     gemfile: Gemfile
     env: CLIENT=mongoid
   allow_failures:
     - rvm: 1.9.3
-    - rvm: jruby-1.7.20.1
+    - rvm: jruby-1.7.23
       env: CLIENT=active_record
+    - rvm: jruby-1.7.23
+      env: CLIENT=redis
+    - rvm: jruby-1.7.23
+      env: CLIENT=mongoid
