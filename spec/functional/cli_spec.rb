@@ -28,6 +28,7 @@ describe Rpush::CLI do
     after { timeout { Rpush.shutdown } }
 
     it 'prints the status' do
+      expect(subject).to receive(:configure_rpush) { true }
       expect(subject).to receive(:puts).with(/app_runners:/)
       subject.status
     end
