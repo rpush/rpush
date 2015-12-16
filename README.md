@@ -177,6 +177,10 @@ end
 
 Call this during startup of your application, for example, by adding it to the end of `config/rpush.rb`. See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
 
+#### Using mina
+
+If you're using [mina](https://github.com/mina-deploy/mina), there is a gem called [mina-rpush](https://github.com/d4rky-pl/mina-rpush) which helps you control rpush.
+
 ### Configuration
 
 See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options.
