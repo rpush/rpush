@@ -218,7 +218,7 @@ You should run `rpush init` after upgrading Rpush to check for configuration and
 
 When running specs, please note that the ActiveRecord adapter can be changed by setting the `ADAPTER` environment variable. For example: `ADAPTER=postgresql rake`.
 
-Available adapters for testing are `mysql`, `mysql2` and `postgresql`.
+Available adapters for testing are `postgresql`, `jdbcpostgresql`, `mysql2`, `jdbcmysql`, `jdbch2`, and `sqlite3`.
 
 Note that the database username is changed at runtime to be the currently logged in user's name. So if you're testing
 with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rpush_test'
