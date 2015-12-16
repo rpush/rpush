@@ -1,3 +1,17 @@
+## 2.6.0 (Unreleased)
+
+#### Features
+
+None yet.
+
+#### Fixes
+
+* Fix typo in Oracle support. ([#185](https://github.com/rpush/rpush/pull/185))
+* Remove `param` tag from WNS message. ([#190](https://github.com/rpush/rpush/pull/190))
+* Fixed WNS response headers parser. ([#192](https://github.com/rpush/rpush/pull/192))
+* GCM: fixed raise of unhandled errors. ([#193](https://github.com/rpush/rpush/pull/193))
+* Fix issue with custom PID file set in `Rpush.config`. ([#224](https://github.com/rpush/rpush/pull/224), [#225](https://github.com/rpush/rpush/pull/225))
+
 ## 2.5.0 (July 19, 2015)
   Features:
   * Add 'rpush status' to inspect running Rpush internal status.
