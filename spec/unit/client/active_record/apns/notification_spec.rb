@@ -98,6 +98,11 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
   let(:magic) { 'abc123' }
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
 
+  before do
+    notification.device_token = "a" * 64
+    notification.id = 1234
+  end
+
   it 'includes the mdm magic in the payload' do
     notification.mdm = magic
     expect(notification.as_json).to eq('mdm' => magic)
@@ -107,6 +112,11 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
     notification.alert = "i'm doomed"
     notification.mdm = magic
     expect(notification.as_json.key?('aps')).to be_falsey
+  end
+
+  it 'can be converted to binary' do
+    notification.mdm = magic
+    expect(notification.to_binary).to be_present
   end
 end if active_record?
 
