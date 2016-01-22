@@ -54,6 +54,11 @@ describe Rpush::Daemon::Wns::Delivery do
       expect(store).to receive(:update_app).with app
       perform
     end
+
+    it 'uses the PostRequest factory for creating the request' do
+      expect(Rpush::Daemon::Wns::PostRequest).to receive(:create).with(notification, "dummy_access_token")
+      perform
+    end
   end
 
   describe "an 200 response with a valid access token" do

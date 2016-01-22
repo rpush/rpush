@@ -132,20 +132,12 @@ module Rpush
         end
 
         def do_post
-          body = notification_to_xml
-          uri = URI.parse(@notification.uri)
-          post = Net::HTTP::Post.new(uri.request_uri,
-                                     "Content-Length" => body.length.to_s,
-                                     "Content-Type" => "text/xml",
-                                     "X-WNS-Type" => "wns/toast",
-                                     "X-WNS-RequestForStatus" => "true",
-                                     "Authorization" => "Bearer #{access_token}")
-          post.body = body
+          post = PostRequest.create(@notification, access_token)
           @http.request(URI.parse(@notification.uri), post)
         end
 
         def status_from_response(response)
-          headers = response.to_hash.inject({}) {|h, v| h[v[0].downcase] = v[1]; h}
+          headers = response.to_hash.each_with_object({}) { |e, a| a[e[0].downcase] = e[1] }
           {
             notification:         headers["x-wns-status"],
             device_connection:    headers["x-wns-deviceconnectionstatus"],
@@ -153,24 +145,6 @@ module Rpush
             error_description:    headers["x-wns-error-description"],
             debug_trace:          headers["x-wns-debug-trace"]
           }
-        end
-
-        def notification_to_xml
-          title = clean_param_string(@notification.data['title']) if @notification.data['title'].present?
-          body = clean_param_string(@notification.data['body']) if @notification.data['body'].present?
-          "<toast>
-            <visual version='1' lang='en-US'>
-              <binding template='ToastText02'>
-                <text id='1'>#{title}</text>
-                <text id='2'>#{body}</text>
-              </binding>
-            </visual>
-          </toast>"
-        end
-
-        def clean_param_string(string)
-          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
         end
 
         def access_token

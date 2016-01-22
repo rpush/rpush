@@ -114,7 +114,9 @@ n.save!
 
 For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 
-#### Windows Phone Notification Service
+#### Windows Phone Notification Service (Windows Phone 8.0 and 7.x)
+
+Uses the older [Windows Phone 8 Toast template](https://msdn.microsoft.com/en-us/library/windows/apps/jj662938(v=vs.105).aspx)
 
 ```ruby
 app = Rpush::Wpns::App.new
@@ -130,6 +132,42 @@ n = Rpush::Wpns::Notification.new
 n.app = Rpush::Wpns::App.find_by_name("windows_phone_app")
 n.uri = "http://..."
 n.data = {title:"MyApp", body:"Hello world", param:"user_param1"}
+n.save!
+```
+
+#### Windows Notification Service (Windows 8.1, 10 Apps & Phone > 8.0)
+
+Uses the more recent [Toast template](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/mt631604.aspx)
+
+The client_id here is the sid url as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the client_id on dashboard.
+
+```ruby
+app = Rpush::Wns::App.new
+app.name = "windows_phone_app"
+app.client_id = YOUR_SID_URL
+app.client_secret = YOUR_CLIENT_SECRET
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Wns::Notification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = "http://..."
+n.data = {title:"MyApp", body:"Hello world"}
+n.save!
+```
+
+#### Windows Raw Push Notifications
+
+Note: The data is passed as .to_json so only this format is supported, altough raw notifications are meant to support any kind of data.
+Current data structure enforces hashes and to_json representation is natural presentation of it.
+
+```ruby
+n = Rpush::Wns::RawNotification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = 'http://...'
+n.data = { foo: 'foo', bar: 'bar' }
 n.save!
 ```
 
