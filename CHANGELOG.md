@@ -2,7 +2,7 @@
 
 #### Features
 
-None yet.
+* Added support for GCM for iOS' `content_available`. ([#221](https://github.com/rpush/rpush/pull/221))
 
 #### Fixes
 
