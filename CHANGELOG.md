@@ -1,4 +1,4 @@
-## 2.6.0 (Unreleased)
+## 2.6.0 (January 25, 2016)
 
 #### Features
 
