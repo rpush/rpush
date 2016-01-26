@@ -14,7 +14,7 @@ module Rpush
             end
           end
 
-          def as_json
+          def as_json(options = nil)
             json = { 'data' => data }
             json['consolidationKey'] = collapse_key if collapse_key
             # number of seconds before message is expired
