@@ -1,3 +1,9 @@
+## 2.7.0 (Unreleased)
+
+#### Fixes
+
+* Fixed issue where setting the `mdm` parameter broke `to_binary` for MDM APNs ([#234](https://github.com/rpush/rpush/pull/234))
+
 ## 2.6.0 (January 25, 2016)
 
 #### Features
