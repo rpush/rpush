@@ -3,6 +3,7 @@
 #### Fixes
 
 * Fixed issue where setting the `mdm` parameter broke `to_binary` for MDM APNs ([#234](https://github.com/rpush/rpush/pull/234))
+* Fixed `as_json` ([#231](https://github.com/rpush/rpush/issues/231))
 
 ## 2.6.0 (January 25, 2016)
 
