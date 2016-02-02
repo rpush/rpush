@@ -141,7 +141,7 @@ n.save!
 
 Uses the more recent [Toast template](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/mt631604.aspx)
 
-The client_id here is the sid url as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the client_id on dashboard.
+The `client_id` here is the SID URL as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the `client_id` on dashboard.
 
 ```ruby
 app = Rpush::Wns::App.new
@@ -162,8 +162,8 @@ n.save!
 
 #### Windows Raw Push Notifications
 
-Note: The data is passed as .to_json so only this format is supported, altough raw notifications are meant to support any kind of data.
-Current data structure enforces hashes and to_json representation is natural presentation of it.
+Note: The data is passed as `.to_json` so only this format is supported, altough raw notifications are meant to support any kind of data.
+Current data structure enforces hashes and `.to_json` representation is natural presentation of it.
 
 ```ruby
 n = Rpush::Wns::RawNotification.new
