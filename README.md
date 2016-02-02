@@ -87,6 +87,8 @@ n = Rpush::Gcm::Notification.new
 n.app = Rpush::Gcm::App.find_by_name("android_app")
 n.registration_ids = ["..."]
 n.data = { message: "hi mom!" }
+n.priority = 'high'        # Optional, can be either 'normal' or 'high'
+n.content_available = true # Optional
 n.save!
 ```
 
