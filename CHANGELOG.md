@@ -3,6 +3,7 @@
 #### Features
 
 * Added support for GCM priorities. ([#243](https://github.com/rpush/rpush/pull/243))
+* Added support for Windows Raw Notifications (in JSON form) ([#238](https://github.com/rpush/rpush/pull/238))
 
 #### Fixes
 
