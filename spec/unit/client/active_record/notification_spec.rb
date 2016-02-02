@@ -7,6 +7,16 @@ describe Rpush::Client::ActiveRecord::Notification do
     notification.registration_ids = %w(a b)
     expect(notification.registration_ids).to eq %w(a b)
   end
+  
+  it 'allows assignment of many registration IDs from string to split on spaces' do
+    notification.registration_ids = 'a b'
+    expect(notification.registration_ids).to eq %w(a b)
+  end
+  
+  it 'allows assignment of many registration IDs from string to parse' do
+    notification.registration_ids = '["a","b"]'
+    expect(notification.registration_ids).to eq %w(a b)
+  end
 
   it 'allows assignment of a single registration ID' do
     notification.registration_ids = 'a'

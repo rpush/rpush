@@ -16,7 +16,7 @@ shared_examples_for "an Notification subclass" do
       notification.data = { ninjas: 1 }
     end
 
-    it "raises an ArgumentError if something other than a Hash is assigned" do
+    it "raises an ArgumentError if something other than a Hash and String is assigned" do
       expect do
         notification.data = []
       end.to raise_error(ArgumentError, "must be a Hash")
@@ -24,6 +24,11 @@ shared_examples_for "an Notification subclass" do
 
     it "encodes the given Hash as JSON" do
       notification.data = { hi: "mom" }
+      expect(notification.read_attribute(:data)).to eq("{\"hi\":\"mom\"}")
+    end
+	
+    it "encodes the given String as JSON" do
+      notification.data = '{"hi":"mom"}'
       expect(notification.read_attribute(:data)).to eq("{\"hi\":\"mom\"}")
     end
 

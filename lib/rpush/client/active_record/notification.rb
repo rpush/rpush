@@ -21,17 +21,27 @@ module Rpush
 
         def data=(attrs)
           return unless attrs
+          attrs = JSON.parse(attrs) if attrs.is_a?(String)
           fail ArgumentError, "must be a Hash" unless attrs.is_a?(Hash)
-          write_attribute(:data, multi_json_dump(attrs.merge(data || {})))
-        end
-
-        def registration_ids=(ids)
-          ids = [ids] if ids && !ids.is_a?(Array)
-          super
+          attrs = data.merge(attrs) if data
+          write_attribute(:data, multi_json_dump(attrs))
         end
 
         def data
           multi_json_load(read_attribute(:data)) if read_attribute(:data)
+        end
+
+        def registration_ids=(ids)
+          if ids && ids.is_a?(String)
+            begin
+              data = JSON.parse(ids)
+              ids = data if data && data.is_a?(Array)
+            rescue JSON::ParserError => e
+              ids = ids.split(' ')
+            end
+          end
+          ids = [ids] if ids && !ids.is_a?(Array)
+          super
         end
       end
     end
