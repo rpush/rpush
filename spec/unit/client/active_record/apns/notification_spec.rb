@@ -23,6 +23,17 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
     expect(notification.errors[:base].include?("APN notification cannot be larger than 2048 bytes. Try condensing your alert and device attributes.")).to be_truthy
   end
 
+  it "should store long alerts" do
+    notification.app = app
+    notification.device_token = "a" * 64
+    notification.alert = "*" * 300
+    expect(notification.valid?).to be_truthy
+
+    notification.save!
+    notification.reload
+    expect(notification.alert).to eq("*" * 300)
+  end
+
   it "should default the sound to 'default'" do
     expect(notification.sound).to eq('default')
   end
