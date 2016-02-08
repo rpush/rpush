@@ -17,6 +17,7 @@ require 'rpush/client/active_record/wpns/app'
 
 require 'rpush/client/active_record/wns/notification'
 require 'rpush/client/active_record/wns/raw_notification'
+require 'rpush/client/active_record/wns/badge_notification'
 require 'rpush/client/active_record/wns/app'
 
 require 'rpush/client/active_record/adm/notification'

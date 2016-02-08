@@ -49,6 +49,7 @@ require 'rpush/daemon/wpns'
 require 'rpush/daemon/wns/post_request'
 require 'rpush/daemon/wns/raw_request'
 require 'rpush/daemon/wns/toast_request'
+require 'rpush/daemon/wns/badge_request'
 require 'rpush/daemon/wns/delivery'
 require 'rpush/daemon/wns'
 

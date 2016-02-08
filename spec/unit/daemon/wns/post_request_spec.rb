@@ -31,6 +31,53 @@ describe Rpush::Daemon::Wns::PostRequest do
       expect(request.body).to include('MyApp')
       expect(request.body).to include('Example notification')
     end
+
+    context 'with launch' do
+      let(:notification) do
+        Rpush::Wns::Notification.create!(
+          app: app,
+          data: {
+            title: "MyApp",
+            body: "Example notification",
+            launch: "MyLaunchArgument"
+          },
+          uri: "http://some.example/"
+        )
+      end
+
+      it 'creates a request characteristic for toast notification with launch' do
+        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        expect(request['X-WNS-Type']).to eq('wns/toast')
+        expect(request['Content-Type']).to eq('text/xml')
+        expect(request.body).to include("<toast launch='MyLaunchArgument'>")
+        expect(request.body).to include('MyApp')
+        expect(request.body).to include('Example notification')
+      end
+    end
+
+    context 'with sound' do
+      let(:notification) do
+        Rpush::Wns::Notification.create!(
+          app: app,
+          data: {
+            title: "MyApp",
+            body: "Example notification"
+          },
+          uri: "http://some.example/",
+          sound: "ms-appx:///examplesound.wav"
+        )
+      end
+
+      it 'creates a request characteristic for toast notification' do
+        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        expect(request['X-WNS-Type']).to eq('wns/toast')
+        expect(request['Content-Type']).to eq('text/xml')
+        expect(request.body).to include('<toast>')
+        expect(request.body).to include('MyApp')
+        expect(request.body).to include('Example notification')
+        expect(request.body).to include("<audio src='ms-appx:///examplesound.wav'/>")
+      end
+    end
   end
 
   context 'RawNotification' do
@@ -47,6 +94,24 @@ describe Rpush::Daemon::Wns::PostRequest do
       expect(request['X-WNS-Type']).to eq('wns/raw')
       expect(request['Content-Type']).to eq('application/octet-stream')
       expect(request.body).to eq("{\"foo\":\"foo\",\"bar\":\"bar\"}")
+    end
+  end
+
+  context 'BadgeNotification' do
+    let(:notification) do
+      Rpush::Wns::BadgeNotification.create!(
+        app: app,
+        uri: "http://some.example/",
+        badge: 42
+      )
+    end
+
+    it 'creates a request characteristic for badge notification' do
+      request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+      expect(request['X-WNS-Type']).to eq('wns/badge')
+      expect(request['Content-Type']).to eq('text/xml')
+      expect(request.body).to include('<badge')
+      expect(request.body).to include('42')
     end
   end
 end

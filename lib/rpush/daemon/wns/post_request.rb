@@ -3,21 +3,29 @@ module Rpush
     module Wns
       class PostRequest
         def self.create(notification, access_token)
-          is_raw_notification = lambda do |n|
-            n.class.name.match(/RawNotification/)
-          end
+          stringify_keys(notification.data) unless notification.data.nil?
 
-          stringify_keys = lambda do |data|
-            data.keys.each { |key| data[key.to_s || key] = data.delete(key) }
-          end
-
-          stringify_keys.call(notification.data)
-
-          if is_raw_notification.call(notification)
+          if raw_notification?(notification)
             RawRequest.create(notification, access_token)
+          elsif badge_notification?(notification)
+            BadgeRequest.create(notification, access_token)
           else
             ToastRequest.create(notification, access_token)
           end
+        end
+
+        private_class_method
+
+        def self.raw_notification?(notification)
+          notification.class.name.match(/RawNotification/)
+        end
+
+        def self.badge_notification?(notification)
+          notification.class.name.match(/BadgeNotification/)
+        end
+
+        def self.stringify_keys(data)
+          data.keys.each { |key| data[key.to_s || key] = data.delete(key) }
         end
       end
     end

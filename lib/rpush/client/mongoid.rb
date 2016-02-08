@@ -29,6 +29,7 @@ require 'rpush/client/mongoid/wpns/app'
 
 require 'rpush/client/mongoid/wns/notification'
 require 'rpush/client/mongoid/wns/raw_notification'
+require 'rpush/client/mongoid/wns/badge_notification'
 require 'rpush/client/mongoid/wns/app'
 
 require 'rpush/client/mongoid/adm/notification'
