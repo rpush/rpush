@@ -150,6 +150,10 @@ Uses the more recent [Toast template](https://msdn.microsoft.com/en-us/library/w
 
 The `client_id` here is the SID URL as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the `client_id` on dashboard.
 
+You can (optionally) include a launch argument by adding a `launch` key to the notification data. 
+
+You can (optionally) include an [audio element](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br230842.aspx) by setting the sound on the notification.
+
 ```ruby
 app = Rpush::Wns::App.new
 app.name = "windows_phone_app"
@@ -163,7 +167,8 @@ app.save!
 n = Rpush::Wns::Notification.new
 n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
 n.uri = "http://..."
-n.data = {title:"MyApp", body:"Hello world"}
+n.data = {title:"MyApp", body:"Hello world", launch:"launch-argument"}
+n.sound = "ms-appx:///mynotificationsound.wav"
 n.save!
 ```
 
@@ -177,6 +182,18 @@ n = Rpush::Wns::RawNotification.new
 n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
 n.uri = 'http://...'
 n.data = { foo: 'foo', bar: 'bar' }
+n.save!
+```
+
+#### Windows Badge Push Notifications
+
+Uses the [badge template](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br212849.aspx) and the type `wns/badge`.
+
+```ruby
+n = Rpush::Wns::BadgeNotification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = 'http://...'
+n.badge = 4
 n.save!
 ```
 
