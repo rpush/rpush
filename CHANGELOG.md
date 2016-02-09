@@ -2,13 +2,21 @@
 
 #### Features
 
-* Added support for GCM priorities. ([#243](https://github.com/rpush/rpush/pull/243))
-* Added support for Windows Raw Notifications (in JSON form) ([#238](https://github.com/rpush/rpush/pull/238))
+* Added support for GCM priorities. ([#243](https://github.com/rpush/rpush/pull/243) by [@aried3r](https://github.com/aried3r))
+* Added support for GCM notification payload ([#246](https://github.com/rpush/rpush/pull/246) by [@aried3r](https://github.com/aried3r))
+* Added support for Windows Raw Notifications (in JSON form) ([#238](https://github.com/rpush/rpush/pull/238) by [@mseppae](https://github.com/mseppae))
+* Added WNS badge notifications ([#247](https://github.com/rpush/rpush/pull/247) by [@wouterh](https://github.com/wouterh))
+* Added the `launch` argument of WNS toast notifications ([#247](https://github.com/rpush/rpush/pull/247) by [@wouterh](https://github.com/wouterh))
+* Added sound in WNS toast notifications ([#247](https://github.com/rpush/rpush/pull/247) by [@wouterh](https://github.com/wouterh))
+
+#### Changes
+
+* Change `alert` type from `string` to `text` in ActiveRecord to allow bigger alert dictionaries. ([#248](https://github.com/rpush/rpush/pull/248) by [@schmidt](https://github.com/schmidt))
 
 #### Fixes
 
-* Fixed issue where setting the `mdm` parameter broke `to_binary` for MDM APNs ([#234](https://github.com/rpush/rpush/pull/234))
-* Fixed `as_json` ([#231](https://github.com/rpush/rpush/issues/231))
+* Fixed issue where setting the `mdm` parameter broke `to_binary` for MDM APNs ([#234](https://github.com/rpush/rpush/pull/234) by [@troya2](https://github.com/troya2))
+* Fixed `as_json` ([#231](https://github.com/rpush/rpush/issues/231) by [@aried3r](https://github.com/aried3r))
 
 ## 2.6.0 (January 25, 2016)
 
