@@ -41,9 +41,10 @@ module Rpush
                 'data' => data
             }
             json['collapse_key'] = collapse_key if collapse_key
-            json['time_to_live'] = expiry if expiry
             json['content_available'] = content_available if content_available
+            json['notification'] = notification if notification
             json['priority'] = priority_for_notification if priority
+            json['time_to_live'] = expiry if expiry
             json
           end
 

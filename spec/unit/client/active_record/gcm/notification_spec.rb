@@ -55,4 +55,13 @@ describe Rpush::Client::ActiveRecord::Gcm::Notification do
   it 'excludes the priority if it is not defined' do
     expect(notification.as_json).not_to have_key 'priority'
   end
+
+  it 'includes the notification payload if defined' do
+    notification.notification = { key: 'any key is allowed' }
+    expect(notification.as_json).to have_key 'notification'
+  end
+
+  it 'excludes the notification payload if undefined' do
+    expect(notification.as_json).not_to have_key 'notification'
+  end
 end if active_record?

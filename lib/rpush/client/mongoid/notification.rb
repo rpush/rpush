@@ -33,6 +33,7 @@ module Rpush
         field :url_args, type: Array
         field :category, type: String
         field :content_available, type: Boolean, default: false
+        field :notification, type: Hash
 
         field :integer_id, type: Integer
         increments :integer_id, model_name: name
