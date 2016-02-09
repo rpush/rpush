@@ -1,4 +1,4 @@
-## 2.7.0 (Unreleased)
+## 2.7.0 (February 9, 2016)
 
 #### Features
 
