@@ -33,6 +33,7 @@ require 'rpush/client/redis/wpns/notification'
 require 'rpush/client/redis/wns/app'
 require 'rpush/client/redis/wns/notification'
 require 'rpush/client/redis/wns/raw_notification'
+require 'rpush/client/redis/wns/badge_notification'
 
 Modis.configure do |config|
   config.namespace = :rpush
