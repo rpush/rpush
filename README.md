@@ -89,10 +89,17 @@ n.registration_ids = ["..."]
 n.data = { message: "hi mom!" }
 n.priority = 'high'        # Optional, can be either 'normal' or 'high'
 n.content_available = true # Optional
+# Optional notification payload. See the reference below for more keys you can use!
+n.notification = { body: 'great match!',
+                   title: 'Portugal vs. Denmark',
+                   icon: 'myicon'
+                 }
 n.save!
 ```
 
 GCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
+
+Check the [GCM reference](https://developers.google.com/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.
 
 #### Amazon Device Messaging
 
