@@ -41,6 +41,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
     add_rpush_migration('rpush_2_0_0_updates')
     add_rpush_migration('rpush_2_1_0_updates')
     add_rpush_migration('rpush_2_6_0_updates')
+    add_rpush_migration('rpush_2_7_0_updates')
   end
 
   protected
@@ -48,7 +49,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
   def has_migration?(template)
     migration_dir = File.expand_path('db/migrate')
     self.class.migration_exists?(migration_dir, template)
-   end
+  end
 
   def add_rpush_migration(template)
     self.class.next_template = template
