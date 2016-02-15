@@ -4,6 +4,8 @@ module Rpush
       extend Loggable
       extend StringHelpers
 
+      APP_ATTRIBUTES_TO_CHECK = [:certificate, :environment, :auth_key, :client_id, :client_secret].freeze
+
       def self.sync
         apps = Rpush::Daemon.store.all_apps
         apps.each { |app| sync_app(app) }
@@ -16,12 +18,9 @@ module Rpush
       def self.sync_app(app)
         if !AppRunner.app_running?(app)
           AppRunner.start_app(app)
-        elsif certificate_changed?(app)
-          log_info("[#{app.name}] Certificate changed, restarting...")
-          AppRunner.stop_app(app.id)
-          AppRunner.start_app(app)
-        elsif environment_changed?(app)
-          log_info("[#{app.name}] Environment changed, restarting...")
+        elsif (changed_attrs = changed_attributes(app)).count > 0
+          changed_attrs_str = changed_attrs.map(&:to_s).join(", ")
+          log_info("[#{app.name}] #{changed_attrs_str} changed, restarting...")
           AppRunner.stop_app(app.id)
           AppRunner.start_app(app)
         else
@@ -46,14 +45,17 @@ module Rpush
         log_info("[#{app.name}] #{start_stop_str} #{pluralize(diff.abs, 'dispatcher')}. #{num_dispatchers} running.")
       end
 
-      def self.certificate_changed?(app)
-        old_app = AppRunner.app_with_id(app.id)
-        app.certificate != old_app.certificate
+      def self.changed_attributes(app)
+        APP_ATTRIBUTES_TO_CHECK.select { |attr| attribute_changed?(app, attr) }
       end
 
-      def self.environment_changed?(app)
-        old_app = AppRunner.app_with_id(app.id)
-        app.environment != old_app.environment
+      def self.attribute_changed?(app, attr)
+        if app.respond_to?(attr)
+          old_app = AppRunner.app_with_id(app.id)
+          app.send(attr) != old_app.send(attr)
+        else
+          false
+        end
       end
     end
   end
