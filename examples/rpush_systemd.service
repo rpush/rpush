@@ -1,0 +1,19 @@
+[Unit]
+Description= RPush production Server
+After=unicorn_temp_directory.service
+
+[Service]
+Type=forking
+SyslogIdentifier=project_name_production_rpush
+User=deployer #user to start this service
+PIDFile=/home/deployer/apps/project_name/shared/tmp/pids/rpush.pid #for a typical capistrano deployment or usually somewhere in /run
+WorkingDirectory=/home/deployer/apps/project_name/current #where the code lies.
+
+ExecStart=/bin/sh -c 'RBENV_ROOT=/home/deployer/.rbenv RBENV_VERSION=2.2.3 /home/deployer/.rbenv/bin/rbenv exec bundle exec rpush start -e production'
+#ExecReload=/bin/kill -s HUP $MAINPID
+ExecReload=/bin/kill -s USR2 $MAINPID
+ExecStop=/bin/sh -c 'RBENV_ROOT=/home/deployer/.rbenv RBENV_VERSION=2.2.3 /home/deployer/.rbenv/bin/rbenv exec bundle exec rpush stop -e production'
+#/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
