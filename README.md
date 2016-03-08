@@ -1,4 +1,5 @@
 [![Gem Version](https://badge.fury.io/rb/rpush.svg)](http://badge.fury.io/rb/rpush)
+[![Build Status](https://travis-ci.org/rpush/rpush.svg?branch=master)](https://travis-ci.org/rpush/rpush)
 [![Join the chat at https://gitter.im/rpush/rpush](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rpush/rpush?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="https://raw.github.com/rpush/rpush/master/logo.png" align="right" width="200px" />
