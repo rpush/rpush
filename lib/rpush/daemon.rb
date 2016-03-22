@@ -40,6 +40,9 @@ require 'rpush/daemon/apns/delivery'
 require 'rpush/daemon/apns/feedback_receiver'
 require 'rpush/daemon/apns'
 
+require 'rpush/daemon/firefox/delivery'
+require 'rpush/daemon/firefox'
+
 require 'rpush/daemon/gcm/delivery'
 require 'rpush/daemon/gcm'
 

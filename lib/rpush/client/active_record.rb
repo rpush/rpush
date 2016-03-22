@@ -9,6 +9,9 @@ require 'rpush/client/active_record/apns/notification'
 require 'rpush/client/active_record/apns/feedback'
 require 'rpush/client/active_record/apns/app'
 
+require 'rpush/client/active_record/firefox/notification'
+require 'rpush/client/active_record/firefox/app'
+
 require 'rpush/client/active_record/gcm/notification'
 require 'rpush/client/active_record/gcm/app'
 
