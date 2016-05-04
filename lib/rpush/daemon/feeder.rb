@@ -6,7 +6,6 @@ module Rpush
 
       def self.start(push_mode = false)
         self.should_stop = false
-
         @thread = Thread.new do
           push_mode ? feed_all : feed_forever
           Rpush::Daemon.store.release_connection

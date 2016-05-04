@@ -23,8 +23,8 @@ class AddRpush < ActiveRecord::Migration
   def self.migrations
     [CreateRapnsNotifications, CreateRapnsFeedback,
      AddAlertIsJsonToRapnsNotifications, AddAppToRapns,
-     CreateRapnsApps, AddGcm, AddWpns, AddAdm, RenameRapnsToRpush,
-     AddFailAfterToRpushNotifications]
+     CreateRapnsApps, AddGcm, AddWpns, AddAdm, AddIonic,
+     RenameRapnsToRpush, AddFailAfterToRpushNotifications]
   end
 
   def self.up
@@ -270,6 +270,16 @@ class AddRpush < ActiveRecord::Migration
       remove_column :rapns_apps, :client_secret
       remove_column :rapns_apps, :access_token
       remove_column :rapns_apps, :access_token_expiration
+    end
+  end
+
+  class AddIonic < ActiveRecord::Migration
+    def self.up
+      add_column :rapns_notifications, :profile, :string, null: true
+    end
+
+    def self.down
+      remove_column :rapns_notifications, :profile
     end
   end
 

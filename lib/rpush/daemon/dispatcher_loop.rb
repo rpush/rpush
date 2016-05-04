@@ -25,6 +25,7 @@ module Rpush
           loop do
             payload = @queue.pop
             if stop_payload?(payload)
+              p 2
               break if should_stop?(payload)
 
               # Intended for another dispatcher loop.
