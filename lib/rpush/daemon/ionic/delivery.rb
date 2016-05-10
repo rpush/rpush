@@ -36,8 +36,8 @@ module Rpush
 
         def handle_response(response)
           case response.code.to_i
-          when 200
-            ok(response)
+          when 201
+            created(response)
           when 400
             bad_request
           when 401
@@ -51,7 +51,7 @@ module Rpush
           end
         end
 
-        def ok(response)
+        def created(response)
           mark_delivered
           log_info("#{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
         end
