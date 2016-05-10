@@ -34,3 +34,6 @@ require 'rpush/client/mongoid/wns/app'
 
 require 'rpush/client/mongoid/adm/notification'
 require 'rpush/client/mongoid/adm/app'
+
+require 'rpush/client/mongoid/ionic/notification'
+require 'rpush/client/mongoid/ionic/app'
