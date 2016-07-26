@@ -44,13 +44,9 @@ module Rpush
           log_info("#{@notification.id} sent to #{@notification.registration_ids.join(', ')}")
         end
 
-        def max_ttl
-          5184000
-        end
-
         def do_post
           post = Net::HTTP::Post.new("#{URI.path}/#{@notification.registration_ids.first}")
-          post['TTL'] = max_ttl
+          post['TTL'] = @notification.expiry
 
           @http.request(URI, post)
         end
