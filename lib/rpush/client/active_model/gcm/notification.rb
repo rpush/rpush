@@ -36,10 +36,16 @@ module Rpush
 
           def as_json(options = nil)
             json = {
-                'registration_ids' => registration_ids,
                 'delay_while_idle' => delay_while_idle,
                 'data' => data
             }
+
+            if registration_ids.size == 1
+              json['to'] = registration_ids.first
+            else
+              json['registration_ids'] = registration_ids
+            end
+
             json['collapse_key'] = collapse_key if collapse_key
             json['content_available'] = content_available if content_available
             json['notification'] = notification if notification
