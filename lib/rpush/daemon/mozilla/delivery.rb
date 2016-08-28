@@ -1,6 +1,6 @@
 module Rpush
   module Daemon
-    module Firefox
+    module Mozilla
       class Delivery < Rpush::Daemon::Delivery
         include MultiJsonHelper
 

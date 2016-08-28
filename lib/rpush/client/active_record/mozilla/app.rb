@@ -1,10 +1,10 @@
 module Rpush
   module Client
     module ActiveRecord
-      module Firefox
+      module Mozilla
         class App < Rpush::Client::ActiveRecord::App
           def service_name
-            'firefox'
+            'mozilla'
           end
         end
       end

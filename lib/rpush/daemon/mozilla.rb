@@ -3,7 +3,7 @@ require 'rpush/daemon'
 
 module Rpush
   module Daemon
-    module Firefox
+    module Mozilla
       extend ServiceConfigMethods
 
       dispatcher :http
