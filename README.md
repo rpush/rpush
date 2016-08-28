@@ -43,7 +43,8 @@ Initialize Rpush into your project. **Rails will be detected automatically.**
 
 ```sh
 $ cd /path/to/project
-$ rpush init
+$ bundle
+$ bundle exec rpush init
 ```
 
 ### Create an App & Notification
