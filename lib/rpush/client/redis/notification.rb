@@ -43,6 +43,7 @@ module Rpush
         attribute :url_args, :array
         attribute :category, :string
         attribute :content_available, :boolean, default: false
+        attribute :mutable_content, :boolean, default: false
         attribute :notification, :hash
 
         def app
