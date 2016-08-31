@@ -7,7 +7,7 @@ module Rpush
             base.instance_eval do
               alias_attribute :device_tokens, :registration_ids
 
-              validates :device_tokens, :profile, presence: true
+              validates :device_tokens, :profile, :notification, presence: true
             end
           end
 
