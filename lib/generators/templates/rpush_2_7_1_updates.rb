@@ -1,4 +1,4 @@
-class AddMutableContentToRpushNotifications < ActiveRecord::Migration
+class Rpush271Updates < ActiveRecord::Migration
   def self.up
     add_column :rpush_notifications, :mutable_content, :boolean, null: false, default: false
   end
@@ -7,3 +7,4 @@ class AddMutableContentToRpushNotifications < ActiveRecord::Migration
     remove_column :rpush_notifications, :mutable_content
   end
 end
+
