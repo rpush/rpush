@@ -44,6 +44,7 @@ module Rpush
         attribute :category, :string
         attribute :content_available, :boolean, default: false
         attribute :notification, :hash
+        attribute :mutable_content, :boolean
 
         def app
           return nil unless app_id

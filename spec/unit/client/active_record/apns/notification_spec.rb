@@ -103,6 +103,11 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
     notification.data = { omg: { ilike: :hashes } }
     expect(notification.as_json["omg"]["ilike"]).to eq "hashes"
   end
+
+  it "should include the mutable-content if present" do
+    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(mutable_content: true)
+    expect(notification.as_json["aps"]["mutable-content"]).to eq 1
+  end
 end if active_record?
 
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
