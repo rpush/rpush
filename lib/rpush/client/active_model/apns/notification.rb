@@ -49,7 +49,7 @@ module Rpush
               json['aps']['badge'] = badge if badge
               json['aps']['sound'] = sound if sound
               json['aps']['category'] = category if category
-              json['aps']['mutable-content'] = 1 if mutable_content?
+              json['aps']['mutable-content'] = 1 if mutable_content == true
               json['aps']['url-args'] = url_args if url_args
 
               if data && data[CONTENT_AVAILABLE_KEY]
