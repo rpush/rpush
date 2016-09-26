@@ -32,6 +32,12 @@ module Rpush
             self.data = (data || {}).merge(MDM_KEY => magic)
           end
 
+          MUTABLE_CONTENT_KEY = '__rpush_mutable_content__'
+          def mutable_content=(bool)
+            return unless bool
+            self.data = (data || {}).merge(MUTABLE_CONTENT_KEY => true)
+          end
+
           CONTENT_AVAILABLE_KEY = '__rpush_content_available__'
           def content_available=(bool)
             return unless bool
@@ -51,12 +57,16 @@ module Rpush
               json['aps']['category'] = category if category
               json['aps']['url-args'] = url_args if url_args
 
+              if data && data[MUTABLE_CONTENT_KEY]
+                json['aps']['mutable-content'] = 1
+              end
+
               if data && data[CONTENT_AVAILABLE_KEY]
                 json['aps']['content-available'] = 1
               end
 
               if data
-                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY }
+                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == MUTABLE_CONTENT_KEY }
                 non_aps_attributes.each { |k, v| json[k.to_s] = v }
               end
             end

@@ -131,6 +131,38 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
   end
 end if active_record?
 
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'mutable-content' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  it 'includes mutable-content in the payload' do
+    notification.mutable_content = true
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+  end
+
+  it 'does not include content-available in the payload if not set' do
+    expect(notification.as_json['aps'].key?('mutable-content')).to be_falsey
+  end
+
+  it 'does not include mutable-content as a non-aps attribute' do
+    notification.mutable_content = true
+    expect(notification.as_json.key?('mutable-content')).to be_falsey
+  end
+
+  it 'does not overwrite existing attributes for the device' do
+    notification.data = { hi: :mom }
+    notification.mutable_content = true
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
+  end
+
+  it 'does not overwrite the mutable-content flag when setting attributes for the device' do
+    notification.mutable_content = true
+    notification.data = { hi: :mom }
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
+  end
+end if active_record?
+
 describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
 
