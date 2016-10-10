@@ -5,7 +5,7 @@ PATH
       activesupport
       ansi
       multi_json (~> 1.0)
-      net-http-persistent
+      net-http-persistent (~> 2.9)
       railties
       thor (>= 0.18.1, < 2.0)
 
@@ -171,7 +171,7 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rainbow (2.1.0)
     rake (11.3.0)
-    redis (3.3.1)
+    redis (3.2.2)
     rpush-mongoid (0.1.0)
       mongoid (~> 4.0.0)
       mongoid-autoinc (~> 4.0.0)
@@ -250,4 +250,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   1.13.1
+   1.13.2
