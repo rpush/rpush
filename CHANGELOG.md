@@ -1,3 +1,14 @@
+## 2.8.0 (unreleased)
+
+#### Features
+
+* Added support for APNS `mutable-content` ([#296](https://github.com/rpush/rpush/pull/296) by [@tdtran](https://github.com/tdtran))
+
+#### Changes
+
+* Make synchronizer aware of GCM and WNS apps ([#254](https://github.com/rpush/rpush/pull/254) by [@wouterh](https://github.com/wouterh))
+* Precise after init commit msg ([#266](https://github.com/rpush/rpush/pull/266) by [@azranel](https://github.com/azranel))
+
 ## 2.7.0 (February 9, 2016)
 
 #### Features
