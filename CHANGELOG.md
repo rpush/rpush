@@ -9,6 +9,10 @@
 * Make synchronizer aware of GCM and WNS apps ([#254](https://github.com/rpush/rpush/pull/254) by [@wouterh](https://github.com/wouterh))
 * Precise after init commit msg ([#266](https://github.com/rpush/rpush/pull/266) by [@azranel](https://github.com/azranel))
 
+#### Bugfixes
+
+* Lock `net-http-persistent` dependency to `< 3`. See also [#306](https://github.com/rpush/rpush/issues/306) for more details. (by [@amaierhofer](https://github.com/amaierhofer))
+
 ## 2.7.0 (February 9, 2016)
 
 #### Features
