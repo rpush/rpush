@@ -48,6 +48,7 @@ describe 'APNs http2 adapter' do
   def create_notification
     notification = Rpush::Apns2::Notification.new
     notification.app = app
+    notification.sound = 'default'
     notification.alert = 'test'
     notification.device_token = fake_device_token
     notification.data = notification_data
