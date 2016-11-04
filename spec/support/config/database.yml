@@ -5,7 +5,7 @@ postgresql:
   database: rpush_test
   host: localhost
   username: postgres
-  password: ""
+  password: "qwerty"
 
 jdbcpostgresql:
   adapter: jdbcpostgresql

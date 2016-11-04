@@ -9,6 +9,9 @@ require 'rpush/client/active_model/apns/device_token_format_validator'
 require 'rpush/client/active_model/apns/app'
 require 'rpush/client/active_model/apns/notification'
 
+require 'rpush/client/active_model/apns2/app'
+require 'rpush/client/active_model/apns2/notification'
+
 require 'rpush/client/active_model/adm/data_validator'
 require 'rpush/client/active_model/adm/app'
 require 'rpush/client/active_model/adm/notification'

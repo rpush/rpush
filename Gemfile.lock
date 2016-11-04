@@ -6,6 +6,7 @@ PATH
       ansi
       multi_json (~> 1.0)
       net-http-persistent (< 3.0)
+      net-http2
       railties
       thor (>= 0.18.1, < 2.0)
 
@@ -83,6 +84,7 @@ GEM
       activesupport (>= 4.1.0)
     hiredis (0.6.1)
     hiredis (0.6.1-java)
+    http-2 (0.8.2)
     i18n (0.7.0)
     jdbc-h2 (1.4.187)
     jdbc-mysql (5.1.39)
@@ -130,6 +132,8 @@ GEM
     multi_json (1.12.1)
     mysql2 (0.4.4)
     net-http-persistent (2.9.4)
+    net-http2 (0.14.0)
+      http-2 (~> 0.8.2)
     nokogiri (1.6.8)
       mini_portile2 (~> 2.1.0)
       pkg-config (~> 1.1.7)
@@ -236,6 +240,7 @@ DEPENDENCIES
   jdbc-postgres
   jruby-openssl
   mysql2
+  net-http2 (= 0.14.0)
   pg
   rails (~> 4.2)
   rake
@@ -250,4 +255,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   1.13.3
+   1.13.6
