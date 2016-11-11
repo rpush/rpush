@@ -59,7 +59,7 @@ describe 'APNs http2 adapter' do
   end
 
   describe 'delivery failures' do
-    context 'when response is something but 200 code' do
+    context 'when response is about incorrect request' do
       let(:fake_http_resp_headers) {
         {
           ":status" => "404",
@@ -73,6 +73,24 @@ describe 'APNs http2 adapter' do
           Rpush.push
           notification.reload
         end.to change(notification, :failed).to(true)
+      end
+
+      it 'reflects :notification_id_failed' do
+        reflector = double
+        expect(reflector).to receive(:accept)
+
+        Rpush.reflect do |on|
+          on.notification_id_failed do |app, id, code, descr|
+            expect(app).to be_kind_of(Rpush::Client::ActiveRecord::Apns2::App)
+            expect(id).to eq 1
+            expect(code).to eq 404
+            expect(descr).to be_nil
+           reflector.accept
+          end
+        end
+
+        notification = create_notification
+        Rpush.push
       end
     end
 
@@ -93,29 +111,81 @@ describe 'APNs http2 adapter' do
       end
     end
 
+    context 'shit' do
+      let(:fake_http_resp_headers) {
+        {
+          ":status" => "500",
+          "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+        }
+      }
+
+      it 'reflects :notification_id_will_retry' do
+        Rpush.reflect do |on|
+          on.notification_id_will_retry do |app, id, timer|
+            expect(app).to be_kind_of(Rpush::Client::ActiveRecord::Apns2::App)
+            expect(id).to eq 1
+          end
+        end
+
+        notification = create_notification
+        Rpush.push
+      end
+    end
+
     context 'when there is SocketError' do
       let(:fake_client) { double }
 
+      before(:each) do
+        expect(fake_client).to receive(:call) { raise(SocketError) }
+      end
+
       it 'fails but retries delivery several times' do
         notification = create_notification
-        fake_client.stub(:call) { raise(SocketError) }
         expect do
           Rpush.push
           notification.reload
         end.to change(notification, :retries).to eq(1)
+      end
+
+      it 'reflects :notification_id_will_retry' do
+        Rpush.reflect do |on|
+          on.notification_id_will_retry do |app, id, timer|
+            expect(app).to be_kind_of(Rpush::Client::ActiveRecord::Apns2::App)
+            expect(id).to eq 1
+            expect(timer).to be_kind_of(Time)
+          end
+        end
+
+        notification = create_notification
+        Rpush.push
       end
     end
 
     context 'when any StandardError occurs' do
       let(:fake_client) { double }
 
+      before(:each) do
+        expect(fake_client).to receive(:call) { raise(StandardError) }
+      end
+
       it 'marks notification failed' do
         notification = create_notification
-        fake_client.stub(:call) { raise(StandardError) }
         expect do
           Rpush.push
           notification.reload
         end.to change(notification, :failed).to(true)
+      end
+
+      it 'reflects :error' do
+        Rpush.reflect do |on|
+          on.error do |error|
+            expect(error).to be_kind_of(StandardError)
+           reflector.accept
+          end
+        end
+
+        notification = create_notification
+        Rpush.push
       end
     end
   end

@@ -2,10 +2,10 @@ module Rpush
   module Daemon
     module ServiceConfigMethods
       DISPATCHERS = {
-        http: Rpush::Daemon::Dispatcher::Http,
-        http2: Rpush::Daemon::Dispatcher::Http2,
-        tcp: Rpush::Daemon::Dispatcher::Tcp,
-        apns_tcp: Rpush::Daemon::Dispatcher::ApnsTcp
+        http:       Rpush::Daemon::Dispatcher::Http,
+        tcp:        Rpush::Daemon::Dispatcher::Tcp,
+        apns_tcp:   Rpush::Daemon::Dispatcher::ApnsTcp,
+        apns_http2: Rpush::Daemon::Dispatcher::ApnsHttp2
       }
 
       def batch_deliveries(value = nil)

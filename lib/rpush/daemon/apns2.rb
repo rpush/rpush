@@ -3,7 +3,7 @@ module Rpush
     module Apns2
       extend ServiceConfigMethods
 
-      dispatcher :http2
+      dispatcher :apns_http2
     end
   end
 end
