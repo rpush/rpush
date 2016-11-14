@@ -19,7 +19,6 @@ module Rpush
           raise
         rescue StandardError => error
           mark_failed(error)
-          reflect(:error, error)
           raise
         ensure
           @batch.notification_processed
@@ -90,11 +89,6 @@ module Rpush
           hash = { aps: aps }
           hash.merge!(notification.data || {})
           JSON.dump(hash).force_encoding(Encoding::BINARY)
-        end
-
-        def mark_retryable(notification, timer, error = nil)
-          super
-          reflect(:notification_id_will_retry, @app, notification.id, timer)
         end
 
         def retry_message_to_log

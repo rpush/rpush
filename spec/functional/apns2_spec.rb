@@ -1,5 +1,4 @@
 require 'functional_spec_helper'
-require 'byebug'
 
 describe 'APNs http2 adapter' do
   let(:fake_client) { double(call: fake_http_response) }
@@ -107,22 +106,13 @@ describe 'APNs http2 adapter' do
         expect do
           Rpush.push
           notification.reload
-        end.to change(notification, :retries).to eq(1)
+        end.to change(notification, :retries)
       end
-    end
-
-    context 'shit' do
-      let(:fake_http_resp_headers) {
-        {
-          ":status" => "500",
-          "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
-        }
-      }
 
       it 'reflects :notification_id_will_retry' do
         Rpush.reflect do |on|
           on.notification_id_will_retry do |app, id, timer|
-            expect(app).to be_kind_of(Rpush::Client::ActiveRecord::Apns2::App)
+            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
             expect(id).to eq 1
           end
         end
@@ -144,13 +134,13 @@ describe 'APNs http2 adapter' do
         expect do
           Rpush.push
           notification.reload
-        end.to change(notification, :retries).to eq(1)
+        end.to change(notification, :retries)
       end
 
       it 'reflects :notification_id_will_retry' do
         Rpush.reflect do |on|
           on.notification_id_will_retry do |app, id, timer|
-            expect(app).to be_kind_of(Rpush::Client::ActiveRecord::Apns2::App)
+            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
             expect(id).to eq 1
             expect(timer).to be_kind_of(Time)
           end

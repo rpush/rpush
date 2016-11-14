@@ -25,6 +25,7 @@ module Rpush
         end
 
         def cleanup
+          @client.close
         end
 
         private
