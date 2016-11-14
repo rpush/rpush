@@ -6,7 +6,7 @@ PATH
       ansi
       multi_json (~> 1.0)
       net-http-persistent (< 3.0)
-      net-http2
+      net-http2 (~> 0.14)
       railties
       thor (>= 0.18.1, < 2.0)
 
@@ -240,7 +240,6 @@ DEPENDENCIES
   jdbc-postgres
   jruby-openssl
   mysql2
-  net-http2 (= 0.14.0)
   pg
   rails (~> 4.2)
   rake
