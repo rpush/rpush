@@ -1,9 +1,17 @@
 require 'functional_spec_helper'
 
 describe 'APNs http2 adapter' do
-  let(:fake_client) { double(call: fake_http_response) }
+  let(:fake_client) {
+    double(
+      prepare_request: fake_http2_request,
+      close:           'ok',
+      call_async:      'ok',
+      join:            'ok'
+    )
+  }
   let(:app) { create_app }
   let(:fake_device_token) { 'a' * 64 }
+  let(:fake_http2_request) { double }
   let(:fake_http_resp_headers) {
     {
       ":status" => "200",
@@ -11,14 +19,20 @@ describe 'APNs http2 adapter' do
     }
   }
   let(:fake_http_resp_body) { '' }
-  let(:fake_http_response) {
-    double(headers: fake_http_resp_headers, body: fake_http_resp_body)
-  }
 
   before do
     Rpush.config.push_poll = 0.5
     allow(NetHttp2::Client).
       to receive(:new).and_return(fake_client)
+    allow(fake_http2_request).
+      to receive(:on).with(:headers).
+      and_yield(fake_http_resp_headers)
+    allow(fake_http2_request).
+      to receive(:on).with(:body_chunk).
+      and_yield(fake_http_resp_body)
+    allow(fake_http2_request).
+      to receive(:on).with(:close).
+      and_yield
   end
 
   def create_app
@@ -43,14 +57,15 @@ describe 'APNs http2 adapter' do
     notification = create_notification
 
     expect(fake_client)
-      .to receive(:call)
+      .to receive(:prepare_request)
       .with(
         :post,
         "/3/device/#{fake_device_token}",
         { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\"}}",
           headers: {} }
       )
-      .and_return(fake_http_response)
+      .and_return(fake_http2_request)
+
     expect do
       Rpush.push
       notification.reload
@@ -75,16 +90,12 @@ describe 'APNs http2 adapter' do
       end
 
       it 'reflects :notification_id_failed' do
-        reflector = double
-        expect(reflector).to receive(:accept)
-
         Rpush.reflect do |on|
           on.notification_id_failed do |app, id, code, descr|
-            expect(app).to be_kind_of(Rpush::Client::ActiveRecord::Apns2::App)
+            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
             expect(id).to eq 1
             expect(code).to eq 404
             expect(descr).to be_nil
-           reflector.accept
           end
         end
 
@@ -123,10 +134,8 @@ describe 'APNs http2 adapter' do
     end
 
     context 'when there is SocketError' do
-      let(:fake_client) { double }
-
       before(:each) do
-        expect(fake_client).to receive(:call) { raise(SocketError) }
+        expect(fake_client).to receive(:call_async) { raise(SocketError) }
       end
 
       it 'fails but retries delivery several times' do
@@ -152,10 +161,8 @@ describe 'APNs http2 adapter' do
     end
 
     context 'when any StandardError occurs' do
-      let(:fake_client) { double }
-
       before(:each) do
-        expect(fake_client).to receive(:call) { raise(StandardError) }
+        expect(fake_client).to receive(:call_async) { raise(StandardError) }
       end
 
       it 'marks notification failed' do
