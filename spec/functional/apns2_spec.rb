@@ -19,6 +19,7 @@ describe 'APNs http2 adapter' do
     }
   }
   let(:fake_http_resp_body) { '' }
+  let(:notification_data) { nil }
 
   before do
     Rpush.config.push_poll = 0.5
@@ -49,6 +50,7 @@ describe 'APNs http2 adapter' do
     notification.app = app
     notification.alert = 'test'
     notification.device_token = fake_device_token
+    notification.data = notification_data
     notification.save!
     notification
   end
@@ -70,6 +72,36 @@ describe 'APNs http2 adapter' do
       Rpush.push
       notification.reload
     end.to change(notification, :delivered).to(true)
+  end
+
+  context 'when there is "headers" field in a data' do
+    let(:bundle_id) { 'some.example.com' }
+    let(:notification_data) {
+      {
+        'headers' => { 'apns-topic' => bundle_id },
+        'some_field' =>  'some value'
+      }
+    }
+
+    it 'delivers notification with custom headers' do
+      notification = create_notification
+
+      expect(fake_client)
+        .to receive(:prepare_request)
+        .with(
+          :post,
+          "/3/device/#{fake_device_token}",
+          { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\"},"\
+                  "\"some_field\":\"some value\"}",
+            headers: { 'apns-topic' => bundle_id }
+          }
+        ).and_return(fake_http2_request)
+
+      expect do
+        Rpush.push
+        notification.reload
+      end.to change(notification, :delivered).to(true)
+    end
   end
 
   describe 'delivery failures' do

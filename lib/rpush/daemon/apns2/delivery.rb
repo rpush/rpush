@@ -2,6 +2,9 @@ module Rpush
   module Daemon
     module Apns2
       # https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html
+
+      HTTP2_HEADERS_KEY = 'headers'
+
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
 
@@ -83,27 +86,35 @@ module Rpush
 
         def build_request
           {
-            path: "/3/device/#{@notification.device_token}",
-            headers: {},
-            body: prepare_body(@notification)
+            path:    "/3/device/#{@notification.device_token}",
+            headers: prepare_headers,
+            body:    prepare_body
           }
         end
 
-        def prepare_body(notification)
+        def prepare_body
           aps = {}
 
           primary_fields = [:alert, :badge, :sound, :category,
             'content-available', 'url-args']
           primary_fields.each do |primary_field|
-            field_value = notification.send(primary_field.to_s.underscore.to_sym)
+            field_value = @notification.send(primary_field.to_s.underscore.to_sym)
             next unless field_value
 
             aps[primary_field] = field_value
           end
 
           hash = { aps: aps }
-          hash.merge!(notification.data || {})
+          hash.merge!(notification_data.except(HTTP2_HEADERS_KEY) || {})
           JSON.dump(hash).force_encoding(Encoding::BINARY)
+        end
+
+        def prepare_headers
+          notification_data[HTTP2_HEADERS_KEY] || {}
+        end
+
+        def notification_data
+          @notification.data || {}
         end
 
         def retry_message_to_log
