@@ -18,11 +18,16 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_runtime_dependency 'multi_json', '~> 1.0'
-  s.add_runtime_dependency 'net-http-persistent', '< 3.0'
   s.add_runtime_dependency 'activesupport'
   s.add_runtime_dependency 'thor', ['>= 0.18.1', '< 2.0']
   s.add_runtime_dependency 'railties'
   s.add_runtime_dependency 'ansi'
+
+  if RUBY_VERSION >= '2.1'
+    s.add_runtime_dependency 'net-http-persistent', ['>= 2', '< 4']
+  else
+    s.add_runtime_dependency 'net-http-persistent', ['>= 2', '< 3']
+  end
 
   if defined? JRUBY_VERSION
     s.platform = 'java'
