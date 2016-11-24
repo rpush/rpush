@@ -15,6 +15,7 @@
 
 * ~~~Lock `net-http-persistent` dependency to `< 3`. See also [#306](https://github.com/rpush/rpush/issues/306) for more details. (by [@amaierhofer](https://github.com/amaierhofer))~~~
 * Fix `net-http-persistent` initializer to support version 2.x as well as 3.x. ([#309](https://github.com/rpush/rpush/pull/309) by [@amirmujkic](https://github.com/amirmujkic))
+* Fixed Rpush::ApnsFeedback being run on every application type when using Redis. ([#318](https://github.com/rpush/rpush/pull/318) by [@robertasg](https://github.com/robertasg))
 
 ## 2.7.0 (February 9, 2016)
 
