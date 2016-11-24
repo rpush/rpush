@@ -77,7 +77,7 @@ The `url_args` attribute is available for Safari Push Notifications.
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
-To use the newer APNS Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
+To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
 
 #### Google Cloud Messaging
 
