@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rpush (2.9.0)
+    rpush (3.0.0)
       activesupport
       ansi
       multi_json (~> 1.0)
@@ -240,6 +240,7 @@ DEPENDENCIES
   jdbc-postgres
   jruby-openssl
   mysql2
+  net-http2 (= 0.14.0)
   pg
   rails (~> 4.2)
   rake
