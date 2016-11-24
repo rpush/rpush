@@ -3,7 +3,7 @@
 #### Features
 
 * Added support for APNS `mutable-content` ([#296](https://github.com/rpush/rpush/pull/296) by [@tdtran](https://github.com/tdtran))
-* Added support for HTTP2 base APNS Api ([#315](https://github.com/rpush/rpush/pull/315) by [@soulfly](https://github.com/soulfly) and [@Nattfodd](https://github.com/Nattfodd)
+* Added support for HTTP2 base APNS Api ([#315](https://github.com/rpush/rpush/pull/315) by [@soulfly](https://github.com/soulfly) and [@Nattfodd](https://github.com/Nattfodd))
 
 #### Changes
 
