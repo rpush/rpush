@@ -1,4 +1,4 @@
-## 2.8.0 (unreleased)
+## 3.0.0 (unreleased)
 
 #### Features
 
