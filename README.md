@@ -51,6 +51,7 @@ $ bundle exec rpush init
 
 #### Apple Push Notification Service
 
+
 If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
 ```ruby
@@ -75,6 +76,8 @@ n.save!
 The `url_args` attribute is available for Safari Push Notifications.
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
+
+To use the newer APNS Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
 
 #### Google Cloud Messaging
 
@@ -154,7 +157,7 @@ Uses the more recent [Toast template](https://msdn.microsoft.com/en-us/library/w
 
 The `client_id` here is the SID URL as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the `client_id` on dashboard.
 
-You can (optionally) include a launch argument by adding a `launch` key to the notification data. 
+You can (optionally) include a launch argument by adding a `launch` key to the notification data.
 
 You can (optionally) include an [audio element](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br230842.aspx) by setting the sound on the notification.
 
