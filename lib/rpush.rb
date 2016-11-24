@@ -1,6 +1,7 @@
 require 'logger'
 require 'multi_json'
 require 'active_support/all'
+require 'net-http2'
 
 module Rpush
   def self.attr_accessible_available?

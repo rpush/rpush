@@ -21,6 +21,9 @@ require 'rpush/client/mongoid/apns/notification'
 require 'rpush/client/mongoid/apns/feedback'
 require 'rpush/client/mongoid/apns/app'
 
+require 'rpush/client/mongoid/apns2/notification'
+require 'rpush/client/mongoid/apns2/app'
+
 require 'rpush/client/mongoid/gcm/notification'
 require 'rpush/client/mongoid/gcm/app'
 
