@@ -34,8 +34,8 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
     expect(notification.alert).to eq("*" * 300)
   end
 
-  it "should default the sound to 'default'" do
-    expect(notification.sound).to eq('default')
+  it "should default the sound to nil" do
+    expect(notification.sound).to be_nil
   end
 
   it "should default the expiry to 1 day" do
