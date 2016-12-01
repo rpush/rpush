@@ -42,7 +42,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
     add_rpush_migration('rpush_2_1_0_updates')
     add_rpush_migration('rpush_2_6_0_updates')
     add_rpush_migration('rpush_2_7_0_updates')
-    add_rpush_migration('rpush_2_8_0_updates')
+    add_rpush_migration('rpush_3_0_0_updates')
   end
 
   protected
