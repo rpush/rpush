@@ -101,19 +101,7 @@ module Rpush
         end
 
         def prepare_body(notification)
-          aps = {}
-
-          primary_fields = [:alert, :badge, :sound, :category,
-            'content-available', 'url-args']
-          primary_fields.each do |primary_field|
-            field_value = notification.send(primary_field.to_s.underscore.to_sym)
-            next unless field_value
-
-            aps[primary_field] = field_value
-          end
-
-          hash = { aps: aps }
-          hash.merge!(notification_data(notification).except(HTTP2_HEADERS_KEY) || {})
+          hash = notification.as_json.except(HTTP2_HEADERS_KEY)
           JSON.dump(hash).force_encoding(Encoding::BINARY)
         end
 

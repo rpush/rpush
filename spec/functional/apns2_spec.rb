@@ -51,6 +51,7 @@ describe 'APNs http2 adapter' do
     notification.alert = 'test'
     notification.device_token = fake_device_token
     notification.data = notification_data
+    notification.content_available = 1
     notification.save!
     notification
   end
@@ -63,7 +64,7 @@ describe 'APNs http2 adapter' do
       .with(
         :post,
         "/3/device/#{fake_device_token}",
-        { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\"}}",
+        { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\",\"content-available\":1}}",
           headers: {} }
       )
       .and_return(fake_http2_request)
@@ -91,8 +92,8 @@ describe 'APNs http2 adapter' do
         .with(
           :post,
           "/3/device/#{fake_device_token}",
-          { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\"},"\
-                  "\"some_field\":\"some value\"}",
+          { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\","\
+                  "\"content-available\":1},\"some_field\":\"some value\"}",
             headers: { 'apns-topic' => bundle_id }
           }
         ).and_return(fake_http2_request)
