@@ -8,124 +8,132 @@ module Rpush
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
 
-        def initialize(app, http2_client, batch, notification)
+        def initialize(app, http2_client, batch)
           @app = app
           @client = http2_client
           @batch = batch
-          @notification = notification
-          @response = OpenStruct.new
         end
 
         def perform
-          do_async_post
+          @batch.each_notification do |notification|
+            prepare_async_post(notification)
+          end
+
+          # Send all preprocessed requests at once
+          @client.join
+
+          @batch.mark_all_delivered
         rescue SocketError => error
-          mark_retryable(@notification, Time.now + 10.seconds, error)
+          mark_batch_retryable(Time.now + 10.seconds, error)
           raise
         rescue StandardError => error
-          mark_failed(error)
+          mark_batch_failed(error)
           raise
         ensure
-          @batch.notification_processed
+          @batch.all_processed
         end
 
         protected
         ######################################################################
 
-        def handle_response
-          code = @response.code
-          case code
-          when 200
-            ok
-          when *RETRYABLE_CODES
-            service_unavailable
-          else
-            reflect(:notification_id_failed,
-              @app,
-              @notification.id, code,
-              @response.failure_reason)
-            fail Rpush::DeliveryError.new(@response.code,
-              @notification.id, @response.failure_reason)
-          end
-        end
+        def prepare_async_post(notification)
+          response = OpenStruct.new
 
-        def ok
-          log_info("#{@notification.id} sent to #{@notification.device_token}")
-          mark_delivered
-        end
-
-        def service_unavailable
-          mark_retryable(@notification, Time.now + 10.seconds)
-          # Logs should go last as soon as we need to initialize
-          # retry time to display it in log
-          failed_message_to_log
-          retry_message_to_log
-        end
-
-        def do_async_post
-          request = build_request
+          request = build_request(notification)
           http_request = @client.prepare_request(:post, request[:path],
             body:    request[:body],
             headers: request[:headers]
           )
 
           http_request.on(:headers) do |hdrs|
-            @response.code = hdrs[':status'].to_i
+            response.code = hdrs[':status'].to_i
           end
 
           http_request.on(:body_chunk) do |body_chunk|
             next unless body_chunk.present?
 
-            @response.failure_reason = JSON.parse(body_chunk)['reason']
+            response.failure_reason = JSON.parse(body_chunk)['reason']
           end
 
-          http_request.on(:close) { handle_response }
+          http_request.on(:close) { handle_response(notification, response) }
 
           @client.call_async(http_request)
-          @client.join
+
+          @batch.notification_processed
         end
 
-        def build_request
+        def handle_response(notification, response)
+          code = response.code
+          case code
+          when 200
+            ok(notification)
+          when *RETRYABLE_CODES
+            service_unavailable(notification, response)
+          else
+            reflect(:notification_id_failed,
+              @app,
+              notification.id, code,
+              response.failure_reason)
+            @batch.mark_failed(notification, response.code, response.failure_reason)
+            failed_message_to_log(notification, response)
+          end
+        end
+
+        def ok(notification)
+          log_info("#{notification.id} sent to #{notification.device_token}")
+          @batch.mark_delivered(notification)
+        end
+
+        def service_unavailable(notification, response)
+          @batch.mark_retryable(notification, Time.now + 10.seconds)
+          # Logs should go last as soon as we need to initialize
+          # retry time to display it in log
+          failed_message_to_log(notification, response)
+          retry_message_to_log(notification)
+        end
+
+        def build_request(notification)
           {
-            path:    "/3/device/#{@notification.device_token}",
-            headers: prepare_headers,
-            body:    prepare_body
+            path:    "/3/device/#{notification.device_token}",
+            headers: prepare_headers(notification),
+            body:    prepare_body(notification)
           }
         end
 
-        def prepare_body
+        def prepare_body(notification)
           aps = {}
 
           primary_fields = [:alert, :badge, :sound, :category,
             'content-available', 'url-args']
           primary_fields.each do |primary_field|
-            field_value = @notification.send(primary_field.to_s.underscore.to_sym)
+            field_value = notification.send(primary_field.to_s.underscore.to_sym)
             next unless field_value
 
             aps[primary_field] = field_value
           end
 
           hash = { aps: aps }
-          hash.merge!(notification_data.except(HTTP2_HEADERS_KEY) || {})
+          hash.merge!(notification_data(notification).except(HTTP2_HEADERS_KEY) || {})
           JSON.dump(hash).force_encoding(Encoding::BINARY)
         end
 
-        def prepare_headers
-          notification_data[HTTP2_HEADERS_KEY] || {}
+        def prepare_headers(notification)
+          notification_data(notification)[HTTP2_HEADERS_KEY] || {}
         end
 
-        def notification_data
-          @notification.data || {}
+        def notification_data(notification)
+          notification.data || {}
         end
 
-        def retry_message_to_log
-          log_warn("Notification #{@notification.id} will be retried after "\
-            "#{@notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} "\
-            "(retry #{@notification.retries}).")
+        def retry_message_to_log(notification)
+          log_warn("Notification #{notification.id} will be retried after "\
+            "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} "\
+            "(retry #{notification.retries}).")
         end
 
-        def failed_message_to_log
-          log_error("Notification #{@notification.id} failed, "\
-            "#{@response.code}/#{@response.failure_reason}")
+        def failed_message_to_log(notification, response)
+          log_error("Notification #{notification.id} failed, "\
+            "#{response.code}/#{response.failure_reason}")
         end
       end
     end

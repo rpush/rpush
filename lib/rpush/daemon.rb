@@ -106,9 +106,7 @@ module Rpush
     end
 
     def self.shutdown_lock
-      return @shutdown_lock if @shutdown_lock
-      @shutdown_lock = Mutex.new
-      @shutdown_lock
+      @shutdown_lock ||= Mutex.new
     end
 
     def self.common_init

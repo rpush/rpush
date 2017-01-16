@@ -21,7 +21,7 @@ module Rpush
         end
 
         def dispatch(payload)
-          @delivery_class.new(@app, @client, payload.batch, payload.notification).perform
+          @delivery_class.new(@app, @client, payload.batch).perform
         end
 
         def cleanup
