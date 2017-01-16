@@ -37,7 +37,7 @@ module Rpush
         ######################################################################
 
         def prepare_async_post(notification)
-          response = OpenStruct.new
+          response = {}
 
           request = build_request(notification)
           http_request = @client.prepare_request(:post, request[:path],
@@ -46,13 +46,13 @@ module Rpush
           )
 
           http_request.on(:headers) do |hdrs|
-            response.code = hdrs[':status'].to_i
+            response[:code] = hdrs[':status'].to_i
           end
 
           http_request.on(:body_chunk) do |body_chunk|
             next unless body_chunk.present?
 
-            response.failure_reason = JSON.parse(body_chunk)['reason']
+            response[:failure_reason] = JSON.parse(body_chunk)['reason']
           end
 
           http_request.on(:close) { handle_response(notification, response) }
@@ -63,7 +63,7 @@ module Rpush
         end
 
         def handle_response(notification, response)
-          code = response.code
+          code = response[:code]
           case code
           when 200
             ok(notification)
@@ -73,8 +73,8 @@ module Rpush
             reflect(:notification_id_failed,
               @app,
               notification.id, code,
-              response.failure_reason)
-            @batch.mark_failed(notification, response.code, response.failure_reason)
+              response[:failure_reason])
+            @batch.mark_failed(notification, response[:code], response[:failure_reason])
             failed_message_to_log(notification, response)
           end
         end
@@ -133,7 +133,7 @@ module Rpush
 
         def failed_message_to_log(notification, response)
           log_error("Notification #{notification.id} failed, "\
-            "#{response.code}/#{response.failure_reason}")
+            "#{response[:code]}/#{response[:failure_reason]}")
         end
       end
     end
