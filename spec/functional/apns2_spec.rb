@@ -59,6 +59,14 @@ describe 'APNs http2 adapter' do
   it 'delivers a notification successfully' do
     notification = create_notification
 
+    thread = nil
+    expect(fake_http2_request).
+      to receive(:on).with(:close) { |&block|
+        # imitate HTTP2 delay
+        thread = Thread.new { sleep(0.01); block.call }
+      }
+    expect(fake_client).to receive(:join) { thread.join }
+
     expect(fake_client)
       .to receive(:prepare_request)
       .with(
