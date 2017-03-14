@@ -10,6 +10,7 @@ gcm_test/bin
 spec/tmp/
 .vagrant/
 tmp/
+log/
 
 ## Environment normalization:
 /.bundle/
