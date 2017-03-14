@@ -21,8 +21,6 @@ module Rpush
 
           # Send all preprocessed requests at once
           @client.join
-
-          @batch.mark_all_delivered
         rescue SocketError => error
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
@@ -58,8 +56,6 @@ module Rpush
           http_request.on(:close) { handle_response(notification, response) }
 
           @client.call_async(http_request)
-
-          @batch.notification_processed
         end
 
         def handle_response(notification, response)
