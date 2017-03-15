@@ -14,7 +14,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 
   * [**Apple Push Notification Service**](#apple-push-notification-service)
     * Including Safari Push Notifications.
-  * [**Google Cloud Messaging**](#google-cloud-messaging)
+  * [**Firebase Cloud Messaging**](#firebase-cloud-messaging) (used to be Google Cloud Messaging)
   * [**Amazon Device Messaging**](#amazon-device-messaging)
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
 
@@ -79,7 +79,9 @@ You should also implement the [ssl_certificate_will_expire](https://github.com/r
 
 To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
 
-#### Google Cloud Messaging
+#### Firebase Cloud Messaging
+
+FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
 
 ```ruby
 app = Rpush::Gcm::App.new
@@ -104,9 +106,9 @@ n.notification = { body: 'great match!',
 n.save!
 ```
 
-GCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
+FCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
 
-Check the [GCM reference](https://developers.google.com/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.
+Check the [FCM reference](https://firebase.google.com/docs/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.
 
 #### Amazon Device Messaging
 
@@ -284,7 +286,7 @@ You should run `rpush init` after upgrading Rpush to check for configuration and
 * [Why open multiple connections to the APNs?](https://github.com/rpush/rpush/wiki/Why-open-multiple-connections-to-the-APNs%3F)
 * [Silent failures might be dropped connections](https://github.com/rpush/rpush/wiki/Dropped-connections)
 
-### Google Cloud Messaging
+### Firebase Cloud Messaging
 * [Notification Options](https://github.com/rpush/rpush/wiki/GCM-Notification-Options)
 * [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
 * [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
@@ -300,4 +302,3 @@ with mysql and you're using a user named 'bob', you will need to grant a mysql u
 mysql database.
 
 To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `active_record`, `redis` or `mongoid`.
-
