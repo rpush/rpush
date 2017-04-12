@@ -15,13 +15,15 @@ module Rpush
         end
 
         def perform
+          @client.on(:error) { |err| mark_batch_retryable(Time.now + 10.seconds, err) }
+
           @batch.each_notification do |notification|
             prepare_async_post(notification)
           end
 
           # Send all preprocessed requests at once
           @client.join
-        rescue SocketError => error
+        rescue Errno::ECONNREFUSED, SocketError => error
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
         rescue StandardError => error

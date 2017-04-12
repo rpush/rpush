@@ -7,7 +7,7 @@ gem 'database_cleaner'
 gem 'timecop'
 gem 'rpush-redis', '0.4.1'
 gem 'rpush-mongoid', '0.1.0'
-gem 'net-http2', '0.14.0'
+gem 'net-http2'
 
 platform :mri do
   gem 'cane'

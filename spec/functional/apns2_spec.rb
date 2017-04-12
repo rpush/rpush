@@ -6,7 +6,8 @@ describe 'APNs http2 adapter' do
       prepare_request: fake_http2_request,
       close:           'ok',
       call_async:      'ok',
-      join:            'ok'
+      join:            'ok',
+      on:              'ok'
     )
   }
   let(:app) { create_app }
