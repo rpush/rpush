@@ -35,15 +35,10 @@ module Rpush
 
       STDOUT.write "* Stopping Rpush (pid #{pid})... "
       STDOUT.flush
-      Process.kill('TERM', pid)
 
-      loop do
-        begin
-          Process.getpgid(pid)
-          sleep 0.05
-        rescue Errno::ESRCH
-          break
-        end
+      while (Process.getpgid(pid) rescue false)
+        Process.kill('TERM', pid)
+        sleep 0.1
       end
 
       puts ANSI.green { '✔' }
