@@ -7,11 +7,14 @@ module Rpush
 
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
+        DEFAULT_TIMEOUT = 60
 
         def initialize(app, http2_client, batch)
           @app = app
           @client = http2_client
           @batch = batch
+
+          @processed_statuses = {}
         end
 
         def perform
@@ -21,11 +24,20 @@ module Rpush
             prepare_async_post(notification)
           end
 
-          # Send all preprocessed requests at once
-          @client.join
+          # Async http2 requests don't have a timeout,
+          # so it's important to implement it on a higher level
+          Timeout.timeout(DEFAULT_TIMEOUT) do
+            @client.join
+          end
         rescue Errno::ECONNREFUSED, SocketError => error
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
+        rescue Timeout::Error => error
+          @batch.each_notification do |notification|
+            next if @processed_statuses[notification.id]
+
+            service_unavailable(notification, error)
+          end
         rescue StandardError => error
           mark_batch_failed(error)
           raise
@@ -61,12 +73,14 @@ module Rpush
         end
 
         def handle_response(notification, response)
+          @processed_statuses[notification.id] = true
+
           code = response[:code]
           case code
           when 200
             ok(notification)
           when *RETRYABLE_CODES
-            service_unavailable(notification, response)
+            service_unavailable(notification, response_message(response))
           else
             reflect(:notification_id_failed,
               @app,
@@ -82,11 +96,11 @@ module Rpush
           @batch.mark_delivered(notification)
         end
 
-        def service_unavailable(notification, response)
+        def service_unavailable(notification, response_msg)
           @batch.mark_retryable(notification, Time.now + 10.seconds)
           # Logs should go last as soon as we need to initialize
           # retry time to display it in log
-          failed_message_to_log(notification, response)
+          failed_message_to_log(notification, response_msg)
           retry_message_to_log(notification)
         end
 
@@ -117,9 +131,12 @@ module Rpush
             "(retry #{notification.retries}).")
         end
 
-        def failed_message_to_log(notification, response)
-          log_error("Notification #{notification.id} failed, "\
-            "#{response[:code]}/#{response[:failure_reason]}")
+        def failed_message_to_log(notification, response_msg)
+          log_error("Notification #{notification.id} failed, #{response_msg}")
+        end
+
+        def response_message(response)
+          "#{response[:code]}/#{response[:failure_reason]}"
         end
       end
     end
