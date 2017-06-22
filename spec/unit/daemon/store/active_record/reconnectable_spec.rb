@@ -85,6 +85,27 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
     test_doubles.each(&:perform)
   end
 
+  context "should reconnect on" do
+    [
+        ::ActiveRecord::ConnectionNotEstablished,
+        ::ActiveRecord::ConnectionTimeoutError,
+        ::ActiveRecord::JDBCError,
+        ::ActiveRecord::StatementInvalid,
+        Mysql::Error,
+        Mysql2::Error,
+        PG::Error,
+        PGError,
+        SQLite3::Exception
+    ].each do |error_class|
+      let(:error) { error_class.new }
+
+      it error_class.name do
+        expect(ActiveRecord::Base).to receive(:establish_connection)
+        test_doubles.each(&:perform)
+      end
+    end
+  end
+
   context "when the reconnection attempt is not successful" do
     before do
       class << Rpush::Client::ActiveRecord::Notification
