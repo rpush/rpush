@@ -106,6 +106,15 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
     end
   end
 
+  context "should not reconnect on" do
+    let(:error) { ActiveRecord::ActiveRecordError.new }
+
+    it "ActiveRecord::ActiveRecordError" do
+      expect(ActiveRecord::Base).not_to receive(:establish_connection)
+      expect { test_doubles.each(&:perform) }.to raise_error(ActiveRecord::ActiveRecordError)
+    end
+  end
+
   context "when the reconnection attempt is not successful" do
     before do
       class << Rpush::Client::ActiveRecord::Notification
