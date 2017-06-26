@@ -1,5 +1,11 @@
 source 'https://rubygems.org'
 
+# https://github.com/bundler/bundler/issues/5476
+git_source(:github) do |repo_name|
+  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?('/')
+  "https://github.com/#{repo_name}.git"
+end
+
 gem 'rake'
 gem 'rspec', '~> 3.4.0'
 gem 'rails', '~> 4.2'
