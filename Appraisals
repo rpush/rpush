@@ -14,13 +14,13 @@ appraise "rails-4.2" do
 end
 
 appraise "rails-5.0" do
-  gem "rails", "~> 5.0"
+  gem "rails", ">= 5.0", "< 5.1"
   gem "mongoid", ">= 6.0", "< 6.2"
   gem "mongoid-autoinc", ">= 6.0", "< 6.2"
 end
 
 appraise "rails-5.1" do
-  gem "rails", "5.1.1"
+  gem "rails", ">= 5.1"
   gem "mongoid", ">= 6.2"
   gem "mongoid-autoinc", ">= 6.0.2"
 end
