@@ -2,7 +2,7 @@ language: ruby
 
 sudo: false
 
-cache: :bundler
+cache: bundler
 
 compiler: clang
 
