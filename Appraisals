@@ -8,13 +8,13 @@
 # > https://github.com/thoughtbot/appraisal
 
 appraise "rails-4.2" do
-  gem "activerecord", "~> 4.2"
+  gem "rails", "~> 4.2"
   gem "mongoid", "~> 5"
   gem "mongoid-autoinc", "~> 5"
 end
 
 appraise "rails-5.0" do
-  gem "activerecord", "~> 5.0"
+  gem "rails", "~> 5.0"
   gem "mongoid", ">= 6.0", "< 6.2"
   gem "mongoid-autoinc", ">= 6.0", "< 6.2"
 end
