@@ -8,8 +8,6 @@ module Rpush
     require 'rails'
   rescue LoadError
     false
-  else
-    ::Rails::VERSION::STRING < '4' || defined?(::ActiveRecord::MassAssignmentSecurity)
   end
 end
 
