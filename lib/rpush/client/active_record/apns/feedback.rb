@@ -5,10 +5,6 @@ module Rpush
         class Feedback < ::ActiveRecord::Base
           self.table_name = 'rpush_feedback'
 
-          if Rpush.attr_accessible_available?
-            attr_accessible :device_token, :failed_at, :app_id
-          end
-
           belongs_to :app, class_name: 'Rpush::Client::ActiveRecord::App'
 
           validates :device_token, presence: true
