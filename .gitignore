@@ -24,3 +24,6 @@ log/
 
 ## Directory-based project format:
 .idea/
+
+# Appraisal
+gemfiles/*.lock

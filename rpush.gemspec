@@ -25,6 +25,8 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'railties'
   s.add_runtime_dependency 'ansi'
 
+  s.add_development_dependency "appraisal"
+
   if defined? JRUBY_VERSION
     s.platform = 'java'
     s.add_runtime_dependency "jruby-openssl"
