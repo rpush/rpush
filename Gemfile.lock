@@ -169,20 +169,12 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activerecord-jdbc-adapter (>= 1.2.6)
-  activerecord-jdbch2-adapter
-  activerecord-jdbcmysql-adapter
-  activerecord-jdbcpostgresql-adapter
-  activerecord-jdbcsqlite3-adapter
   appraisal
   byebug
   cane
   codeclimate-test-reporter
   database_cleaner
-  jdbc-postgres
-  jruby-openssl
   mysql2
-  net-http2
   pg
   rake
   rpush!

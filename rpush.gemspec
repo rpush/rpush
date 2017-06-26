@@ -25,11 +25,21 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'railties'
   s.add_runtime_dependency 'ansi'
 
-  s.add_development_dependency "appraisal"
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rspec', '~> 3.4.0'
+  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'timecop'
+  s.add_development_dependency 'stackprof'
+  s.add_development_dependency 'rpush-redis', '0.4.1'
 
-  if defined? JRUBY_VERSION
-    s.platform = 'java'
-    s.add_runtime_dependency "jruby-openssl"
-    s.add_runtime_dependency "activerecord-jdbc-adapter"
-  end
+  s.add_development_dependency 'appraisal'
+  s.add_development_dependency 'cane'
+  s.add_development_dependency 'codeclimate-test-reporter'
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'byebug'
+
+  s.add_development_dependency 'pg'
+  s.add_development_dependency 'mysql2'
+  s.add_development_dependency 'sqlite3'
 end
