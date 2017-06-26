@@ -10,7 +10,7 @@ end
 
 if ENV['TRAVIS'] && ENV['QUALITY'] != 'true'
   task default: 'spec'
-elsif RUBY_VERSION > '1.9' && defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
+elsif RUBY_VERSION > '2.2.2' && defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
   task default: 'spec:quality'
 else
   task default: 'spec'

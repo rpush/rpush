@@ -22,51 +22,24 @@ env:
 matrix:
   fast_finish: true
   include:
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=active_record
   - rvm: 2.2.2
     gemfile: Gemfile
     env: CLIENT=active_record
   - rvm: 2.3.0
     gemfile: Gemfile
     env: CLIENT=active_record
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=redis
   - rvm: 2.2.2
     gemfile: Gemfile
     env: CLIENT=redis
   - rvm: 2.3.0
     gemfile: Gemfile
     env: CLIENT=redis
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=mongoid
   - rvm: 2.2.2
     gemfile: Gemfile
     env: CLIENT=mongoid
   - rvm: 2.3.0
     gemfile: Gemfile
     env: CLIENT=mongoid
-  - rvm: 2.1.6
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.2.2
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.3.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.1.6
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.2.2
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.3.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
   - rvm: jruby-1.7.23
     gemfile: Gemfile
     env: CLIENT=active_record
