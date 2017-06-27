@@ -1,4 +1,4 @@
-class CreateRapnsFeedback < ActiveRecord::Migration
+class CreateRapnsFeedback < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
   def self.up
     create_table :rapns_feedback do |t|
       t.string    :device_token,          null: false, limit: 64
