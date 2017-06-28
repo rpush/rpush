@@ -8,19 +8,29 @@
 # > https://github.com/thoughtbot/appraisal
 
 appraise "rails-4.2" do
-  gem "rails", "~> 4.2"
-  gem "mongoid", "~> 5"
-  gem "mongoid-autoinc", "~> 5"
+  gem "activesupport", "~> 4.2"
+
+  group :development do
+    gem "rails", "~> 4.2"
+  end
 end
 
 appraise "rails-5.0" do
-  gem "rails", ">= 5.0", "< 5.1"
-  gem "mongoid", ">= 6.0", "< 6.2"
-  gem "mongoid-autoinc", ">= 6.0", "< 6.2"
+  gem "activesupport", ">= 5.0", "< 5.1"
+
+  group :development do
+    gem "rails", ">= 5.0", "< 5.1"
+    gem "mongoid", ">= 6.0", "< 6.2"
+    gem "mongoid-autoinc", ">= 6.0"
+  end
 end
 
 appraise "rails-5.1" do
-  gem "rails", ">= 5.1"
-  gem "mongoid", ">= 6.2"
-  gem "mongoid-autoinc", ">= 6.0.2"
+  gem "activesupport", ">= 5.1"
+
+  group :development do
+    gem "rails", ">= 5.1"
+    gem "mongoid", ">= 6.2"
+    gem "mongoid-autoinc", ">= 6.0.2"
+  end
 end

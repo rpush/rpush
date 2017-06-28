@@ -30,6 +30,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'stackprof'
+  s.add_development_dependency 'modis', '1.4.1'
   s.add_development_dependency 'rpush-redis', '0.4.1'
 
   s.add_development_dependency 'appraisal'
