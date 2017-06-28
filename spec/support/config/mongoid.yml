@@ -1,6 +1,6 @@
 development:
-  # Configure available database clients. (required)
-  clients:
+  # Configure available database sessions. (required)
+  sessions:
     # Defines the default session. (required)
     default:
       # Defines the name of the default database that Mongoid can connect to.
@@ -56,7 +56,7 @@ development:
     # Ensure all times are UTC in the app side. (default: false)
     # use_utc: false
 test:
-  clients:
+  sessions:
     default:
       database: rpush_test
       hosts:
