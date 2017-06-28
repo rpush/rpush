@@ -1,10 +1,4 @@
 PATH
-  remote: rpush-redis
-  specs:
-    rpush-redis (0.4.1)
-      modis (~> 2.0)
-
-PATH
   remote: .
   specs:
     rpush (3.0.0)
@@ -61,7 +55,7 @@ GEM
       parallel
     codeclimate-test-reporter (0.6.0)
       simplecov (>= 0.7.1, < 1.0.0)
-    connection_pool (2.2.1)
+    connection_pool (2.2.0)
     database_cleaner (1.5.3)
     diff-lcs (1.2.5)
     docile (1.1.5)
@@ -71,17 +65,23 @@ GEM
     http-2 (0.8.2)
     i18n (0.8.4)
     json (2.1.0)
-    json (2.1.0-java)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mini_portile2 (2.2.0)
     minitest (5.10.2)
-    modis (2.1.0)
+    modis (1.4.1)
       activemodel (>= 3.0)
       activesupport (>= 3.0)
       connection_pool (>= 2)
       hiredis (>= 0.5)
       msgpack (>= 0.5)
+      redis (>= 3.0)
+    modis (1.4.1-java)
+      activemodel (>= 3.0)
+      activesupport (>= 3.0)
+      connection_pool (>= 2)
+      hiredis (>= 0.5)
+      msgpack-jruby
       redis (>= 3.0)
     mongo (2.4.2)
       bson (>= 4.2.1, < 5.0.0)
@@ -92,8 +92,8 @@ GEM
       tzinfo (>= 0.3.37)
     mongoid-autoinc (5.0.2)
       mongoid (~> 5.0)
-    msgpack (1.1.0)
-    msgpack (1.1.0-java)
+    msgpack (1.0.0)
+    msgpack-jruby (1.4.1-java)
     multi_json (1.12.1)
     mysql2 (0.4.4)
     net-http-persistent (2.9.4)
@@ -126,7 +126,9 @@ GEM
       thor (>= 0.18.1, < 2.0)
     rainbow (2.1.0)
     rake (12.0.0)
-    redis (3.3.3)
+    redis (3.3.1)
+    rpush-redis (0.4.1)
+      modis (~> 1.4, >= 1.4.1)
     rspec (3.4.0)
       rspec-core (~> 3.4.0)
       rspec-expectations (~> 3.4.0)
@@ -177,7 +179,7 @@ DEPENDENCIES
   rake
   rpush!
   rpush-mongoid!
-  rpush-redis!
+  rpush-redis (= 0.4.1)
   rspec (~> 3.4.0)
   rubocop
   simplecov
