@@ -2,13 +2,10 @@
 
 source "https://rubygems.org"
 
-gem "rpush-mongoid", path: "../rpush-mongoid"
 gem "activesupport", ">= 5.0", "< 5.1"
 
 group :development do
   gem "rails", ">= 5.0", "< 5.1"
-  gem "mongoid", ">= 6.0", "< 6.2"
-  gem "mongoid-autoinc", ">= 6.0"
 end
 
 gemspec path: "../"

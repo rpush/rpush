@@ -12,6 +12,7 @@ appraise "rails-4.2" do
 
   group :development do
     gem "rails", "~> 4.2"
+    gem "rpush-mongoid", "0.1.0"
   end
 end
 
@@ -20,8 +21,6 @@ appraise "rails-5.0" do
 
   group :development do
     gem "rails", ">= 5.0", "< 5.1"
-    gem "mongoid", ">= 6.0", "< 6.2"
-    gem "mongoid-autoinc", ">= 6.0"
   end
 end
 
@@ -30,7 +29,5 @@ appraise "rails-5.1" do
 
   group :development do
     gem "rails", ">= 5.1"
-    gem "mongoid", ">= 6.2"
-    gem "mongoid-autoinc", ">= 6.0.2"
   end
 end
