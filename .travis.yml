@@ -37,3 +37,8 @@ env:
 
 matrix:
   fast_finish: true
+  exclude:
+    - gemfile: gemfiles/rails_5.0.gemfile
+      env: CLIENT=mongoid
+    - gemfile: gemfiles/rails_5.1.gemfile
+      env: CLIENT=mongoid
