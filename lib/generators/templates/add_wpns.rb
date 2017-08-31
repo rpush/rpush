@@ -1,4 +1,4 @@
-class AddWpns < ActiveRecord::Migration
+class AddWpns < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
   module Rapns
     class Notification < ActiveRecord::Base
       self.table_name = 'rapns_notifications'

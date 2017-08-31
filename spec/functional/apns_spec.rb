@@ -49,8 +49,7 @@ describe 'APNs' do
   end
 
   def fail_notification(notification)
-    id = (defined?(Mongoid) && notification.is_a?(Mongoid::Document)) ? notification.integer_id : notification.id
-    allow(ssl_socket).to receive_messages(read: [8, 4, id].pack('ccN'))
+    allow(ssl_socket).to receive_messages(read: [8, 4, notification.id].pack('ccN'))
     enable_io_select
   end
 

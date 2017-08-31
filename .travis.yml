@@ -1,14 +1,25 @@
 language: ruby
 
+dist: trusty
+
 sudo: false
 
-cache: :bundler
+cache: bundler
 
 compiler: clang
 
+rvm:
+  - 2.2.7
+  - 2.3.4
+  - 2.4.1
+
+gemfile:
+  - gemfiles/rails_4.2.gemfile
+  - gemfiles/rails_5.0.gemfile
+  - gemfiles/rails_5.1.gemfile
+
 services:
   - redis-server
-  - mongodb
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install: gem update bundler
@@ -18,93 +29,9 @@ env:
     - AMAZON_S3_BUCKET=rpush
     - AMAZON_ACCESS_KEY_ID=AKIAIWENGKCRZZX7NGOQ
     - secure: "JZSnurdpqClRgy2s99xFaOymuCDaCh8rZmHgj8Wj/KRFNDuEFVq7CgUjAg24shL4aB+uE/sgBemfsuvJLcWT27/7bi1h/idepNdB36l+GhdJj5CovtqPGX9rXv6vp1s0tELgjxTcx17IQ1oZ5iqTozg9UWWpCXtOBB70/aJvTn8="
+  matrix:
+    - CLIENT=active_record
+    - CLIENT=redis
 
 matrix:
   fast_finish: true
-  include:
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.2.2
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.3.0
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.2.2
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.3.0
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.2.2
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.3.0
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.1.6
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.2.2
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.3.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.1.6
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.2.2
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.3.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: jruby-1.7.23
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: jruby-1.7.23
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: jruby-1.7.23
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: jruby-9.0.4.0
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: jruby-9.0.4.0
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: jruby-9.0.4.0
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  allow_failures:
-    - rvm: 1.9.3
-    - rvm: jruby-1.7.23
-      env: CLIENT=active_record
-    - rvm: jruby-1.7.23
-      env: CLIENT=redis
-    - rvm: jruby-1.7.23
-      env: CLIENT=mongoid
-    - rvm: jruby-9.0.4.0
-      env: CLIENT=active_record
-    - rvm: jruby-9.0.4.0
-      env: CLIENT=redis
-    - rvm: jruby-9.0.4.0
-      env: CLIENT=mongoid
-    - rvm: rbx-2.5.8
-      gemfile: Gemfile
-      env: CLIENT=active_record
-    - rvm: rbx-2.5.8
-      gemfile: Gemfile
-      env: CLIENT=redis
-    - rvm: rbx-2.5.8
-      gemfile: Gemfile
-      env: CLIENT=mongoid

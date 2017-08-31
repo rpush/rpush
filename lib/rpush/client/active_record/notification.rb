@@ -12,13 +12,6 @@ module Rpush
 
         belongs_to :app, class_name: 'Rpush::Client::ActiveRecord::App'
 
-        if Rpush.attr_accessible_available?
-          attr_accessible :badge, :device_token, :sound, :alert, :data, :expiry, :delivered,
-                          :delivered_at, :failed, :failed_at, :error_code, :error_description, :deliver_after,
-                          :alert_is_json, :app, :app_id, :collapse_key, :delay_while_idle, :registration_ids,
-                          :uri, :url_args, :category, :content_available, :mutable_content, :notification
-        end
-
         def data=(attrs)
           return unless attrs
           fail ArgumentError, 'must be a Hash' unless attrs.is_a?(Hash)

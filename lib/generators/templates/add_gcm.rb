@@ -1,4 +1,4 @@
-class AddGcm < ActiveRecord::Migration
+class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
   module Rapns
     class App < ActiveRecord::Base
       self.table_name = 'rapns_apps'

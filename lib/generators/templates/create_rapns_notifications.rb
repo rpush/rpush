@@ -1,4 +1,4 @@
-class CreateRapnsNotifications < ActiveRecord::Migration
+class CreateRapnsNotifications < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
   def self.up
     create_table :rapns_notifications do |t|
       t.integer   :badge,                 null: true
