@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rpush (3.0.0)
+    rpush (3.0.0.rc1)
       activesupport
       ansi
       multi_json (~> 1.0)
