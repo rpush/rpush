@@ -153,7 +153,7 @@ module Rpush
     end
 
     def check_ruby_version
-      STDERR.puts(ANSI.yellow { 'WARNING: ' } + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '2.2.2' && RUBY_ENGINE == 'ruby'
+      STDERR.puts(ANSI.yellow { 'WARNING: ' } + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION < '2.2.2' && RUBY_ENGINE == 'ruby'
     end
 
     def underscore_option_names
