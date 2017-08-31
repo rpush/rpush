@@ -11,11 +11,13 @@ module Rpush
         self.namespace = 'notifications'
 
         def self.absolute_pending_namespace
-          "#{absolute_namespace}:pending"
+          ns = sti_child? ? sti_base_absolute_namespace : absolute_namespace
+          "#{ns}:pending"
         end
 
         def self.absolute_retryable_namespace
-          "#{absolute_namespace}:retryable"
+          ns = sti_child? ? sti_base_absolute_namespace : absolute_namespace
+          "#{ns}:retryable"
         end
 
         attribute :badge, :integer
