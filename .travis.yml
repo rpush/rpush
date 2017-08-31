@@ -20,7 +20,6 @@ gemfile:
 
 services:
   - redis-server
-  - mongodb
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install: gem update bundler
@@ -33,12 +32,6 @@ env:
   matrix:
     - CLIENT=active_record
     - CLIENT=redis
-    - CLIENT=mongoid
 
 matrix:
   fast_finish: true
-  exclude:
-    - gemfile: gemfiles/rails_5.0.gemfile
-      env: CLIENT=mongoid
-    - gemfile: gemfiles/rails_5.1.gemfile
-      env: CLIENT=mongoid

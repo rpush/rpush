@@ -12,7 +12,6 @@ appraise "rails-4.2" do
 
   group :development do
     gem "rails", "~> 4.2"
-    gem "rpush-mongoid", "0.1.0"
   end
 end
 

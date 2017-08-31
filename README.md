@@ -20,7 +20,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 
 #### Feature Highlights
 
-* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord), [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) or [**MongoDB**](https://github.com/rpush/rpush/wiki/Using-Mongodb) for storage.
+* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord) or [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) for storage.
 * Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
 [**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd) or [write your own](https://github.com/rpush/rpush/wiki/Writing-a-Plugin).
 * Seamless integration with your projects, including **Rails**.
@@ -301,4 +301,4 @@ Note that the database username is changed at runtime to be the currently logged
 with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rpush_test'
 mysql database.
 
-To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `active_record`, `redis` or `mongoid`.
+To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `active_record` or `redis`.

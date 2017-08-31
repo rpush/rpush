@@ -5,7 +5,7 @@ PATH
       activesupport
       ansi
       multi_json (~> 1.0)
-      net-http-persistent (< 3.0)
+      net-http-persistent
       net-http2 (~> 0.14)
       railties
       thor (>= 0.18.1, < 2.0)
@@ -159,4 +159,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   1.15.1
+   1.15.4

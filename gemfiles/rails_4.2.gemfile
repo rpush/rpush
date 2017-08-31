@@ -6,7 +6,6 @@ gem "activesupport", "~> 4.2"
 
 group :development do
   gem "rails", "~> 4.2"
-  gem "rpush-mongoid", "0.1.0"
 end
 
 gemspec path: "../"
