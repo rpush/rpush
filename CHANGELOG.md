@@ -1,5 +1,7 @@
 ## 3.0.0 (unreleased)
 
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
 #### Features
 
 * Added support for APNS `mutable-content` ([#296](https://github.com/rpush/rpush/pull/296) by [@tdtran](https://github.com/tdtran))
