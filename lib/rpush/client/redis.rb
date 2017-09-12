@@ -41,3 +41,10 @@ require 'rpush/client/redis/wns/badge_notification'
 Modis.configure do |config|
   config.namespace = :rpush
 end
+
+# Prevent diverging Redis namespaces for subclasses as introduced by Modis 1.4.2
+Rpush::Client::Redis::Notification.subclasses.each do |notification_class|
+  notification_class.class_eval do
+    self.namespace = Rpush::Client::Redis::Notification.namespace
+  end
+end
