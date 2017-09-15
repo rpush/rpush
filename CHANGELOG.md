@@ -12,6 +12,14 @@
 
 - None
 
+## 3.0.0 (2017-09-15)
+
+Same as 3.0.0.rc1 including:
+
+#### Features
+
+* Added support for latest modis version ([#378](https://github.com/rpush/rpush/pull/378)) by [@milgner](https://github.com/milgner)
+
 ## 3.0.0.rc1 (2017-08-31)
 
 When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
