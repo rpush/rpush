@@ -28,7 +28,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
-* Works with **MRI**, **JRuby** and **Rubinius**.
+* Tested with **MRI**
 
 
 ### Getting Started
