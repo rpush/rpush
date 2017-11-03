@@ -79,6 +79,28 @@ You should also implement the [ssl_certificate_will_expire](https://github.com/r
 
 To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
 
+To use the p8 APNs Api replace `Rpush::Apns::App` with `Rpush::Apnsp8::App`.
+
+```ruby
+app = Rpush::Apnsp8::App.new
+app.name = "ios_app"
+app.apn_key = File.read("/path/to/sandbox.pem")
+app.environment = "development" # APNs environment.
+app.apn_key_id = "APN KEY ID"
+app.team_id = "TEAM ID"
+app.bundle_id = "BUNDLE ID"
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Apns::Notification.new
+n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
+n.device_token = "..." # 64-character hex string
+n.alert = "hi mom!"
+n.data = { foo: :bar }
+n.save!
+```
 #### Firebase Cloud Messaging
 
 FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.

@@ -25,6 +25,7 @@ require 'rpush/daemon/dispatcher/http'
 require 'rpush/daemon/dispatcher/tcp'
 require 'rpush/daemon/dispatcher/apns_tcp'
 require 'rpush/daemon/dispatcher/apns_http2'
+require 'rpush/daemon/dispatcher/apnsp8_http2'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 require 'rpush/daemon/ring_buffer'
@@ -43,6 +44,9 @@ require 'rpush/daemon/apns'
 
 require 'rpush/daemon/apns2/delivery'
 require 'rpush/daemon/apns2'
+
+require 'rpush/daemon/apnsp8/delivery'
+require 'rpush/daemon/apnsp8'
 
 require 'rpush/daemon/gcm/delivery'
 require 'rpush/daemon/gcm'

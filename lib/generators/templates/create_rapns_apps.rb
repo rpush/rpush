@@ -14,3 +14,4 @@ class CreateRapnsApps < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migrat
     drop_table :rapns_apps
   end
 end
+x

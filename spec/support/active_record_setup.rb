@@ -33,7 +33,7 @@ require 'generators/templates/rpush_2_6_0_updates'
 require 'generators/templates/rpush_2_7_0_updates'
 require 'generators/templates/rpush_3_0_0_updates'
 
-migrations = [AddRpush, Rpush200Updates, Rpush210Updates, Rpush260Updates, Rpush270Updates, Rpush300Updates]
+migrations = [AddRpush, Rpush200Updates, Rpush210Updates, Rpush260Updates, Rpush270Updates, Rpush300Updates, AddApnsp8]
 
 unless ENV['TRAVIS']
   migrations.reverse_each do |m|
