@@ -8,10 +8,12 @@ module Rpush
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
 
-        def initialize(app, http2_client, batch)
+        def initialize(app, http2_client, token_provider, batch)
           @app = app
           @client = http2_client
           @batch = batch
+          @first_push = true
+          @token_provider = token_provider
         end
 
         def perform
@@ -23,7 +25,8 @@ module Rpush
 
           # Send all preprocessed requests at once
           @client.join
-        rescue Errno::ECONNREFUSED, SocketError => error
+        rescue Errno::ECONNREFUSED, SocketError, HTTP2::Error::StreamLimitExceeded => error
+          # TODO restart connection when StreamLimitExceeded
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
         rescue StandardError => error
@@ -58,7 +61,32 @@ module Rpush
 
           http_request.on(:close) { handle_response(notification, response) }
 
+          if @first_push
+            @first_push = false
+            @client.call_async(http_request)
+          else
+            delayed_push_async(http_request)
+          end
+        end
+
+        def delayed_push_async(http_request)
+          until streams_available? do
+            sleep 0.001
+          end
           @client.call_async(http_request)
+        end
+
+        def streams_available?
+          remote_max_concurrent_streams - @client.stream_count > 0
+        end
+
+        def remote_max_concurrent_streams
+          # 0x7fffffff is the default value from http-2 gem (2^31)
+          if @client.remote_settings[:settings_max_concurrent_streams] == 0x7fffffff
+            0
+          else
+            @client.remote_settings[:settings_max_concurrent_streams]
+          end
         end
 
         def handle_response(notification, response)
@@ -105,8 +133,7 @@ module Rpush
         end
 
         def prepare_headers(notification)
-          ec_key = OpenSSL::PKey::EC.new(@app.apn_key)
-          jwt_token = JWT.encode({iss: @app.team_id, iat: Time.now.to_i}, ec_key, 'ES256', {alg: 'ES256', kid: @app.apn_key_id})
+          jwt_token = @token_provider.token
 
           headers = {}
           

@@ -15,12 +15,13 @@ module Rpush
           @delivery_class = delivery_class
 
           url = URLS[app.environment.to_sym]
-          @client = NetHttp2::Client.new(url,
-            connect_timeout: DEFAULT_TIMEOUT)
+          @client = NetHttp2::Client.new(url, connect_timeout: DEFAULT_TIMEOUT)
+          @token_provider = Rpush::Daemon::Apnsp8::Token.new(@app)
         end
 
         def dispatch(payload)
-          @delivery_class.new(@app, @client, payload.batch).perform
+
+          @delivery_class.new(@app, @client, @token_provider, payload.batch).perform
         end
 
         def cleanup
