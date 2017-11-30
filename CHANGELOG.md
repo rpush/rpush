@@ -12,6 +12,13 @@
 
 - None
 
+## 3.0.1 (2017-11-30)
+
+#### Enhancements
+
+* Reduce booleans to true/false, do not allow nil ([#384](https://github.com/rpush/rpush/pull/384)) by [@grosser](https://github.com/grosser)
+* Better error message for error 8 in APNS ([#387](https://github.com/rpush/rpush/pull/387/files)) by [@grosser](https://github.com/grosser)
+
 ## 3.0.0 (2017-09-15)
 
 Same as 3.0.0.rc1 including:
