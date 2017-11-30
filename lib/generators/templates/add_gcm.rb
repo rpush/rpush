@@ -50,10 +50,10 @@ class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] 
     change_column :rapns_notifications, :app_id, :integer, null: false
     remove_column :rapns_notifications, :app
 
-    if ActiveRecord::VERSION::MAJOR >= 5 && index_name_exists?(:rapns_notifications, "index_rapns_notifications_multi") ||
+    if ActiveRecord::VERSION::MAJOR >= 5.1 && index_name_exists?(:rapns_notifications, "index_rapns_notifications_multi") ||
         index_name_exists?(:rapns_notifications, "index_rapns_notifications_multi", true)
       remove_index :rapns_notifications, name: "index_rapns_notifications_multi"
-    elsif ActiveRecord::VERSION::MAJOR >= 5 && index_name_exists?(:rapns_notifications, "index_rapns_notifications_on_delivered_failed_deliver_after") ||
+    elsif ActiveRecord::VERSION::MAJOR >= 5.1 && index_name_exists?(:rapns_notifications, "index_rapns_notifications_on_delivered_failed_deliver_after") ||
         index_name_exists?(:rapns_notifications, "index_rapns_notifications_on_delivered_failed_deliver_after", false)
       remove_index :rapns_notifications, name: "index_rapns_notifications_on_delivered_failed_deliver_after"
     end
@@ -94,7 +94,7 @@ class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] 
       AddGcm::Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
     end
 
-    if ActiveRecord::VERSION::MAJOR >= 5 && index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi) ||
+    if ActiveRecord::VERSION::MAJOR >= 5.1 && index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi) ||
         index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi, true)
       remove_index :rapns_notifications, name: :index_rapns_notifications_multi
     end
