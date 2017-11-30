@@ -95,7 +95,7 @@ class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] 
     end
 
     if ActiveRecord::VERSION::MAJOR >= 5 && index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi) ||
-        index_name_exists?(:rpush_feedback, :index_rpush_feedback_on_device_token, true)
+        index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi, true)
       remove_index :rapns_notifications, name: :index_rapns_notifications_multi
     end
 
