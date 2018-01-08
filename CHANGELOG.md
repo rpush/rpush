@@ -12,6 +12,13 @@
 
 - None
 
+## 3.0.2 (2018-01-08)
+
+#### Fixes
+
+* Fixes migrations added in 3.0.1 ([#396](https://github.com/rpush/rpush/pull/396) by [@grosser](https://github.com/grosser))
+* Actually run these migrations in the test suite ([#399](https://github.com/rpush/rpush/pull/399) by [@aried3r](https://github.com/aried3r))
+
 ## 3.0.1 (2017-11-30)
 
 #### Enhancements
