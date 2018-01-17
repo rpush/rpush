@@ -36,7 +36,7 @@ module Rpush
           when 200
             ok(response)
           when 400
-            bad_request
+            bad_request(response)
           when 401
             unauthorized
           when 500
@@ -100,14 +100,15 @@ module Rpush
         end
 
         def create_new_notification(response, unavailable_idxs)
-          attrs = { 'app_id' => @notification.app_id, 'collapse_key' => @notification.collapse_key, 'delay_while_idle' => @notification.delay_while_idle }
+          attrs = { 'app_id' => @notification.app_id, 'collapse_key' => @notification.collapse_key }
           registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
           Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data,
                                                       registration_ids, deliver_after_header(response), @notification.app)
         end
 
-        def bad_request
-          fail Rpush::DeliveryError.new(400, @notification.id, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
+        def bad_request(response)
+          # due to gcm > fcm update
+          fail Rpush::DeliveryError.new(400, @notification.id, response.inspect)
         end
 
         def unauthorized

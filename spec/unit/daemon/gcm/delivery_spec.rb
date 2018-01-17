@@ -40,9 +40,9 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'creates a new notification for the unavailable devices' do
-      notification.update_attributes(registration_ids: %w(id_0 id_1 id_2), data: { 'one' => 1 }, collapse_key: 'thing', delay_while_idle: true)
+      notification.update_attributes(registration_ids: %w(id_0 id_1 id_2), data: { 'one' => 1 }, collapse_key: 'thing')
       allow(response).to receive_messages(header: { 'retry-after' => 10 })
-      attrs = { 'collapse_key' => 'thing', 'delay_while_idle' => true, 'app_id' => app.id }
+      attrs = { 'collapse_key' => 'thing', 'app_id' => app.id }
       expect(store).to receive(:create_gcm_notification).with(attrs, notification.data,
                                                               %w(id_0 id_2), now + 10.seconds, notification.app)
       perform_with_rescue

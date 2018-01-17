@@ -37,7 +37,6 @@ module Rpush
           def as_json(options = nil)
             json = {
                 'registration_ids' => registration_ids,
-                'delay_while_idle' => delay_while_idle,
                 'data' => data
             }
             json['collapse_key'] = collapse_key if collapse_key
