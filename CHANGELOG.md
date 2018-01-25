@@ -12,6 +12,20 @@
 
 - None
 
+## 3.0.2 (2018-01-08)
+
+#### Fixes
+
+* Fixes migrations added in 3.0.1 ([#396](https://github.com/rpush/rpush/pull/396) by [@grosser](https://github.com/grosser))
+* Actually run these migrations in the test suite ([#399](https://github.com/rpush/rpush/pull/399) by [@aried3r](https://github.com/aried3r))
+
+## 3.0.1 (2017-11-30)
+
+#### Enhancements
+
+* Reduce booleans to true/false, do not allow nil ([#384](https://github.com/rpush/rpush/pull/384)) by [@grosser](https://github.com/grosser)
+* Better error message for error 8 in APNS ([#387](https://github.com/rpush/rpush/pull/387/files)) by [@grosser](https://github.com/grosser)
+
 ## 3.0.0 (2017-09-15)
 
 Same as 3.0.0.rc1 including:
