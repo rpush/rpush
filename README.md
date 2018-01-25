@@ -84,7 +84,7 @@ To use the p8 APNs Api replace `Rpush::Apns::App` with `Rpush::Apnsp8::App`.
 ```ruby
 app = Rpush::Apnsp8::App.new
 app.name = "ios_app"
-app.apn_key = File.read("/path/to/sandbox.pem")
+app.apn_key = File.read("/path/to/sandbox.p8")
 app.environment = "development" # APNs environment.
 app.apn_key_id = "APN KEY ID"
 app.team_id = "TEAM ID"
