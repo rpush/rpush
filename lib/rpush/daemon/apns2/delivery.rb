@@ -57,6 +57,10 @@ module Rpush
 
           http_request.on(:close) { handle_response(notification, response) }
 
+          http_request.on(:error) do |error|
+            log_error("Error sending notification #{notification.id}: #{error}")
+          end
+
           @client.call_async(http_request)
         end
 
