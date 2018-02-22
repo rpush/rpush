@@ -27,3 +27,5 @@ log/
 
 # Appraisal
 gemfiles/*.lock
+
+Gemfile.lock
