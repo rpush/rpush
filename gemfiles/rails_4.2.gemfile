@@ -6,6 +6,7 @@ gem "activesupport", "~> 4.2"
 
 group :development do
   gem "rails", "~> 4.2"
+  gem "pg", "< 1.0"
 end
 
 gemspec path: "../"
