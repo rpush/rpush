@@ -25,9 +25,9 @@ module Rpush
           # I'm not happy about it, but this will have to do until I can take a further look.
           def priority=(priority)
             case priority
-              when 'high'
+              when 'high',10
                 super(GCM_PRIORITY_HIGH)
-              when 'normal'
+              when 'normal',5
                 super(GCM_PRIORITY_NORMAL)
               else
                 errors.add(:priority, 'must be one of either "normal" or "high"')
