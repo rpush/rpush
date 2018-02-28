@@ -98,7 +98,7 @@ n.registration_ids = ["..."]
 n.data = { message: "hi mom!" }
 n.priority = 'high'        # Optional, can be either 'normal' or 'high'
 n.content_available = true # Optional
-# Optional notification payload. See the reference below for more keys you can use!
+# You must define at least `body` or `title` fiels to your notification appear. See the reference below for more keys you can use!
 n.notification = { body: 'great match!',
                    title: 'Portugal vs. Denmark',
                    icon: 'myicon'
