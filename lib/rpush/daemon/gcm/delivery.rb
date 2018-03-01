@@ -103,7 +103,7 @@ module Rpush
           attrs = { 'app_id' => @notification.app_id, 'collapse_key' => @notification.collapse_key }
           registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
           Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data,
-                                                      registration_ids, deliver_after_header(response), @notification.app)
+                                                      registration_ids, deliver_after_header(response), @app)
         end
 
         def bad_request(response)
@@ -144,7 +144,7 @@ module Rpush
 
         def do_post
           post = Net::HTTP::Post.new(FCM_URI.path, 'Content-Type'  => 'application/json',
-                                                   'Authorization' => "key=#{@notification.app.auth_key}")
+                                                   'Authorization' => "key=#{@app.auth_key}")
           post.body = @notification.as_json.to_json
           @http.request(FCM_URI, post)
         end
