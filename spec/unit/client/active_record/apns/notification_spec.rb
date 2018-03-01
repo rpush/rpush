@@ -254,10 +254,12 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.badge = 3
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.data = { hi: :mom }
-    notification.expiry = 86_400 # 1 day, \x00\x01Q\x80
+    notification.expiry = 86_400 # 1 day
     notification.priority = Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
     notification.app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
-    expect(notification.to_binary).to eq "\x02\x00\x00\x00\x99\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04\x00\x01Q\x80\x05\x00\x01\n"
+    now = Time.now
+    allow(Time).to receive_messages(now: now)
+    expect(notification.to_binary).to eq "\x02\x00\x00\x00\x99\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04#{[now.to_i + 86_400].pack('N')}\x05\x00\x01\n"
   end
 end if active_record?
 
