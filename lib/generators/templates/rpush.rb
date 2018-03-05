@@ -1,3 +1,4 @@
+require 'rpush'
 Rpush.configure do |config|
 
   # Supported clients are :active_record and :redis
