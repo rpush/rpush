@@ -66,7 +66,7 @@ app.save!
 
 ```ruby
 n = Rpush::Apns::Notification.new
-n.app = Rpush::Apns::App.find_by_name("ios_app")
+n.app = Rpush::Apns::App.find_by(name: "ios_app")
 n.device_token = "..." # 64-character hex string
 n.alert = "hi mom!"
 n.data = { foo: :bar }
@@ -93,7 +93,7 @@ app.save!
 
 ```ruby
 n = Rpush::Gcm::Notification.new
-n.app = Rpush::Gcm::App.find_by_name("android_app")
+n.app = Rpush::Gcm::App.find_by(name: "android_app")
 n.registration_ids = ["..."]
 n.data = { message: "hi mom!" }
 n.priority = 'high'        # Optional, can be either 'normal' or 'high'
@@ -123,7 +123,7 @@ app.save!
 
 ```ruby
 n = Rpush::Adm::Notification.new
-n.app = Rpush::Adm::App.find_by_name("kindle_app")
+n.app = Rpush::Adm::App.find_by(name: "kindle_app")
 n.registration_ids = ["..."]
 n.data = { message: "hi mom!"}
 n.collapse_key = "Optional consolidationKey"
@@ -147,7 +147,7 @@ app.save!
 
 ```ruby
 n = Rpush::Wpns::Notification.new
-n.app = Rpush::Wpns::App.find_by_name("windows_phone_app")
+n.app = Rpush::Wpns::App.find_by(name: "windows_phone_app")
 n.uri = "http://..."
 n.data = {title:"MyApp", body:"Hello world", param:"user_param1"}
 n.save!
