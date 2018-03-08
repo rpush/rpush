@@ -5,7 +5,8 @@ module Rpush
 
         URLS = {
           production: 'https://api.push.apple.com:443',
-          development: 'https://api.development.push.apple.com:443'
+          development: 'https://api.development.push.apple.com:443',
+          sandbox: 'https://api.development.push.apple.com:443'
         }
 
         DEFAULT_TIMEOUT = 60
