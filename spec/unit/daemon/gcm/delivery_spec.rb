@@ -313,7 +313,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     before { allow(response).to receive_messages(code: 400) }
 
     it 'marks the notification as failed' do
-      error = Rpush::DeliveryError.new(400, notification.id, 'GCM failed to parse the JSON request. Possibly an Rpush bug, please open an issue.')
+      error = Rpush::DeliveryError.new(400, notification.id, response.inspect)
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
     end
