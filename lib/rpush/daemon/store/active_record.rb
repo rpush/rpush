@@ -31,7 +31,7 @@ module Rpush
             notifications = Rpush::Client::ActiveRecord::Notification.transaction do
               relation = ready_for_delivery
               relation = relation.limit(limit)
-              ids = relation.lock(true).pluck(:id)
+              ids = relation.lock(true).ids
               unless ids.empty?
                 relation = Rpush::Client::ActiveRecord::Notification.where(id: ids)
                 # mark processing
