@@ -10,7 +10,12 @@
 
  ### Fixed
 
- - None
+ - Database deadlock [#200](https://github.com/rpush/rpush/issues/200) (by [@loadhigh](https://github.com/loadhigh) in [#428](https://github.com/rpush/rpush/issues/428))
+
+### Enhancements
+
+- Change the index on `rpush_notifications` to minimize number of locked records and pre-sort the records ([#428](https://github.com/rpush/rpush/issues/428) by [@loadhigh](https://github.com/loadhigh))
+- Minimize the locking duration by moving the row dump code outside of the transaction ([#428](https://github.com/rpush/rpush/issues/428) by [@loadhigh](https://github.com/loadhigh))
 
 ## 3.1.0 (2018-04-11)
 
