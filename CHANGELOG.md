@@ -1,16 +1,27 @@
 ## HEAD
 
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
 ### Breaking Changes
 
 - None
 
 ### Added
 
-- None
+- Added sandbox URL to `ApnsHttp2` dispatcher ([#392](https://github.com/rpush/rpush/pull/392) by [@brianlittmann](https://github.com/brianlittmann))
+
+### Features
+
+- Added support for [Pushy](https://pushy.me/) ([#404](https://github.com/rpush/rpush/pull/404) by [@zabolotnov87](https://github.com/zabolotnov87))
 
 ### Fixed
 
-- None
+- `@notification.app` triggers loading of association :app ([#410](https://github.com/rpush/rpush/issues/410) by [@loadhigh](https://github.com/loadhigh))
+- APNS expiry should be number of seconds since epoch ([#416](https://github.com/rpush/rpush/issues/416) by [@loadhigh](https://github.com/loadhigh))
+
+### Enhancements
+
+- Test rpush with Ruby 2.5 on Travis CI ([#407](https://github.com/rpush/rpush/pull/407) by [@Atul9](https://github.com/Atul9))
 
 ## 3.0.2 (2018-01-08)
 
