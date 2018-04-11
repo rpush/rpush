@@ -1,4 +1,18 @@
-## HEAD
+ ## HEAD
+
+ ### Breaking Changes
+
+ - None
+
+ ### Added
+
+ - None
+
+ ### Fixed
+
+ - None
+
+## 3.1.0 (2018-04-11)
 
 When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
 
