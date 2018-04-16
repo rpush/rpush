@@ -38,3 +38,5 @@ env:
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - gemfile: gemfiles/rails_edge.gemfile
