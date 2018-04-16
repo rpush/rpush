@@ -14,6 +14,8 @@
 
 ## 3.1.1 (2018-04-16)
 
+When upgrading, don't forget to run bundle exec rpush init to get all the latest migrations.
+
 ### Breaking Changes
 
 - None
