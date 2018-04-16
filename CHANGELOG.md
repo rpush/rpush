@@ -1,16 +1,30 @@
- ## HEAD
+## HEAD
 
- ### Breaking Changes
+### Breaking Changes
 
- - None
+- None
 
- ### Added
+### Added
 
- - None
+- None
 
- ### Fixed
+### Fixed
 
- - Database deadlock [#200](https://github.com/rpush/rpush/issues/200) (by [@loadhigh](https://github.com/loadhigh) in [#428](https://github.com/rpush/rpush/issues/428))
+- None
+
+## 3.1.1 (2018-04-16)
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- Database deadlock [#200](https://github.com/rpush/rpush/issues/200) (by [@loadhigh](https://github.com/loadhigh) in [#428](https://github.com/rpush/rpush/issues/428))
 
 ### Enhancements
 
