@@ -84,6 +84,8 @@ To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
 
 FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
 
+Please refer to the Firebase Console on where to find your `auth_key` (probably called _Server Key_ there). To verify you have the right key, use tools like [Postman](https://www.getpostman.com/), [HTTPie](https://httpie.org/), `curl` or similar before reporting a new issue. See also [this comment](https://github.com/rpush/rpush/issues/346#issuecomment-289218776).
+
 ```ruby
 app = Rpush::Gcm::App.new
 app.name = "android_app"
