@@ -28,3 +28,6 @@ require 'rpush/client/active_record/wns/app'
 
 require 'rpush/client/active_record/adm/notification'
 require 'rpush/client/active_record/adm/app'
+
+require 'rpush/client/active_record/pushy/notification'
+require 'rpush/client/active_record/pushy/app'

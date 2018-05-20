@@ -106,7 +106,7 @@ module Rpush
       client_module = Rpush::Client.const_get(client.to_s.camelize)
       Rpush.send(:include, client_module) unless Rpush.ancestors.include?(client_module)
 
-      [:Apns, :Gcm, :Wpns, :Wns, :Adm].each do |service|
+      [:Apns, :Gcm, :Wpns, :Wns, :Adm, :Pushy].each do |service|
         Rpush.const_set(service, client_module.const_get(service)) unless Rpush.const_defined?(service)
       end
 

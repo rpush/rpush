@@ -13,6 +13,7 @@ module Rpush
         attribute :auth_key, :string
         attribute :client_id, :string
         attribute :client_secret, :string
+        attribute :api_key, :string
         attribute :apn_key, :string
         attribute :apn_key_id, :string
         attribute :team_id, :string

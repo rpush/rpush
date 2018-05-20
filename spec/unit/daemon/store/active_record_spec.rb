@@ -63,7 +63,7 @@ describe Rpush::Daemon::Store::ActiveRecord do
       Rpush.config.batch_size = 5000
       relation = double.as_null_object
       expect(relation).to receive(:limit).with(5000)
-      allow(relation).to receive_messages(to_a: [])
+      allow(relation).to receive_messages(pluck: [])
       allow(store).to receive_messages(ready_for_delivery: relation)
       store.deliverable_notifications(Rpush.config.batch_size)
     end

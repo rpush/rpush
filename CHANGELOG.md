@@ -12,6 +12,52 @@
 
 - None
 
+## 3.1.1 (2018-04-16)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- Database deadlock [#200](https://github.com/rpush/rpush/issues/200) (by [@loadhigh](https://github.com/loadhigh) in [#428](https://github.com/rpush/rpush/issues/428))
+
+### Enhancements
+
+- Change the index on `rpush_notifications` to minimize number of locked records and pre-sort the records ([#428](https://github.com/rpush/rpush/issues/428) by [@loadhigh](https://github.com/loadhigh))
+- Minimize the locking duration by moving the row dump code outside of the transaction ([#428](https://github.com/rpush/rpush/issues/428) by [@loadhigh](https://github.com/loadhigh))
+
+## 3.1.0 (2018-04-11)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- Added sandbox URL to `ApnsHttp2` dispatcher ([#392](https://github.com/rpush/rpush/pull/392) by [@brianlittmann](https://github.com/brianlittmann))
+
+### Features
+
+- Added support for [Pushy](https://pushy.me/) ([#404](https://github.com/rpush/rpush/pull/404) by [@zabolotnov87](https://github.com/zabolotnov87))
+
+### Fixed
+
+- `@notification.app` triggers loading of association :app ([#410](https://github.com/rpush/rpush/issues/410) by [@loadhigh](https://github.com/loadhigh))
+- APNS expiry should be number of seconds since epoch ([#416](https://github.com/rpush/rpush/issues/416) by [@loadhigh](https://github.com/loadhigh))
+
+### Enhancements
+
+- Test rpush with Ruby 2.5 on Travis CI ([#407](https://github.com/rpush/rpush/pull/407) by [@Atul9](https://github.com/Atul9))
+
 ## 3.0.2 (2018-01-08)
 
 #### Fixes

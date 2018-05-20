@@ -28,3 +28,7 @@ require 'rpush/client/active_model/wpns/notification'
 
 require 'rpush/client/active_model/wns/app'
 require 'rpush/client/active_model/wns/notification'
+
+require 'rpush/client/active_model/pushy/app'
+require 'rpush/client/active_model/pushy/notification'
+require 'rpush/client/active_model/pushy/time_to_live_validator'

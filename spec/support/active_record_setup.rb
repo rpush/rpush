@@ -33,6 +33,8 @@ require 'generators/templates/rpush_2_6_0_updates'
 require 'generators/templates/rpush_2_7_0_updates'
 require 'generators/templates/rpush_3_0_0_updates'
 require 'generators/templates/rpush_3_0_1_updates'
+require 'generators/templates/rpush_3_1_0_add_pushy'
+require 'generators/templates/rpush_3_1_1_updates'
 require 'generators/templates/add_apnsp8'
 
 migrations = [
@@ -43,6 +45,8 @@ migrations = [
   Rpush270Updates,
   Rpush300Updates,
   Rpush301Updates,
+  Rpush310AddPushy,
+  Rpush311Updates,
   AddApnsp8
 ]
 

@@ -23,7 +23,9 @@ services:
   - redis-server
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
-before_install: gem update bundler
+before_install:
+  - gem update --system
+  - gem update bundler
 
 env:
   global:

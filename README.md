@@ -17,6 +17,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
   * [**Firebase Cloud Messaging**](#firebase-cloud-messaging) (used to be Google Cloud Messaging)
   * [**Amazon Device Messaging**](#amazon-device-messaging)
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
+  * [**Pushy**](#pushy)
 
 #### Feature Highlights
 
@@ -104,6 +105,8 @@ n.save!
 #### Firebase Cloud Messaging
 
 FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
+
+Please refer to the Firebase Console on where to find your `auth_key` (probably called _Server Key_ there). To verify you have the right key, use tools like [Postman](https://www.getpostman.com/), [HTTPie](https://httpie.org/), `curl` or similar before reporting a new issue. See also [this comment](https://github.com/rpush/rpush/issues/346#issuecomment-289218776).
 
 ```ruby
 app = Rpush::Gcm::App.new
@@ -227,6 +230,31 @@ n.uri = 'http://...'
 n.badge = 4
 n.save!
 ```
+
+#### Pushy
+
+[Pushy](https://pushy.me/) is a highly-reliable push notification gateway, based on [MQTT](https://pushy.me/support#what-is-mqtt) protocol for cross platform push notification delivery that includes web, Android, and iOS. One of its advantages is it allows for reliable notification delivery to Android devices in China where Google Cloud Messaging and Firebase Cloud Messaging are blocked and to custom hardware devices that use Android OS but are not using Google Play Services.
+
+Note: current implementation of Pushy only supports Android devices and does not include [subscriptions](https://pushy.me/docs/android/subscribe-topics).
+
+```ruby
+app = Rpush::Pushy::App.new
+app.name = "android_app"
+app.api_key = YOUR_API_KEY
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Pushy::Notification.new
+n.app = Rpush::Pushy::App.find_by_name("android_app")
+n.registration_ids = ["..."]
+n.data = { message: "hi mom!"}
+n.time_to_live = 60 # seconds
+n.save!
+```
+
+For more documentation on [Pushy](https://pushy.me/docs).
 
 ### Running Rpush
 
