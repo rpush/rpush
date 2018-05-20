@@ -47,7 +47,7 @@ migrations = [
   Rpush301Updates,
   Rpush310AddPushy,
   Rpush311Updates,
-  Rpush312AddApnsp8
+  Rpush312AddApnsP8
 ]
 
 unless ENV['TRAVIS']
