@@ -14,7 +14,11 @@ module Rpush
         attribute :client_id, :string
         attribute :client_secret, :string
         attribute :api_key, :string
-
+        attribute :apn_key, :string
+        attribute :apn_key_id, :string
+        attribute :team_id, :string
+        attribute :bundle_id, :string
+ 
         index :name
 
         validates :name, presence: true

@@ -12,6 +12,9 @@ require 'rpush/client/active_model/apns/notification'
 require 'rpush/client/active_model/apns2/app'
 require 'rpush/client/active_model/apns2/notification'
 
+require 'rpush/client/active_model/apnsp8/app'
+require 'rpush/client/active_model/apnsp8/notification'
+
 require 'rpush/client/active_model/adm/data_validator'
 require 'rpush/client/active_model/adm/app'
 require 'rpush/client/active_model/adm/notification'

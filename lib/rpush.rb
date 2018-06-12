@@ -2,6 +2,7 @@ require 'logger'
 require 'multi_json'
 require 'active_support/all'
 require 'net-http2'
+require 'jwt'
 
 require 'rails'
 
