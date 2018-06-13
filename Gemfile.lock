@@ -1,9 +1,10 @@
 PATH
   remote: .
   specs:
-    rpush (3.1.1)
+    rpush (3.2.0)
       activesupport
       ansi
+      jwt (~> 1.5.6)
       multi_json (~> 1.0)
       net-http-persistent
       net-http2 (~> 0.14)
@@ -57,6 +58,7 @@ GEM
     i18n (1.0.0)
       concurrent-ruby (~> 1.0)
     json (2.1.0)
+    jwt (1.5.6)
     loofah (2.2.2)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -84,7 +86,7 @@ GEM
       ast (~> 2.4.0)
     pg (1.0.0)
     powerpack (0.1.1)
-    rack (2.0.4)
+    rack (2.0.5)
     rack-test (1.0.0)
       rack (>= 1.0, < 3)
     rails-dom-testing (2.0.3)
