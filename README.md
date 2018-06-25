@@ -304,6 +304,10 @@ Call this during startup of your application, for example, by adding it to the e
 
 If you're using [mina](https://github.com/mina-deploy/mina), there is a gem called [mina-rpush](https://github.com/d4rky-pl/mina-rpush) which helps you control rpush.
 
+### Cleanup
+
+Rpush leaves delivered notifications in the database. If you do not clear them out, they will take up more and more space. This isn't great for any database, but is especially problematic if using Redis as the Rpush store. [Here](https://github.com/rpush/rpush/wiki/Using-Redis) is an example solution for cleaning up delivered notifications in Redis.
+
 ### Configuration
 
 See [Configuration](https://github.com/rpush/rpush/wiki/Configuration) for a list of options.
