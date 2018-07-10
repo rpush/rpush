@@ -12,6 +12,12 @@
 
 - None
 
+## 3.2.1 (2018-07-10)
+
+### Fixed
+
+- A memory leak in the Rpush daemon which caused it to consume more and more memory was fixed. [#441](https://github.com/rpush/rpush/pull/441) (by [@armahmoudi](https://github.com/armahmoudi))
+
 ## 3.2.0 (2018-06-13)
 
 When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
@@ -22,7 +28,7 @@ When upgrading, don't forget to run `bundle exec rpush init` to get all the late
 
 ### Added
 
-- Added support for P8 certificate Apple push notifications [#386](https://github.com/rpush/rpush/pull/386) (by [@mariannegru](https://github.com/mariannegru)
+- Added support for P8 certificate Apple push notifications [#386](https://github.com/rpush/rpush/pull/386) (by [@mariannegru](https://github.com/mariannegru))
 
 ## 3.1.1 (2018-04-16)
 
