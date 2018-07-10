@@ -12,6 +12,12 @@
 
 - None
 
+## 3.2.2 (2018-07-10)
+
+### Fixed
+
+- Migrations now work with Rails 5.2 and ActiveRecord. Redis support for Rails 5.2 is not yet working if you're using Modis, see [this issue](https://github.com/ileitch/modis/issues/13).
+
 ## 3.2.1 (2018-07-10)
 
 ### Fixed
