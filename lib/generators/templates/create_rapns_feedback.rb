@@ -10,9 +10,16 @@ class CreateRapnsFeedback < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mi
   end
 
   def self.down
-    if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token, true)
-      remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
+    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+      if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token)
+        remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
+      end
+    else
+      if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token, true)
+        remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
+      end
     end
+
     drop_table :rapns_feedback
   end
 end

@@ -36,3 +36,19 @@ appraise "rails-5.1" do
     gem "rails", ">= 5.1", "< 5.2"
   end
 end
+
+appraise "rails-5.2" do
+  gem "activesupport", ">= 5.2.0.beta2"
+
+  group :development do
+    gem "rails", ">= 5.2.0.beta2"
+  end
+end
+
+appraise "rails-edge" do
+  gem "activesupport", git: "https://github.com/rails/rails", require: "activesupport"
+
+  group :development do
+    gem "rails", git: "https://github.com/rails/rails"
+  end
+end

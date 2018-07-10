@@ -21,9 +21,16 @@ class CreateRapnsNotifications < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecor
   end
 
   def self.down
-    if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi', true)
-      remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
+    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+      if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi')
+        remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
+      end
+    else
+      if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi', true)
+        remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
+      end
     end
+
     drop_table :rapns_notifications
   end
 end

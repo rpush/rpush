@@ -18,12 +18,24 @@ class RenameRapnsToRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mig
     rename_table :rapns_apps, :rpush_apps
     rename_table :rapns_feedback, :rpush_feedback
 
-    if index_name_exists?(:rpush_notifications, :index_rapns_notifications_multi, true)
-      rename_index :rpush_notifications, :index_rapns_notifications_multi, :index_rpush_notifications_multi
+    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+      if index_name_exists?(:rpush_notifications, :index_rapns_notifications_multi)
+        rename_index :rpush_notifications, :index_rapns_notifications_multi, :index_rpush_notifications_multi
+      end
+    else
+      if index_name_exists?(:rpush_notifications, :index_rapns_notifications_multi, true)
+        rename_index :rpush_notifications, :index_rapns_notifications_multi, :index_rpush_notifications_multi
+      end
     end
 
-    if index_name_exists?(:rpush_feedback, :index_rapns_feedback_on_device_token, true)
-      rename_index :rpush_feedback, :index_rapns_feedback_on_device_token, :index_rpush_feedback_on_device_token
+    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+      if index_name_exists?(:rpush_feedback, :index_rapns_feedback_on_device_token)
+        rename_index :rpush_feedback, :index_rapns_feedback_on_device_token, :index_rpush_feedback_on_device_token
+      end
+    else
+      if index_name_exists?(:rpush_feedback, :index_rapns_feedback_on_device_token, true)
+        rename_index :rpush_feedback, :index_rapns_feedback_on_device_token, :index_rpush_feedback_on_device_token
+      end
     end
 
     update_type(RenameRapnsToRpush::Rpush::Notification, 'Rapns::Apns::Notification', 'Rpush::Apns::Notification')
@@ -48,12 +60,24 @@ class RenameRapnsToRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mig
     update_type(RenameRapnsToRpush::Rpush::App, 'Rpush::Adm::App', 'Rapns::Adm::App')
     update_type(RenameRapnsToRpush::Rpush::App, 'Rpush::Wpns::App', 'Rapns::Wpns::App')
 
-    if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi, true)
-      rename_index :rpush_notifications, :index_rpush_notifications_multi, :index_rapns_notifications_multi
+    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+      if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi)
+        rename_index :rpush_notifications, :index_rpush_notifications_multi, :index_rapns_notifications_multi
+      end
+    else
+      if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi, true)
+        rename_index :rpush_notifications, :index_rpush_notifications_multi, :index_rapns_notifications_multi
+      end
     end
 
-    if index_name_exists?(:rpush_feedback, :index_rpush_feedback_on_device_token, true)
-      rename_index :rpush_feedback, :index_rpush_feedback_on_device_token, :index_rapns_feedback_on_device_token
+    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+      if index_name_exists?(:rpush_feedback, :index_rpush_feedback_on_device_token)
+        rename_index :rpush_feedback, :index_rpush_feedback_on_device_token, :index_rapns_feedback_on_device_token
+      end
+    else
+      if index_name_exists?(:rpush_feedback, :index_rpush_feedback_on_device_token, true)
+        rename_index :rpush_feedback, :index_rpush_feedback_on_device_token, :index_rapns_feedback_on_device_token
+      end
     end
 
     rename_table :rpush_notifications, :rapns_notifications
