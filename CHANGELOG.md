@@ -12,6 +12,12 @@
 
 - None
 
+## 3.2.3 (2018-07-12)
+
+### Changes
+
+- Update jwt dependency from 1.x to 2.x [#444](https://github.com/rpush/rpush/pull/444) (by [@jsantos](https://github.com/jsantos)).
+
 ## 3.2.2 (2018-07-10)
 
 ### Fixed
