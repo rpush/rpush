@@ -75,15 +75,17 @@ module Rpush
           end
 
           def to_binary(options = {})
-            frame_payload = payload
-            frame_id = options[:for_validation] ? 0 : send(options.fetch(:id_attribute, :id))
-            frame = ""
-            frame << [1, 32, device_token].pack("cnH*")
-            frame << [2, frame_payload.bytesize, frame_payload].pack("cna*")
-            frame << [3, 4, frame_id].pack("cnN")
-            frame << [4, 4, expiry ? Time.now.to_i + expiry.to_i : 0].pack("cnN")
-            frame << [5, 1, priority_for_frame].pack("cnc")
-            [2, frame.bytesize].pack("cN") + frame
+            [*device_token, *registration_ids].each_with_index.map do |device_token, index|
+              frame_payload = payload
+              frame_id = options[:for_validation] ? 0 : send(options.fetch(:id_attribute, :id))
+              frame = ""
+              frame << [1, 32, device_token].pack("cnH*")
+              frame << [2, frame_payload.bytesize, frame_payload].pack("cna*")
+              frame << [3, 4, frame_id ^ index].pack("cnN")
+              frame << [4, 4, expiry ? Time.now.to_i + expiry.to_i : 0].pack("cnN")
+              frame << [5, 1, priority_for_frame].pack("cnc")
+              [2, frame.bytesize].pack("cN") + frame
+            end.join
           end
 
           private
