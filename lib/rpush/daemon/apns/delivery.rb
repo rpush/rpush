@@ -26,8 +26,10 @@ module Rpush
 
         def batch_to_binary
           payload = ""
-          @batch.each_notification do |notification|
-            payload << notification.to_binary
+          @batch
+            .each_notification.lazy.flat_map { |notification| notification.device_tokens.zip([notification].cycle) }
+            .each_with_index do |(device_token, notification), frame_id|
+            payload << notification.to_binary(frame_id: frame_id, device_token: device_token)
           end
           payload
         end

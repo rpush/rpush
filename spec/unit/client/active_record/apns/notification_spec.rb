@@ -286,7 +286,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
       n.app = Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     end
 
-    expect(notification.to_binary(for_validation: true).bytesize).to be > 256
+    expect(notification.to_binary(frame_id: 0).bytesize).to be > 256
     expect(notification.payload.bytesize).to be < 256
     expect(notification).to be_valid
   end

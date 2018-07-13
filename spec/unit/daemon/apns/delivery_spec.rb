@@ -17,8 +17,8 @@ describe Rpush::Daemon::Apns::Delivery do
   end
 
   it 'writes the binary batch' do
-    allow(notification1).to receive_messages(to_binary: 'binary1')
-    allow(notification2).to receive_messages(to_binary: 'binary2')
+    allow(notification1).to receive_messages(to_binary: 'binary1', device_tokens: ['abc123'])
+    allow(notification2).to receive_messages(to_binary: 'binary2', device_tokens: ['abc123'])
     expect(connection).to receive(:write).with('binary1binary2')
     delivery.perform
   end
