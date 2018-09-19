@@ -5,6 +5,7 @@ require 'net-http2'
 require 'jwt'
 
 require 'rails'
+require 'rpush/rails_extensions/active_model'
 
 require 'rpush/version'
 require 'rpush/cli'
