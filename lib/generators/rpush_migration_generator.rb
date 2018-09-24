@@ -47,6 +47,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
     add_rpush_migration('rpush_3_1_0_add_pushy')
     add_rpush_migration('rpush_3_1_1_updates')
     add_rpush_migration('rpush_3_2_0_add_apns_p8')
+    add_rpush_migration('rpush_3_2_4_updates')
   end
 
   protected
