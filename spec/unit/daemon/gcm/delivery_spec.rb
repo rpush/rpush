@@ -329,6 +329,34 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
   end
 
+  describe 'a 5xx response' do
+    before { allow(response).to receive_messages(code: 555) }
+
+    it 'logs a warning that the notification will be retried.' do
+      notification.retries = 1
+      notification.deliver_after = now + 2
+      expect(logger).to receive(:warn).with("[MyApp] GCM responded with a 5xx Error. Notification #{notification.id} will be retried after 2012-10-14 00:00:02 (retry 1).")
+      perform
+    end
+
+    it 'respects an integer Retry-After header' do
+      allow(response).to receive_messages(header: { 'retry-after' => 10 })
+      expect(delivery).to receive(:mark_retryable).with(notification, now + 10.seconds)
+      perform
+    end
+
+    it 'respects a HTTP-date Retry-After header' do
+      allow(response).to receive_messages(header: { 'retry-after' => 'Wed, 03 Oct 2012 20:55:11 GMT' })
+      expect(delivery).to receive(:mark_retryable).with(notification, Time.parse('Wed, 03 Oct 2012 20:55:11 GMT'))
+      perform
+    end
+
+    it 'defaults to exponential back-off if the Retry-After header is not present' do
+      expect(delivery).to receive(:mark_retryable).with(notification, now + 2**1)
+      perform
+    end
+  end
+
   describe 'a 401 response' do
     before { allow(response).to receive_messages(code: 401) }
 

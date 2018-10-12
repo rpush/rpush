@@ -45,6 +45,8 @@ module Rpush
             bad_gateway(response)
           when 503
             service_unavailable(response)
+          when 500..599
+            other_5xx_error(response)
           else
             fail Rpush::DeliveryError.new(response.code.to_i, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
           end
@@ -129,6 +131,11 @@ module Rpush
         def service_unavailable(response)
           retry_delivery(@notification, response)
           log_warn("GCM responded with an Service Unavailable Error. " + retry_message)
+        end
+
+        def other_5xx_error
+          retry_delivery(@notification, response)
+          log_warn("GCM responded with a 5xx Error. " + retry_message)
         end
 
         def deliver_after_header(response)
