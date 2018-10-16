@@ -133,7 +133,7 @@ module Rpush
           log_warn("GCM responded with an Service Unavailable Error. " + retry_message)
         end
 
-        def other_5xx_error
+        def other_5xx_error(response)
           retry_delivery(@notification, response)
           log_warn("GCM responded with a 5xx Error. " + retry_message)
         end
