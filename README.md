@@ -370,7 +370,7 @@ This will install all the required gems that requires to test against each versi
 ```
 bundle exec appraisal rake
 ```
-This will run RSpec against all versions of Rails
+This will run RSpec against all versions of Rails.
 
 ##### To run a single test
 
