@@ -7,7 +7,7 @@ module Rpush
 
         host = 'https://fcm.googleapis.com'
         FCM_URI = URI.parse("#{host}/fcm/send")
-        UNAVAILABLE_STATES = %w(Unavailable InternalServerError)
+        UNAVAILABLE_STATES = %w(Unavailable BadGateway InternalServerError)
         INVALID_REGISTRATION_ID_STATES = %w(InvalidRegistration MismatchSenderId NotRegistered InvalidPackageName)
 
         def initialize(app, http, notification, batch)
@@ -41,8 +41,12 @@ module Rpush
             unauthorized
           when 500
             internal_server_error(response)
+          when 502
+            bad_gateway(response)
           when 503
             service_unavailable(response)
+          when 500..599
+            other_5xx_error(response)
           else
             fail Rpush::DeliveryError.new(response.code.to_i, @notification.id, Rpush::Daemon::HTTP_STATUS_CODES[response.code.to_i])
           end
@@ -119,9 +123,19 @@ module Rpush
           log_warn("GCM responded with an Internal Error. " + retry_message)
         end
 
+        def bad_gateway(response)
+          retry_delivery(@notification, response)
+          log_warn("GCM responded with a Bad Gateway Error. " + retry_message)
+        end
+
         def service_unavailable(response)
           retry_delivery(@notification, response)
           log_warn("GCM responded with an Service Unavailable Error. " + retry_message)
+        end
+
+        def other_5xx_error(response)
+          retry_delivery(@notification, response)
+          log_warn("GCM responded with a 5xx Error. " + retry_message)
         end
 
         def deliver_after_header(response)
