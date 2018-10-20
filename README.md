@@ -347,6 +347,41 @@ You should run `rpush init` after upgrading Rpush to check for configuration and
 
 ### Contributing
 
+#### Running Tests
+
+Rpush uses [Appraisal](https://github.com/thoughtbot/appraisal) to run tests against multiple versions of Ruby on Rails. This helps making sure that Rpush performs correctly with multiple Rails versions.
+
+Rpush also uses RSpec for its tests.
+
+##### Bootstrapping your test suite:
+
+First, we need to setup a test database, `rpush_test`.
+
+E.g. (postgres): `psql -c 'create database rpush_test;' -U postgres >/dev/null`
+
+```
+bundle install
+bundle exec appraisal install
+```
+This will install all the required gems that requires to test against each version of Rails, which defined in `gemfiles/*.gemfile`.
+
+##### To run a full test suite:
+
+```
+bundle exec appraisal rake
+```
+This will run RSpec against all versions of Rails
+
+##### To run a single test
+
+You need to specify a `BUNDLE_GEMFILE` pointing to the gemfile before running the normal test command:
+
+```
+BUNDLE_GEMFILE=gemfiles/5.1.gemfile rspec spec/unit/apns_feedback_spec.rb
+```
+
+##### Multiple database adapter support
+
 When running specs, please note that the ActiveRecord adapter can be changed by setting the `ADAPTER` environment variable. For example: `ADAPTER=postgresql rake`.
 
 Available adapters for testing are `postgresql`, `jdbcpostgresql`, `mysql2`, `jdbcmysql`, `jdbch2`, and `sqlite3`.
