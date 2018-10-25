@@ -309,3 +309,16 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "multi_json usage" do
     end
   end
 end if active_record?
+
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'thread-id' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  it 'includes thread-id in the payload' do
+    notification.thread_id = 'THREAD-ID'
+    expect(notification.as_json['aps']['thread-id']).to eq 'THREAD-ID'
+  end
+
+  it 'does not include thread-id in the payload if not set' do
+    expect(notification.as_json['aps']).to_not have_key('thread-id')
+  end
+end if active_record?

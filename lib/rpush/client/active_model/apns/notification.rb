@@ -56,6 +56,7 @@ module Rpush
               json['aps']['sound'] = sound if sound
               json['aps']['category'] = category if category
               json['aps']['url-args'] = url_args if url_args
+              json['aps']['thread-id'] = thread_id if thread_id
 
               if data && data[MUTABLE_CONTENT_KEY]
                 json['aps']['mutable-content'] = 1
