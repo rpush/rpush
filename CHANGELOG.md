@@ -26,7 +26,6 @@ When upgrading, don't forget to run `bundle exec rpush init` to get all the late
 
 ### Fixed
 
-- Relaxed JWT dependency version [#447](https://github.com/rpush/rpush/pull/447) (by [@sposin](https://github.com/sposin)).
 - Change `apn_key` column type from string to text [#455](https://github.com/rpush/rpush/pull/455) (by [sonxurxo](https://github.com/sonxurxo)).
 - Retry all GCM 5xx errors [#456](https://github.com/rpush/rpush/pull/456) (by [@rofreg](https://github.com/rofreg)).
 
