@@ -377,7 +377,7 @@ This will run RSpec against all versions of Rails.
 You need to specify a `BUNDLE_GEMFILE` pointing to the gemfile before running the normal test command:
 
 ```
-BUNDLE_GEMFILE=gemfiles/5.1.gemfile rspec spec/unit/apns_feedback_spec.rb
+BUNDLE_GEMFILE=gemfiles/rails_5.2.gemfile rspec spec/unit/apns_feedback_spec.rb
 ```
 
 ##### Multiple database adapter support
