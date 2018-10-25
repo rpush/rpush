@@ -12,6 +12,24 @@
 
 - None
 
+## 3.2.4 (2018-10-25)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Changes
+
+- Relaxed JWT dependency version [#447](https://github.com/rpush/rpush/pull/447) (by [@sposin](https://github.com/sposin)).
+
+### Docs
+
+- Better documentation for running tests when developing Rpush [#458](https://github.com/rpush/rpush/pull/458) (by [@jsantos](https://github.com/jsantos)).
+
+### Fixed
+
+- Relaxed JWT dependency version [#447](https://github.com/rpush/rpush/pull/447) (by [@sposin](https://github.com/sposin)).
+- Change `apn_key` column type from string to text [#455](https://github.com/rpush/rpush/pull/455) (by [sonxurxo](https://github.com/sonxurxo)).
+- Retry all GCM 5xx errors [#456](https://github.com/rpush/rpush/pull/456) (by [@rofreg](https://github.com/rofreg)).
+
 ## 3.2.3 (2018-07-12)
 
 ### Changes
