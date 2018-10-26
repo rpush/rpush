@@ -21,7 +21,6 @@ module Rpush
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
-  class ConfigurationWithoutDefaults < Struct.new(*CONFIG_ATTRS); end # rubocop:disable Style/StructInheritance
 
   class ApnsFeedbackReceiverConfiguration < Struct.new(:frequency, :enabled) # rubocop:disable Style/StructInheritance
     def initialize
