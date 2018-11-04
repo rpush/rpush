@@ -11,7 +11,7 @@ describe 'APNs http2 adapter' do
     )
   }
   let(:app) { create_app }
-  let(:fake_device_token) { 'a' * 64 }
+  let(:fake_device_token) { 'a' * 108 }
   let(:fake_http2_request) { double }
   let(:fake_http_resp_headers) {
     {

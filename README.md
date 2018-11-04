@@ -68,7 +68,7 @@ app.save!
 ```ruby
 n = Rpush::Apns::Notification.new
 n.app = Rpush::Apns::App.find_by_name("ios_app")
-n.device_token = "..." # 64-character hex string
+n.device_token = "..." # hex string
 n.alert = "hi mom!"
 n.data = { foo: :bar }
 n.save!
@@ -97,7 +97,7 @@ app.save!
 ```ruby
 n = Rpush::Apns::Notification.new
 n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
-n.device_token = "..." # 64-character hex string
+n.device_token = "..." # hex string
 n.alert = "hi mom!"
 n.data = { foo: :bar }
 n.save!
