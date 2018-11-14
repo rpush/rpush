@@ -12,6 +12,14 @@
 
 - None
 
+## 3.3.1 (2018-11-14)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Fixed
+
+- Remove validation of 64-characters length from `device_token`. [#463](https://github.com/rpush/rpush/pull/463) (by [@chrisokamoto](https://github.com/chrisokamoto)).
+
 ## 3.3.0 (2018-11-14)
 
 When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
