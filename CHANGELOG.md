@@ -12,6 +12,18 @@
 
 - None
 
+## 3.3.0 (2018-11-14)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Added
+
+- Added support for Apple Push Notification service `thread-id` field [#460](https://github.com/rpush/rpush/pull/460) (by [@gerard-morera](https://github.com/gerard-morera)).
+
+### Changes
+
+- Remove unused class `ConfigurationWithoutDefaults` [#461](https://github.com/rpush/rpush/pull/461) (by [@adis-io](https://github.com/adis-io)).
+
 ## 3.2.4 (2018-10-25)
 
 When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
