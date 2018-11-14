@@ -24,7 +24,7 @@ describe 'New app loading' do
     notification = Rpush::Apns::Notification.new
     notification.app = app
     notification.alert = 'test'
-    notification.device_token = 'a' * 64
+    notification.device_token = 'a' * 108
     notification.save!
     notification
   end
