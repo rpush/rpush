@@ -38,10 +38,10 @@ appraise "rails-5.1" do
 end
 
 appraise "rails-5.2" do
-  gem "activesupport", ">= 5.2.0"
+  gem "activesupport", ">= 5.2.0", "< 5.3"
 
   group :development do
-    gem "rails", ">= 5.2.0"
+    gem "rails", ">= 5.2.0", "< 5.3"
   end
 end
 
