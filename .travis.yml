@@ -10,9 +10,10 @@ compiler: clang
 
 rvm:
   - 2.2.10
-  - 2.3.7
-  - 2.4.4
-  - 2.5.1
+  - 2.3.8
+  - 2.4.5
+  - 2.5.3
+  - ruby-head
 
 gemfile:
   - gemfiles/rails_4.2.gemfile
@@ -41,6 +42,7 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
+    - rvm: ruby-head
     - gemfile: gemfiles/rails_edge.gemfile
     - gemfile: gemfiles/rails_5.2.gemfile
       env: CLIENT=redis
