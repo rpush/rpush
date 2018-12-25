@@ -27,7 +27,10 @@ services:
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
-  - gem update --system
+  # Rubygems 3.x doesn't support Ruby 2.2 anymore, so we have to install an
+  # older version until we ourselves drop Ruby 2.2 support.
+  # See https://github.com/rubygems/rubygems/issues/2534
+  - gem i rubygems-update -v '<3' && update_rubygems
   - gem update bundler
 
 env:
