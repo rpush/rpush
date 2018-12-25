@@ -44,5 +44,3 @@ matrix:
   allow_failures:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_edge.gemfile
-    - gemfile: gemfiles/rails_5.2.gemfile
-      env: CLIENT=redis
