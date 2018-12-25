@@ -5,6 +5,8 @@ source "https://rubygems.org"
 gem "activesupport", ">= 5.2.0", "< 5.3"
 
 group :development do
+  gem "modis", "~> 3.0"
+  gem "rpush-redis", "~> 1.1"
   gem "rails", ">= 5.2.0", "< 5.3"
 end
 
