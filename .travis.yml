@@ -47,3 +47,8 @@ matrix:
   allow_failures:
     - rvm: ruby-head
     - gemfile: gemfiles/rails_edge.gemfile
+    # For Rails 5.2 we need a version of modis and rpush-redis that only support
+    # Ruby >2.2, so we allow this failure.
+    - gemfile: gemfiles/rails_5.2.gemfile
+      env: CLIENT=redis
+      rvm: 2.2.10
