@@ -152,12 +152,12 @@ DEPENDENCIES
   cane
   codeclimate-test-reporter
   database_cleaner
-  modis (~> 3.0)
+  modis (>= 2.0)
   mysql2
   pg
   rake
   rpush!
-  rpush-redis (~> 1.1)
+  rpush-redis (~> 1.0)
   rspec (~> 3.4.0)
   rubocop
   simplecov
