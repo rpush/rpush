@@ -43,7 +43,6 @@ module Rpush
           response = {}
 
           request = build_request(notification)
-          log_warn(request)
           http_request = @client.prepare_request(:post, request[:path],
             body:    request[:body],
             headers: request[:headers]
