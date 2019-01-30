@@ -43,6 +43,8 @@ before_install:
   # This should help with the other Ruby versions.
   # Taken from https://docs.travis-ci.com/user/languages/ruby/
   - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  # Another try, above doesn't seem to work for Ruby 2.5
+  - gem uninstall bundler -v '>= 2' || true
   - gem install bundler -v '< 2'
 
 env:
