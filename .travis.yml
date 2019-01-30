@@ -35,6 +35,9 @@ services:
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
   - gem install rubygems-update && update_rubygems
+  # TODO: None of these workarounds seem to work for the Rails 4.2, Ruby 2.5
+  # combination!
+  #
   # Rails 4.2 doesn't support bundler 2.0, so we have multiple workarounds.
   # This is just for Rails 2.5 which ships with bundler 2.x on Travis CI while
   # Ruby 2.6 does not. Taken from:
@@ -54,6 +57,9 @@ env:
 
 matrix:
   fast_finish: true
+  allow_failures:
+    - gemfile: gemfiles/rails_4.2.gemfile
+      rvm: 2.5.3
   exclude:
     - gemfile: gemfiles/rails_6.0.gemfile
       rvm: 2.3.8
