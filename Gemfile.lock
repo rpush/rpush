@@ -151,7 +151,7 @@ DEPENDENCIES
   cane
   codeclimate-test-reporter
   database_cleaner
-  modis (~> 2.0)
+  modis (>= 2.0)
   mysql2
   pg
   rake
@@ -165,4 +165,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   1.17.1
+   1.17.3
