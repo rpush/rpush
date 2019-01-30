@@ -35,8 +35,9 @@ services:
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
-  - gem update --system
-  - gem update bundler
+  # Rails 4.2 doesn't support bundler 2.0 which comes with rubygems 3.0
+  - gem install rubygems-update -v '<3' && update_rubygems
+  - gem install bundler
 
 env:
   matrix:
