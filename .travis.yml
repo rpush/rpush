@@ -36,7 +36,9 @@ before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
   - gem install rubygems-update && update_rubygems
   # Rails 4.2 doesn't support bundler 2.0
-  - gem install bundler -v 1.17.3
+  # Taken from https://docs.travis-ci.com/user/languages/ruby/
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  - gem install bundler -v '< 2'
 
 env:
   matrix:
