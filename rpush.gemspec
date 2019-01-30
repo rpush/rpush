@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = '>= 2.2.2'
+  s.required_ruby_version = '>= 2.3.0'
 
   s.add_runtime_dependency 'multi_json', '~> 1.0'
   s.add_runtime_dependency 'net-http-persistent'
@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'stackprof'
-  s.add_development_dependency 'modis', '~> 2.0'
+  s.add_development_dependency 'modis', '>= 2.0'
   s.add_development_dependency 'rpush-redis', '~> 1.0'
 
   s.add_development_dependency 'appraisal'

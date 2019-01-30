@@ -49,12 +49,6 @@ describe Rpush::Client::ActiveRecord::Pushy::Notification do
         expect(subject.errors[:time_to_live]).to eq ['must be greater than 0']
       end
 
-      it 'should be integer' do
-        subject.time_to_live = 1.4
-        is_expected.not_to be_valid
-        expect(subject.errors[:time_to_live]).to eq ['must be an integer']
-      end
-
       it 'should be <= 1.year.seconds' do
         subject.time_to_live = 2.years.seconds.to_i
         is_expected.not_to be_valid

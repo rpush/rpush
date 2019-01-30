@@ -1,40 +1,56 @@
 language: ruby
 
-dist: trusty
-
-sudo: false
+dist: xenial
 
 cache: bundler
 
 compiler: clang
 
 rvm:
-  - 2.2.10
   - 2.3.8
   - 2.4.5
   - 2.5.3
-  - ruby-head
+  - 2.6.0
+
+# Build only commits on master for the "Build pushed branches" feature. This
+# prevents building twice on PRs originating from our repo ("Build pushed pull
+# requests)". See:
+#   - https://github.com/travis-ci/travis-ci/issues/1147
+#   - https://docs.travis-ci.com/user/pull-requests/#double-builds-on-pull-requests
+branches:
+  only:
+    - master
 
 gemfile:
   - gemfiles/rails_4.2.gemfile
   - gemfiles/rails_5.0.gemfile
   - gemfiles/rails_5.1.gemfile
   - gemfiles/rails_5.2.gemfile
-  - gemfiles/rails_edge.gemfile
+  - gemfiles/rails_6.0.gemfile
 
 services:
+  - postgresql
   - redis-server
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
-  - gem update --system
-  - gem update bundler
+  - gem install rubygems-update && update_rubygems
+  # TODO: None of these workarounds seem to work for the Rails 4.2, Ruby 2.5
+  # combination!
+  #
+  # Rails 4.2 doesn't support bundler 2.0, so we have multiple workarounds.
+  # This is just for Rails 2.5 which ships with bundler 2.x on Travis CI while
+  # Ruby 2.6 does not. Taken from:
+  # https://github.com/travis-ci/travis-ci/issues/8717#issuecomment-366500378
+  - "find /home/travis/.rvm/rubies -wholename '*default/bundler-*.gemspec' -delete"
+  # This should help with the other Ruby versions.
+  # Taken from https://docs.travis-ci.com/user/languages/ruby/
+  - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
+  # Another try, above doesn't seem to work for Ruby 2.5
+  - gem uninstall bundler -v '>= 2' || true
+  - gem install bundler -v '< 2'
 
 env:
-  global:
-    - AMAZON_S3_BUCKET=rpush
-    - AMAZON_ACCESS_KEY_ID=AKIAIWENGKCRZZX7NGOQ
-    - secure: "JZSnurdpqClRgy2s99xFaOymuCDaCh8rZmHgj8Wj/KRFNDuEFVq7CgUjAg24shL4aB+uE/sgBemfsuvJLcWT27/7bi1h/idepNdB36l+GhdJj5CovtqPGX9rXv6vp1s0tELgjxTcx17IQ1oZ5iqTozg9UWWpCXtOBB70/aJvTn8="
   matrix:
     - CLIENT=active_record
     - CLIENT=redis
@@ -42,7 +58,10 @@ env:
 matrix:
   fast_finish: true
   allow_failures:
-    - rvm: ruby-head
-    - gemfile: gemfiles/rails_edge.gemfile
-    - gemfile: gemfiles/rails_5.2.gemfile
-      env: CLIENT=redis
+    - gemfile: gemfiles/rails_4.2.gemfile
+      rvm: 2.5.3
+  exclude:
+    - gemfile: gemfiles/rails_6.0.gemfile
+      rvm: 2.3.8
+    - gemfile: gemfiles/rails_6.0.gemfile
+      rvm: 2.4.5

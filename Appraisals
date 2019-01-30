@@ -45,10 +45,10 @@ appraise "rails-5.2" do
   end
 end
 
-appraise "rails-edge" do
-  gem "activesupport", git: "https://github.com/rails/rails", require: "activesupport"
+appraise "rails-6.0" do
+  gem 'activesupport', '~> 6.0.0.beta1'
 
   group :development do
-    gem "rails", git: "https://github.com/rails/rails"
+    gem 'rails', '~> 6.0.0.beta1'
   end
 end
