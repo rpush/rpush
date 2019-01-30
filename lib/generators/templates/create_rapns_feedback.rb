@@ -10,7 +10,7 @@ class CreateRapnsFeedback < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mi
   end
 
   def self.down
-    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+    if ActiveRecord.version >= Gem::Version.new('5.1')
       if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token)
         remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
       end

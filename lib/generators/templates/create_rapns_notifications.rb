@@ -21,7 +21,7 @@ class CreateRapnsNotifications < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecor
   end
 
   def self.down
-    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+    if ActiveRecord.version >= Gem::Version.new('5.1')
       if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi')
         remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
       end

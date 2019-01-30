@@ -18,7 +18,7 @@ class RenameRapnsToRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mig
     rename_table :rapns_apps, :rpush_apps
     rename_table :rapns_feedback, :rpush_feedback
 
-    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+    if ActiveRecord.version >= Gem::Version.new('5.1')
       if index_name_exists?(:rpush_notifications, :index_rapns_notifications_multi)
         rename_index :rpush_notifications, :index_rapns_notifications_multi, :index_rpush_notifications_multi
       end
@@ -28,7 +28,7 @@ class RenameRapnsToRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mig
       end
     end
 
-    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+    if ActiveRecord.version >= Gem::Version.new('5.1')
       if index_name_exists?(:rpush_feedback, :index_rapns_feedback_on_device_token)
         rename_index :rpush_feedback, :index_rapns_feedback_on_device_token, :index_rpush_feedback_on_device_token
       end
@@ -60,7 +60,7 @@ class RenameRapnsToRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mig
     update_type(RenameRapnsToRpush::Rpush::App, 'Rpush::Adm::App', 'Rapns::Adm::App')
     update_type(RenameRapnsToRpush::Rpush::App, 'Rpush::Wpns::App', 'Rapns::Wpns::App')
 
-    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+    if ActiveRecord.version >= Gem::Version.new('5.1')
       if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi)
         rename_index :rpush_notifications, :index_rpush_notifications_multi, :index_rapns_notifications_multi
       end
@@ -70,7 +70,7 @@ class RenameRapnsToRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mig
       end
     end
 
-    if ActiveRecord::VERSION::MAJOR >= 5 && ActiveRecord::VERSION::MINOR >= 1
+    if ActiveRecord.version >= Gem::Version.new('5.1')
       if index_name_exists?(:rpush_feedback, :index_rpush_feedback_on_device_token)
         rename_index :rpush_feedback, :index_rpush_feedback_on_device_token, :index_rapns_feedback_on_device_token
       end
