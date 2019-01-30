@@ -29,6 +29,7 @@ gemfile:
   - gemfiles/rails_6.0.gemfile
 
 services:
+  - postgresql
   - redis-server
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
