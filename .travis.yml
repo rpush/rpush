@@ -35,7 +35,12 @@ services:
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
   - gem install rubygems-update && update_rubygems
-  # Rails 4.2 doesn't support bundler 2.0
+  # Rails 4.2 doesn't support bundler 2.0, so we have multiple workarounds.
+  # This is just for Rails 2.5 which ships with bundler 2.x on Travis CI while
+  # Ruby 2.6 does not. Taken from:
+  # https://github.com/travis-ci/travis-ci/issues/8717#issuecomment-366500378
+  - "find /home/travis/.rvm/rubies -wholename '*default/bundler-*.gemspec' -delete"
+  # This should help with the other Ruby versions.
   # Taken from https://docs.travis-ci.com/user/languages/ruby/
   - gem uninstall -v '>= 2' -i $(rvm gemdir)@global -ax bundler || true
   - gem install bundler -v '< 2'
