@@ -14,6 +14,15 @@ rvm:
   - 2.5.3
   - 2.6.0
 
+# Build only commits on master for the "Build pushed branches" feature. This
+# prevents building twice on PRs originating from our repo ("Build pushed pull
+# requests)". See:
+#   - https://github.com/travis-ci/travis-ci/issues/1147
+#   - https://docs.travis-ci.com/user/pull-requests/#double-builds-on-pull-requests
+branches:
+  only:
+    - master
+
 gemfile:
   - gemfiles/rails_4.2.gemfile
   - gemfiles/rails_5.0.gemfile
