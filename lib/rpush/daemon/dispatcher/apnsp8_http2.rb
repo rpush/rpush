@@ -2,6 +2,8 @@ module Rpush
   module Daemon
     module Dispatcher
       class Apnsp8Http2
+        include Loggable
+        include Reflectable
 
         URLS = {
           production: 'https://api.push.apple.com',
@@ -14,9 +16,7 @@ module Rpush
           @app = app
           @delivery_class = delivery_class
 
-          url = URLS[app.environment.to_sym]
-          @client = NetHttp2::Client.new(url, connect_timeout: DEFAULT_TIMEOUT)
-          @client.on(:error) {|error| reflect(:error, error)}
+          @client = create_http2_client(app)
           @token_provider = Rpush::Daemon::Apnsp8::Token.new(@app)
         end
 
@@ -26,6 +26,18 @@ module Rpush
 
         def cleanup
           @client.close
+        end
+
+        private
+
+        def create_http2_client(app)
+          url = URLS[app.environment.to_sym]
+          client = NetHttp2::Client.new(url, connect_timeout: DEFAULT_TIMEOUT)
+          client.on(:error) do |error|
+            log_error(error)
+            reflect(:error, error)
+          end
+          client
         end
       end
     end
