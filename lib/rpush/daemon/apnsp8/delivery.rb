@@ -14,8 +14,6 @@ module Rpush
           @batch = batch
           @first_push = true
           @token_provider = token_provider
-
-          @client.on(:error) { |err| mark_batch_retryable(Time.now + 10.seconds, err) }
         end
 
         def perform
