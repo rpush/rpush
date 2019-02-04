@@ -65,7 +65,7 @@ module Rpush
 
     def log(where, msg, inline = false, prefix = nil, io = STDOUT)
       if msg.is_a?(Exception)
-        formatted_backtrace = msg.backtrace.join("\n")
+        formatted_backtrace = msg.backtrace&.join("\n")
         msg = "#{msg.class.name}, #{msg.message}\n#{formatted_backtrace}"
       end
 
