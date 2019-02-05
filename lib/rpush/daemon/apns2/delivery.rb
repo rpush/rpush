@@ -15,8 +15,6 @@ module Rpush
         end
 
         def perform
-          @client.on(:error) { |err| mark_batch_retryable(Time.now + 10.seconds, err) }
-
           @batch.each_notification do |notification|
             prepare_async_post(notification)
           end
