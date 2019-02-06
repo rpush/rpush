@@ -15,10 +15,7 @@ module Rpush
           @app = app
           @delivery_class = delivery_class
 
-          url = URLS[app.environment.to_sym]
-          @client = NetHttp2::Client.new(url,
-            ssl_context:     prepare_ssl_context,
-            connect_timeout: DEFAULT_TIMEOUT)
+          @client = create_http2_client(app)
         end
 
         def dispatch(payload)
@@ -30,6 +27,16 @@ module Rpush
         end
 
         private
+
+        def create_http2_client(app)
+          url = URLS[app.environment.to_sym]
+          client = NetHttp2::Client.new(url, ssl_context: prepare_ssl_context, connect_timeout: DEFAULT_TIMEOUT)
+          client.on(:error) do |error|
+            log_error(error)
+            reflect(:error, error)
+          end
+          client
+        end
 
         def prepare_ssl_context
           @ssl_context ||= begin
