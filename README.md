@@ -269,6 +269,13 @@ $ cd /path/to/project
 $ rpush start
 ```
 
+#### As a foreground process
+
+```sh
+$ cd /path/to/project
+$ rpush start -f
+```
+
 #### On the command-line
 
 ```sh
