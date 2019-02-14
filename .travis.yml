@@ -10,7 +10,7 @@ rvm:
   - 2.3.8
   - 2.4.5
   - 2.5.3
-  - 2.6.0
+  - 2.6.1
 
 # Build only commits on master for the "Build pushed branches" feature. This
 # prevents building twice on PRs originating from our repo ("Build pushed pull
