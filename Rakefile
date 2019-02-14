@@ -10,12 +10,11 @@ RSpec::Core::RakeTask.new(:spec) do |spec|
   spec.rspec_opts = ['--backtrace']
 end
 
-RuboCop::RakeTask.new
-
-if ENV['TRAVIS'] && ENV['QUALITY'] != 'true'
-  task default: 'spec'
-elsif RUBY_VERSION > '2.2.2' && defined?(RUBY_ENGINE) && RUBY_ENGINE == 'ruby'
-  task default: 'spec:quality'
-else
-  task default: 'spec'
+RuboCop::RakeTask.new.tap do |task|
+  if RUBY_ENGINE == 'ruby' &&
+     RbConfig::CONFIG['host_os'] !~ /mswin|msys|mingw|cygwin|bccwin|wince|emc/
+    task.options = %w[--parallel]
+  end
 end
+
+task default: 'spec'
