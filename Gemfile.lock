@@ -42,8 +42,6 @@ GEM
     ast (2.4.0)
     builder (3.2.3)
     byebug (10.0.2)
-    cane (3.0.0)
-      parallel
     codeclimate-test-reporter (1.0.9)
       simplecov (<= 0.13)
     concurrent-ruby (1.1.4)
@@ -149,7 +147,6 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   byebug
-  cane
   codeclimate-test-reporter
   database_cleaner
   modis (>= 2.0)

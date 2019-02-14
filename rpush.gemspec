@@ -37,7 +37,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rpush-redis', '~> 1.0'
 
   s.add_development_dependency 'appraisal'
-  s.add_development_dependency 'cane'
   s.add_development_dependency 'codeclimate-test-reporter'
   s.add_development_dependency 'simplecov'
   s.add_development_dependency 'rubocop'
