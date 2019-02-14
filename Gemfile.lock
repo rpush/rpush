@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rpush (3.3.1)
+    rpush (4.0.0)
       activesupport
       ansi
       jwt (>= 1.5.6)
