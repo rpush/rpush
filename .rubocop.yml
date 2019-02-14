@@ -1,6 +1,10 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   Exclude:
+    - gemfiles/vendor/bundle/**/* # This dir only shows up on Travis
     - lib/generators/**/*
+    - vendor/bundle/**/*
 
 LineLength:
   Enabled: false
