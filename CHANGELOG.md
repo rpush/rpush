@@ -1,16 +1,21 @@
-## HEAD
+# Changelog
 
-### Breaking Changes
+## Unreleased
 
-- None
+## 4.0.0 (2019-02-14)
 
-### Added
+### Changed
 
-- None
+- Stop logging all APNSp8 requests as warnings. [#474](https://github.com/rpush/rpush/pull/474) (by [@jhottenstein](https://github.com/jhottenstein) and [@rofreg](https://github.com/rofreg))
+
+### Removed
+
+- Support for Ruby 2.2
 
 ### Fixed
 
-- None
+- Fixed APNSp8 memory leak [#475](https://github.com/rpush/rpush/pull/475) (by [@jhottenstein](https://github.com/jhottenstein))
+- Fixed APNS2 memory leak. [#476](https://github.com/rpush/rpush/pull/476) (by [@jhottenstein](https://github.com/jhottenstein))
 
 ## 3.3.1 (2018-11-14)
 
