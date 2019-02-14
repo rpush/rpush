@@ -65,3 +65,9 @@ matrix:
       rvm: 2.3.8
     - gemfile: gemfiles/rails_6.0.gemfile
       rvm: 2.4.5
+
+jobs:
+  include:
+    - stage: Lint
+      rvm: 2.6.1
+      script: bundle exec rake rubocop
