@@ -29,7 +29,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'ansi'
 
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~> 3.4.0'
+  s.add_development_dependency 'rspec', '~> 3.8'
   s.add_development_dependency 'database_cleaner'
   s.add_development_dependency 'timecop'
   s.add_development_dependency 'stackprof'
