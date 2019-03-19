@@ -119,6 +119,7 @@ describe Rpush::Daemon::Store::Redis do
 
     it 'ignores IDs that do not exist without throwing an exception' do
       notification.destroy
+      expect(logger).to receive(:warn).with("Couldn't find Rpush::Client::Redis::Notification with id=#{notification.id}")
       expect do
         store.mark_ids_retryable([notification.id], deliver_after)
       end.not_to raise_exception
@@ -249,6 +250,7 @@ describe Rpush::Daemon::Store::Redis do
 
     it 'ignores IDs that do not exist without throwing an exception' do
       notification.destroy
+      expect(logger).to receive(:warn).with("Couldn't find Rpush::Client::Redis::Notification with id=#{notification.id}")
       expect do
         store.mark_ids_failed([notification.id], nil, '', Time.now)
       end.not_to raise_exception
