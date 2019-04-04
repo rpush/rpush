@@ -116,6 +116,14 @@ describe Rpush::Daemon::Store::Redis do
         notification.reload
       end.to change { notification.deliver_after.try(:utc).to_s }.to(deliver_after.utc.to_s)
     end
+
+    it 'ignores IDs that do not exist without throwing an exception' do
+      notification.destroy
+      expect(logger).to receive(:warn).with("Couldn't find Rpush::Client::Redis::Notification with id=#{notification.id}")
+      expect do
+        store.mark_ids_retryable([notification.id], deliver_after)
+      end.not_to raise_exception
+    end
   end
 
   describe 'mark_batch_retryable' do
@@ -238,6 +246,14 @@ describe Rpush::Daemon::Store::Redis do
         store.mark_ids_failed([notification.id], nil, '', Time.now)
         notification.reload
       end.to change(notification, :failed).to(true)
+    end
+
+    it 'ignores IDs that do not exist without throwing an exception' do
+      notification.destroy
+      expect(logger).to receive(:warn).with("Couldn't find Rpush::Client::Redis::Notification with id=#{notification.id}")
+      expect do
+        store.mark_ids_failed([notification.id], nil, '', Time.now)
+      end.not_to raise_exception
     end
   end
 
