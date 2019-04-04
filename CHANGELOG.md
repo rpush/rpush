@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.0.1 (2019-04-04)
+
+### Fixed
+
+- Fail gracefully when a Modis notification no longer exists [#486](https://github.com/rpush/rpush/pull/486) (by [@rofreg](https://github.com/rofreg)).
+
 ## 4.0.0 (2019-02-14)
 
 ### Changed
