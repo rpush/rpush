@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Allow disabling of APNS feedback for specific rpush apps [#491](https://github.com/rpush/rpush/pull/491) (by [@drn](https://github.com/drn)).
+
 ## 4.1.0 (2019-04-17)
 
 ### Added
