@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.1.0 (2019-04-17)
+
+### Added
+
+- Functionality to use `dry_run` in FCM notifications. This is useful if you want to just validate notification sending works without actually sending a notification to the receivers, fixes #63. ([#492](https://github.com/rpush/rpush/pull/492) by [@aried3r](https://github.com/aried3r))
+
 ## 4.0.1 (2019-04-04)
 
 ### Fixed
