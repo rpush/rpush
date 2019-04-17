@@ -19,6 +19,13 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 2.3.0'
 
+  s.post_install_message = <<~POST_INSTALL_MESSAGE
+    When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+    For details on this specific release, refer to the CHANGELOG.md file.
+    https://github.com/rpush/rpush/blob/master/CHANGELOG.md
+  POST_INSTALL_MESSAGE
+
   s.add_runtime_dependency 'multi_json', '~> 1.0'
   s.add_runtime_dependency 'net-http-persistent'
   s.add_runtime_dependency 'net-http2', '~> 0.14'
