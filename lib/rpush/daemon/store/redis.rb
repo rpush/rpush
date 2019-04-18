@@ -5,11 +5,11 @@ module Rpush
         DEFAULT_MARK_OPTIONS = { persist: true }
 
         def app(app_id)
-          Rpush::Client::Redis::App.find(app_id)
+          Rpush::Client::ActiveRecord::App.find(app_id)
         end
 
         def all_apps
-          Rpush::Client::Redis::App.all
+          Rpush::Client::ActiveRecord::App.all
         end
 
         def deliverable_notifications(limit)
