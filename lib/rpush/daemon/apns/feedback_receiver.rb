@@ -36,7 +36,7 @@ module Rpush
             Rpush::Daemon.store.release_connection
           end
 
-          puts ANSI.green { '✔' } if Rpush.config.foreground
+          puts Rainbow('✔').green if Rpush.config.foreground
         end
 
         def stop
