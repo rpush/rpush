@@ -81,10 +81,9 @@ GEM
     nokogiri (1.10.2)
       mini_portile2 (~> 2.4.0)
     parallel (1.17.0)
-    parser (2.6.2.0)
+    parser (2.6.3.0)
       ast (~> 2.4.0)
     pg (1.1.4)
-    psych (3.1.0)
     rack (2.0.7)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -117,14 +116,15 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
-    rubocop (0.66.0)
+    rubocop (0.68.0)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.5, != 2.5.1.1)
-      psych (>= 3.1.0)
       rainbow (>= 2.2.2, < 4.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 1.6)
+    rubocop-performance (1.1.0)
+      rubocop (>= 0.67.0)
     ruby-progressbar (1.10.0)
     simplecov (0.16.1)
       docile (~> 1.1)
@@ -156,6 +156,7 @@ DEPENDENCIES
   rpush-redis (~> 1.0)
   rspec (~> 3.4.0)
   rubocop
+  rubocop-performance
   simplecov
   sqlite3
   stackprof
