@@ -53,7 +53,6 @@ module Rpush
     option 'active-record', type: :boolean, desc: 'Install ActiveRecord migrations'
     def init
       underscore_option_names
-      check_ruby_version
       require 'rails/generators'
 
       puts "* " + Rainbow('Installing config...').green
@@ -111,7 +110,6 @@ module Rpush
 
     def config_setup
       underscore_option_names
-      check_ruby_version
       configure_rpush
     end
 
@@ -150,10 +148,6 @@ module Rpush
 
     def default_config_path
       self.class.default_config_path
-    end
-
-    def check_ruby_version
-      STDERR.puts(Rainbow('WARNING: ').yellow + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION < '2.3.0' && RUBY_ENGINE == 'ruby'
     end
 
     def underscore_option_names
