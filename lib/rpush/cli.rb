@@ -62,14 +62,7 @@ module Rpush
       install_migrations = options['active_record']
 
       unless options.key?('active_record')
-        has_answer = false
-        until has_answer
-          STDOUT.write "\n* #{Rainbow('Install ActiveRecord migrations?').green} [y/n]: "
-          STDOUT.flush
-          answer = STDIN.gets.chomp.downcase
-          has_answer = %w(y n).include?(answer)
-        end
-
+        answer = ask("\n* #{Rainbow('Install ActiveRecord migrations?').green}", limited_to: %w[y n])
         install_migrations = answer == 'y'
       end
 
