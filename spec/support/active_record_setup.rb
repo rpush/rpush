@@ -40,6 +40,7 @@ require 'generators/templates/rpush_3_2_4_updates'
 require 'generators/templates/rpush_3_3_0_updates'
 require 'generators/templates/rpush_3_3_1_updates'
 require 'generators/templates/rpush_4_1_0_updates'
+require 'generators/templates/rpush_4_1_1_updates'
 
 migrations = [
   AddRpush,
@@ -55,7 +56,8 @@ migrations = [
   Rpush324Updates,
   Rpush330Updates,
   Rpush331Updates,
-  Rpush410Updates
+  Rpush410Updates,
+  Rpush411Updates
 ]
 
 unless ENV['TRAVIS']

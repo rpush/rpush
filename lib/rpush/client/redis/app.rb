@@ -18,7 +18,8 @@ module Rpush
         attribute :apn_key_id, :string
         attribute :team_id, :string
         attribute :bundle_id, :string
- 
+        attribute :feedback_enabled, :boolean, default: true
+
         index :name
 
         validates :name, presence: true
