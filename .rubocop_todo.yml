@@ -352,14 +352,6 @@ Style/BracesAroundHashParameters:
     - 'lib/rpush/daemon/apnsp8/token.rb'
     - 'spec/functional/apns2_spec.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: Keywords.
-# Keywords: TODO, FIXME, OPTIMIZE, HACK, REVIEW
-Style/CommentAnnotation:
-  Exclude:
-    - 'lib/rpush/daemon/apnsp8/delivery.rb'
-
 # Offense count: 2
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SingleLineConditionsOnly, IncludeTernaryExpressions.

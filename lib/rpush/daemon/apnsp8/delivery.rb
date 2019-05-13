@@ -24,7 +24,7 @@ module Rpush
           # Send all preprocessed requests at once
           @client.join
         rescue Errno::ECONNREFUSED, SocketError, HTTP2::Error::StreamLimitExceeded => error
-          # TODO restart connection when StreamLimitExceeded
+          # TODO: restart connection when StreamLimitExceeded
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
         rescue StandardError => error
