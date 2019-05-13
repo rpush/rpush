@@ -6,9 +6,7 @@ describe 'Synchronization' do
 
   def wait_for_num_dispatchers(num)
     Timeout.timeout(timeout) do
-      until Rpush::Daemon::AppRunner.num_dispatchers_for_app(app) == num
-        sleep 0.1
-      end
+      sleep 0.1 until Rpush::Daemon::AppRunner.num_dispatchers_for_app(app) == num
     end
   end
 

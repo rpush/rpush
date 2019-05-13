@@ -67,9 +67,7 @@ module Rpush
         end
 
         def delayed_push_async(http_request)
-          until streams_available? do
-            sleep 0.001
-          end
+          sleep 0.001 until streams_available?
           @client.call_async(http_request)
         end
 

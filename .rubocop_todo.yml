@@ -554,16 +554,3 @@ Style/TernaryParentheses:
 Style/UnlessElse:
   Exclude:
     - 'lib/rpush/daemon/store/active_record.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Style/WhileUntilDo:
-  Exclude:
-    - 'lib/rpush/daemon/apnsp8/delivery.rb'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-Style/WhileUntilModifier:
-  Exclude:
-    - 'lib/rpush/daemon/apnsp8/delivery.rb'
-    - 'spec/functional/synchronization_spec.rb'
