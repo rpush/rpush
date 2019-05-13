@@ -24,11 +24,13 @@ module Rpush
 
         def start
           return if Rpush.config.push
+
           Rpush.logger.info("[#{@app.name}] Starting feedback receiver... ", true)
 
           @thread = Thread.new do
             loop do
               break if @stop
+
               check_for_feedback
               @interruptible_sleep.sleep(Rpush.config.apns.feedback_receiver.frequency)
             end

@@ -32,6 +32,7 @@ module Rpush
 
       def on_connect(&blk)
         raise 'already connected' if @connected
+
         @connection_callbacks << blk
       end
 

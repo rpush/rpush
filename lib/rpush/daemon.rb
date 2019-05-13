@@ -126,6 +126,7 @@ module Rpush
 
     def self.init_store
       return if store
+
       begin
         name = Rpush.config.client.to_s
         require "rpush/daemon/store/#{name}"

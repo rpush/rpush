@@ -179,6 +179,7 @@ module Rpush
 
       def service
         return @service if defined? @service
+
         @service = "Rpush::Daemon::#{@app.service_name.camelize}".constantize
       end
 

@@ -24,6 +24,7 @@ module Rpush
     def reflect
       yield(@reflection_collection)
       return if Rpush.reflection_stack.include?(@reflection_collection)
+
       Rpush.reflection_stack << @reflection_collection
     end
 

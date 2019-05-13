@@ -204,6 +204,7 @@ module Rpush
           env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
           config = ::ActiveRecord::Base.configurations[env]
           return '' unless config
+
           Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
         end
       end

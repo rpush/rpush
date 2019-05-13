@@ -11,6 +11,7 @@ module Rpush
 
       def batch_deliveries(value = nil)
         return batch_deliveries? if value.nil?
+
         @batch_deliveries = value
       end
 
@@ -43,6 +44,7 @@ module Rpush
       def loop_instances(app)
         (@loops || []).map do |cls, options|
           next unless options.key?(:if) ? options[:if].call : true
+
           cls.new(app)
         end.compact
       end

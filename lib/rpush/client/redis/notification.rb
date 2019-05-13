@@ -50,6 +50,7 @@ module Rpush
 
         def app
           return nil unless app_id
+
           @app ||= Rpush::Client::Redis::App.find(app_id)
         end
 

@@ -14,6 +14,7 @@ module Rpush
 
   def self.shutdown
     return unless Rpush.config.embedded
+
     Rpush::Daemon.shutdown
     @embed_thread.join if @embed_thread
   rescue StandardError => e
@@ -25,11 +26,13 @@ module Rpush
 
   def self.sync
     return unless Rpush.config.embedded
+
     Rpush::Daemon::Synchronizer.sync
   end
 
   def self.status
     return unless Rpush.config.embedded
+
     status = Rpush::Daemon::AppRunner.status
     Rpush.logger.info(JSON.pretty_generate(status))
     status

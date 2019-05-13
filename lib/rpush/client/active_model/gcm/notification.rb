@@ -53,6 +53,7 @@ module Rpush
 
           def priority_for_notification
             return 'high' if priority == GCM_PRIORITY_HIGH
+
             'normal' if priority == GCM_PRIORITY_NORMAL
           end
         end

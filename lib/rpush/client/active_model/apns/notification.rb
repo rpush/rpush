@@ -35,12 +35,14 @@ module Rpush
           MUTABLE_CONTENT_KEY = '__rpush_mutable_content__'
           def mutable_content=(bool)
             return unless bool
+
             self.data = (data || {}).merge(MUTABLE_CONTENT_KEY => true)
           end
 
           CONTENT_AVAILABLE_KEY = '__rpush_content_available__'
           def content_available=(bool)
             return unless bool
+
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 

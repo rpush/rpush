@@ -75,6 +75,7 @@ module Rpush
           successes.each do |result|
             reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
             next unless result.key?(:canonical_id)
+
             reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
           end
         end

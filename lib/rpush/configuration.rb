@@ -11,6 +11,7 @@ module Rpush
 
     def configure
       return unless block_given?
+
       yield config
       config.initialize_client
     end
@@ -100,6 +101,7 @@ module Rpush
     def initialize_client
       return if @client_initialized
       raise ConfigurationError, 'Rpush.config.client is not set.' unless client
+
       require "rpush/client/#{client}"
 
       client_module = Rpush::Client.const_get(client.to_s.camelize)

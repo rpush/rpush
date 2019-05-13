@@ -76,6 +76,7 @@ module Rpush
             # On Linux, select returns nil from a dropped connection.
             # On OS X, Errno::EBADF is raised following a Errno::EADDRNOTAVAIL from the write call.
             return unless @connection.select(SELECT_TIMEOUT)
+
             tuple = @connection.read(ERROR_TUPLE_BYTES)
           rescue *TcpConnection::TCP_ERRORS
             reconnect unless @stop_error_receiver
@@ -108,6 +109,7 @@ module Rpush
 
         def reconnect
           return if @reconnect_disabled
+
           log_error("Lost connection to #{@connection.host}:#{@connection.port}, reconnecting...")
           @connection.reconnect_with_rescue
         end

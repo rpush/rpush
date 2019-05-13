@@ -66,11 +66,6 @@ Layout/DotPosition:
   Exclude:
     - 'spec/functional/apns2_spec.rb'
 
-# Offense count: 38
-# Cop supports --auto-correct.
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-
 # Offense count: 1
 # Cop supports --auto-correct.
 Layout/EmptyLineAfterMagicComment:

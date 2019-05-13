@@ -25,6 +25,7 @@ module Rpush
               loop do
                 socket = server.accept
                 break if @stop
+
                 read_loop(socket)
               end
 

@@ -121,6 +121,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
         def count
           @count_calls += 1
           return if @count_calls == 2
+
           fail @error
         end
       end
