@@ -46,9 +46,9 @@ appraise "rails-5.2" do
 end
 
 appraise "rails-6.0" do
-  gem 'activesupport', '~> 6.0.0.beta1'
+  gem 'activesupport', '~> 6.0.0.rc1'
 
   group :development do
-    gem 'rails', '~> 6.0.0.beta1'
+    gem 'rails', '~> 6.0.0.rc1'
   end
 end
