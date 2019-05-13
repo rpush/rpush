@@ -567,10 +567,3 @@ Style/WhileUntilModifier:
   Exclude:
     - 'lib/rpush/daemon/apnsp8/delivery.rb'
     - 'spec/functional/synchronization_spec.rb'
-
-# Offense count: 4
-# Cop supports --auto-correct.
-Style/ZeroLengthPredicate:
-  Exclude:
-    - 'lib/rpush/daemon/app_runner.rb'
-    - 'lib/rpush/daemon/dispatcher/apns_tcp.rb'

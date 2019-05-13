@@ -113,7 +113,7 @@ module Rpush
         end
 
         def handle_disconnect
-          log_error("The APNs disconnected before any notifications could be delivered. This usually indicates you are using an invalid certificate.") if delivered_buffer.size == 0
+          log_error("The APNs disconnected before any notifications could be delivered. This usually indicates you are using an invalid certificate.") if delivered_buffer.empty?
         end
 
         def handle_error(code, notification_id)
@@ -127,7 +127,7 @@ module Rpush
           if failed_pos
             retry_ids = delivered_buffer[(failed_pos + 1)..-1]
             retry_notification_ids(retry_ids, notification_id)
-          elsif delivered_buffer.size > 0
+          elsif !delivered_buffer.empty?
             log_error("Delivery sequence unknown for notifications following #{notification_id}.")
           end
         end
@@ -137,7 +137,7 @@ module Rpush
         end
 
         def retry_notification_ids(ids, notification_id)
-          return if ids.size == 0
+          return if ids.empty?
 
           now = Time.now
           Rpush::Daemon.store.mark_ids_retryable(ids, now)

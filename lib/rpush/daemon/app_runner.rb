@@ -113,7 +113,7 @@ module Rpush
       end
 
       def wait_until_idle
-        sleep 0.5 while queue.size > 0
+        sleep 0.5 until queue.empty?
       end
 
       def enqueue(notifications)
