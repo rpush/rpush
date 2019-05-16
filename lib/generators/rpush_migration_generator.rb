@@ -27,6 +27,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
     if has_migration?('create_rapns_notifications')
       add_rpush_migration('create_rapns_feedback')
       add_rpush_migration('add_alert_is_json_to_rapns_notifications')
+      add_rpush_migration('add_sound_is_json_to_rapns_notifications')
       add_rpush_migration('add_app_to_rapns')
       add_rpush_migration('create_rapns_apps')
       add_rpush_migration('add_gcm')
@@ -52,6 +53,7 @@ class RpushMigrationGenerator < Rails::Generators::Base
     add_rpush_migration('rpush_3_3_1_updates')
     add_rpush_migration('rpush_4_1_0_updates')
     add_rpush_migration('rpush_4_1_1_updates')
+    add_rpush_migration('rpush_4_1_2_updates')
   end
 
   protected
