@@ -11,6 +11,11 @@ Gem::Specification.new do |s|
   s.summary     = 'The push notification service for Ruby.'
   s.description = 'The push notification service for Ruby.'
   s.license     = 'MIT'
+  s.metadata    = {
+    "bug_tracker_uri" => "https://github.com/rpush/rpush/issues",
+    "changelog_uri" => "https://github.com/rpush/rpush/blob/master/CHANGELOG.md",
+    "source_code_uri" => "https://github.com/rpush/rpush"
+  }
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}`.split("\n")
