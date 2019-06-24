@@ -43,6 +43,7 @@ module Rpush
             }
             json['collapse_key'] = collapse_key if collapse_key
             json['content_available'] = content_available if content_available
+            json['mutable_content'] = mutable_content if mutable_content
             json['dry_run'] = dry_run if dry_run
             json['notification'] = notification if notification
             json['priority'] = priority_for_notification if priority
