@@ -35,7 +35,7 @@ module Rpush
             end
           end
 
-          def as_json(options = nil)
+          def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
             json = {
                 'registration_ids' => registration_ids,
                 'delay_while_idle' => delay_while_idle,
