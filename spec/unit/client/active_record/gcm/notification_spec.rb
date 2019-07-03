@@ -37,6 +37,11 @@ describe Rpush::Client::ActiveRecord::Gcm::Notification do
     expect(notification.as_json['content_available']).to eq true
   end
 
+  it 'includes mutable_content in the payload' do
+    notification.mutable_content = true
+    expect(notification.as_json['mutable_content']).to eq true
+  end
+
   it 'sets the priority to high when set to high' do
     notification.priority = 'high'
     expect(notification.as_json['priority']).to eq 'high'
