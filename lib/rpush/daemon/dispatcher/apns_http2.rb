@@ -4,7 +4,7 @@ module Rpush
       class ApnsHttp2
         include Loggable
         include Reflectable
-        
+
         URLS = {
           production: 'https://api.push.apple.com:443',
           development: 'https://api.development.push.apple.com:443',
