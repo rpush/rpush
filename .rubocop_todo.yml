@@ -14,15 +14,6 @@ Gemspec/OrderedDependencies:
   Exclude:
     - 'rpush.gemspec'
 
-# Offense count: 8
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle, IndentationWidth.
-# SupportedStyles: with_first_argument, with_fixed_indentation
-Layout/AlignArguments:
-  Exclude:
-    - 'lib/rpush/daemon/apns2/delivery.rb'
-    - 'lib/rpush/daemon/apnsp8/delivery.rb'
-
 # Offense count: 80
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle.

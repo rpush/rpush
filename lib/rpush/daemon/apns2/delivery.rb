@@ -38,7 +38,9 @@ module Rpush
           response = {}
 
           request = build_request(notification)
-          http_request = @client.prepare_request(:post, request[:path],
+          http_request = @client.prepare_request(
+            :post,
+            request[:path],
             body:    request[:body],
             headers: request[:headers]
           )
@@ -66,10 +68,13 @@ module Rpush
           when *RETRYABLE_CODES
             service_unavailable(notification, response)
           else
-            reflect(:notification_id_failed,
+            reflect(
+              :notification_id_failed,
               @app,
-              notification.id, code,
-              response[:failure_reason])
+              notification.id,
+              code,
+              response[:failure_reason]
+            )
             @batch.mark_failed(notification, response[:code], response[:failure_reason])
             failed_message_to_log(notification, response)
           end
