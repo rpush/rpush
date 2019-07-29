@@ -24,6 +24,7 @@ module Rpush
 
         def start
           return if Rpush.config.push
+          return unless @app.feedback_enabled
           Rpush.logger.info("[#{@app.name}] Starting feedback receiver... ", true)
 
           @thread = Thread.new do

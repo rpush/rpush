@@ -7,7 +7,16 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   let(:frequency) { 60 }
   let(:certificate) { double }
   let(:password) { double }
-  let(:app) { double(name: 'my_app', password: password, certificate: certificate, environment: 'production') }
+  let(:feedback_enabled) { true }
+  let(:app) do
+    double(
+      name: 'my_app',
+      password: password,
+      certificate: certificate,
+      feedback_enabled: feedback_enabled,
+      environment: 'production'
+    )
+  end
   let(:connection) { double(connect: nil, read: nil, close: nil) }
   let(:logger) { double(error: nil, info: nil) }
   let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
@@ -92,6 +101,15 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
     it 'checks for feedback when started' do
       expect(receiver).to receive(:check_for_feedback).at_least(:once)
       receiver.start
+    end
+
+    context 'with feedback_enabled false' do
+      let(:feedback_enabled) { false }
+
+      it 'does not check for feedback when started' do
+        expect(receiver).not_to receive(:check_for_feedback)
+        receiver.start
+      end
     end
   end
 
