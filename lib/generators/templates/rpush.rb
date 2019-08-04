@@ -29,6 +29,17 @@ Rpush.configure do |config|
   # config.apns.feedback_receiver.enabled = true
   # config.apns.feedback_receiver.frequency = 60
 
+  # Allow GCM reflections to return batch results
+  # setting this option skips calling gcm_delivered_to_recipient, :gcm_failed_to_recipient,
+  # :gcm_canonical_id, :gcm_invalid_registration_id and calls plural :gcm reflections
+  # :gcm_delivered_to_recipients and :gcm_failed_to_recipients instead
+  # config.gcm_batch_reflections = true
+
+  # Allow batches to reflect per-notification :notification_delivered, :notification_failed,
+  # :notification_will_retry by bulk reflections :notifications_delivered, :notifications_failed and
+  # :notifications_will_retry
+  # config.notification_batch_reflections = true
+
 end
 
 Rpush.reflect do |on|
@@ -59,6 +70,15 @@ Rpush.reflect do |on|
   # on.notification_failed do |notification|
   # end
 
+  # Called when notifications are successfully delivered and config.notification_batch_reflections is set.
+  # on.notifications_delivered do |notifications|
+  # end
+
+  # Called when notifications delivery failed and config.notification_batch_reflections is set.
+  # Call 'error_code' and 'error_description' on the notification for the cause.
+  # on.notifications_failed do |notifications|
+  # end
+
   # Called when the notification delivery failed and only the notification ID
   # is present in memory.
   # on.notification_id_failed do |app, notification_id, error_code, error_description|
@@ -68,6 +88,10 @@ Rpush.reflect do |on|
   # Call 'deliver_after' on the notification for the next delivery date
   # and 'retries' for the number of times this notification has been retried.
   # on.notification_will_retry do |notification|
+  # end
+
+  # Called when notifications will be retried at a later date and config.notification_batch_reflections is set.
+  # on.notifications_will_retry do |notifications|
   # end
 
   # Called when a notification will be retried and only the notification ID
@@ -99,6 +123,21 @@ Rpush.reflect do |on|
   # Called when the GCM returns a failure that indicates an invalid registration id.
   # You will need to delete the registration_id from your records.
   # on.gcm_invalid_registration_id do |app, error, registration_id|
+  # end
+
+  # When configuration option :gcm_batch_reflections is set
+  # reflection would use only plural gcm reflections
+  # successes_map is a map of registration_id to canonical_id (if id replace is required, else nil)
+  # { token1 => canonical_token, token2 => nil, token3 => nil, ... }
+  # on.gcm_delivered_to_recipients do |notification, successes_map|
+  # end
+  #
+  # failures map is a map of registration_id to failure hash
+  # unavailable and invalid states are set as keys (:invalid and :unavailable) in the failure hash
+  # { token4 => { error: 'NotRegistered', invalid: true },
+  #   token5 => { error: 'InvalidRegistration', invalid: true },
+  #   token6 => { error: 'Unavailable', unavailable: true } }
+  # on.gcm_failed_to_recipients do |notification, failures_map|
   # end
 
   # Called when an SSL certificate will expire within 1 month.

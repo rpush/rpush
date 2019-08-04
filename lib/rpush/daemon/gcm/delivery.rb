@@ -72,10 +72,17 @@ module Rpush
         end
 
         def handle_successes(successes)
-          successes.each do |result|
-            reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
-            next unless result.key?(:canonical_id)
-            reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
+          return if successes.blank?
+
+          if Rpush.config.gcm_batch_reflections
+            successes_map = successes.map { |result| [result[:registration_id], result[:canonical_id]] }.to_h
+            reflect(:gcm_delivered_to_recipients, @notification, successes_map)
+          else
+            successes.each do |result|
+              reflect(:gcm_delivered_to_recipient, @notification, result[:registration_id])
+              next unless result.key?(:canonical_id)
+              reflect(:gcm_canonical_id, result[:registration_id], result[:canonical_id])
+            end
           end
         end
 
@@ -95,11 +102,16 @@ module Rpush
         end
 
         def handle_errors(failures)
-          failures.each do |result|
-            reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
-          end
-          failures[:invalid].each do |result|
-            reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id])
+          if Rpush.config.gcm_batch_reflections
+            failures_map = failures.map { |result| [result[:registration_id], result] }.to_h
+            reflect(:gcm_failed_to_recipients, @notification, failures_map)
+          else
+            failures.each do |result|
+              reflect(:gcm_failed_to_recipient, @notification, result[:error], result[:registration_id])
+            end
+            failures[:invalid].each do |result|
+              reflect(:gcm_invalid_registration_id, @app, result[:error], result[:registration_id])
+            end
           end
         end
 
@@ -190,7 +202,10 @@ module Rpush
               entry[:error] = result['error']
               failures << entry
               failure_partitions.each do |category, error_states|
-                failures[category] << entry if error_states.include?(result['error'])
+                if error_states.include?(result['error'])
+                  failures[category] << entry
+                  entry[category] = true
+                end
               end
             end
           end
@@ -208,6 +223,10 @@ module Rpush
 
         def each
           self[:all].each { |x| yield x }
+        end
+
+        def map(&blk)
+          self[:all].map(&blk)
         end
 
         def <<(item)

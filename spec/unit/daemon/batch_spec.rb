@@ -166,4 +166,60 @@ describe Rpush::Daemon::Batch do
       end
     end
   end
+
+  context 'when config.notification_batch_reflections is set' do
+    before(:each) { Rpush.config.notification_batch_reflections = true }
+    after(:each) { Rpush.config.notification_batch_reflections = false }
+
+    describe '#complete_delivered' do
+      it 'reflects :notifications_delivered instead of :notification_delivered' do
+        expect(batch).to receive(:reflect).with(:notifications_delivered, Array)
+        expect(batch).not_to receive(:reflect).with(:notification_delivered, Object)
+        batch.mark_all_delivered
+        batch.send(:complete_delivered)
+      end
+
+      context 'when none delivered' do
+        it 'does not reflect neither :notifications_delivered nor :notification_delivered' do
+          expect(batch).not_to receive(:reflect)
+          batch.mark_all_failed('asd', 'ddd')
+          batch.send(:complete_delivered)
+        end
+      end
+    end
+
+    describe '#complete_failed' do
+      it 'reflects :notifications_failed instead of :notification_failed' do
+        expect(batch).to receive(:reflect).with(:notifications_failed, Array)
+        expect(batch).not_to receive(:reflect).with(:notification_failed, Object)
+        batch.mark_all_failed('asd', 'ddd')
+        batch.send(:complete_failed)
+      end
+
+      context 'when none failed' do
+        it 'does not reflect neither :notifications_failed nor :notification_failed' do
+          expect(batch).not_to receive(:reflect)
+          batch.mark_all_delivered
+          batch.send(:complete_failed)
+        end
+      end
+    end
+
+    describe '#complete_retried' do
+      it 'reflects :notifications_will_retry instead of :notification_will_retry' do
+        expect(batch).to receive(:reflect).with(:notifications_will_retry, Array)
+        expect(batch).not_to receive(:reflect).with(:notification_will_retry, Object)
+        batch.mark_all_retryable(1.hour.from_now)
+        batch.send(:complete_retried)
+      end
+
+      context 'when none retried' do
+        it 'does not reflect neither :notifications_will_retry nor :notification_will_retry' do
+          expect(batch).not_to receive(:reflect)
+          batch.mark_all_delivered
+          batch.send(:complete_retried)
+        end
+      end
+    end
+  end
 end
