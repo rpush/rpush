@@ -9,6 +9,10 @@ daysUntilStale: 365
 # but will remain marked as stale.
 daysUntilClose: 30
 
+# Issues with these labels will never be considered stale
+exemptLabels:
+  - pinned
+
 # Label to use when marking as stale
 staleLabel: stale
 
