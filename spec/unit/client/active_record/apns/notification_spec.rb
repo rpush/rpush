@@ -82,13 +82,18 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
   end
 
   it "should include the sound if present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: "my_sound.aiff")
-    expect(notification.as_json["aps"]["alert"]).to eq "my_sound.aiff"
+    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: "my_sound.aiff")
+    expect(notification.as_json["aps"]["sound"]).to eq "my_sound.aiff"
   end
 
   it "should not include the sound key if the sound is not present" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: nil)
     expect(notification.as_json["aps"].key?("sound")).to be_falsey
+  end
+
+  it "should encode the sound as JSON if it is a Hash" do
+    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: { 'name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5 })
+    expect(notification.as_json["aps"]["sound"]).to eq('name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5)
   end
 
   it "should include attributes for the device" do
