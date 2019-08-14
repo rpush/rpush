@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Add support for critical APNS alerts [#502](https://github.com/rpush/rpush/pull/502) (by [@servn](https://github.com/servn))
 - Fix disabling APNS feedback for specific Rpush apps [#511](https://github.com/rpush/rpush/pull/511) (by [@kirbydcool](https://github.com/kirbydcool))
 
 ## 4.1.1 (2019-05-13)
