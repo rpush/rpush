@@ -17,7 +17,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
   end
 
   it "should validate the length of the binary conversion of the notification" do
-    notification.device_token = "a" * 64
+    notification.device_token = "a" * 108
     notification.alert = "way too long!" * 200
     expect(notification.valid?).to be_falsey
     expect(notification.errors[:base].include?("APN notification cannot be larger than 2048 bytes. Try condensing your alert and device attributes.")).to be_truthy
@@ -25,7 +25,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
 
   it "should store long alerts" do
     notification.app = app
-    notification.device_token = "a" * 64
+    notification.device_token = "a" * 108
     notification.alert = "*" * 300
     expect(notification.valid?).to be_truthy
 
@@ -34,8 +34,8 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
     expect(notification.alert).to eq("*" * 300)
   end
 
-  it "should default the sound to 'default'" do
-    expect(notification.sound).to eq('default')
+  it "should default the sound to nil" do
+    expect(notification.sound).to be_nil
   end
 
   it "should default the expiry to 1 day" do
@@ -82,13 +82,18 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
   end
 
   it "should include the sound if present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: "my_sound.aiff")
-    expect(notification.as_json["aps"]["alert"]).to eq "my_sound.aiff"
+    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: "my_sound.aiff")
+    expect(notification.as_json["aps"]["sound"]).to eq "my_sound.aiff"
   end
 
   it "should not include the sound key if the sound is not present" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: nil)
     expect(notification.as_json["aps"].key?("sound")).to be_falsey
+  end
+
+  it "should encode the sound as JSON if it is a Hash" do
+    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: { 'name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5 })
+    expect(notification.as_json["aps"]["sound"]).to eq('name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5)
   end
 
   it "should include attributes for the device" do
@@ -110,7 +115,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
 
   before do
-    notification.device_token = "a" * 64
+    notification.device_token = "a" * 108
     notification.id = 1234
   end
 
@@ -128,6 +133,38 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
   it 'can be converted to binary' do
     notification.mdm = magic
     expect(notification.to_binary).to be_present
+  end
+end if active_record?
+
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'mutable-content' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  it 'includes mutable-content in the payload' do
+    notification.mutable_content = true
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+  end
+
+  it 'does not include content-available in the payload if not set' do
+    expect(notification.as_json['aps'].key?('mutable-content')).to be_falsey
+  end
+
+  it 'does not include mutable-content as a non-aps attribute' do
+    notification.mutable_content = true
+    expect(notification.as_json.key?('mutable-content')).to be_falsey
+  end
+
+  it 'does not overwrite existing attributes for the device' do
+    notification.data = { hi: :mom }
+    notification.mutable_content = true
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
+  end
+
+  it 'does not overwrite the mutable-content flag when setting attributes for the device' do
+    notification.mutable_content = true
+    notification.data = { hi: :mom }
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
   end
 end if active_record?
 
@@ -193,7 +230,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
 
   before do
-    notification.device_token = "a" * 64
+    notification.device_token = "a" * 108
     notification.id = 1234
   end
 
@@ -222,10 +259,12 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.badge = 3
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.data = { hi: :mom }
-    notification.expiry = 86_400 # 1 day, \x00\x01Q\x80
+    notification.expiry = 86_400 # 1 day
     notification.priority = Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
     notification.app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
-    expect(notification.to_binary).to eq "\x02\x00\x00\x00\x99\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04\x00\x01Q\x80\x05\x00\x01\n"
+    now = Time.now
+    allow(Time).to receive_messages(now: now)
+    expect(notification.to_binary).to eq "\x02\x00\x00\x00\xAF\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04#{[now.to_i + 86_400].pack('N')}\x05\x00\x01\n"
   end
 end if active_record?
 
@@ -247,7 +286,7 @@ end if active_record?
 describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
   it "should limit payload size to 256 bytes but not the entire packet" do
     notification = Rpush::Client::ActiveRecord::Apns::Notification.new do |n|
-      n.device_token = "a" * 64
+      n.device_token = "a" * 108
       n.alert = "a" * 210
       n.app = Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     end
@@ -273,5 +312,18 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, "multi_json usage" do
       expect(MultiJson).to receive(:decode).with(any_args)
       notification.alert
     end
+  end
+end if active_record?
+
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'thread-id' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  it 'includes thread-id in the payload' do
+    notification.thread_id = 'THREAD-ID'
+    expect(notification.as_json['aps']['thread-id']).to eq 'THREAD-ID'
+  end
+
+  it 'does not include thread-id in the payload if not set' do
+    expect(notification.as_json['aps']).to_not have_key('thread-id')
   end
 end if active_record?

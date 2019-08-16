@@ -24,6 +24,7 @@ module Rpush
 
         def start
           return if Rpush.config.push
+          return unless @app.feedback_enabled
           Rpush.logger.info("[#{@app.name}] Starting feedback receiver... ", true)
 
           @thread = Thread.new do
@@ -36,7 +37,7 @@ module Rpush
             Rpush::Daemon.store.release_connection
           end
 
-          puts ANSI.green { '✔' } if Rpush.config.foreground
+          puts Rainbow('✔').green if Rpush.config.foreground
         end
 
         def stop

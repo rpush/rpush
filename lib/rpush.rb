@@ -1,16 +1,10 @@
 require 'logger'
 require 'multi_json'
 require 'active_support/all'
+require 'net-http2'
+require 'jwt'
 
-module Rpush
-  def self.attr_accessible_available?
-    require 'rails'
-  rescue LoadError
-    false
-  else
-    ::Rails::VERSION::STRING < '4' || defined?(::ActiveRecord::MassAssignmentSecurity)
-  end
-end
+require 'rails'
 
 require 'rpush/version'
 require 'rpush/cli'

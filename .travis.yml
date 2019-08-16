@@ -1,125 +1,64 @@
 language: ruby
 
-sudo: false
+dist: xenial
 
-cache: :bundler
+cache: bundler
 
 compiler: clang
 
+rvm:
+  - 2.3.8
+  - 2.4.6
+  - 2.5.5
+  - 2.6.3
+
+# Build only commits on master for the "Build pushed branches" feature. This
+# prevents building twice on PRs originating from our repo ("Build pushed pull
+# requests)". See:
+#   - https://github.com/travis-ci/travis-ci/issues/1147
+#   - https://docs.travis-ci.com/user/pull-requests/#double-builds-on-pull-requests
+branches:
+  only:
+    - master
+
+gemfile:
+  - gemfiles/rails_4.2.gemfile
+  - gemfiles/rails_5.0.gemfile
+  - gemfiles/rails_5.1.gemfile
+  - gemfiles/rails_5.2.gemfile
+  - gemfiles/rails_6.0.gemfile
+
 services:
+  - postgresql
   - redis-server
-  - mongodb
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
-before_install: gem update bundler
+before_install:
+  - gem install rubygems-update && update_rubygems
+  # Rails 4.2 doesn't support bundler 2.0, so we need to lock bundler to
+  # v1.17.3. This is just for Ruby 2.5 which ships with bundler 2.x on Travis
+  # CI while Ruby 2.6 does not.
+  - yes | rvm @global do gem uninstall bundler --all
+  - yes | rvm @global do gem install bundler -v 1.17.3 || true
 
 env:
-  global:
-    - AMAZON_S3_BUCKET=rpush
-    - AMAZON_ACCESS_KEY_ID=AKIAIWENGKCRZZX7NGOQ
-    - secure: "JZSnurdpqClRgy2s99xFaOymuCDaCh8rZmHgj8Wj/KRFNDuEFVq7CgUjAg24shL4aB+uE/sgBemfsuvJLcWT27/7bi1h/idepNdB36l+GhdJj5CovtqPGX9rXv6vp1s0tELgjxTcx17IQ1oZ5iqTozg9UWWpCXtOBB70/aJvTn8="
+  matrix:
+    - CLIENT=active_record
+    - CLIENT=redis
 
 matrix:
   fast_finish: true
-  include:
-  - rvm: 2.0.0
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.2.2
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.3.0
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: 2.0.0
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.2.2
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.3.0
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: 2.0.0
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.1.6
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.2.2
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.3.0
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: 2.0.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.1.6
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.2.2
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.3.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=redis
-  - rvm: 2.0.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.1.6
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.2.2
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: 2.3.0
-    gemfile: Gemfile.rails-3
-    env: CLIENT=active_record
-  - rvm: rbx-2.5.8
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: rbx-2.5.8
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: rbx-2.5.8
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: jruby-1.7.23
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: jruby-1.7.23
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: jruby-1.7.23
-    gemfile: Gemfile
-    env: CLIENT=mongoid
-  - rvm: jruby-9.0.4.0
-    gemfile: Gemfile
-    env: CLIENT=active_record
-  - rvm: jruby-9.0.4.0
-    gemfile: Gemfile
-    env: CLIENT=redis
-  - rvm: jruby-9.0.4.0
-    gemfile: Gemfile
-    env: CLIENT=mongoid
   allow_failures:
-    - rvm: 1.9.3
-    - rvm: jruby-1.7.23
-      env: CLIENT=active_record
-    - rvm: jruby-1.7.23
-      env: CLIENT=redis
-    - rvm: jruby-1.7.23
-      env: CLIENT=mongoid
-    - rvm: jruby-9.0.4.0
-      env: CLIENT=active_record
-    - rvm: jruby-9.0.4.0
-      env: CLIENT=redis
-    - rvm: jruby-9.0.4.0
-      env: CLIENT=mongoid
+    - gemfile: gemfiles/rails_4.2.gemfile
+      rvm: 2.5.5
+  exclude:
+    - gemfile: gemfiles/rails_6.0.gemfile
+      rvm: 2.3.8
+    - gemfile: gemfiles/rails_6.0.gemfile
+      rvm: 2.4.6
+
+jobs:
+  include:
+    - stage: Lint
+      rvm: 2.6.3
+      script: bundle exec rake rubocop

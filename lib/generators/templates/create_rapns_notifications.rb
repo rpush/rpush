@@ -1,4 +1,4 @@
-class CreateRapnsNotifications < ActiveRecord::Migration
+class CreateRapnsNotifications < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
   def self.up
     create_table :rapns_notifications do |t|
       t.integer   :badge,                 null: true
@@ -21,9 +21,16 @@ class CreateRapnsNotifications < ActiveRecord::Migration
   end
 
   def self.down
-    if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi', true)
-      remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
+    if ActiveRecord.version >= Gem::Version.new('5.1')
+      if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi')
+        remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
+      end
+    else
+      if index_name_exists?(:rapns_notifications, 'index_rapns_notifications_multi', true)
+        remove_index :rapns_notifications, name: 'index_rapns_notifications_multi'
+      end
     end
+
     drop_table :rapns_notifications
   end
 end

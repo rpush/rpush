@@ -20,7 +20,7 @@ module Rpush
 
         attribute :badge, :integer
         attribute :device_token, :string
-        attribute :sound, :string, default: 'default'
+        attribute :sound, [:string, :hash], strict: false, default: 'default'
         attribute :alert, [:string, :hash], strict: false
         attribute :data, :hash
         attribute :expiry, :integer, default: 1.day.to_i
@@ -34,6 +34,7 @@ module Rpush
         attribute :error_description, :string
         attribute :deliver_after, :timestamp
         attribute :alert_is_json, :boolean
+        attribute :sound_is_json, :boolean
         attribute :app_id, :integer
         attribute :collapse_key, :string
         attribute :delay_while_idle, :boolean
@@ -43,7 +44,10 @@ module Rpush
         attribute :url_args, :array
         attribute :category, :string
         attribute :content_available, :boolean, default: false
+        attribute :dry_run, :boolean, default: false
+        attribute :mutable_content, :boolean, default: false
         attribute :notification, :hash
+        attribute :thread_id, :string
 
         def app
           return nil unless app_id

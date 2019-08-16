@@ -10,6 +10,7 @@ gcm_test/bin
 spec/tmp/
 .vagrant/
 tmp/
+log/
 
 ## Environment normalization:
 /.bundle/
@@ -23,3 +24,10 @@ tmp/
 
 ## Directory-based project format:
 .idea/
+
+# Appraisal
+gemfiles/*.lock
+
+# Keep the Gemfile.lock in the repo
+# http://bundler.io/blog/2018/01/17/making-gem-development-a-little-better.html
+# Gemfile.lock

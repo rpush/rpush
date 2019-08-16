@@ -9,6 +9,12 @@ require 'rpush/client/active_model/apns/device_token_format_validator'
 require 'rpush/client/active_model/apns/app'
 require 'rpush/client/active_model/apns/notification'
 
+require 'rpush/client/active_model/apns2/app'
+require 'rpush/client/active_model/apns2/notification'
+
+require 'rpush/client/active_model/apnsp8/app'
+require 'rpush/client/active_model/apnsp8/notification'
+
 require 'rpush/client/active_model/adm/data_validator'
 require 'rpush/client/active_model/adm/app'
 require 'rpush/client/active_model/adm/notification'
@@ -22,3 +28,7 @@ require 'rpush/client/active_model/wpns/notification'
 
 require 'rpush/client/active_model/wns/app'
 require 'rpush/client/active_model/wns/notification'
+
+require 'rpush/client/active_model/pushy/app'
+require 'rpush/client/active_model/pushy/notification'
+require 'rpush/client/active_model/pushy/time_to_live_validator'

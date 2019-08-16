@@ -11,6 +11,7 @@ module Rpush
             base.instance_eval do
               validates :registration_ids, presence: true
               validates :priority, inclusion: { in: GCM_PRIORITIES }, allow_nil: true
+              validates :dry_run, inclusion: { in: [true, false] }
 
               validates_with Rpush::Client::ActiveModel::PayloadDataSizeValidator, limit: 4096
               validates_with Rpush::Client::ActiveModel::RegistrationIdsCountValidator, limit: 1000
@@ -34,7 +35,7 @@ module Rpush
             end
           end
 
-          def as_json(options = nil)
+          def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
             json = {
                 'registration_ids' => registration_ids,
                 'delay_while_idle' => delay_while_idle,
@@ -42,6 +43,8 @@ module Rpush
             }
             json['collapse_key'] = collapse_key if collapse_key
             json['content_available'] = content_available if content_available
+            json['mutable_content'] = mutable_content if mutable_content
+            json['dry_run'] = dry_run if dry_run
             json['notification'] = notification if notification
             json['priority'] = priority_for_notification if priority
             json['time_to_live'] = expiry if expiry

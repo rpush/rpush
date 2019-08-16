@@ -16,7 +16,7 @@ describe 'embedding' do
 
     notification.app = app
     notification.alert = 'test'
-    notification.device_token = 'a' * 64
+    notification.device_token = 'a' * 108
     notification.save!
 
     stub_tcp_connection
