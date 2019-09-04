@@ -8,9 +8,9 @@ compiler: clang
 
 rvm:
   - 2.3.8
-  - 2.4.6
-  - 2.5.5
-  - 2.6.3
+  - 2.4.7
+  - 2.5.6
+  - 2.6.4
 
 # Build only commits on master for the "Build pushed branches" feature. This
 # prevents building twice on PRs originating from our repo ("Build pushed pull
@@ -49,15 +49,15 @@ matrix:
   fast_finish: true
   allow_failures:
     - gemfile: gemfiles/rails_4.2.gemfile
-      rvm: 2.5.5
+      rvm: 2.5.6
   exclude:
     - gemfile: gemfiles/rails_6.0.gemfile
       rvm: 2.3.8
     - gemfile: gemfiles/rails_6.0.gemfile
-      rvm: 2.4.6
+      rvm: 2.4.7
 
 jobs:
   include:
     - stage: Lint
-      rvm: 2.6.3
+      rvm: 2.6.4
       script: bundle exec rake rubocop
