@@ -5,7 +5,7 @@ module Rpush
         include MultiJsonHelper
 
         host = 'https://updates.push.services.mozilla.com'
-        URI = URI.parse("#{host}/push/v1")
+        URI = URI.parse("#{host}/wpush/v1")
         UNAVAILABLE_STATES = %w()
         INVALID_REGISTRATION_ID_STATES = %w()
 
