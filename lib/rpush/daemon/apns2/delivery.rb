@@ -7,6 +7,7 @@ module Rpush
 
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
+        CLIENT_JOIN_TIMEOUT = 60
 
         def initialize(app, http2_client, batch)
           @app = app
@@ -20,7 +21,10 @@ module Rpush
           end
 
           # Send all preprocessed requests at once
-          @client.join
+          @client.join(timeout: CLIENT_JOIN_TIMEOUT)
+        rescue NetHttp2::TimeoutError
+          @client.close
+          raise
         rescue Errno::ECONNREFUSED, SocketError => error
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
