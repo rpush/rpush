@@ -235,8 +235,10 @@ describe 'APNs http2 adapter' do
       end
 
       it 'closes the client' do
-        create_notification
         expect(fake_client).to receive(:close)
+
+        create_notification
+        Rpush.push
       end
 
       it 'reflects :error' do
@@ -251,6 +253,5 @@ describe 'APNs http2 adapter' do
         Rpush.push
       end
     end
-
   end
 end
