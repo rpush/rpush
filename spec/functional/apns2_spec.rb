@@ -4,10 +4,10 @@ describe 'APNs http2 adapter' do
   let(:fake_client) {
     double(
       prepare_request: fake_http2_request,
-      close:           'ok',
-      call_async:      'ok',
-      join:            'ok',
-      on:              'ok'
+      close: 'ok',
+      call_async: 'ok',
+      join: 'ok',
+      on: 'ok'
     )
   }
   let(:app) { create_app }
@@ -16,7 +16,7 @@ describe 'APNs http2 adapter' do
   let(:fake_http_resp_headers) {
     {
       ":status" => "200",
-      "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+      "apns-id" => "C6D65840-5E3F-785A-4D91-B97D305C12F6"
     }
   }
   let(:fake_http_resp_body) { '' }
@@ -28,13 +28,13 @@ describe 'APNs http2 adapter' do
       to receive(:new).and_return(fake_client)
     allow(fake_http2_request).
       to receive(:on).with(:headers).
-      and_yield(fake_http_resp_headers)
+        and_yield(fake_http_resp_headers)
     allow(fake_http2_request).
       to receive(:on).with(:body_chunk).
-      and_yield(fake_http_resp_body)
+        and_yield(fake_http_resp_body)
     allow(fake_http2_request).
       to receive(:on).with(:close).
-      and_yield
+        and_yield
   end
 
   def create_app
@@ -71,13 +71,13 @@ describe 'APNs http2 adapter' do
 
     expect(fake_client)
       .to receive(:prepare_request)
-      .with(
-        :post,
-        "/3/device/#{fake_device_token}",
-        { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\",\"content-available\":1}}",
-          headers: {} }
-      )
-      .and_return(fake_http2_request)
+            .with(
+              :post,
+              "/3/device/#{fake_device_token}",
+              {body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\",\"content-available\":1}}",
+               headers: {}}
+            )
+            .and_return(fake_http2_request)
 
     expect do
       Rpush.push
@@ -89,8 +89,8 @@ describe 'APNs http2 adapter' do
     let(:bundle_id) { 'some.example.com' }
     let(:notification_data) {
       {
-        'headers' => { 'apns-topic' => bundle_id },
-        'some_field' =>  'some value'
+        'headers' => {'apns-topic' => bundle_id},
+        'some_field' => 'some value'
       }
     }
 
@@ -99,14 +99,14 @@ describe 'APNs http2 adapter' do
 
       expect(fake_client)
         .to receive(:prepare_request)
-        .with(
-          :post,
-          "/3/device/#{fake_device_token}",
-          { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\","\
+              .with(
+                :post,
+                "/3/device/#{fake_device_token}",
+                {body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\","\
                   "\"content-available\":1},\"some_field\":\"some value\"}",
-            headers: { 'apns-topic' => bundle_id }
-          }
-        ).and_return(fake_http2_request)
+                 headers: {'apns-topic' => bundle_id}
+                }
+              ).and_return(fake_http2_request)
 
       expect do
         Rpush.push
@@ -120,7 +120,7 @@ describe 'APNs http2 adapter' do
       let(:fake_http_resp_headers) {
         {
           ":status" => "404",
-          "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+          "apns-id" => "C6D65840-5E3F-785A-4D91-B97D305C12F6"
         }
       }
 
@@ -151,7 +151,7 @@ describe 'APNs http2 adapter' do
       let(:fake_http_resp_headers) {
         {
           ":status" => "500",
-          "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+          "apns-id" => "C6D65840-5E3F-785A-4D91-B97D305C12F6"
         }
       }
 
@@ -245,7 +245,7 @@ describe 'APNs http2 adapter' do
         Rpush.reflect do |on|
           on.error do |error|
             expect(error).to be_kind_of(StandardError)
-           reflector.accept
+            reflector.accept
           end
         end
 
