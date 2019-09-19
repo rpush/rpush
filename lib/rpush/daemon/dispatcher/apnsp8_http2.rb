@@ -24,6 +24,7 @@ module Rpush
 
         def dispatch(payload)
           @delivery_class.new(@app, @client, @token_provider, payload.batch).perform
+          @client.close # resolve memory leak
         end
 
         def cleanup
