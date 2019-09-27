@@ -3,14 +3,12 @@ shared_examples_for 'an Notification subclass' do
     before { allow(Rpush::Deprecation).to receive(:warn) }
 
     it 'calls MultiJson.dump when multi_json responds to :dump' do
-      notification = notification_class.new
       allow(MultiJson).to receive(:respond_to?).with(:dump).and_return(true)
       expect(MultiJson).to receive(:dump).with(any_args)
       notification.data = { pirates: 1 }
     end
 
     it 'calls MultiJson.encode when multi_json does not respond to :dump' do
-      notification = notification_class.new
       allow(MultiJson).to receive(:respond_to?).with(:dump).and_return(false)
       expect(MultiJson).to receive(:encode).with(any_args)
       notification.data = { ninjas: 1 }

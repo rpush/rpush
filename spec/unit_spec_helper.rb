@@ -1,6 +1,8 @@
 require 'spec_helper'
 require 'rails'
 
+Dir["./spec/unit/client/shared/**/*.rb"].sort.each { |f| require f }
+
 def unit_example?(metadata)
   metadata[:file_path] =~ %r{spec/unit}
 end
