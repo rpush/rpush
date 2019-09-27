@@ -1,9 +1,6 @@
 require 'unit_spec_helper'
-require 'unit/notification_shared.rb'
 
 shared_examples 'Rpush::Client::Gcm::Notification' do
-  it_should_behave_like 'an Notification subclass'
-
   let(:app) { Rpush::Gcm::App.create!(name: 'test', auth_key: 'abc') }
   let(:notification) { described_class.new }
 

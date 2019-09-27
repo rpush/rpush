@@ -1,10 +1,8 @@
 # encoding: US-ASCII
 
 require "unit_spec_helper"
-require 'unit/notification_shared.rb'
 
 shared_examples 'Rpush::Client::Apns::Notification' do
-  it_should_behave_like 'an Notification subclass'
   let(:notification) { described_class.new }
   let(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
 

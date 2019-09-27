@@ -1,10 +1,7 @@
 require 'unit_spec_helper'
-require 'unit/notification_shared.rb'
 
 shared_examples 'Rpush::Client::Pushy::Notification' do
   subject(:notification) { described_class.new }
-
-  it_behaves_like 'an Notification subclass'
 
   describe 'validates' do
     let(:app) { Rpush::Pushy::App.create!(name: 'MyApp', api_key: 'my_api_key') }

@@ -1,4 +1,6 @@
-shared_examples_for 'an Notification subclass' do
+shared_examples_for 'Rpush::Client::ActiveRecord::Notification' do
+  let(:notification) { described_class.new }
+
   describe 'when assigning data for the device' do
     before { allow(Rpush::Deprecation).to receive(:warn) }
 
@@ -21,12 +23,12 @@ shared_examples_for 'an Notification subclass' do
     end
 
     it 'encodes the given Hash as JSON' do
-      notification.data = { hi: 'mom'}
+      notification.data = { hi: 'mom' }
       expect(notification.read_attribute(:data)).to eq('{"hi":"mom"}')
     end
 
     it 'decodes the JSON when using the reader method' do
-      notification.data = { hi: 'mom'}
+      notification.data = { hi: 'mom' }
       expect(notification.data).to eq('hi' => 'mom')
     end
   end
@@ -39,12 +41,12 @@ shared_examples_for 'an Notification subclass' do
     end
 
     it 'encodes the given Hash as JSON' do
-      notification.notification = { hi: 'dad'}
+      notification.notification = { hi: 'dad' }
       expect(notification.read_attribute(:notification)).to eq('{"hi":"dad"}')
     end
 
     it 'decodes the JSON when using the reader method' do
-      notification.notification = { hi: 'dad'}
+      notification.notification = { hi: 'dad' }
       expect(notification.notification).to eq('hi' => 'dad')
     end
   end

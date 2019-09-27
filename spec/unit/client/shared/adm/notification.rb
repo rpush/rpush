@@ -1,9 +1,6 @@
 require 'unit_spec_helper'
-require 'unit/notification_shared.rb'
 
 shared_examples 'Rpush::Client::Adm::Notification' do
-  it_should_behave_like 'an Notification subclass'
-
   let(:app) { Rpush::Adm::App.create!(name: 'test', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
   let(:notification) { described_class.new }
 
