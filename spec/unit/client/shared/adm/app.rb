@@ -2,7 +2,6 @@ require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::Adm::App' do
   subject { described_class.new(name: 'test', environment: 'development', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
-  let(:existing_app) { described_class.create!(name: 'existing', environment: 'development', client_id: 'CLIENT_ID', client_secret: 'CLIENT_SECRET') }
 
   it 'should be valid if properly instantiated' do
     expect(subject).to be_valid
@@ -12,12 +11,6 @@ shared_examples 'Rpush::Client::Adm::App' do
     subject.name = nil
     expect(subject).not_to be_valid
     expect(subject.errors[:name]).to eq ["can't be blank"]
-  end
-
-  it 'should be invalid if name is not unique within scope' do
-    subject.name = existing_app.name
-    expect(subject).not_to be_valid
-    expect(subject.errors[:name]).to eq ["has already been taken"]
   end
 
   it 'should be invalid if missing client_id' do
