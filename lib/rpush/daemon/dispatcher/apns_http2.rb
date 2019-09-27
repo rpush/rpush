@@ -2,6 +2,8 @@ module Rpush
   module Daemon
     module Dispatcher
       class ApnsHttp2
+        include Loggable
+        include Reflectable
 
         URLS = {
           production: 'https://api.push.apple.com:443',
