@@ -236,15 +236,16 @@ shared_examples 'Rpush::Daemon::Store' do
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
       expect(Rpush::Apns::Feedback).to receive(:create!).with(
-        failed_at: time, device_token: 'ab' * 32, app_id: app.id)
+        failed_at: time, device_token: 'ab' * 32, app_id: app.id
+      )
       store.create_apns_feedback(time, 'ab' * 32, app)
     end
   end
 
   describe 'create_gcm_notification' do
-    let(:data) { {'data' => true} }
-    let(:attributes) { {device_token: 'ab' * 32} }
-    let(:registration_ids) { %w(123 456) }
+    let(:data) { { 'data' => true } }
+    let(:attributes) { { device_token: 'ab' * 32 } }
+    let(:registration_ids) { %w[123 456] }
     let(:deliver_after) { time + 10.seconds }
     let(:args) { [attributes, data, registration_ids, deliver_after, app] }
 
@@ -275,9 +276,9 @@ shared_examples 'Rpush::Daemon::Store' do
   end
 
   describe 'create_adm_notification' do
-    let(:data) { {'data' => true} }
-    let(:attributes) { {app_id: app.id, collapse_key: 'ckey', delay_while_idle: true} }
-    let(:registration_ids) { %w(123 456) }
+    let(:data) { { 'data' => true } }
+    let(:attributes) { { app_id: app.id, collapse_key: 'ckey', delay_while_idle: true } }
+    let(:registration_ids) { %w[123 456] }
     let(:deliver_after) { time + 10.seconds }
     let(:args) { [attributes, data, registration_ids, deliver_after, app] }
 

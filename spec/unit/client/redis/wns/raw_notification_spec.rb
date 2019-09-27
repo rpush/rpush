@@ -7,7 +7,7 @@ describe Rpush::Client::Redis::Wns::RawNotification do
     notif = described_class.new
     notif.app = Rpush::Wns::App.create!(name: "MyApp", client_id: "someclient", client_secret: "somesecret")
     notif.uri = 'https://db5.notify.windows.com/?token=TOKEN'
-    notif.data = {foo: 'foo', bar: 'bar'}
+    notif.data = { foo: 'foo', bar: 'bar' }
     notif
   end
 

@@ -9,7 +9,7 @@ describe Rpush::Client::ActiveRecord::Wns::RawNotification do
     notif.data = { foo: 'foo', bar: 'bar' }
     notif
   end
-  
+
   it 'does not allow the size of payload over 5 KB' do
     allow(notification).to receive(:payload_data_size) { 5121 }
     expect(notification.valid?).to be(false)
