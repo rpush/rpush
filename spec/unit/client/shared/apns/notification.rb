@@ -30,10 +30,6 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     expect(notification.alert).to eq("*" * 300)
   end
 
-  it "should default the sound to nil" do
-    expect(notification.sound).to be_nil
-  end
-
   it "should default the expiry to 1 day" do
     expect(notification.expiry).to eq 1.day.to_i
   end
@@ -93,14 +89,14 @@ shared_examples 'Rpush::Client::Apns::Notification' do
 
     it "should include attributes for the device" do
       notification = described_class.new
-      notification.data = { omg: :lol, wtf: :dunno }
+      notification.data = { 'omg' => 'lol', 'wtf' => 'dunno' }
       expect(notification.as_json["omg"]).to eq "lol"
       expect(notification.as_json["wtf"]).to eq "dunno"
     end
 
     it "should allow attributes to include a hash" do
       notification = described_class.new
-      notification.data = { omg: { ilike: :hashes } }
+      notification.data = { 'omg' => { 'ilike' => 'hashes' } }
       expect(notification.as_json["omg"]["ilike"]).to eq "hashes"
     end
   end
@@ -146,15 +142,8 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     end
 
     it 'does not overwrite existing attributes for the device' do
-      notification.data = { hi: :mom }
+      notification.data = { 'hi' => 'mom' }
       notification.mutable_content = true
-      expect(notification.as_json['aps']['mutable-content']).to eq 1
-      expect(notification.as_json['hi']).to eq 'mom'
-    end
-
-    it 'does not overwrite the mutable-content flag when setting attributes for the device' do
-      notification.mutable_content = true
-      notification.data = { hi: :mom }
       expect(notification.as_json['aps']['mutable-content']).to eq 1
       expect(notification.as_json['hi']).to eq 'mom'
     end
@@ -176,15 +165,8 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     end
 
     it 'does not overwrite existing attributes for the device' do
-      notification.data = { hi: :mom }
+      notification.data = { 'hi' => 'mom' }
       notification.content_available = true
-      expect(notification.as_json['aps']['content-available']).to eq 1
-      expect(notification.as_json['hi']).to eq 'mom'
-    end
-
-    it 'does not overwrite the content-available flag when setting attributes for the device' do
-      notification.content_available = true
-      notification.data = { hi: :mom }
       expect(notification.as_json['aps']['content-available']).to eq 1
       expect(notification.as_json['hi']).to eq 'mom'
     end
@@ -258,18 +240,11 @@ shared_examples 'Rpush::Client::Apns::Notification' do
       notification.alert = "{\"one\":2}"
       expect(notification.alert).to eq "{\"one\":2}"
     end
-
-    it 'does confuse a JSON looking string as JSON if the alert_is_json attribute is not present' do
-      notification = described_class.new
-      allow(notification).to receive_messages(has_attribute?: false)
-      notification.alert = "{\"one\":2}"
-      expect(notification.alert).to eq('one' => 2)
-    end
   end
 
   describe "bug #35" do
     it "should limit payload size to 256 bytes but not the entire packet" do
-      notification = described_class.new do |n|
+      notification = described_class.new.tap do |n|
         n.device_token = "a" * 108
         n.alert = "a" * 210
         n.app = app
@@ -278,24 +253,6 @@ shared_examples 'Rpush::Client::Apns::Notification' do
       expect(notification.to_binary(for_validation: true).bytesize).to be > 256
       expect(notification.payload.bytesize).to be < 256
       expect(notification).to be_valid
-    end
-  end
-
-  describe "multi_json usage" do
-    describe "alert" do
-      it "should call MultiJson.load when multi_json version is 1.3.0" do
-        notification = described_class.new(alert: { a: 1 }, alert_is_json: true)
-        allow(Gem).to receive(:loaded_specs).and_return('multi_json' => Gem::Specification.new('multi_json', '1.3.0'))
-        expect(MultiJson).to receive(:load).with(any_args)
-        notification.alert
-      end
-
-      it "should call MultiJson.decode when multi_json version is 1.2.9" do
-        notification = described_class.new(alert: { a: 1 }, alert_is_json: true)
-        allow(Gem).to receive(:loaded_specs).and_return('multi_json' => Gem::Specification.new('multi_json', '1.2.9'))
-        expect(MultiJson).to receive(:decode).with(any_args)
-        notification.alert
-      end
     end
   end
 
