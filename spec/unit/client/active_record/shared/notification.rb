@@ -1,6 +1,11 @@
 shared_examples_for 'Rpush::Client::ActiveRecord::Notification' do
   let(:notification) { described_class.new }
 
+  it 'allows assignment of a single registration ID' do
+    notification.registration_ids = 'a'
+    expect(notification.registration_ids).to eq ['a']
+  end
+
   describe 'when assigning data for the device' do
     before { allow(Rpush::Deprecation).to receive(:warn) }
 

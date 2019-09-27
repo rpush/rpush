@@ -18,7 +18,7 @@ shared_examples 'Rpush::Client::Adm::Notification' do
 
   it 'validates data can be blank if collapse_key is set' do
     notification.app = app
-    notification.registration_ids = 'a'
+    notification.registration_ids = ['a']
     notification.collapse_key = 'test'
     notification.data = nil
     expect(notification.valid?).to eq(true)
