@@ -21,7 +21,7 @@ module Rpush
         def notification=(attrs)
           return unless attrs
           fail ArgumentError, 'must be a Hash' unless attrs.is_a?(Hash)
-          write_attribute(:notification, multi_json_dump(attrs.merge(data || {})))
+          write_attribute(:notification, multi_json_dump(attrs.merge(notification || {})))
         end
 
         def registration_ids=(ids)
