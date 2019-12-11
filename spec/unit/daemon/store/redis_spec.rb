@@ -51,12 +51,12 @@ describe Rpush::Daemon::Store::Redis do
     end
 
     it 'loads an undelivered notification without deliver_after set' do
-      notification.update_attributes!(delivered: false, deliver_after: nil)
+      notification.update!(delivered: false, deliver_after: nil)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
     end
 
     it 'loads an notification with a deliver_after time in the past' do
-      notification.update_attributes!(delivered: false, deliver_after: 1.hour.ago)
+      notification.update!(delivered: false, deliver_after: 1.hour.ago)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
     end
 
