@@ -2,8 +2,27 @@
 
 ## Unreleased
 
-- Add support for critical APNS alerts [#502](https://github.com/rpush/rpush/pull/502) (by [@servn](https://github.com/servn))
-- Fix disabling APNS feedback for specific Rpush apps [#511](https://github.com/rpush/rpush/pull/511) (by [@kirbydcool](https://github.com/kirbydcool))
+Nothing so far.
+
+## 4.2.0 (2019-12-13)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v4.1.1...v4.2.0)
+
+**Merged pull requests:**
+
+- Fix Rails 6.1 related deprecation warnings [\#541](https://github.com/rpush/rpush/pull/541) ([dsantosmerino](https://github.com/dsantosmerino))
+- GCM notification incorrectly mixes data into notification hashes [\#535](https://github.com/rpush/rpush/pull/535) ([mkon](https://github.com/mkon))
+- handle priority in WNS [\#533](https://github.com/rpush/rpush/pull/533) ([Fivell](https://github.com/Fivell))
+- Update development apns urls to match documentation [\#524](https://github.com/rpush/rpush/pull/524) ([jhottenstein](https://github.com/jhottenstein))
+- Update README to remove incorrect info [\#523](https://github.com/rpush/rpush/pull/523) ([sharang-d](https://github.com/sharang-d))
+- Fix and improve Travis setup [\#520](https://github.com/rpush/rpush/pull/520) ([aried3r](https://github.com/aried3r))
+- Explicitly use Rails 6.0.0 [\#519](https://github.com/rpush/rpush/pull/519) ([jsantos](https://github.com/jsantos))
+- Stale bot config change [\#515](https://github.com/rpush/rpush/pull/515) ([aried3r](https://github.com/aried3r))
+- Add stale bot configuration. [\#514](https://github.com/rpush/rpush/pull/514) ([drn](https://github.com/drn))
+- Correctly use feedback_enabled. [\#511](https://github.com/rpush/rpush/pull/511) ([kirbycool](https://github.com/kirbycool))
+- Update apns_http2.rb [\#510](https://github.com/rpush/rpush/pull/510) ([mldoscar](https://github.com/mldoscar))
+- Add `mutable_content` support for GCM [\#506](https://github.com/rpush/rpush/pull/506) ([hon3st](https://github.com/hon3st))
+- Add support for critical alerts [\#502](https://github.com/rpush/rpush/pull/502) ([servn](https://github.com/servn))
 
 ## 4.1.1 (2019-05-13)
 
