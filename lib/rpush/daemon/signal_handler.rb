@@ -29,7 +29,7 @@ module Rpush
 
       def self.start_handler(read_io)
         @thread = Thread.new do
-          while readable_io = IO.select([read_io]) # rubocop:disable AssignmentInCondition
+          while readable_io = IO.select([read_io]) # rubocop:disable Lint/AssignmentInCondition
             signal = readable_io.first[0].gets.strip
 
             begin

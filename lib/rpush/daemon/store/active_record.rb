@@ -183,7 +183,7 @@ module Rpush
 
         private
 
-        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable ParameterLists
+        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
           with_database_reconnect_and_retry do
             notification.assign_attributes(attrs)
             notification.data = data
