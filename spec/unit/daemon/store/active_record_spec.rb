@@ -69,27 +69,27 @@ describe Rpush::Daemon::Store::ActiveRecord do
     end
 
     it 'loads an undelivered notification without deliver_after set' do
-      notification.update_attributes!(delivered: false, deliver_after: nil)
+      notification.update!(delivered: false, deliver_after: nil)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
     end
 
     it 'loads an notification with a deliver_after time in the past' do
-      notification.update_attributes!(delivered: false, deliver_after: 1.hour.ago)
+      notification.update!(delivered: false, deliver_after: 1.hour.ago)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
     end
 
     it 'does not load an notification with a deliver_after time in the future' do
-      notification.update_attributes!(delivered: false, deliver_after: 1.hour.from_now)
+      notification.update!(delivered: false, deliver_after: 1.hour.from_now)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
 
     it 'does not load a previously delivered notification' do
-      notification.update_attributes!(delivered: true, delivered_at: time)
+      notification.update!(delivered: true, delivered_at: time)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
 
     it "does not enqueue a notification that has previously failed delivery" do
-      notification.update_attributes!(delivered: false, failed: true)
+      notification.update!(delivered: false, failed: true)
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
   end
