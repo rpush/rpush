@@ -34,7 +34,9 @@ services:
 
 before_script: psql -c 'create database rpush_test;' -U postgres >/dev/null
 before_install:
-  - gem update --system
+  # https://github.com/rubygems/rubygems/issues/3036
+  # https://github.com/rubygems/rubygems/issues/3036#issuecomment-566132226
+  - yes | gem update --system
   # Rails 4.2 doesn't support bundler 2.0, so we need to lock bundler to
   # v1.17.3. This is just for Ruby 2.5 which ships with bundler 2.x on Travis
   # CI while Ruby 2.6 does not.
