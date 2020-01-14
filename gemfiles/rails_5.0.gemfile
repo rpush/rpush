@@ -2,10 +2,10 @@
 
 source "https://rubygems.org"
 
-gem "activesupport", ">= 5.0", "< 5.1"
+gem "activesupport", "~> 5.0.0"
 
 group :development do
-  gem "rails", ">= 5.0", "< 5.1"
+  gem "rails", "~> 5.0.0"
   gem "pg", "< 1.0"
 end
 
