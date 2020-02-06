@@ -57,6 +57,14 @@ shared_examples 'Rpush::Client::Gcm::Notification' do
     expect(notification.as_json).not_to have_key 'priority'
   end
 
+  it 'sets the priority to high when set to high in the database' do
+    notification.priority = 'high'
+    notification.app = app
+    notification.save!(validate: false)
+    notification.reload
+    expect(notification.as_json['priority']).to eq 'high'
+  end
+
   it 'includes the notification payload if defined' do
     notification.notification = { key: 'any key is allowed' }
     expect(notification.as_json).to have_key 'notification'
