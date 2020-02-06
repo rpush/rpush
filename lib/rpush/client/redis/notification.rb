@@ -6,6 +6,8 @@ module Rpush
         include Modis::Model
         include Rpush::Client::ActiveModel::Notification
 
+        enable_all_index false # prevent creation of massive rpush:notifications:all set
+
         after_create :register_notification
 
         self.namespace = 'notifications'
