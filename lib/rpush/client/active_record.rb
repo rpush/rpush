@@ -32,3 +32,6 @@ require 'rpush/client/active_record/adm/app'
 
 require 'rpush/client/active_record/pushy/notification'
 require 'rpush/client/active_record/pushy/app'
+
+require 'rpush/client/active_record/webpush/notification'
+require 'rpush/client/active_record/webpush/app'

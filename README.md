@@ -18,6 +18,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
   * [**Amazon Device Messaging**](#amazon-device-messaging)
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
   * [**Pushy**](#pushy)
+  * [**Webpush**](#webpush)
 
 #### Feature Highlights
 
@@ -296,6 +297,49 @@ n.save!
 ```
 
 For more documentation on [Pushy](https://pushy.me/docs).
+
+#### Webpush
+
+[Webpush](https://tools.ietf.org/html/draft-ietf-webpush-protocol-10) is a
+protocol for delivering push messages to desktop browsers. It's supported by
+all major browsers (except Safari, you have to use one of the Apns transports
+for that).
+
+Using [VAPID](https://tools.ietf.org/html/draft-ietf-webpush-vapid-01), there
+is no need for the sender of push notifications to register upfront with push
+services (as was the case with the now legacy Mozilla or Google desktop push
+providers).
+
+Instead, you generate a pair of keys and use the public key when subscribing
+users in your web app. The keys are stored along with an email address (which,
+according to the spec, can be used by push service providers to contact you in
+case of problems) in the `certificates` field of the Rpush Application record:
+
+```ruby
+vapid_keypair = Webpush.generate_key.to_hash
+app = Rpush::Webpush::App.new
+app.name = 'webpush'
+app.certificate = vapid_keypair.merge(subject: 'user@example.org').to_json
+app.connections = 1
+app.save!
+```
+
+The `subscription` object you obtain from a subscribed browser holds an
+endpoint URL and cryptographic keys. When sending a notification, simply pass
+the whole subscription as sole member of the `registration_ids` collection:
+
+```ruby
+n = Rpush::Webpush::Notification.new
+n.app = Rpush::App.find_by_name("webpush")
+n.registration_ids = [subscription]
+n.data = { message: "hi mom!" }
+n.save!
+```
+
+In order to send the same message to multiple devices, create one
+`Notification` per device, as passing multiple subscriptions at once as
+`registration_ids` is not supported.
+
 
 ### Running Rpush
 
