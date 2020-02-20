@@ -46,6 +46,8 @@ path = File.join(File.dirname(__FILE__), 'support')
 TEST_CERT = File.read(File.join(path, 'cert_without_password.pem'))
 TEST_CERT_WITH_PASSWORD = File.read(File.join(path, 'cert_with_password.pem'))
 
+VAPID_KEYPAIR = Webpush.generate_key.to_hash.merge(subject: 'rpush-test@example.org').to_json
+
 def after_example_cleanup
   Rpush.logger = nil
   Rpush::Daemon.store = nil

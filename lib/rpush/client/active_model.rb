@@ -32,3 +32,6 @@ require 'rpush/client/active_model/wns/notification'
 require 'rpush/client/active_model/pushy/app'
 require 'rpush/client/active_model/pushy/notification'
 require 'rpush/client/active_model/pushy/time_to_live_validator'
+
+require 'rpush/client/active_model/webpush/app'
+require 'rpush/client/active_model/webpush/notification'

@@ -68,6 +68,9 @@ require 'rpush/daemon/adm'
 require 'rpush/daemon/pushy'
 require 'rpush/daemon/pushy/delivery'
 
+require 'rpush/daemon/webpush/delivery'
+require 'rpush/daemon/webpush'
+
 module Rpush
   module Daemon
     class << self
