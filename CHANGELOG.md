@@ -1,8 +1,8 @@
 # Changelog
 
-## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
+## [v5.0.0](https://github.com/rpush/rpush/tree/v5.0.0) (2020-02-21)
 
-[Full Changelog](https://github.com/rpush/rpush/compare/v4.2.0...HEAD)
+[Full Changelog](https://github.com/rpush/rpush/compare/v4.2.0...v5.0.0)
 
 **Merged pull requests:**
 
