@@ -9,7 +9,7 @@ AllCops:
     - vendor/bundle/**/*
   TargetRubyVersion: 2.3
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 
 Style/StringLiterals:
@@ -26,6 +26,15 @@ Metrics/ClassLength:
 
 Metrics/CyclomaticComplexity:
   Enabled: false
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
 
 Style/SignalException:
   Enabled: false
