@@ -10,10 +10,6 @@
 - Fix GCM priority when using Redis [\#549](https://github.com/rpush/rpush/pull/549) ([daniel-nelson](https://github.com/daniel-nelson))
 - Drop support for Rails 4.2 [\#547](https://github.com/rpush/rpush/pull/547) ([aried3r](https://github.com/aried3r))
 
-## Unreleased
-
-Nothing so far.
-
 ## 4.2.0 (2019-12-13)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v4.1.1...v4.2.0)
