@@ -52,8 +52,69 @@ $ bundle exec rpush init
 
 #### Apple Push Notification Service
 
+There is a choice of two modes (and one legacy mode) using certificates or using tokens:
 
-If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
+* `Rpush::Apns2` This requires an annually renewable certificate. see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns
+* `Rpush::Apnsp8` This uses encrypted tokens and requires an encryption key id and encryption key (provide as a p8 file). (see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_token-based_connection_to_apns)
+* `Rpush::Apns` There is also the original APNS (the original version using certificates with a binary underlying protocol over TCP directly rather than over Http/2).
+  Apple have [announced](https://developer.apple.com/news/?id=11042019a) that this is not supported after November 2020.
+
+If this is your first time using the APNs, you will need to generate either SSL certificates (for Apns2 or Apns) or an Encryption Key (p8) and an Encryption Key ID (for Apnsp8). See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
+
+##### Apnsp8
+
+To use the p8 APNs Api:
+
+```ruby
+app = Rpush::Apnsp8::App.new
+app.name = "ios_app"
+app.apn_key = File.read("/path/to/sandbox.p8")
+app.environment = "development" # APNs environment.
+app.apn_key_id = "APN KEY ID" # This is the Encryption Key ID provided by apple
+app.team_id = "TEAM ID" # the team id - e.g. ABCDE12345
+app.bundle_id = "BUNDLE ID" # the unique bundle id of the app, like com.example.appname
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Apns::Notification.new
+n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
+n.device_token = "..." # hex string
+n.alert = "hi mom!"
+n.data = { foo: :bar }
+n.save!
+```
+
+##### Apns2
+
+(NB this uses the same protocol as Apnsp8, but authenticates with a certificate rather than tokens)
+
+```ruby
+app = Rpush::Apns2::App.new
+app.name = "ios_app"
+app.certificate = File.read("/path/to/sandbox.pem")
+app.environment = "development"
+app.password = "certificate password"
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Apns2::Notification.new
+n.app = Rpush::Apns2::App.find_by_name("ios_app")
+n.device_token = "..." # hex string
+n.alert = "hi mom!"
+n.data = {
+  headers: { 'apns-topic': "BUNDLE ID", # the bundle id of the app, like com.example.appname
+  foo: :bar }
+  }
+n.save!
+```
+
+You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
+
+##### Apns (legacy protocol)
 
 ```ruby
 app = Rpush::Apns::App.new
@@ -74,34 +135,14 @@ n.data = { foo: :bar }
 n.save!
 ```
 
-The `url_args` attribute is available for Safari Push Notifications.
+##### Safari Push Notifications
 
-You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
+Using one of the notifications methods above, the `url_args` attribute is available for Safari Push Notifications.
 
-To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
+##### Environment
 
-To use the p8 APNs Api replace `Rpush::Apns::App` with `Rpush::Apnsp8::App`.
+The app `environment` for any Apns* option is "development" for XCode installs, and "production" for app store and TestFlight. Note that for Apns2 you can now use one (production + sandbox) certificate (you don't need a separate "sandbox" or development certificate), but if you do generate a development/sandbox certificate it can only be used for "development". With Apnsp8 tokens, you can target either "development" or "production" environments.
 
-```ruby
-app = Rpush::Apnsp8::App.new
-app.name = "ios_app"
-app.apn_key = File.read("/path/to/sandbox.p8")
-app.environment = "development" # APNs environment.
-app.apn_key_id = "APN KEY ID"
-app.team_id = "TEAM ID"
-app.bundle_id = "BUNDLE ID"
-app.connections = 1
-app.save!
-```
-
-```ruby
-n = Rpush::Apns::Notification.new
-n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
-n.device_token = "..." # hex string
-n.alert = "hi mom!"
-n.data = { foo: :bar }
-n.save!
-```
 #### Firebase Cloud Messaging
 
 FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
