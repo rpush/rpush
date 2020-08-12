@@ -29,6 +29,8 @@ Rpush.configure do |config|
   # config.apns.feedback_receiver.enabled = true
   # config.apns.feedback_receiver.frequency = 60
 
+  # Define proxy
+  # config.proxy = URI('http://localhost:3128')
 end
 
 Rpush.reflect do |on|
