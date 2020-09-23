@@ -7,6 +7,7 @@ module Rpush
           APNS_PRIORITY_IMMEDIATE = 10
           APNS_PRIORITY_CONSERVE_POWER = 5
           APNS_PRIORITIES = [APNS_PRIORITY_IMMEDIATE, APNS_PRIORITY_CONSERVE_POWER]
+          MAX_PAYLOAD_BYTESIZE = 2048
 
           def self.included(base)
             base.instance_eval do
@@ -15,12 +16,16 @@ module Rpush
               validates :priority, inclusion: { in: APNS_PRIORITIES }, allow_nil: true
 
               validates_with Rpush::Client::ActiveModel::Apns::DeviceTokenFormatValidator
-              validates_with Rpush::Client::ActiveModel::Apns::BinaryNotificationValidator
+              validates_with Rpush::Client::ActiveModel::Apns::NotificationPayloadSizeValidator
 
               base.const_set('APNS_DEFAULT_EXPIRY', APNS_DEFAULT_EXPIRY) unless base.const_defined?('APNS_DEFAULT_EXPIRY')
               base.const_set('APNS_PRIORITY_IMMEDIATE', APNS_PRIORITY_IMMEDIATE) unless base.const_defined?('APNS_PRIORITY_IMMEDIATE')
               base.const_set('APNS_PRIORITY_CONSERVE_POWER', APNS_PRIORITY_CONSERVE_POWER) unless base.const_defined?('APNS_PRIORITY_CONSERVE_POWER')
             end
+          end
+
+          def max_payload_bytesize
+            MAX_PAYLOAD_BYTESIZE
           end
 
           def device_token=(token)

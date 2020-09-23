@@ -3,15 +3,15 @@
 require "unit_spec_helper"
 require 'unit/notification_shared.rb'
 
-describe Rpush::Client::ActiveRecord::Apns::Notification do
+describe Rpush::Client::Redis::Apns::Notification do
   it_should_behave_like 'an Notification subclass'
 
-  let(:app) { Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
-  let(:notification_class) { Rpush::Client::ActiveRecord::Apns::Notification }
+  let(:app) { Rpush::Client::Redis::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification_class) { Rpush::Client::Redis::Apns::Notification }
   let(:notification) { notification_class.new }
 
   it "should validate the format of the device_token" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(device_token: "{$%^&*()}")
+    notification = Rpush::Client::Redis::Apns::Notification.new(device_token: "{$%^&*()}")
     expect(notification.valid?).to be_falsey
     expect(notification.errors[:device_token].include?("is invalid")).to be_truthy
   end
@@ -45,78 +45,78 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
   it "should default the expiry to 1 day" do
     expect(notification.expiry).to eq 1.day.to_i
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, "when assigning the device token" do
+describe Rpush::Client::Redis::Apns::Notification, "when assigning the device token" do
   it "should strip spaces from the given string" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(device_token: "o m g")
+    notification = Rpush::Client::Redis::Apns::Notification.new(device_token: "o m g")
     expect(notification.device_token).to eq "omg"
   end
 
   it "should strip chevrons from the given string" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(device_token: "<omg>")
+    notification = Rpush::Client::Redis::Apns::Notification.new(device_token: "<omg>")
     expect(notification.device_token).to eq "omg"
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, "as_json" do
+describe Rpush::Client::Redis::Apns::Notification, "as_json" do
   it "should include the alert if present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: "hi mom")
+    notification = Rpush::Client::Redis::Apns::Notification.new(alert: "hi mom")
     expect(notification.as_json["aps"]["alert"]).to eq "hi mom"
   end
 
   it "should not include the alert key if the alert is not present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: nil)
+    notification = Rpush::Client::Redis::Apns::Notification.new(alert: nil)
     expect(notification.as_json["aps"].key?("alert")).to be_falsey
   end
 
   it "should encode the alert as JSON if it is a Hash" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { 'body' => "hi mom", 'alert-loc-key' => "View" })
+    notification = Rpush::Client::Redis::Apns::Notification.new(alert: { 'body' => "hi mom", 'alert-loc-key' => "View" })
     expect(notification.as_json["aps"]["alert"]).to eq('body' => "hi mom", 'alert-loc-key' => "View")
   end
 
   it "should include the badge if present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(badge: 6)
+    notification = Rpush::Client::Redis::Apns::Notification.new(badge: 6)
     expect(notification.as_json["aps"]["badge"]).to eq 6
   end
 
   it "should not include the badge key if the badge is not present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(badge: nil)
+    notification = Rpush::Client::Redis::Apns::Notification.new(badge: nil)
     expect(notification.as_json["aps"].key?("badge")).to be_falsey
   end
 
   it "should include the sound if present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: "my_sound.aiff")
+    notification = Rpush::Client::Redis::Apns::Notification.new(sound: "my_sound.aiff")
     expect(notification.as_json["aps"]["sound"]).to eq "my_sound.aiff"
   end
 
   it "should not include the sound key if the sound is not present" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: nil)
+    notification = Rpush::Client::Redis::Apns::Notification.new(sound: nil)
     expect(notification.as_json["aps"].key?("sound")).to be_falsey
   end
 
   it "should encode the sound as JSON if it is a Hash" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new(sound: { 'name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5 })
+    notification = Rpush::Client::Redis::Apns::Notification.new(sound: { 'name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5 })
     expect(notification.as_json["aps"]["sound"]).to eq('name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5)
   end
 
   it "should include attributes for the device" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new
+    notification = Rpush::Client::Redis::Apns::Notification.new
     notification.data = { omg: :lol, wtf: :dunno }
     expect(notification.as_json["omg"]).to eq "lol"
     expect(notification.as_json["wtf"]).to eq "dunno"
   end
 
   it "should allow attributes to include a hash" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new
+    notification = Rpush::Client::Redis::Apns::Notification.new
     notification.data = { omg: { ilike: :hashes } }
     expect(notification.as_json["omg"]["ilike"]).to eq "hashes"
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
+describe Rpush::Client::Redis::Apns::Notification, 'MDM' do
   let(:magic) { 'abc123' }
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   before do
     notification.device_token = "a" * 108
@@ -138,10 +138,10 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
     notification.mdm = magic
     expect(notification.to_binary).to be_present
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'mutable-content' do
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+describe Rpush::Client::Redis::Apns::Notification, 'mutable-content' do
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   it 'includes mutable-content in the payload' do
     notification.mutable_content = true
@@ -170,10 +170,10 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'mutable-content' do
     expect(notification.as_json['aps']['mutable-content']).to eq 1
     expect(notification.as_json['hi']).to eq 'mom'
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+describe Rpush::Client::Redis::Apns::Notification, 'content-available' do
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   it 'includes content-available in the payload' do
     notification.content_available = true
@@ -202,10 +202,10 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'content-available' do
     expect(notification.as_json['aps']['content-available']).to eq 1
     expect(notification.as_json['hi']).to eq 'mom'
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'url-args' do
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+describe Rpush::Client::Redis::Apns::Notification, 'url-args' do
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   it 'includes url-args in the payload' do
     notification.url_args = ['url-arg-1']
@@ -215,10 +215,10 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'url-args' do
   it 'does not include url-args in the payload if not set' do
     expect(notification.as_json['aps'].key?('url-args')).to be_falsey
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'category' do
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+describe Rpush::Client::Redis::Apns::Notification, 'category' do
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   it 'includes category in the payload' do
     notification.category = 'INVITE_CATEGORY'
@@ -228,10 +228,10 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'category' do
   it 'does not include category in the payload if not set' do
     expect(notification.as_json['aps'].key?('category')).to be_falsey
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+describe Rpush::Client::Redis::Apns::Notification, 'to_binary' do
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   before do
     notification.device_token = "a" * 108
@@ -245,7 +245,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.content_available = true
     bytes = notification.to_binary.bytes.to_a[-4..-1]
     expect(bytes.first).to eq 5 # priority item ID
-    expect(bytes.last).to eq Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
+    expect(bytes.last).to eq Rpush::Client::Redis::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
   end
 
   it 'uses APNS_PRIORITY_IMMEDIATE if content-available is not the only key' do
@@ -255,7 +255,7 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.content_available = true
     bytes = notification.to_binary.bytes.to_a[-4..-1]
     expect(bytes.first).to eq 5 # priority item ID
-    expect(bytes.last).to eq Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
+    expect(bytes.last).to eq Rpush::Client::Redis::Apns::Notification::APNS_PRIORITY_IMMEDIATE
   end
 
   it "should correctly convert the notification to binary" do
@@ -264,63 +264,63 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'to_binary' do
     notification.alert = "Don't panic Mr Mainwaring, don't panic!"
     notification.data = { hi: :mom }
     notification.expiry = 86_400 # 1 day
-    notification.priority = Rpush::Client::ActiveRecord::Apns::Notification::APNS_PRIORITY_IMMEDIATE
-    notification.app = Rpush::Client::ActiveRecord::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
+    notification.priority = Rpush::Client::Redis::Apns::Notification::APNS_PRIORITY_IMMEDIATE
+    notification.app = Rpush::Client::Redis::Apns::App.new(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     now = Time.now
     allow(Time).to receive_messages(now: now)
     expect(notification.to_binary).to eq "\x02\x00\x00\x00\xAF\x01\x00 \xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\xAA\x02\x00a{\"aps\":{\"alert\":\"Don't panic Mr Mainwaring, don't panic!\",\"badge\":3,\"sound\":\"1.aiff\"},\"hi\":\"mom\"}\x03\x00\x04\x00\x00\x04\xD2\x04\x00\x04#{[now.to_i + 86_400].pack('N')}\x05\x00\x01\n"
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #31" do
+describe Rpush::Client::Redis::Apns::Notification, "bug #31" do
   it 'does not confuse a JSON looking string as JSON' do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new
+    notification = Rpush::Client::Redis::Apns::Notification.new
     notification.alert = "{\"one\":2}"
     expect(notification.alert).to eq "{\"one\":2}"
   end
 
   it 'does confuse a JSON looking string as JSON if the alert_is_json attribute is not present' do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new
+    notification = Rpush::Client::Redis::Apns::Notification.new
     allow(notification).to receive_messages(has_attribute?: false)
     notification.alert = "{\"one\":2}"
     expect(notification.alert).to eq('one' => 2)
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, "bug #35" do
+describe Rpush::Client::Redis::Apns::Notification, "bug #35" do
   it "should limit payload size to 256 bytes but not the entire packet" do
-    notification = Rpush::Client::ActiveRecord::Apns::Notification.new do |n|
+    notification = Rpush::Client::Redis::Apns::Notification.new do |n|
       n.device_token = "a" * 108
       n.alert = "a" * 210
-      n.app = Rpush::Client::ActiveRecord::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT)
+      n.app = Rpush::Client::Redis::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT)
     end
 
     expect(notification.to_binary(for_validation: true).bytesize).to be > 256
     expect(notification.payload.bytesize).to be < 256
     expect(notification).to be_valid
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, "multi_json usage" do
-  describe Rpush::Client::ActiveRecord::Apns::Notification, "alert" do
+describe Rpush::Client::Redis::Apns::Notification, "multi_json usage" do
+  describe Rpush::Client::Redis::Apns::Notification, "alert" do
     it "should call MultiJson.load when multi_json version is 1.3.0" do
-      notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { a: 1 }, alert_is_json: true)
+      notification = Rpush::Client::Redis::Apns::Notification.new(alert: { a: 1 }, alert_is_json: true)
       allow(Gem).to receive(:loaded_specs).and_return('multi_json' => Gem::Specification.new('multi_json', '1.3.0'))
       expect(MultiJson).to receive(:load).with(any_args)
       notification.alert
     end
 
     it "should call MultiJson.decode when multi_json version is 1.2.9" do
-      notification = Rpush::Client::ActiveRecord::Apns::Notification.new(alert: { a: 1 }, alert_is_json: true)
+      notification = Rpush::Client::Redis::Apns::Notification.new(alert: { a: 1 }, alert_is_json: true)
       allow(Gem).to receive(:loaded_specs).and_return('multi_json' => Gem::Specification.new('multi_json', '1.2.9'))
       expect(MultiJson).to receive(:decode).with(any_args)
       notification.alert
     end
   end
-end if active_record?
+end if redis?
 
-describe Rpush::Client::ActiveRecord::Apns::Notification, 'thread-id' do
-  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+describe Rpush::Client::Redis::Apns::Notification, 'thread-id' do
+  let(:notification) { Rpush::Client::Redis::Apns::Notification.new }
 
   it 'includes thread-id in the payload' do
     notification.thread_id = 'THREAD-ID'
@@ -330,4 +330,4 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'thread-id' do
   it 'does not include thread-id in the payload if not set' do
     expect(notification.as_json['aps']).to_not have_key('thread-id')
   end
-end if active_record?
+end if redis?
