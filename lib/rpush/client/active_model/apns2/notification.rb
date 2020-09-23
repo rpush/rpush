@@ -7,8 +7,14 @@ module Rpush
         module Notification
           MAX_PAYLOAD_BYTESIZE = 4096
 
-          def max_payload_bytesize
-            MAX_PAYLOAD_BYTESIZE
+          module ClassMethods
+            def max_payload_bytesize
+              MAX_PAYLOAD_BYTESIZE
+            end
+          end
+
+          def self.included(base)
+            base.extend ClassMethods
           end
         end
       end

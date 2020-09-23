@@ -9,7 +9,14 @@ module Rpush
           APNS_PRIORITIES = [APNS_PRIORITY_IMMEDIATE, APNS_PRIORITY_CONSERVE_POWER]
           MAX_PAYLOAD_BYTESIZE = 2048
 
+          module ClassMethods
+            def max_payload_bytesize
+              MAX_PAYLOAD_BYTESIZE
+            end
+          end
+
           def self.included(base)
+            base.extend ClassMethods
             base.instance_eval do
               validates :device_token, presence: true
               validates :badge, numericality: true, allow_nil: true
@@ -22,10 +29,6 @@ module Rpush
               base.const_set('APNS_PRIORITY_IMMEDIATE', APNS_PRIORITY_IMMEDIATE) unless base.const_defined?('APNS_PRIORITY_IMMEDIATE')
               base.const_set('APNS_PRIORITY_CONSERVE_POWER', APNS_PRIORITY_CONSERVE_POWER) unless base.const_defined?('APNS_PRIORITY_CONSERVE_POWER')
             end
-          end
-
-          def max_payload_bytesize
-            MAX_PAYLOAD_BYTESIZE
           end
 
           def device_token=(token)
