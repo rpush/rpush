@@ -4,7 +4,13 @@ module Rpush
       module Apns2
         include Rpush::Client::ActiveModel::Apns
 
-        MAX_PAYLOAD_BYTESIZE = 4096
+        module Notification
+          MAX_PAYLOAD_BYTESIZE = 4096
+
+          def max_payload_bytesize
+            MAX_PAYLOAD_BYTESIZE
+          end
+        end
       end
     end
   end
