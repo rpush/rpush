@@ -93,8 +93,8 @@ describe Rpush::Client::Redis::Apns::Notification, "as_json" do
   it "should include attributes for the device" do
     notification = Rpush::Client::Redis::Apns::Notification.new
     notification.data = { omg: :lol, wtf: :dunno }
-    expect(notification.as_json["omg"]).to eq "lol"
-    expect(notification.as_json["wtf"]).to eq "dunno"
+    expect(notification.as_json["omg"].to_s).to eq "lol"
+    expect(notification.as_json["wtf"].to_s).to eq "dunno"
   end
 
   it "should allow attributes to include a hash" do
@@ -152,7 +152,7 @@ describe Rpush::Client::Redis::Apns::Notification, 'mutable-content' do
     notification.data = { hi: :mom }
     notification.mutable_content = true
     expect(notification.as_json['aps']['mutable-content']).to eq 1
-    expect(notification.as_json['hi']).to eq 'mom'
+    expect(notification.as_json['hi'].to_s).to eq 'mom'
   end
 
   it 'does not overwrite the mutable-content flag when setting attributes for the device' do
@@ -185,7 +185,7 @@ describe Rpush::Client::Redis::Apns::Notification, 'content-available' do
     notification.data = { hi: :mom }
     notification.content_available = true
     expect(notification.as_json['aps']['content-available']).to eq 1
-    expect(notification.as_json['hi']).to eq 'mom'
+    expect(notification.as_json['hi'].to_s).to eq 'mom'
   end
 
   it 'does not overwrite the content-available flag when setting attributes for the device' do
