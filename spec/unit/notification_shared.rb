@@ -1,4 +1,6 @@
 shared_examples_for 'an Notification subclass' do
+  before { skip "Doesn't apply to Redis right now" } if redis?
+
   describe 'when assigning data for the device' do
     before { allow(Rpush::Deprecation).to receive(:warn) }
 

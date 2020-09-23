@@ -20,7 +20,7 @@ module Rpush
 
         attribute :badge, :integer
         attribute :device_token, :string
-        attribute :sound, [:string, :hash], strict: false, default: 'default'
+        attribute :sound, [:string, :hash], strict: false
         attribute :alert, [:string, :hash], strict: false
         attribute :data, :hash
         attribute :expiry, :integer, default: 1.day.to_i
