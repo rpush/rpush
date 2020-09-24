@@ -7,8 +7,6 @@ cache: bundler
 compiler: clang
 
 rvm:
-  - 2.3
-  - 2.4
   - 2.5
   - 2.6
   - 2.7
@@ -46,11 +44,6 @@ env:
 
 matrix:
   fast_finish: true
-  exclude:
-    - gemfile: gemfiles/rails_6.0.gemfile
-      rvm: 2.3
-    - gemfile: gemfiles/rails_6.0.gemfile
-      rvm: 2.4
 
 jobs:
   include:
