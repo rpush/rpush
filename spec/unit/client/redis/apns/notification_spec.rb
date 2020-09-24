@@ -1,0 +1,35 @@
+# encoding: US-ASCII
+
+require "unit_spec_helper"
+
+describe Rpush::Client::Redis::Apns::Notification do
+  it_behaves_like 'Rpush::Client::Apns::Notification'
+
+  it "should default the sound to 'default'" do
+    notification = described_class.new
+    expect(notification.sound).to eq('default')
+  end
+
+  # skipping these tests because data= for redis doesn't merge existing data
+  xit 'does not overwrite the mutable-content flag when setting attributes for the device' do
+    notification.mutable_content = true
+    notification.data = { 'hi' => 'mom' }
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
+  end
+
+  xit 'does not overwrite the content-available flag when setting attributes for the device' do
+    notification.content_available = true
+    notification.data = { 'hi' => 'mom' }
+    expect(notification.as_json['aps']['content-available']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
+  end
+
+  # redis does not use alert_is_json - unclear if that is a bug or desired behavior
+  xit 'does confuse a JSON looking string as JSON if the alert_is_json attribute is not present' do
+    notification = described_class.new
+    allow(notification).to receive_messages(has_attribute?: false)
+    notification.alert = "{\"one\":2}"
+    expect(notification.alert).to eq('one' => 2)
+  end
+end if redis?
