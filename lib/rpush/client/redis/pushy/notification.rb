@@ -9,7 +9,6 @@ module Rpush
 
           def time_to_live=(value)
             self.expiry = value
-            super
           end
         end
       end

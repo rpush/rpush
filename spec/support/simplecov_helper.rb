@@ -18,7 +18,7 @@ module SimpleCovHelper
         end
       end
 
-      formatter SimpleCov::Formatter::MultiFormatter[*formatters]
+      formatter SimpleCov::Formatter::MultiFormatter.new(formatters)
     end
   end
 end
