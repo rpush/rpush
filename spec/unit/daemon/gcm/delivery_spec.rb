@@ -1,6 +1,6 @@
 require 'unit_spec_helper'
 
-describe Rpush::Daemon::Gcm::Delivery do
+describe Rpush::Daemon::Gcm::Delivery do # rubocop:disable Metrics/BlockLength
   let(:app) { Rpush::Gcm::App.create!(name: 'MyApp', auth_key: 'abc123') }
   let(:notification) { Rpush::Gcm::Notification.create!(app: app, registration_ids: ['xyz'], deliver_after: Time.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
@@ -382,6 +382,76 @@ describe Rpush::Daemon::Gcm::Delivery do
       error = Rpush::DeliveryError.new(418, notification.id, "I'm a Teapot")
       expect(delivery).to receive(:mark_failed).with(error)
       perform_with_rescue
+    end
+  end
+
+  context 'when config.notification_batch_reflections is set' do
+    before(:each) { Rpush.config.gcm_batch_reflections = true }
+    after(:each) { Rpush.config.gcm_batch_reflections = false }
+
+    describe '#handle_successes' do
+      let(:successes) do
+        [
+          { registration_id: 'asd', canonical_id: 'ddd' },
+          { registration_id: 'asd2' }
+        ]
+      end
+
+      let(:successes_map) do
+        {
+          'asd' => 'ddd',
+          'asd2' => nil
+        }
+      end
+
+      it 'reflects :gcm_delivered_to_recipients instead of :gcm_delivered_to_recipient and :gcm_canonical_id' do
+        expect(delivery).to receive(:reflect).with(:gcm_delivered_to_recipients, notification, Hash)
+        expect(delivery).not_to receive(:reflect).with(:gcm_delivered_to_recipient, notification, String)
+        expect(delivery).not_to receive(:reflect).with(:gcm_canonical_id, String, String)
+        delivery.send(:handle_successes, successes)
+      end
+
+      it 'reflects :gcm_delivered_to_recipients with { token => canonical_id } hash' do
+        expect(delivery).to receive(:reflect).with(:gcm_delivered_to_recipients, notification, successes_map)
+        delivery.send(:handle_successes, successes)
+      end
+
+      context 'when none device received delivery' do
+        let(:successes) { [] }
+
+        it 'reflects nothing' do
+          expect(delivery).not_to receive(:reflect)
+          delivery.send(:handle_successes, successes)
+        end
+      end
+    end
+
+    describe '#handle_errors' do
+      let(:failures) do
+        f = Rpush::Daemon::Gcm::Failures.new
+        f << { registration_id: 'asd', error: 'NotRegistered', invalid: true }
+        f << { registration_id: 'asd2', error: 'MismatchSenderId', invalid: true }
+        f
+      end
+
+      let(:failures_map) do
+        {
+          'asd' => { registration_id: 'asd', error: 'NotRegistered', invalid: true },
+          'asd2' => { registration_id: 'asd2', error: 'MismatchSenderId', invalid: true }
+        }
+      end
+
+      it 'reflects :gcm_failed_to_recipients instead of :gcm_failed_to_recipient and :gcm_invalid_registration_id' do
+        expect(delivery).to receive(:reflect).with(:gcm_failed_to_recipients, notification, Hash)
+        expect(delivery).not_to receive(:reflect).with(:gcm_failed_to_recipient, notification, String, String)
+        expect(delivery).not_to receive(:reflect).with(:gcm_invalid_registration_id, app, String, String)
+        delivery.send(:handle_errors, failures)
+      end
+
+      it 'reflects :gcm_failed_to_recipients with { token => failure } hash' do
+        expect(delivery).to receive(:reflect).with(:gcm_failed_to_recipients, notification, failures_map)
+        delivery.send(:handle_errors, failures)
+      end
     end
   end
 end

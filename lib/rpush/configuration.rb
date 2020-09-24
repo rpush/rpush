@@ -16,7 +16,8 @@ module Rpush
     end
   end
 
-  CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :log_level, :plugin, :apns]
+  CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground,
+                   :log_level, :plugin, :apns, :gcm_batch_reflections, :notification_batch_reflections]
   DEPRECATED_ATTRS = []
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
@@ -53,6 +54,8 @@ module Rpush
       self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::DEBUG
       self.plugin = OpenStruct.new
       self.foreground = false
+      self.gcm_batch_reflections = false
+      self.notification_batch_reflections = false
 
       self.apns = ApnsConfiguration.new
 

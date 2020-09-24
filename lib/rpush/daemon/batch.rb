@@ -111,16 +111,24 @@ module Rpush
 
       def complete_delivered
         Rpush::Daemon.store.mark_batch_delivered(@delivered)
-        @delivered.each do |notification|
-          reflect(:notification_delivered, notification)
+        if Rpush.config.notification_batch_reflections
+          reflect(:notifications_delivered, @delivered) if @delivered.present?
+        else
+          @delivered.each do |notification|
+            reflect(:notification_delivered, notification)
+          end
         end
       end
 
       def complete_failed
         @failed.each do |(code, description), notifications|
           Rpush::Daemon.store.mark_batch_failed(notifications, code, description)
-          notifications.each do |notification|
-            reflect(:notification_failed, notification)
+          if Rpush.config.notification_batch_reflections
+            reflect(:notifications_failed, notifications)
+          else
+            notifications.each do |notification|
+              reflect(:notification_failed, notification)
+            end
           end
         end
       end
@@ -128,8 +136,12 @@ module Rpush
       def complete_retried
         @retryable.each do |deliver_after, notifications|
           Rpush::Daemon.store.mark_batch_retryable(notifications, deliver_after)
-          notifications.each do |notification|
-            reflect(:notification_will_retry, notification)
+          if Rpush.config.notification_batch_reflections
+            reflect(:notifications_will_retry, notifications)
+          else
+            notifications.each do |notification|
+              reflect(:notification_will_retry, notification)
+            end
           end
         end
       end
