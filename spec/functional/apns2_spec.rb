@@ -228,5 +228,41 @@ describe 'APNs http2 adapter' do
         Rpush.push
       end
     end
+
+    context 'when waiting for requests to complete times out' do
+      before(:each) do
+        expect(fake_client).to receive(:join) { raise(NetHttp2::AsyncRequestTimeout) }
+      end
+
+      it 'closes the client' do
+        create_notification
+        expect(fake_client).to receive(:close)
+        Rpush.push
+      end
+
+      it 'reflects :error' do
+        reflected_error = false
+        Rpush.reflect do |on|
+          on.error do |error|
+            reflected_error = true
+            expect(error).to be_kind_of(StandardError)
+            reflector.accept
+          end
+        end
+
+        notification = create_notification
+        Rpush.push
+
+        expect(reflected_error).to be true
+      end
+
+      it 'fails but retries delivery several times' do
+        notification = create_notification
+        expect do
+          Rpush.push
+          notification.reload
+        end.to change(notification, :retries)
+      end
+    end
   end
 end
