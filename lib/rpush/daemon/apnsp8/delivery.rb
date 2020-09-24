@@ -7,6 +7,7 @@ module Rpush
 
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
+        CLIENT_JOIN_TIMEOUT = 60
 
         def initialize(app, http2_client, token_provider, batch)
           @app = app
@@ -22,7 +23,11 @@ module Rpush
           end
 
           # Send all preprocessed requests at once
-          @client.join
+          @client.join(timeout: CLIENT_JOIN_TIMEOUT)
+        rescue NetHttp2::AsyncRequestTimeout => error
+          mark_batch_retryable(Time.now + 10.seconds, error)
+          @client.close
+          raise
         rescue Errno::ECONNREFUSED, SocketError, HTTP2::Error::StreamLimitExceeded => error
           # TODO restart connection when StreamLimitExceeded
           mark_batch_retryable(Time.now + 10.seconds, error)
@@ -133,7 +138,7 @@ module Rpush
           jwt_token = @token_provider.token
 
           headers = {}
-          
+
           headers['content-type'] = 'application/json'
           headers['apns-expiration'] = '0'
           headers['apns-priority'] = '10'
