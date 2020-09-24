@@ -5,13 +5,17 @@ module Rpush
         def self.create(notification, access_token)
           body = ToastRequestPayload.new(notification).to_xml
           uri  = URI.parse(notification.uri)
-          post = Net::HTTP::Post.new(
-            uri.request_uri,
+          headers = {
             "Content-Length" => body.length.to_s,
             "Content-Type" => "text/xml",
             "X-WNS-Type" => "wns/toast",
             "X-WNS-RequestForStatus" => "true",
             "Authorization" => "Bearer #{access_token}"
+          }
+          headers['X-WNS-PRIORITY'] = notification.priority.to_s if notification.priority
+          post = Net::HTTP::Post.new(
+            uri.request_uri,
+            headers
           )
           post.body = body
           post

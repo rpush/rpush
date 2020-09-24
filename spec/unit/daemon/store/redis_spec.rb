@@ -22,6 +22,16 @@ describe Rpush::Daemon::Store::Redis do
       store.deliverable_notifications(Rpush.config.batch_size)
     end
 
+    it 'loads an undelivered notification without deliver_after set' do
+      notification.update!(delivered: false, deliver_after: nil)
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
+    end
+
+    it 'loads an notification with a deliver_after time in the past' do
+      notification.update!(delivered: false, deliver_after: 1.hour.ago)
+      expect(store.deliverable_notifications(Rpush.config.batch_size)).to eq [notification]
+    end
+
     it 'does not load an notification with a deliver_after time in the future' do
       notification
       notification = store.deliverable_notifications(Rpush.config.batch_size).first

@@ -2,11 +2,13 @@ module Rpush
   module Daemon
     module Dispatcher
       class ApnsHttp2
+        include Loggable
+        include Reflectable
 
         URLS = {
           production: 'https://api.push.apple.com:443',
-          development: 'https://api.development.push.apple.com:443',
-          sandbox: 'https://api.development.push.apple.com:443'
+          development: 'https://api.sandbox.push.apple.com:443',
+          sandbox: 'https://api.sandbox.push.apple.com:443'
         }
 
         DEFAULT_TIMEOUT = 60
