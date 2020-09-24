@@ -80,8 +80,8 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
     test_doubles.each(&:perform)
   end
 
-  it "should test out the new connection by performing a count" do
-    expect(Rpush::Client::ActiveRecord::Notification).to receive(:count).twice
+  it "should test out the new connection by performing an exists" do
+    expect(Rpush::Client::ActiveRecord::Notification).to receive(:exists?).twice
     test_doubles.each(&:perform)
   end
 
@@ -118,13 +118,13 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   context "when the reconnection attempt is not successful" do
     before do
       class << Rpush::Client::ActiveRecord::Notification
-        def count
-          @count_calls += 1
-          return if @count_calls == 2
+        def exists?
+          @exists_calls += 1
+          return if @exists_calls == 2
           fail @error
         end
       end
-      Rpush::Client::ActiveRecord::Notification.instance_variable_set("@count_calls", 0)
+      Rpush::Client::ActiveRecord::Notification.instance_variable_set("@exists_calls", 0)
       Rpush::Client::ActiveRecord::Notification.instance_variable_set("@error", error)
     end
 
@@ -152,7 +152,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
       end
 
       it "should log errors raised when the reconnection is not successful" do
-        expect(Rpush.logger).to receive(:error).with(error)
+        expect(Rpush.logger).to receive(:error).with(timeout)
         test_doubles[1].perform
       end
 
