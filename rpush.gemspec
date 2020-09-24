@@ -33,7 +33,7 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency 'multi_json', '~> 1.0'
   s.add_runtime_dependency 'net-http-persistent'
-  s.add_runtime_dependency 'net-http2', '~> 0.14'
+  s.add_runtime_dependency 'net-http2', '~> 0.18', '>= 0.18.3'
   s.add_runtime_dependency 'jwt', '>= 1.5.6'
   s.add_runtime_dependency 'activesupport', '>= 5.0'
   s.add_runtime_dependency 'thor', ['>= 0.18.1', '< 2.0']
