@@ -1,10 +1,6 @@
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::Apns::App' do
-  before do
-    skip "Validation isn't performed on Redis" if redis?
-  end
-
   it 'does not validate an app with an invalid certificate' do
     app = described_class.new(name: 'test', environment: 'development', certificate: 'foo')
     app.valid?
