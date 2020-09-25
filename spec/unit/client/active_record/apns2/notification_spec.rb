@@ -8,12 +8,15 @@ describe Rpush::Client::ActiveRecord::Apns2::Notification do
 
   it "should validate the length of the binary conversion of the notification" do
     notification = described_class.new
+    notification.app = Rpush::Apns2::App.create(name: 'test', environment: 'development')
     notification.device_token = "a" * 108
+    notification.alert = ""
 
-    notification.alert = "a" * 4095
+    notification.alert << "a" until notification.payload.bytesize == 4096
+    expect(notification.valid?).to be_truthy
     expect(notification.errors[:base]).to be_empty
 
-    notification.alert = "a" * 4096
+    notification.alert << "a"
     expect(notification.valid?).to be_falsey
     expect(notification.errors[:base].include?("APN notification cannot be larger than 4096 bytes. Try condensing your alert and device attributes.")).to be_truthy
   end
