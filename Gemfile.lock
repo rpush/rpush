@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rpush (5.0.0)
+    rpush (5.1.0)
       activesupport (>= 5.0)
       jwt (>= 1.5.6)
       multi_json (~> 1.0)
