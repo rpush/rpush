@@ -27,19 +27,19 @@ module Rpush
       end
 
       def mark_retryable(notification, deliver_after)
+        return if notification.delivered || notification.failed
+
         @mutex.synchronize do
           @retryable[deliver_after] ||= []
           @retryable[deliver_after] << notification
         end
+
         Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
       end
 
       def mark_all_retryable(deliver_after)
-        @mutex.synchronize do
-          @retryable[deliver_after] = @notifications
-        end
         each_notification do |notification|
-          Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
+          mark_retryable(notification, deliver_after)
         end
       end
 

@@ -177,6 +177,13 @@ describe 'APNs http2 adapter' do
     end
 
     context 'when there is SocketError' do
+      let(:fake_http_resp_headers) {
+        {
+          ":status" => "500",
+          "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+        }
+      }
+
       before(:each) do
         expect(fake_client).to receive(:call_async) { raise(SocketError) }
       end
@@ -200,6 +207,24 @@ describe 'APNs http2 adapter' do
 
         notification = create_notification
         Rpush.push
+      end
+
+      context 'when specific notification was delivered before request failed' do
+        let(:fake_http_resp_headers) {
+          {
+            ":status" => "200",
+            "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+          }
+        }
+
+        it 'fails but will not retry this notification' do
+          notification = create_notification
+          expect do
+            Rpush.push
+            notification.reload
+          end.to change(notification, :retries).by(0)
+             .and change(notification, :delivered).to(true)
+        end
       end
     end
 
@@ -230,8 +255,17 @@ describe 'APNs http2 adapter' do
     end
 
     context 'when waiting for requests to complete times out' do
+      let(:on_close) do
+        proc { |&block| @thread = Thread.new { sleep(0.01) } }
+      end
+
       before(:each) do
-        expect(fake_client).to receive(:join) { raise(NetHttp2::AsyncRequestTimeout) }
+        @thread = nil
+
+        expect(fake_http2_request).
+          to receive(:on).with(:close), &on_close
+
+        expect(fake_client).to receive(:join) { @thread.join; raise(NetHttp2::AsyncRequestTimeout) }
       end
 
       it 'closes the client' do
@@ -262,6 +296,21 @@ describe 'APNs http2 adapter' do
           Rpush.push
           notification.reload
         end.to change(notification, :retries)
+      end
+
+      context 'when specific notification was delivered before another async call failed' do
+        let(:on_close) do
+          proc { |&block| @thread = Thread.new { sleep(0.01); block.call } }
+        end
+
+        it 'fails but retries delivery several times' do
+          notification = create_notification
+          expect do
+            Rpush.push
+            notification.reload
+          end.to change(notification, :retries).by(0)
+             .and change(notification, :delivered).to(true)
+        end
       end
     end
   end

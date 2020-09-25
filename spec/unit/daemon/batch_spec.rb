@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Batch do
-  let(:notification1) { double(:notification1, id: 1) }
-  let(:notification2) { double(:notification2, id: 2) }
+  let(:notification1) { double(:notification1, id: 1, delivered: false, failed: false) }
+  let(:notification2) { double(:notification2, id: 2, delivered: false, failed: false) }
   let(:batch) { Rpush::Daemon::Batch.new([notification1, notification2]) }
   let(:store) { double.as_null_object }
   let(:time) { Time.now }
@@ -84,6 +84,20 @@ describe Rpush::Daemon::Batch do
     it 'defers persisting' do
       batch.mark_retryable(notification1, time)
       expect(batch.retryable).to eq(time => [notification1])
+    end
+
+    context 'when notification is already delivered' do
+      let(:notification1) { double(:notification1, id: 1, delivered: true, failed: false) }
+
+      it 'do not mark the notification as retryable' do
+        expect(store).not_to receive(:mark_retryable)
+        batch.mark_retryable(notification1, time)
+      end
+
+      it 'leaves retryable empty' do
+        batch.mark_retryable(notification1, time)
+        expect(batch.retryable).to eq({})
+      end
     end
   end
 
