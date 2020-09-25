@@ -1,6 +1,6 @@
 require "unit_spec_helper"
 
-describe Rpush::Client::ActiveRecord::Apns::Notification do
+describe Rpush::Client::ActiveRecord::Apns2::Notification do
   subject(:notification) { described_class.new }
 
   it_behaves_like 'Rpush::Client::Apns::Notification'
@@ -12,13 +12,13 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
     notification.device_token = "a" * 108
     notification.alert = ""
 
-    notification.alert << "a" until notification.payload.bytesize == 2048
+    notification.alert << "a" until notification.payload.bytesize == 4096
     expect(notification.valid?).to be_truthy
     expect(notification.errors[:base]).to be_empty
 
     notification.alert << "a"
     expect(notification.valid?).to be_falsey
-    expect(notification.errors[:base].include?("APN notification cannot be larger than 2048 bytes. Try condensing your alert and device attributes.")).to be_truthy
+    expect(notification.errors[:base].include?("APN notification cannot be larger than 4096 bytes. Try condensing your alert and device attributes.")).to be_truthy
   end
 
   describe "multi_json usage" do

@@ -12,13 +12,6 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     expect(notification.errors[:device_token].include?("is invalid")).to be_truthy
   end
 
-  it "should validate the length of the binary conversion of the notification" do
-    notification.device_token = "a" * 108
-    notification.alert = "way too long!" * 200
-    expect(notification.valid?).to be_falsey
-    expect(notification.errors[:base].include?("APN notification cannot be larger than 2048 bytes. Try condensing your alert and device attributes.")).to be_truthy
-  end
-
   it "should store long alerts" do
     notification.app = app
     notification.device_token = "a" * 108

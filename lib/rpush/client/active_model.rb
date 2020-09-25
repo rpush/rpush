@@ -4,10 +4,10 @@ require 'rpush/client/active_model/notification'
 require 'rpush/client/active_model/payload_data_size_validator'
 require 'rpush/client/active_model/registration_ids_count_validator'
 
-require 'rpush/client/active_model/apns/binary_notification_validator'
 require 'rpush/client/active_model/apns/device_token_format_validator'
 require 'rpush/client/active_model/apns/app'
 require 'rpush/client/active_model/apns/notification'
+require 'rpush/client/active_model/apns/notification_payload_size_validator'
 
 require 'rpush/client/active_model/apns2/app'
 require 'rpush/client/active_model/apns2/notification'
