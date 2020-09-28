@@ -50,6 +50,54 @@ describe Rpush::Daemon::Batch do
     end
   end
 
+  describe 'mark_all_retryable' do
+    let(:error) { StandardError.new('Exception') }
+
+    it 'marks all notifications as retryable without persisting' do
+      expect(store).to receive(:mark_retryable).ordered.with(notification1, time, persist: false)
+      expect(store).to receive(:mark_retryable).ordered.with(notification2, time, persist: false)
+
+      batch.mark_all_retryable(time, error)
+    end
+
+    it 'defers persisting' do
+      batch.mark_all_retryable(time, error)
+      expect(batch.retryable).to eq(time => [notification1, notification2])
+    end
+
+    context 'when one of the notifications delivered' do
+      let(:notification2) { double(:notification2, id: 2, delivered: true, failed: false) }
+
+      it 'marks all only pending notification as retryable without persisting' do
+        expect(store).to receive(:mark_retryable).ordered.with(notification1, time, persist: false)
+        expect(store).not_to receive(:mark_retryable).ordered.with(notification2, time, persist: false)
+
+        batch.mark_all_retryable(time, error)
+      end
+
+      it 'defers persisting' do
+        batch.mark_all_retryable(time, error)
+        expect(batch.retryable).to eq(time => [notification1])
+      end
+    end
+
+    context 'when one of the notifications failed' do
+      let(:notification2) { double(:notification2, id: 2, delivered: false, failed: true) }
+
+      it 'marks all only pending notification as retryable without persisting' do
+        expect(store).to receive(:mark_retryable).ordered.with(notification1, time, persist: false)
+        expect(store).not_to receive(:mark_retryable).ordered.with(notification2, time, persist: false)
+
+        batch.mark_all_retryable(time, error)
+      end
+
+      it 'defers persisting' do
+        batch.mark_all_retryable(time, error)
+        expect(batch.retryable).to eq(time => [notification1])
+      end
+    end
+  end
+
   describe 'mark_failed' do
     it 'marks the notification as failed without persisting' do
       expect(store).to receive(:mark_failed).with(notification1, 1, 'an error', time, persist: false)
@@ -84,20 +132,6 @@ describe Rpush::Daemon::Batch do
     it 'defers persisting' do
       batch.mark_retryable(notification1, time)
       expect(batch.retryable).to eq(time => [notification1])
-    end
-
-    context 'when notification is already delivered' do
-      let(:notification1) { double(:notification1, id: 1, delivered: true, failed: false) }
-
-      it 'do not mark the notification as retryable' do
-        expect(store).not_to receive(:mark_retryable)
-        batch.mark_retryable(notification1, time)
-      end
-
-      it 'leaves retryable empty' do
-        batch.mark_retryable(notification1, time)
-        expect(batch.retryable).to eq({})
-      end
     end
   end
 
