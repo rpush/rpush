@@ -20,8 +20,7 @@ module Rpush
       end
 
       def mark_batch_retryable(deliver_after, error)
-        log_warn("Will retry #{@batch.notifications.size} notifications after #{deliver_after.strftime('%Y-%m-%d %H:%M:%S')} due to error (#{error.class.name}, #{error.message})")
-        @batch.mark_all_retryable(deliver_after)
+        @batch.mark_all_retryable(deliver_after, error)
       end
 
       def mark_delivered

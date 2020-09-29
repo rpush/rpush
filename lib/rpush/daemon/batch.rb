@@ -2,6 +2,7 @@ module Rpush
   module Daemon
     class Batch
       include Reflectable
+      include Loggable
 
       attr_reader :num_processed, :notifications, :delivered, :failed, :retryable
 
@@ -31,16 +32,21 @@ module Rpush
           @retryable[deliver_after] ||= []
           @retryable[deliver_after] << notification
         end
+
         Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
       end
 
-      def mark_all_retryable(deliver_after)
-        @mutex.synchronize do
-          @retryable[deliver_after] = @notifications
-        end
+      def mark_all_retryable(deliver_after, error)
+        retryable_count = 0
+
         each_notification do |notification|
-          Rpush::Daemon.store.mark_retryable(notification, deliver_after, persist: false)
+          next if notification.delivered || notification.failed
+
+          retryable_count += 1
+          mark_retryable(notification, deliver_after)
         end
+
+        log_warn("Will retry #{retryable_count} of #{@notifications.size} notifications after #{deliver_after.strftime('%Y-%m-%d %H:%M:%S')} due to error (#{error.class.name}, #{error.message})")
       end
 
       def mark_delivered(notification)
@@ -54,6 +60,7 @@ module Rpush
         @mutex.synchronize do
           @delivered = @notifications
         end
+
         each_notification do |notification|
           Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
         end

@@ -41,6 +41,16 @@ describe Rpush::Daemon::Delivery do
     end
   end
 
+  describe 'mark_batch_retryable' do
+    let(:batch) { double(Rpush::Daemon::Batch) }
+    let(:error) { StandardError.new('Exception') }
+
+    it 'marks all notifications as retryable' do
+      expect(batch).to receive(:mark_all_retryable)
+      delivery.mark_batch_retryable(Time.now + 1.hour, error)
+    end
+  end
+
   describe 'mark_batch_failed' do
     it 'marks all notifications as delivered' do
       error = Rpush::DeliveryError.new(1, 42, 'an error')
