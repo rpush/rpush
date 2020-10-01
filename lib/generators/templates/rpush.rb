@@ -46,10 +46,7 @@ Rpush.reflect do |on|
   # Called when a notification is queued internally for delivery.
   # The internal queue for each app runner can be inspected:
   #
-  # Rpush::Daemon::AppRunner.runners.each do |app_id, runner|
-  #   runner.app
-  #   runner.queue_size
-  # end
+  # Rpush::Daemon::AppRunner.status
   #
   # on.notification_enqueued do |notification|
   # end
