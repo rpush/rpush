@@ -79,6 +79,7 @@ module Rpush
     end
 
     def log_foreground(io, formatted_msg, inline)
+      return unless Rpush.config.foreground_logging
       return unless io == STDERR || Rpush.config.foreground
 
       if inline
