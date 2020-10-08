@@ -109,7 +109,7 @@ module Rpush
         Feeder.stop
         AppRunner.stop
         delete_pid_file
-        puts Rainbow('✔').red if Rpush.config.foreground
+        puts Rainbow('✔').red if Rpush.config.foreground && Rpush.config.foreground_logging
       end
     end
 

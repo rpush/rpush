@@ -26,6 +26,10 @@ Rpush.configure do |config|
   # Define a custom logger.
   # config.logger = MyLogger.new
 
+  # By default in foreground mode logs are directed both to the logger and to stdout.
+  # If the logger goes to stdout, you can disable foreground logging to avoid duplication.
+  # config.foreground_logging = false
+
   # config.apns.feedback_receiver.enabled = true
   # config.apns.feedback_receiver.frequency = 60
 
