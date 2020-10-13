@@ -407,6 +407,8 @@ First, we need to setup a test database, `rpush_test`.
 
 E.g. (postgres): `psql -c 'create database rpush_test;' -U postgres >/dev/null`
 
+The tests also require a running redis database.
+
 ```
 bundle install
 bundle exec appraisal install
