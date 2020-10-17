@@ -135,7 +135,6 @@ describe 'APNs http2 adapter' do
       it 'reflects :notification_id_failed' do
         Rpush.reflect do |on|
           on.notification_id_failed do |app, id, code, descr|
-            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
             expect(id).to eq 1
             expect(code).to eq 404
             expect(descr).to be_nil
@@ -166,7 +165,6 @@ describe 'APNs http2 adapter' do
       it 'reflects :notification_id_will_retry' do
         Rpush.reflect do |on|
           on.notification_id_will_retry do |app, id, timer|
-            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
             expect(id).to eq 1
           end
         end
@@ -199,7 +197,6 @@ describe 'APNs http2 adapter' do
       it 'reflects :notification_id_will_retry' do
         Rpush.reflect do |on|
           on.notification_id_will_retry do |app, id, timer|
-            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
             expect(id).to eq 1
             expect(timer).to be_kind_of(Time)
           end
