@@ -249,7 +249,7 @@ n.save!
 
 #### Windows Raw Push Notifications
 
-Note: The data is passed as `.to_json` so only this format is supported, altough raw notifications are meant to support any kind of data.
+Note: The data is passed as `.to_json` so only this format is supported, although raw notifications are meant to support any kind of data.
 Current data structure enforces hashes and `.to_json` representation is natural presentation of it.
 
 ```ruby
