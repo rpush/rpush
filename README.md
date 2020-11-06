@@ -107,7 +107,7 @@ n.app = Rpush::Apns2::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
 n.data = {
-  headers: { 'apns-topic': "BUNDLE ID", # the bundle id of the app, like com.example.appname },
+  headers: { 'apns-topic': "BUNDLE ID" }, # the bundle id of the app, like com.example.appname
   foo: :bar
 }
 n.save!
