@@ -97,6 +97,7 @@ app.name = "ios_app"
 app.certificate = File.read("/path/to/sandbox.pem")
 app.environment = "development"
 app.password = "certificate password"
+app.bundle_id = "BUNDLE ID" # the unique bundle id of the app, like com.example.appname
 app.connections = 1
 app.save!
 ```
@@ -107,7 +108,7 @@ n.app = Rpush::Apns2::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
 n.data = {
-  headers: { 'apns-topic': "BUNDLE ID" }, # the bundle id of the app, like com.example.appname
+  headers: { 'apns-topic': "BUNDLE ID" }, # the bundle id of the app, like com.example.appname. Not necessary if set on the app (see above)
   foo: :bar
 }
 n.save!
