@@ -4,7 +4,7 @@ module Rpush
       module Apns
         class DeviceTokenFormatValidator < ::ActiveModel::Validator
           def validate(record)
-            return if record.device_token =~ /^[a-z0-9]\w+$/i
+            return if record.device_token =~ /\A[a-z0-9]\w+\z/i
             record.errors.add :device_token, "is invalid"
           end
         end
