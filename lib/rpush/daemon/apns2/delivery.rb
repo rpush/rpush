@@ -107,7 +107,13 @@ module Rpush
         end
 
         def prepare_headers(notification)
-          notification_data(notification)[HTTP2_HEADERS_KEY] || {}
+          headers = {}
+
+          headers['apns-expiration'] = '0'
+          headers['apns-priority'] = '10'
+          headers['apns-topic'] = @app.bundle_id
+
+          headers.merge notification_data(notification)[HTTP2_HEADERS_KEY] || {}
         end
 
         def notification_data(notification)

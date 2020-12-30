@@ -42,6 +42,7 @@ describe 'APNs http2 adapter' do
     app.certificate = TEST_CERT
     app.name = 'test'
     app.environment = 'development'
+    app.bundle_id = 'com.example.app'
     app.save!
     app
   end
@@ -75,7 +76,12 @@ describe 'APNs http2 adapter' do
         :post,
         "/3/device/#{fake_device_token}",
         { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\",\"content-available\":1}}",
-          headers: {} }
+          headers: {
+            'apns-expiration' => '0',
+            'apns-priority' => '10',
+            'apns-topic' => 'com.example.app'
+          }
+        }
       )
       .and_return(fake_http2_request)
 
@@ -104,7 +110,11 @@ describe 'APNs http2 adapter' do
           "/3/device/#{fake_device_token}",
           { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\","\
                   "\"content-available\":1},\"some_field\":\"some value\"}",
-            headers: { 'apns-topic' => bundle_id }
+            headers: {
+              'apns-topic' => bundle_id,
+              'apns-expiration' => '0',
+              'apns-priority' => '10'
+            }
           }
         ).and_return(fake_http2_request)
 
