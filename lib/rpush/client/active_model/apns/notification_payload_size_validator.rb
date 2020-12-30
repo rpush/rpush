@@ -6,7 +6,7 @@ module Rpush
           def validate(record)
             limit = record.class.max_payload_bytesize
             return unless record.payload.bytesize > limit
-            record.errors[:base] << "APN notification cannot be larger than #{limit} bytes. Try condensing your alert and device attributes."
+            record.errors.add :base, "APN notification cannot be larger than #{limit} bytes. Try condensing your alert and device attributes."
           end
         end
       end
