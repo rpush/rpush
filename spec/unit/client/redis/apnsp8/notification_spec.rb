@@ -26,4 +26,4 @@ describe Rpush::Client::Redis::Apnsp8::Notification do
     expect(notification.valid?).to be_falsey
     expect(notification.errors[:base].include?("APN notification cannot be larger than 4096 bytes. Try condensing your alert and device attributes.")).to be_truthy
   end
-end
+end if redis?
