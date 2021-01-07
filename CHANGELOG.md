@@ -1,5 +1,21 @@
 # Changelog
 
+## [v5.3.0](https://github.com/rpush/rpush/tree/v5.3.0) (2021-01-07)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.2.0...v5.3.0)
+
+**Implemented enhancements:**
+
+- support for Webpush with VAPID [\#574](https://github.com/rpush/rpush/pull/574) ([jkraemer](https://github.com/jkraemer))
+
+**Merged pull requests:**
+
+- Bug fix: APNS P8 Notifications Are Marked as Invalid When the Payload Exceeds 2kb \(2048 bytes\) [\#583](https://github.com/rpush/rpush/pull/583) ([gregblake](https://github.com/gregblake))
+- Fix more Rails 6.1 deprecation warnings [\#582](https://github.com/rpush/rpush/pull/582) ([jas14](https://github.com/jas14))
+- Feature/apns2 default headers [\#579](https://github.com/rpush/rpush/pull/579) ([jkraemer](https://github.com/jkraemer))
+- Fix APNS2 documentation in README [\#578](https://github.com/rpush/rpush/pull/578) ([jamestjw](https://github.com/jamestjw))
+- Fixed typo with misspell [\#575](https://github.com/rpush/rpush/pull/575) ([hsbt](https://github.com/hsbt))
+
 ## [v5.2.0](https://github.com/rpush/rpush/tree/v5.2.0) (2020-10-08)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v5.1.0...v5.2.0)
