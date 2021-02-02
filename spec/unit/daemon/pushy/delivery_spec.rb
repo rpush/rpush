@@ -61,10 +61,12 @@ describe Rpush::Daemon::Pushy::Delivery do
       it_behaves_like 'process notification'
     end
 
-    shared_examples 'retry delivery' do |response_code:|
-      let(:response_code) { response_code }
+    shared_examples 'retry delivery' do |options|
+      let(:response_code) { options[:response_code] }
 
-      shared_examples 'logs' do |deliver_after:|
+      shared_examples 'logs' do |log_options|
+        let(:deliver_after) { log_options[:deliver_after] }
+
         let(:expected_log_message) do
           "Pushy responded with a #{response_code} error. Notification #{notification.id} " \
           "will be retried after #{deliver_after} (retry 1)."
