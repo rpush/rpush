@@ -164,8 +164,8 @@ class AddRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0
 
       change_column :rapns_notifications, :type, :string, null: false
       change_column :rapns_apps, :type, :string, null: false
-      change_column :rapns_notifications, :device_token, :string, { null: true, limit: 64 }
-      change_column :rapns_notifications, :expiry, :integer, { null: true, default: 1.day.to_i }
+      change_column :rapns_notifications, :device_token, :string, null: true, limit: 64
+      change_column :rapns_notifications, :expiry, :integer, null: true, default: 1.day.to_i
       change_column :rapns_apps, :environment, :string, null: true
       change_column :rapns_apps, :certificate, :text, null: true, default: nil
 
@@ -218,8 +218,8 @@ class AddRpush < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0
       remove_column :rapns_notifications, :type
       remove_column :rapns_apps, :type
 
-      change_column :rapns_notifications, :device_token, :string, { null: false, limit: 64 }
-      change_column :rapns_notifications, :expiry, :integer, { null: false, default: 1.day.to_i }
+      change_column :rapns_notifications, :device_token, :string, null: false, limit: 64
+      change_column :rapns_notifications, :expiry, :integer, null: false, default: 1.day.to_i
       change_column :rapns_apps, :environment, :string, null: false
       change_column :rapns_apps, :certificate, :text, null: false
 
