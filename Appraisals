@@ -42,3 +42,11 @@ appraise "rails-6.0" do
     gem 'rails', '~> 6.0.0'
   end
 end
+
+appraise "rails-6.1" do
+  gem 'activesupport', '~> 6.1.0'
+
+  group :development do
+    gem 'rails', '~> 6.1.0'
+  end
+end
