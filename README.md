@@ -79,7 +79,7 @@ app.save!
 ```
 
 ```ruby
-n = Rpush::Apns::Notification.new
+n = Rpush::Apnsp8::Notification.new
 n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
