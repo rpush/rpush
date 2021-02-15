@@ -1,5 +1,14 @@
 # Changelog
 
+## [v5.4.0](https://github.com/rpush/rpush/tree/v5.4.0) (2021-02-15)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.3.0...v5.4.0)
+
+**Merged pull requests:**
+
+- fix typo in README.md [\#587](https://github.com/rpush/rpush/pull/587) ([yltsrc](https://github.com/yltsrc))
+- Support Ruby 3.0 & Rails 6.1 [\#586](https://github.com/rpush/rpush/pull/586) ([andreaslillebo](https://github.com/andreaslillebo))
+
 ## [v5.3.0](https://github.com/rpush/rpush/tree/v5.3.0) (2021-01-07)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v5.2.0...v5.3.0)
