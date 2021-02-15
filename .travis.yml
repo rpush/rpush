@@ -12,6 +12,7 @@ rvm:
   - 2.5
   - 2.6
   - 2.7
+  - 3.0
 
 # Build only commits on master for the "Build pushed branches" feature. This
 # prevents building twice on PRs originating from our repo ("Build pushed pull
@@ -27,6 +28,7 @@ gemfile:
   - gemfiles/rails_5.1.gemfile
   - gemfiles/rails_5.2.gemfile
   - gemfiles/rails_6.0.gemfile
+  - gemfiles/rails_6.1.gemfile
 
 services:
   - postgresql
@@ -47,9 +49,19 @@ env:
 matrix:
   fast_finish: true
   exclude:
+    - gemfile: gemfiles/rails_5.0.gemfile
+      rvm: 3.0
+    - gemfile: gemfiles/rails_5.1.gemfile
+      rvm: 3.0
+    - gemfile: gemfiles/rails_5.2.gemfile
+      rvm: 3.0
     - gemfile: gemfiles/rails_6.0.gemfile
       rvm: 2.3
     - gemfile: gemfiles/rails_6.0.gemfile
+      rvm: 2.4
+    - gemfile: gemfiles/rails_6.1.gemfile
+      rvm: 2.3
+    - gemfile: gemfiles/rails_6.1.gemfile
       rvm: 2.4
 
 jobs:
