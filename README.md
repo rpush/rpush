@@ -58,7 +58,7 @@ There is a choice of two modes (and one legacy mode) using certificates or using
 * `Rpush::Apns2` This requires an annually renewable certificate. see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns
 * `Rpush::Apnsp8` This uses encrypted tokens and requires an encryption key id and encryption key (provide as a p8 file). (see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_token-based_connection_to_apns)
 * `Rpush::Apns` There is also the original APNS (the original version using certificates with a binary underlying protocol over TCP directly rather than over Http/2).
-  Apple have [announced](https://developer.apple.com/news/?id=11042019a) that this is not supported after November 2020.
+  Apple have [announced](https://developer.apple.com/news/?id=11042019a) that this is not supported after March 31, 2021.
 
 If this is your first time using the APNs, you will need to generate either SSL certificates (for Apns2 or Apns) or an Encryption Key (p8) and an Encryption Key ID (for Apnsp8). See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
