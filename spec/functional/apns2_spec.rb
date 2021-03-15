@@ -79,7 +79,8 @@ describe 'APNs http2 adapter' do
           headers: {
             'apns-expiration' => '0',
             'apns-priority' => '10',
-            'apns-topic' => 'com.example.app'
+            'apns-topic' => 'com.example.app',
+            'apns-push-type' => 'background'
           }
         }
       )
@@ -113,7 +114,8 @@ describe 'APNs http2 adapter' do
             headers: {
               'apns-topic' => bundle_id,
               'apns-expiration' => '0',
-              'apns-priority' => '10'
+              'apns-priority' => '10',
+              'apns-push-type' => 'background'
             }
           }
         ).and_return(fake_http2_request)

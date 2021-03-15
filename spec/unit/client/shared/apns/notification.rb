@@ -165,6 +165,21 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     end
   end
 
+  describe 'content_available?' do
+    context 'if not set' do
+      it 'should be false' do
+        expect(notification.content_available?).to be_falsey
+      end
+    end
+
+    context 'if set' do
+      it 'should be true' do
+        notification.content_available = true
+        expect(notification.content_available?).to be_truthy
+      end
+    end
+  end
+
   describe 'url-args' do
     it 'includes url-args in the payload' do
       notification.url_args = ['url-arg-1']
