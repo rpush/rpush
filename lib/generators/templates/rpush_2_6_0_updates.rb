@@ -1,4 +1,4 @@
-class Rpush260Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class Rpush260Updates < ActiveRecord::Migration[5.0]
   def self.up
     add_column :rpush_notifications, :content_available, :boolean, default: false
   end

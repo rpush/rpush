@@ -1,4 +1,4 @@
-class CreateRapnsApps < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class CreateRapnsApps < ActiveRecord::Migration[5.0]
   def self.up
     create_table :rapns_apps do |t|
       t.string    :key,             null: false
