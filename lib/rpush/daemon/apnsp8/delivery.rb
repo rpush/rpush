@@ -144,6 +144,7 @@ module Rpush
           headers['apns-priority'] = '10'
           headers['apns-topic'] = @app.bundle_id
           headers['authorization'] = "bearer #{jwt_token}"
+          headers['apns-push-type'] = 'background' if notification.content_available?
 
           headers.merge notification_data(notification)[HTTP2_HEADERS_KEY] || {}
         end
