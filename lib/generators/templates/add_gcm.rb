@@ -1,4 +1,4 @@
-class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class AddGcm < ActiveRecord::Migration[5.0]
   module Rapns
     class App < ActiveRecord::Base
       self.table_name = 'rapns_apps'
@@ -50,18 +50,10 @@ class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] 
     change_column :rapns_notifications, :app_id, :integer, null: false
     remove_column :rapns_notifications, :app
 
-    if ActiveRecord.version >= Gem::Version.new('5.1')
-      if index_name_exists?(:rapns_notifications, "index_rapns_notifications_multi")
-        remove_index :rapns_notifications, name: "index_rapns_notifications_multi"
-      elsif index_name_exists?(:rapns_notifications, "index_rapns_notifications_on_delivered_failed_deliver_after")
-        remove_index :rapns_notifications, name: "index_rapns_notifications_on_delivered_failed_deliver_after"
-      end
-    else
-      if index_name_exists?(:rapns_notifications, "index_rapns_notifications_multi", true)
-        remove_index :rapns_notifications, name: "index_rapns_notifications_multi"
-      elsif index_name_exists?(:rapns_notifications, "index_rapns_notifications_on_delivered_failed_deliver_after", false)
-        remove_index :rapns_notifications, name: "index_rapns_notifications_on_delivered_failed_deliver_after"
-      end
+    if index_name_exists?(:rapns_notifications, "index_rapns_notifications_multi")
+      remove_index :rapns_notifications, name: "index_rapns_notifications_multi"
+    elsif index_name_exists?(:rapns_notifications, "index_rapns_notifications_on_delivered_failed_deliver_after")
+      remove_index :rapns_notifications, name: "index_rapns_notifications_on_delivered_failed_deliver_after"
     end
 
     add_index :rapns_notifications, [:app_id, :delivered, :failed, :deliver_after], name: "index_rapns_notifications_multi"
@@ -100,14 +92,8 @@ class AddGcm < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] 
       AddGcm::Rapns::Notification.update_all(['app = ?', app.key], ['app_id = ?', app.id])
     end
 
-    if ActiveRecord.version >= Gem::Version.new('5.1')
-      if index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi)
-        remove_index :rapns_notifications, name: :index_rapns_notifications_multi
-      end
-    else
-      if index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi, true)
-        remove_index :rapns_notifications, name: :index_rapns_notifications_multi
-      end
+    if index_name_exists?(:rapns_notifications, :index_rapns_notifications_multi)
+      remove_index :rapns_notifications, name: :index_rapns_notifications_multi
     end
 
     remove_column :rapns_notifications, :app_id
