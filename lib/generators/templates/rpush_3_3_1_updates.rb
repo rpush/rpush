@@ -1,4 +1,4 @@
-class Rpush331Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class Rpush331Updates < ActiveRecord::Migration[5.0]
   def self.up
     change_column :rpush_notifications, :device_token, :string, null: true
     change_column :rpush_feedback, :device_token, :string, null: true
