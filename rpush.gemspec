@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.3.0'
 
   s.post_install_message = <<~POST_INSTALL_MESSAGE
-    When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+    When upgrading Rpush, don't forget to run `bundle exec rpush init` to get all the latest migrations.
 
     For details on this specific release, refer to the CHANGELOG.md file.
     https://github.com/rpush/rpush/blob/master/CHANGELOG.md
