@@ -7,7 +7,7 @@ describe Rpush::Client::Redis::Apns::Notification do
 
   it "should validate the length of the binary conversion of the notification" do
     notification = described_class.new
-    notification.app = Rpush::Apns2::App.create(name: 'test', environment: 'development')
+    notification.app = Rpush::Apns2::App.create(name: 'test', environment: 'development', certificate: TEST_CERT)
     notification.device_token = "a" * 108
     notification.alert = ""
 
