@@ -8,6 +8,7 @@ module Rpush
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
         CLIENT_JOIN_TIMEOUT = 60
+        DEFAULT_MAX_CONCURRENT_STREAMS = 100
 
         def initialize(app, http2_client, token_provider, batch)
           @app = app
@@ -85,7 +86,7 @@ module Rpush
         def remote_max_concurrent_streams
           # 0x7fffffff is the default value from http-2 gem (2^31)
           if @client.remote_settings[:settings_max_concurrent_streams] == 0x7fffffff
-            0
+            DEFAULT_MAX_CONCURRENT_STREAMS
           else
             @client.remote_settings[:settings_max_concurrent_streams]
           end
