@@ -29,6 +29,10 @@ module Rpush
         rescue Errno::ECONNREFUSED, SocketError => error
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
+        rescue Errno::ECONNRESET => error
+          mark_batch_retryable(Time.now + 10.seconds, error)
+          @client.close
+          raise
         rescue StandardError => error
           mark_batch_failed(error)
           raise

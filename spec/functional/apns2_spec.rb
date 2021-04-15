@@ -228,6 +228,64 @@ describe 'APNs http2 adapter' do
       end
     end
 
+    context 'when there is ECONNRESET error' do
+      let(:fake_http_resp_headers) {
+        {
+          ":status" => "500",
+          "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+        }
+      }
+
+      before(:each) do
+        expect(fake_client).to receive(:call_async) { raise(Errno::ECONNRESET) }
+      end
+
+      it 'closes the client' do
+        create_notification
+        expect(fake_client).to receive(:close)
+        Rpush.push
+      end
+
+      it 'fails but retries delivery several times' do
+        notification = create_notification
+        expect do
+          Rpush.push
+          notification.reload
+        end.to change(notification, :retries)
+      end
+
+      it 'reflects :notification_id_will_retry' do
+        Rpush.reflect do |on|
+          on.notification_id_will_retry do |app, id, timer|
+            expect(app).to be_kind_of(Rpush::Client::Apns2::App)
+            expect(id).to eq 1
+            expect(timer).to be_kind_of(Time)
+          end
+        end
+
+        notification = create_notification
+        Rpush.push
+      end
+
+      context 'when specific notification was delivered before request failed' do
+        let(:fake_http_resp_headers) {
+          {
+            ":status" => "200",
+            "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
+          }
+        }
+
+        it 'fails but will not retry this notification' do
+          notification = create_notification
+          expect do
+            Rpush.push
+            notification.reload
+          end.to change(notification, :retries).by(0)
+             .and change(notification, :delivered).to(true)
+        end
+      end
+    end
+
     context 'when any StandardError occurs' do
       before(:each) do
         expect(fake_client).to receive(:call_async) { raise(StandardError) }
