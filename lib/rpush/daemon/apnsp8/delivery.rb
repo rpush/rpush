@@ -86,6 +86,10 @@ module Rpush
         def remote_max_concurrent_streams
           # 0x7fffffff is the default value from http-2 gem (2^31)
           if @client.remote_settings[:settings_max_concurrent_streams] == 0x7fffffff
+            # Ideally we'd fall back to `#local_settings` here, but `NetHttp2::Client`
+            # doesn't expose that attr from the `HTTP2::Client` it wraps. Instead, we
+            # chose a hard-coded value matching the default local setting from the
+            # `HTTP2::Client` class
             DEFAULT_MAX_CONCURRENT_STREAMS
           else
             @client.remote_settings[:settings_max_concurrent_streams]
