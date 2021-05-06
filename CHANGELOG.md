@@ -1,5 +1,23 @@
 # Changelog
 
+## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-06)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...v6.0.0)
+
+This release contains **breaking changes**, such as removing support for Rails versions older than 5.2.
+Please see the details in the PRs below.
+
+**Merged pull requests:**
+
+- Bump activesupport version to 5.2 or later [\#610](https://github.com/rpush/rpush/pull/610) ([biow0lf](https://github.com/biow0lf))
+- Fixed infinite loop issue with Apnsp8 delivery [\#608](https://github.com/rpush/rpush/pull/608) ([diminish7](https://github.com/diminish7))
+- Eliminate deprecation warning in Ruby 3.0 [\#602](https://github.com/rpush/rpush/pull/602) ([rofreg](https://github.com/rofreg))
+- Bump gemspec post\_install\_message [\#600](https://github.com/rpush/rpush/pull/600) ([fdoxyz](https://github.com/fdoxyz))
+- Remove references and checks for unsupported versions of Rails [\#599](https://github.com/rpush/rpush/pull/599) ([ericsaupe](https://github.com/ericsaupe))
+- Drop support for Rails 5.0 and 5.1 [\#597](https://github.com/rpush/rpush/pull/597) ([ericsaupe](https://github.com/ericsaupe))
+- Fix silent APNS notifications for Apns2 and Apnsp8 [\#596](https://github.com/rpush/rpush/pull/596) ([shved270189](https://github.com/shved270189))
+- Updates README to Apple's new EOL date for the APNs legacy binary protocol [\#595](https://github.com/rpush/rpush/pull/595) ([gregblake](https://github.com/gregblake))
+
 ## [v5.4.0](https://github.com/rpush/rpush/tree/v5.4.0) (2021-02-15)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v5.3.0...v5.4.0)
