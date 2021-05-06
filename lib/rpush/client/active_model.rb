@@ -10,9 +10,6 @@ require 'rpush/client/active_model/apns/app'
 require 'rpush/client/active_model/apns/notification'
 require 'rpush/client/active_model/apns/notification_payload_size_validator'
 
-require 'rpush/client/active_model/apns2/app'
-require 'rpush/client/active_model/apns2/notification'
-
 require 'rpush/client/active_model/apnsp8/app'
 require 'rpush/client/active_model/apnsp8/notification'
 

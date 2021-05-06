@@ -7,7 +7,7 @@ module Rpush
           APNS_PRIORITY_IMMEDIATE = 10
           APNS_PRIORITY_CONSERVE_POWER = 5
           APNS_PRIORITIES = [APNS_PRIORITY_IMMEDIATE, APNS_PRIORITY_CONSERVE_POWER]
-          MAX_PAYLOAD_BYTESIZE = 2048
+          MAX_PAYLOAD_BYTESIZE = 4096
 
           module ClassMethods
             def max_payload_bytesize
