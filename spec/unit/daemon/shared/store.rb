@@ -3,8 +3,8 @@ require 'unit_spec_helper'
 shared_examples 'Rpush::Daemon::Store' do
   subject(:store) { described_class.new }
 
-  let(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
-  let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 64, app: app) }
+  let(:app) { Rpush::Apns2::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification) { Rpush::Apns2::Notification.create!(device_token: "a" * 64, app: app) }
   let(:time) { Time.parse('2019/06/06 02:45').utc }
   let(:logger) { double(Rpush::Logger, error: nil, internal_logger: nil) }
 
@@ -235,7 +235,7 @@ shared_examples 'Rpush::Daemon::Store' do
 
   describe 'create_apns_feedback' do
     it 'creates the Feedback record' do
-      expect(Rpush::Apns::Feedback).to receive(:create!).with(
+      expect(Rpush::Apns2::Feedback).to receive(:create!).with(
         failed_at: time, device_token: 'ab' * 32, app_id: app.id
       )
       store.create_apns_feedback(time, 'ab' * 32, app)

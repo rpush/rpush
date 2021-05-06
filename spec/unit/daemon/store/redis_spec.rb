@@ -3,8 +3,8 @@ require 'unit_spec_helper'
 describe Rpush::Daemon::Store::Redis do
   it_behaves_like 'Rpush::Daemon::Store'
 
-  let(:app) { Rpush::Client::Redis::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
-  let(:notification) { Rpush::Client::Redis::Apns::Notification.create!(device_token: "a" * 64, app: app) }
+  let(:app) { Rpush::Client::Redis::Apns2::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification) { Rpush::Client::Redis::Apns2::Notification.create!(device_token: "a" * 64, app: app) }
   let(:store) { Rpush::Daemon::Store::Redis.new }
   let(:time) { Time.now.utc }
   let(:logger) { double(Rpush::Logger, error: nil, internal_logger: nil) }

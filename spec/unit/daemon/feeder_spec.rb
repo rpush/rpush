@@ -1,8 +1,8 @@
 require "unit_spec_helper"
 
 describe Rpush::Daemon::Feeder do
-  let!(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
-  let(:notification) { Rpush::Apns::Notification.create!(device_token: "a" * 108, app: app) }
+  let!(:app) { Rpush::Apns2::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:notification) { Rpush::Apns2::Notification.create!(device_token: "a" * 108, app: app) }
   let(:logger) { double }
   let(:interruptible_sleeper) { double(sleep: nil, stop: nil) }
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, deliverable_notifications: [notification], release_connection: nil) }

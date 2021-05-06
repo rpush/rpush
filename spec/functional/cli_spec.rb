@@ -2,7 +2,7 @@ require 'functional_spec_helper'
 
 describe Rpush::CLI do
   def create_app
-    app = Rpush::Apns::App.new
+    app = Rpush::Apns2::App.new
     app.certificate = TEST_CERT
     app.name = 'test'
     app.environment = 'sandbox'

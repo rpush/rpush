@@ -55,7 +55,7 @@ $ bundle exec rpush init
 
 There is a choice of two modes (and one legacy mode) using certificates or using tokens:
 
-* `Rpush::Apns` This requires an annually renewable certificate. see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns
+* `Rpush::Apns2` This requires an annually renewable certificate. see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns
 * `Rpush::Apnsp8` This uses encrypted tokens and requires an encryption key id and encryption key (provide as a p8 file). (see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_token-based_connection_to_apns)
   Apple have [announced](https://developer.apple.com/news/?id=c88acm2b) that this is not supported after March 31, 2021.
 
@@ -86,12 +86,12 @@ n.data = { foo: :bar }
 n.save!
 ```
 
-##### Apns
+##### Apns2
 
 (NB this uses the same protocol as Apnsp8, but authenticates with a certificate rather than tokens)
 
 ```ruby
-app = Rpush::Apns::App.new
+app = Rpush::Apns2::App.new
 app.name = "ios_app"
 app.certificate = File.read("/path/to/sandbox.pem")
 app.environment = "development"
@@ -102,8 +102,8 @@ app.save!
 ```
 
 ```ruby
-n = Rpush::Apns::Notification.new
-n.app = Rpush::Apns::App.find_by_name("ios_app")
+n = Rpush::Apns2::Notification.new
+n.app = Rpush::Apns2::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
 n.data = {

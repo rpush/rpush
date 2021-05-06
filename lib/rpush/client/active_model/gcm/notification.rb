@@ -3,8 +3,8 @@ module Rpush
     module ActiveModel
       module Gcm
         module Notification
-          GCM_PRIORITY_HIGH = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_IMMEDIATE
-          GCM_PRIORITY_NORMAL = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
+          GCM_PRIORITY_HIGH = Rpush::Client::ActiveModel::Apns2::Notification::APNS_PRIORITY_IMMEDIATE
+          GCM_PRIORITY_NORMAL = Rpush::Client::ActiveModel::Apns2::Notification::APNS_PRIORITY_CONSERVE_POWER
           GCM_PRIORITIES = [GCM_PRIORITY_HIGH, GCM_PRIORITY_NORMAL]
 
           def self.included(base)

@@ -76,4 +76,4 @@ migrations.each(&:up)
 
 Rpush::Client::ActiveRecord::Notification.reset_column_information
 Rpush::Client::ActiveRecord::App.reset_column_information
-Rpush::Client::ActiveRecord::Apns::Feedback.reset_column_information
+Rpush::Client::ActiveRecord::Apns2::Feedback.reset_column_information

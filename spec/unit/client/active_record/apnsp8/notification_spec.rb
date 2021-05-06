@@ -3,7 +3,7 @@ require "unit_spec_helper"
 describe Rpush::Client::ActiveRecord::Apnsp8::Notification do
   subject(:notification) { described_class.new }
 
-  it_behaves_like 'Rpush::Client::Apns::Notification'
+  it_behaves_like 'Rpush::Client::Apns2::Notification'
   it_behaves_like 'Rpush::Client::ActiveRecord::Notification'
 
   it "should validate the length of the binary conversion of the notification", :aggregate_failures do

@@ -1,9 +1,10 @@
 module Rpush
   module Client
     module ActiveRecord
-      module Apnsp8
-        class Notification < Rpush::Client::ActiveRecord::Apns2::Notification
+      module Apns2
+        class Notification < Rpush::Client::ActiveRecord::Notification
           include Rpush::Client::ActiveModel::Apns2::Notification
+          include ActiveRecordSerializableNotification
         end
       end
     end

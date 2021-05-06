@@ -5,7 +5,7 @@ describe Rpush::Client::Redis::Apnsp8::Notification do
     Rpush::Apnsp8::App.all.select { |a| a.environment == "development" && a.apn_key == "1" }.each(&:destroy)
   end
 
-  it_behaves_like "Rpush::Client::Apns::Notification"
+  it_behaves_like "Rpush::Client::Apns2::Notification"
 
   it "should validate the length of the binary conversion of the notification", :aggregate_failures do
     notification = described_class.new
