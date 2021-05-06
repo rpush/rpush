@@ -12,6 +12,7 @@ Please see the details in the PRs below.
 - Bump activesupport version to 5.2 or later [\#610](https://github.com/rpush/rpush/pull/610) ([biow0lf](https://github.com/biow0lf))
 - Fixed infinite loop issue with Apnsp8 delivery [\#608](https://github.com/rpush/rpush/pull/608) ([diminish7](https://github.com/diminish7))
 - Eliminate deprecation warning in Ruby 3.0 [\#602](https://github.com/rpush/rpush/pull/602) ([rofreg](https://github.com/rofreg))
+- Make ActiveRecord validations work with Apns2 client [\#601](https://github.com/rpush/rpush/pull/601) ([favrik](https://github.com/favrik))
 - Bump gemspec post\_install\_message [\#600](https://github.com/rpush/rpush/pull/600) ([fdoxyz](https://github.com/fdoxyz))
 - Remove references and checks for unsupported versions of Rails [\#599](https://github.com/rpush/rpush/pull/599) ([ericsaupe](https://github.com/ericsaupe))
 - Drop support for Rails 5.0 and 5.1 [\#597](https://github.com/rpush/rpush/pull/597) ([ericsaupe](https://github.com/ericsaupe))
