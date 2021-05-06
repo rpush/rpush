@@ -3,6 +3,7 @@ require 'active_model'
 require 'rpush/client/active_model/notification'
 require 'rpush/client/active_model/payload_data_size_validator'
 require 'rpush/client/active_model/registration_ids_count_validator'
+require 'rpush/client/active_model/certificate_private_key_validator'
 
 require 'rpush/client/active_model/apns/device_token_format_validator'
 require 'rpush/client/active_model/apns/app'
