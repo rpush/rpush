@@ -3,7 +3,7 @@ def client
   (ENV['CLIENT'] || :active_record).to_sym
 end
 
-if !ENV['TRAVIS'] || (ENV['TRAVIS'] && ENV['QUALITY'] == 'true')
+if !ENV['CI'] || (ENV['CI'] && ENV['QUALITY'] == 'true')
   begin
     require './spec/support/simplecov_helper'
     include SimpleCovHelper
