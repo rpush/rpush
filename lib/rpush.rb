@@ -19,7 +19,7 @@ require 'rpush/reflectable'
 require 'rpush/plugin'
 require 'rpush/embed'
 require 'rpush/push'
-require 'rpush/apns_feedback'
+require 'rpush/apns2_feedback'
 
 module Rpush
   def self.jruby?
