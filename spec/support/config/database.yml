@@ -2,10 +2,10 @@
 
 postgresql:
   adapter: postgresql
-  database: rpush_test
-  host: localhost
-  username: postgres
-  password: ""
+  database: <%= ENV.fetch('POSTGRES_DB', 'rpush_test') %>
+  host: <%= ENV.fetch('POSTGRES_HOST', 'localhost') %>
+  username: <%= ENV.fetch('POSTGRES_USER', 'postgres') %>
+  password: <%= ENV.fetch('PGPASSWORD', '') %>
 
 jdbcpostgresql:
   adapter: jdbcpostgresql
