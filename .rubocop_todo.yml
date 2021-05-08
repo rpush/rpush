@@ -208,7 +208,7 @@ Lint/IneffectiveAccessModifier:
 # Offense count: 1
 Lint/NestedMethodDefinition:
   Exclude:
-    - 'spec/unit/daemon/apns/feedback_receiver_spec.rb'
+    - 'spec/unit/daemon/apns2/feedback_receiver_spec.rb'
 
 # Offense count: 5
 # Cop supports --auto-correct.
@@ -246,7 +246,7 @@ Lint/UnusedBlockArgument:
 Lint/UnusedMethodArgument:
   Exclude:
     - 'lib/rpush/client/active_model/adm/notification.rb'
-    - 'lib/rpush/client/active_model/apns/notification.rb'
+    - 'lib/rpush/client/active_model/apns2/notification.rb'
     - 'lib/rpush/client/active_model/gcm/notification.rb'
 
 # Offense count: 2
@@ -378,7 +378,7 @@ Style/Encoding:
   Exclude:
     - 'lib/rpush/cli.rb'
     - 'lib/rpush/daemon.rb'
-    - 'lib/rpush/daemon/apns/feedback_receiver.rb'
+    - 'lib/rpush/daemon/apns2/feedback_receiver.rb'
     - 'lib/rpush/daemon/app_runner.rb'
     - 'rpush.gemspec'
 
@@ -416,7 +416,7 @@ Style/GuardClause:
     - 'lib/rpush/daemon/adm/delivery.rb'
     - 'lib/rpush/daemon/app_runner.rb'
     - 'lib/rpush/daemon/tcp_connection.rb'
-    - 'spec/unit/daemon/apns/feedback_receiver_spec.rb'
+    - 'spec/unit/daemon/apns2/feedback_receiver_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -428,7 +428,7 @@ Style/HashEachMethods:
 # Cop supports --auto-correct.
 Style/IfUnlessModifier:
   Exclude:
-    - 'lib/rpush/client/active_model/apns/notification.rb'
+    - 'lib/rpush/client/active_model/apns2/notification.rb'
     - 'lib/rpush/daemon/delivery.rb'
     - 'lib/rpush/daemon/tcp_connection.rb'
     - 'lib/rpush/embed.rb'
@@ -454,7 +454,7 @@ Style/MultilineIfModifier:
 # Offense count: 1
 Style/MultipleComparison:
   Exclude:
-    - 'lib/rpush/client/active_model/apns/notification.rb'
+    - 'lib/rpush/client/active_model/apns2/notification.rb'
 
 # Offense count: 34
 # Cop supports --auto-correct.
@@ -490,7 +490,7 @@ Style/OrAssignment:
 # Configuration parameters: PreferredDelimiters.
 Style/PercentLiteralDelimiters:
   Exclude:
-    - 'lib/rpush/client/active_model/apns/app.rb'
+    - 'lib/rpush/client/active_model/apns2/app.rb'
     - 'lib/rpush/client/active_model/apnsp8/app.rb'
     - 'lib/rpush/daemon/gcm/delivery.rb'
     - 'lib/rpush/daemon/signal_handler.rb'
@@ -506,8 +506,8 @@ Style/PercentLiteralDelimiters:
 # AllowedMethods: present?, blank?, presence, try, try!
 Style/SafeNavigation:
   Exclude:
-    - 'lib/rpush/client/active_model/apns/notification.rb'
-    - 'lib/rpush/daemon/apns/feedback_receiver.rb'
+    - 'lib/rpush/client/active_model/apns2/notification.rb'
+    - 'lib/rpush/daemon/apns2/feedback_receiver.rb'
     - 'lib/rpush/daemon/app_runner.rb'
     - 'lib/rpush/daemon/dispatcher/apns_tcp.rb'
     - 'lib/rpush/daemon/dispatcher/tcp.rb'
