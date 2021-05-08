@@ -4,7 +4,6 @@ require: rubocop-performance
 
 AllCops:
   Exclude:
-    - gemfiles/vendor/bundle/**/* # This dir only shows up on Travis
     - lib/generators/**/*
     - vendor/bundle/**/*
   TargetRubyVersion: 2.3
