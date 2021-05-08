@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 
 describe Rpush, 'apns_feedback' do
-  let!(:apns_app) { Rpush::Apns::App.create!(apns_app_params) }
+  let!(:apns_app) { Rpush::Apns2::App.create!(apns_app_params) }
   let(:apns_app_params) do
     {
       name: 'test',
@@ -14,7 +14,7 @@ describe Rpush, 'apns_feedback' do
   let(:receiver) { double(check_for_feedback: nil) }
 
   before do
-    allow(Rpush::Daemon::Apns::FeedbackReceiver).to receive(:new) { receiver }
+    allow(Rpush::Daemon::Apns2::FeedbackReceiver).to receive(:new) { receiver }
   end
 
   it 'initializes the daemon' do
@@ -23,7 +23,7 @@ describe Rpush, 'apns_feedback' do
   end
 
   it 'checks feedback for each app' do
-    expect(Rpush::Daemon::Apns::FeedbackReceiver).to receive(:new).with(apns_app).and_return(receiver)
+    expect(Rpush::Daemon::Apns2::FeedbackReceiver).to receive(:new).with(apns_app).and_return(receiver)
     expect(receiver).to receive(:check_for_feedback)
     Rpush.apns_feedback
   end
@@ -32,7 +32,7 @@ describe Rpush, 'apns_feedback' do
     let(:apns_app_params) { super().merge(feedback_enabled: false) }
 
     it 'does not initialize feedback receiver' do
-      expect(Rpush::Daemon::Apns::FeedbackReceiver).not_to receive(:new)
+      expect(Rpush::Daemon::Apns2::FeedbackReceiver).not_to receive(:new)
       Rpush.apns_feedback
     end
   end

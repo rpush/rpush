@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveModel
-      module Apns
+      module Apns2
         class NotificationPayloadSizeValidator < ::ActiveModel::Validator
           def validate(record)
             limit = record.class.max_payload_bytesize

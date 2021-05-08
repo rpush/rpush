@@ -89,7 +89,7 @@ module Rpush
         end
 
         def create_apns_feedback(failed_at, device_token, app)
-          Rpush::Client::Redis::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app_id: app.id)
+          Rpush::Client::Redis::Apns2::Feedback.create!(failed_at: failed_at, device_token: device_token, app_id: app.id)
         end
 
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)

@@ -12,7 +12,7 @@ describe 'New app loading' do
   end
 
   def create_app
-    app = Rpush::Apns::App.new
+    app = Rpush::Apns2::App.new
     app.certificate = TEST_CERT
     app.name = 'test'
     app.environment = 'sandbox'
@@ -21,7 +21,7 @@ describe 'New app loading' do
   end
 
   def create_notification
-    notification = Rpush::Apns::Notification.new
+    notification = Rpush::Apns2::Notification.new
     notification.app = app
     notification.alert = 'test'
     notification.device_token = 'a' * 108

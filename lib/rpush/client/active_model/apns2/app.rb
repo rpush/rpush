@@ -12,7 +12,7 @@ module Rpush
           end
 
           def service_name
-            'apns2'
+            'apns'
           end
         end
       end

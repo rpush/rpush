@@ -1,7 +1,7 @@
 require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record'
 
-describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
+describe Rpush::Daemon::Apns2::FeedbackReceiver, 'check_for_feedback' do
   let(:host) { 'feedback.push.apple.com' }
   let(:port) { 2196 }
   let(:frequency) { 60 }
@@ -19,7 +19,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
   end
   let(:connection) { double(connect: nil, read: nil, close: nil) }
   let(:logger) { double(error: nil, info: nil) }
-  let(:receiver) { Rpush::Daemon::Apns::FeedbackReceiver.new(app) }
+  let(:receiver) { Rpush::Daemon::Apns2::FeedbackReceiver.new(app) }
   let(:feedback) { double }
   let(:sleeper) { double(Rpush::Daemon::InterruptibleSleep, sleep: nil, stop: nil) }
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, create_apns_feedback: feedback, release_connection: nil) }
@@ -44,7 +44,7 @@ describe Rpush::Daemon::Apns::FeedbackReceiver, 'check_for_feedback' do
 
   it 'initializes the sleeper with the feedback polling frequency' do
     expect(Rpush::Daemon::InterruptibleSleep).to receive_messages(new: sleeper)
-    Rpush::Daemon::Apns::FeedbackReceiver.new(app)
+    Rpush::Daemon::Apns2::FeedbackReceiver.new(app)
   end
 
   it 'instantiates a new connection' do

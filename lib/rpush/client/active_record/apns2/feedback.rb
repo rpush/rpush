@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveRecord
-      module Apns
+      module Apns2
         class Feedback < ::ActiveRecord::Base
           self.table_name = 'rpush_feedback'
 
@@ -10,7 +10,7 @@ module Rpush
           validates :device_token, presence: true
           validates :failed_at, presence: true
 
-          validates_with Rpush::Client::ActiveModel::Apns::DeviceTokenFormatValidator
+          validates_with Rpush::Client::ActiveModel::Apns2::DeviceTokenFormatValidator
         end
       end
     end

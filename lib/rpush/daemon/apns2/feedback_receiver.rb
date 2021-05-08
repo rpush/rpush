@@ -2,7 +2,7 @@
 
 module Rpush
   module Daemon
-    module Apns
+    module Apns2
       class FeedbackReceiver
         include Reflectable
         include Loggable
