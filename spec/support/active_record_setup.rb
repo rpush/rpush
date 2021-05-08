@@ -6,14 +6,15 @@ SPEC_ADAPTER = ENV['ADAPTER'] || 'postgresql'
 SPEC_ADAPTER = 'jdbc' + SPEC_ADAPTER if jruby
 
 require 'yaml'
-db_config = YAML.load_file(File.expand_path("config/database.yml", File.dirname(__FILE__)))
+db_config_path = File.expand_path("config/database.yml", File.dirname(__FILE__))
+db_config = YAML.load(ERB.new(File.read(db_config_path)).result)
 
 if db_config[SPEC_ADAPTER].nil?
   puts "No such adapter '#{SPEC_ADAPTER}'. Valid adapters are #{db_config.keys.join(', ')}."
   exit 1
 end
 
-if ENV['TRAVIS']
+if ENV['CI']
   db_config[SPEC_ADAPTER]['username'] = 'postgres'
 else
   require 'etc'
@@ -62,7 +63,7 @@ migrations = [
   Rpush420Updates
 ]
 
-unless ENV['TRAVIS']
+unless ENV['CI']
   migrations.reverse_each do |m|
     begin
       m.down

@@ -39,4 +39,4 @@ describe 'Retries' do
     notification.reload
     expect(notification.delivered).to eq(false)
   end
-end
+end if redis?

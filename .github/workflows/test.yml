@@ -1,0 +1,102 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will download a prebuilt Ruby version, install dependencies and run tests with Rake
+# For more information see: https://github.com/marketplace/actions/setup-ruby-jruby-and-truffleruby
+
+name: RPush Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  POSTGRES_USER: postgres
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: 5432
+  POSTGRES_DB: rpush_test
+  PGPASSWORD: postgres # https://www.postgresql.org/docs/13/libpq-envars.html
+
+jobs:
+  test:
+    runs-on: ubuntu-20.04
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps tcp port 5432 on service container to the host
+          - 5432:5432
+
+      redis:
+        image: redis
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          # Maps port 6379 on service container to the host
+          - 6379:6379
+
+    strategy:
+      matrix:
+        gemfile: ['rails_5.2', 'rails_6.0', 'rails_6.1']
+
+        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0']
+
+        client: ['active_record', 'redis']
+
+        exclude:
+          # Rails 5.2 requires Ruby < 3.0
+          # https://github.com/rails/rails/issues/40938
+          - ruby: '3.0'
+            gemfile: 'rails_5.2'
+          # Rails >= 6 need Ruby >= 2.5
+          - ruby: '2.3'
+            gemfile: 'rails_6.0'
+          - ruby: '2.4'
+            gemfile: 'rails_6.0'
+          - ruby: '2.3'
+            gemfile: 'rails_6.1'
+          - ruby: '2.4'
+            gemfile: 'rails_6.1'
+
+    env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
+      BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: ${{ matrix.ruby }}
+        bundler-cache: true # runs 'bundle install' and caches installed gems automatically
+
+    - name: Create PostgreSQL database
+      run: |
+        createdb \
+          --host=$POSTGRES_HOST \
+          --port=$POSTGRES_PORT \
+          --username=$POSTGRES_USER \
+          $POSTGRES_DB
+
+    - name: Run tests
+      run: bundle exec rake
+      env:
+        # The hostname used to communicate with the PostgreSQL service container
+        POSTGRES_HOST: localhost
+        # The default PostgreSQL port
+        POSTGRES_PORT: 5432
+        CLIENT: ${{ matrix.client }}
