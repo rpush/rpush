@@ -27,6 +27,9 @@ require 'rpush/client/redis/apns2/notification'
 require 'rpush/client/redis/apnsp8/app'
 require 'rpush/client/redis/apnsp8/notification'
 
+require 'rpush/client/redis/fcm/app'
+require 'rpush/client/redis/fcm/notification'
+
 require 'rpush/client/redis/gcm/app'
 require 'rpush/client/redis/gcm/notification'
 
