@@ -1,6 +1,10 @@
 # Changelog
 
-## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-06)
+## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...HEAD)
+
+## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-21)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...v6.0.0)
 
@@ -9,6 +13,8 @@ Please see the details in the PRs below.
 
 **Merged pull requests:**
 
+- Switch to GitHub Actions for CI [\#615](https://github.com/rpush/rpush/pull/615) ([aried3r](https://github.com/aried3r))
+- Prepare 6.0.0 release [\#613](https://github.com/rpush/rpush/pull/613) ([aried3r](https://github.com/aried3r))
 - Bump activesupport version to 5.2 or later [\#610](https://github.com/rpush/rpush/pull/610) ([biow0lf](https://github.com/biow0lf))
 - Fixed infinite loop issue with Apnsp8 delivery [\#608](https://github.com/rpush/rpush/pull/608) ([diminish7](https://github.com/diminish7))
 - Eliminate deprecation warning in Ruby 3.0 [\#602](https://github.com/rpush/rpush/pull/602) ([rofreg](https://github.com/rofreg))
