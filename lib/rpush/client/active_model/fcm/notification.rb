@@ -41,7 +41,7 @@ module Rpush
               'token' => device_token
             }
             json['content_available'] = content_available if content_available
-            json['notification'] = notification if notification
+            json['notification'] = alert if alert
             { 'message' => json }
           end
 
@@ -49,7 +49,7 @@ module Rpush
             json = {
               'notification' => android_notification,
             }
-            json['data'] => data if data
+            json['data'] = data if data
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority if priority
             json['ttl'] = "#{expiry}s" if expiry
@@ -59,7 +59,8 @@ module Rpush
           def android_notification
             json = notification || {}
             json['notification_priority'] = priority_for_notification if priority
-            json['default_sound'] = sound if sound
+            json['sound'] = sound if sound
+            json['default_sound'] = !sound || sound == 'default' ? true : false
             json
           end
 
