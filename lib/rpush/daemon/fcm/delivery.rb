@@ -17,7 +17,7 @@ module Rpush
 
             @uri = URI.parse("#{HOST}/v1/projects/#{ENV['FIREBASE_PROJECT_ID']}/messages:send")
           else
-            Rpush::Logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables!")
+            Rpush.logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables!")
           end
         end
 
