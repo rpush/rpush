@@ -4,7 +4,7 @@ module Rpush
       class Base < ::ActiveRecord::Base
         self.abstract_class = true
 
-        connect_to database: Rpush.config.database
+        connects_to database: Rpush.config.database
       end
     end
   end

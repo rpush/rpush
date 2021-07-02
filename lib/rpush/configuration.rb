@@ -61,7 +61,7 @@ module Rpush
       self.embedded = false
       self.push = false
 
-      self.database = nil
+      self.database = {}
     end
 
     def update(other)
