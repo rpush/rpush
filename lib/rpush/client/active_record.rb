@@ -2,6 +2,7 @@ require 'active_record'
 
 require 'rpush/client/active_model'
 
+require 'rpush/client/active_record/base'
 require 'rpush/client/active_record/notification'
 require 'rpush/client/active_record/app'
 
