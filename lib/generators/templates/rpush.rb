@@ -1,5 +1,7 @@
 Rpush.configure do |config|
 
+  # Set multiple database configuration with active_record
+  # config.database = {}
   # Supported clients are :active_record and :redis
   config.client = :active_record
 
