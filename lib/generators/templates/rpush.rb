@@ -1,5 +1,11 @@
 Rpush.configure do |config|
 
+  # Set multiple database configuration with active_record
+  # such as { writing: :animals, reading: :animals_replica }
+  # See https://guides.rubyonrails.org/active_record_multiple_databases.html for available options
+  # The database config must be set before setting the client
+  # config.database = {}
+
   # Supported clients are :active_record and :redis
   config.client = :active_record
 
