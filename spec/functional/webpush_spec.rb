@@ -8,6 +8,7 @@ describe 'Webpush' do
 
   let(:device_reg) {
     { endpoint: 'https://webpush-provider.example.org/push/some-id',
+      expirationTime: nil,
       keys: {'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A'} }
   }
   let(:notification) { Rpush::Webpush::Notification.create!(app: app, registration_ids: [device_reg], data: { message: 'test' }) }

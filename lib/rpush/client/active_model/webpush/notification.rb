@@ -11,7 +11,7 @@ module Rpush
               return if record.registration_ids.size > 1
               reg = record.registration_ids.first
               unless reg.is_a?(Hash) &&
-                  reg.keys.sort == KEYS &&
+                  (KEYS-reg.keys).empty? &&
                   reg[:endpoint].is_a?(String) &&
                   reg[:keys].is_a?(Hash)
                 record.errors.add(:base, 'Registration must have :endpoint (String) and :keys (Hash) keys')
