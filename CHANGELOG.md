@@ -2,7 +2,16 @@
 
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
-[Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...HEAD)
+## [v6.0.1](https://github.com/rpush/rpush/tree/v6.0.1) (2021-10-08)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v6.0.0...v6.0.1)
+
+**Merged pull requests:**
+
+- Don't limit webpush registration keys [\#624](https://github.com/rpush/rpush/pull/624) ([treyrich](https://github.com/treyrich))
+- Add Prometheus Exporter plugin link to README [\#617](https://github.com/rpush/rpush/pull/617) ([maxsz](https://github.com/maxsz))
+- Reference current interface in config template [\#569](https://github.com/rpush/rpush/pull/569) ([benlangfeld](https://github.com/benlangfeld))
+- Default the Rails environment to RAILS\_ENV if set [\#562](https://github.com/rpush/rpush/pull/562) ([benlangfeld](https://github.com/benlangfeld))
 
 ## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-21)
 
