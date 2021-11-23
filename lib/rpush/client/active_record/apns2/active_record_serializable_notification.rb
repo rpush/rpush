@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveRecord
-      module Apns
+      module Apns2
         module ActiveRecordSerializableNotification
           def alert=(alert)
             if alert.is_a?(Hash)

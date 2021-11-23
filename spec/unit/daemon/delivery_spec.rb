@@ -10,7 +10,7 @@ describe Rpush::Daemon::Delivery do
   let(:now) { Time.parse("2014-10-14 00:00:00") }
   let(:batch) { double(Rpush::Daemon::Batch) }
   let(:delivery) { DeliverySpecDelivery.new(batch) }
-  let(:notification) { Rpush::Apns::Notification.new }
+  let(:notification) { Rpush::Apns2::Notification.new }
 
   before { allow(Time).to receive_messages(now: now) }
 

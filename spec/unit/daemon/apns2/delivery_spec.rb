@@ -1,13 +1,13 @@
 require 'unit_spec_helper'
 
-describe Rpush::Daemon::Apns::Delivery do
+describe Rpush::Daemon::Apns2::Delivery do
   let(:app) { double(name: 'MyApp') }
   let(:notification1) { double.as_null_object }
   let(:notification2) { double.as_null_object }
   let(:batch) { double(mark_all_failed: nil, mark_all_delivered: nil, all_processed: nil) }
   let(:logger) { double(error: nil, info: nil) }
   let(:connection) { double(select: false, write: nil, reconnect: nil, close: nil, connect: nil) }
-  let(:delivery) { Rpush::Daemon::Apns::Delivery.new(app, connection, batch) }
+  let(:delivery) { Rpush::Daemon::Apns2::Delivery.new(app, connection, batch) }
 
   before do
     allow(batch).to receive(:each_notification) do |&blk|

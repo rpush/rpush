@@ -1,6 +1,6 @@
 require 'unit_spec_helper'
 
-shared_examples 'Rpush::Client::Apns::App' do
+shared_examples 'Rpush::Client::Apns2::App' do
   it 'does not validate an app with an invalid certificate' do
     app = described_class.new(name: 'test', environment: 'development', certificate: 'foo')
     app.valid?

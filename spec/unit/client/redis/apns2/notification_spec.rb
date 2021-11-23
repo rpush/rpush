@@ -3,7 +3,7 @@
 require "unit_spec_helper"
 
 describe Rpush::Client::Redis::Apns2::Notification do
-  it_behaves_like 'Rpush::Client::Apns::Notification'
+  it_behaves_like 'Rpush::Client::Apns2::Notification'
 
   it "should validate the length of the binary conversion of the notification" do
     notification = described_class.new

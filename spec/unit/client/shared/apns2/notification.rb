@@ -2,9 +2,9 @@
 
 require "unit_spec_helper"
 
-shared_examples 'Rpush::Client::Apns::Notification' do
+shared_examples 'Rpush::Client::Apns2::Notification' do
   let(:notification) { described_class.new }
-  let(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
+  let(:app) { Rpush::Apns2::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
 
   it "should validate the format of the device_token" do
     notification = described_class.new(device_token: "{$%^&*()}")

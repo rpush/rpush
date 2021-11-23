@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveModel
-      module Apns
+      module Apns2
         class DeviceTokenFormatValidator < ::ActiveModel::Validator
           def validate(record)
             return if record.device_token =~ /\A[a-z0-9]\w+\z/i
