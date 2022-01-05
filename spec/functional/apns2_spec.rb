@@ -254,6 +254,18 @@ describe 'APNs http2 adapter' do
       end
     end
 
+    context 'when SSL error occurs' do
+      before(:each) do
+        expect(fake_client).to receive(:call_async) { raise(OpenSSL::SSL::SSLError) }
+      end
+
+      it 'logs the error' do
+        expect(Rpush.logger).to receive(:error)
+        create_notification
+        Rpush.push
+      end
+    end
+
     context 'when waiting for requests to complete times out' do
       let(:on_close) do
         proc { |&block| @thread = Thread.new { sleep(0.01) } }
