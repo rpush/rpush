@@ -17,6 +17,9 @@ end
 
 appraise "rails-6.0" do
   gem "activesupport", "~> 6.0.0"
+  # https://gist.github.com/yahonda/2776d8d7b6ea7045359f38c10449937b#rails-60z
+  # https://gist.github.com/yahonda/2776d8d7b6ea7045359f38c10449937b#psych-4-support
+  gem "psych", "~> 3.0"
 
   group :development do
     gem "rails", "~> 6.0.0"
