@@ -181,6 +181,17 @@ module Rpush
           id
         end
 
+        def adapter_name
+          env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
+          if ::ActiveRecord::VERSION::MAJOR > 6
+            ::ActiveRecord::Base.configurations.configs_for(env_name: env).first.configuration_hash[:adapter]
+          else
+            config = ::ActiveRecord::Base.configurations[env]
+            return '' unless config
+            Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
+          end
+        end
+
         private
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
@@ -198,13 +209,6 @@ module Rpush
         def ready_for_delivery
           relation = Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now)
           relation.order('deliver_after ASC, created_at ASC')
-        end
-
-        def adapter_name
-          env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
-          config = ::ActiveRecord::Base.configurations[env]
-          return '' unless config
-          Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
         end
       end
     end
