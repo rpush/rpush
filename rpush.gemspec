@@ -22,7 +22,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = '>= 2.3.0'
+  s.required_ruby_version = '>= 2.4.0'
 
   s.post_install_message = <<~POST_INSTALL_MESSAGE
     When upgrading Rpush, don't forget to run `bundle exec rpush init` to get all the latest migrations.
