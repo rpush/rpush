@@ -53,7 +53,7 @@ jobs:
       matrix:
         gemfile: ['rails_5.2', 'rails_6.0', 'rails_6.1', 'rails_7.0']
 
-        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0']
+        ruby: ['2.4', '2.5', '2.6', '2.7', '3.0']
 
         client: ['active_record', 'redis']
 
@@ -63,17 +63,11 @@ jobs:
           - ruby: '3.0'
             gemfile: 'rails_5.2'
           # Rails >= 6 requires Ruby >= 2.5
-          - ruby: '2.3'
-            gemfile: 'rails_6.0'
           - ruby: '2.4'
             gemfile: 'rails_6.0'
-          - ruby: '2.3'
-            gemfile: 'rails_6.1'
           - ruby: '2.4'
             gemfile: 'rails_6.1'
           # Rails >= 7 requires Ruby >= 2.7
-          - ruby: '2.3'
-            gemfile: 'rails_7.0'
           - ruby: '2.4'
             gemfile: 'rails_7.0'
           - ruby: '2.5'
