@@ -53,7 +53,7 @@ jobs:
       matrix:
         gemfile: ['rails_5.2', 'rails_6.0', 'rails_6.1', 'rails_7.0']
 
-        ruby: ['2.4', '2.5', '2.6', '2.7', '3.0']
+        ruby: ['2.4', '2.5', '2.6', '2.7', '3.0', '3.1']
 
         client: ['active_record', 'redis']
 
@@ -61,6 +61,8 @@ jobs:
           # Rails 5.2 requires Ruby < 3.0
           # https://github.com/rails/rails/issues/40938
           - ruby: '3.0'
+            gemfile: 'rails_5.2'
+          - ruby: '3.1'
             gemfile: 'rails_5.2'
           # Rails >= 6 requires Ruby >= 2.5
           - ruby: '2.4'
