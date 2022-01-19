@@ -17,7 +17,11 @@ module Rpush
 
         def perform
           @batch.each_notification do |notification|
-            prepare_async_post(notification)
+            begin
+              prepare_async_post(notification)
+            rescue OpenSSL::SSL::SSLError => error
+              log_error("Notification #{notification.id} failed with SSL error")
+            end
           end
 
           # Send all preprocessed requests at once
