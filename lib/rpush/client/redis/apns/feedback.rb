@@ -5,6 +5,8 @@ module Rpush
         class Feedback
           include Modis::Model
 
+          enable_all_index false # prevent creation of rpush:rpush:client:redis:apns:feedback:all set
+
           attribute :app_id, :integer
           attribute :device_token, :string
           attribute :failed_at, :timestamp
