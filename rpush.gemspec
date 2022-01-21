@@ -14,7 +14,8 @@ Gem::Specification.new do |s|
   s.metadata    = {
     "bug_tracker_uri" => "https://github.com/rpush/rpush/issues",
     "changelog_uri" => "https://github.com/rpush/rpush/blob/master/CHANGELOG.md",
-    "source_code_uri" => "https://github.com/rpush/rpush"
+    "source_code_uri" => "https://github.com/rpush/rpush",
+    "rubygems_mfa_required" => "true"
   }
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
