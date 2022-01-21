@@ -2,6 +2,23 @@
 
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...HEAD)
+
+## [v7.0.0](https://github.com/rpush/rpush/tree/HEAD)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v6.0.1...v7.0.0)
+
+**Merged pull requests:**
+
+- Test with Ruby 3.1 [\#632](https://github.com/rpush/rpush/pull/632) ([aried3r](https://github.com/aried3r))
+- Resolves Rails 7 Time.now.to\_s deprecation warning [\#630](https://github.com/rpush/rpush/pull/630) ([gregblake](https://github.com/gregblake))
+- Adds Rails 7 Support [\#629](https://github.com/rpush/rpush/pull/629) ([gregblake](https://github.com/gregblake))
+- Test with Rails 7.0.0.alpha2 [\#626](https://github.com/rpush/rpush/pull/626) ([aried3r](https://github.com/aried3r))
+
+**Breaking:**
+
+- Drop support for Ruby 2.3 [\#631](https://github.com/rpush/rpush/pull/631) ([aried3r](https://github.com/aried3r))
+
 ## [v6.0.1](https://github.com/rpush/rpush/tree/v6.0.1) (2021-10-08)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v6.0.0...v6.0.1)
