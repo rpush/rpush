@@ -152,10 +152,10 @@ module Rpush
           retryable_ns = Rpush::Client::Redis::Notification.absolute_retryable_namespace
 
           Modis.with_connection do |redis|
-            retryable_results = redis.multi do
+            retryable_results = redis.multi do |transaction|
               now = Time.now.to_i
-              redis.zrangebyscore(retryable_ns, 0, now)
-              redis.zremrangebyscore(retryable_ns, 0, now)
+              transaction.zrangebyscore(retryable_ns, 0, now)
+              transaction.zremrangebyscore(retryable_ns, 0, now)
             end
 
             retryable_results.first
@@ -167,9 +167,9 @@ module Rpush
           pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
 
           Modis.with_connection do |redis|
-            pending_results = redis.multi do
-              redis.zrange(pending_ns, 0, limit)
-              redis.zremrangebyrank(pending_ns, 0, limit)
+            pending_results = redis.multi do |transaction|
+              transaction.zrange(pending_ns, 0, limit)
+              transaction.zremrangebyrank(pending_ns, 0, limit)
             end
 
             pending_results.first
