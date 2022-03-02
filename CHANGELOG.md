@@ -1,5 +1,13 @@
 # Changelog
 
+## [v7.0.1](https://github.com/rpush/rpush/tree/v7.0.1) (2022-03-02)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...v7.0.1)
+
+**Merged pull requests:**
+
+- Fix deprecation warnings from the redis gem [\#636](https://github.com/rpush/rpush/pull/636) ([sharang-d](https://github.com/sharang-d))
+
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...HEAD)
