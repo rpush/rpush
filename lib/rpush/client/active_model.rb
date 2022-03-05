@@ -36,3 +36,6 @@ require 'rpush/client/active_model/pushy/time_to_live_validator'
 
 require 'rpush/client/active_model/webpush/app'
 require 'rpush/client/active_model/webpush/notification'
+
+require 'rpush/client/active_model/hms/app'
+require 'rpush/client/active_model/hms/notification'

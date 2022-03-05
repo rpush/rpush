@@ -22,6 +22,7 @@ require 'rpush/client/redis'
 require 'rpush/client/active_record'
 require 'rpush/daemon/store/active_record'
 require 'rpush/daemon/store/redis'
+require 'fixtures'
 
 def active_record?
   client == :active_record
