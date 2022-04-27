@@ -41,7 +41,7 @@ module Rpush
               'token' => device_token
             }
             json['content_available'] = content_available if content_available
-            json['notification'] = alert if alert
+            json['notification'] = notification if notification
             { 'message' => json }
           end
 
