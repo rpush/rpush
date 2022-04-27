@@ -145,6 +145,9 @@ module Rpush
         end
 
         def necessary_data_exists?
+          # Needed for Google Auth
+          # See https://github.com/googleapis/google-auth-library-ruby#example-environment-variables
+          # for further information
           ENV.key?('FIREBASE_PROJECT_ID') &&
           ENV.key?('GOOGLE_ACCOUNT_TYPE') && 
           ENV.key?('GOOGLE_CLIENT_ID') &&
