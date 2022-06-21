@@ -391,7 +391,8 @@ else
 end
 ```
 
-Call this during startup of your application, for example, by adding it to the end of `config/rpush.rb`. See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
+Call this during startup of your application, for example, by adding it to the `config.ru` file.
+See [Embedding API](https://github.com/rpush/rpush/wiki/Embedding-API) for more details.
 
 #### Using mina
 
