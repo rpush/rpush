@@ -11,6 +11,7 @@ spec/tmp/
 .vagrant/
 tmp/
 log/
+.byebug_history
 
 ## Environment normalization:
 /.bundle/

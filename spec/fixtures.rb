@@ -1,0 +1,1 @@
+require 'fixtures/apps'

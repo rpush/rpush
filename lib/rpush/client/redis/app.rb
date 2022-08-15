@@ -19,6 +19,10 @@ module Rpush
         attribute :team_id, :string
         attribute :bundle_id, :string
         attribute :feedback_enabled, :boolean, default: true
+        attribute :hms_app_id, :string
+        attribute :hms_key_id, :string
+        attribute :hms_sub_acc_id, :string
+        attribute :hms_key, :string
 
         index :name
 

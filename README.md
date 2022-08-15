@@ -341,6 +341,36 @@ In order to send the same message to multiple devices, create one
 `Notification` per device, as passing multiple subscriptions at once as
 `registration_ids` is not supported.
 
+#### HMS Push notification service
+
+We are using **service account key** authentication to send push notification to HMS. Follow the steps below to create the credential.
+
+1. Go to Huawei console -> Credentials.
+2. Select the appropriate project
+3. Click **Create credential** and select **service account key**.
+4. Fill in the necessary information. You can generate the credential without providing public key, Huawei will generate one if not given.
+5. Download the credential json and extract `key_id`, `sub_account_id` and `private_key` for later use in app creation in rpush.
+
+```ruby
+app = Rpush::Hms::App.new
+app.name = app_name
+app.hms_app_id = YOUR_APP_ID # Get this from the Huawei console. This app should belongs to a project in Huawei console
+app.hms_key_id = YOUR_KEY_ID # from service account key credential
+app.hms_sub_acc_id = YOUR_SUBACCOUNT_ID # from service account key credential
+app.hms_key = YOUR_PRIVATE_KEY # from service account key credential
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Hms::Notification.new
+n.app = Rpush::Hms::App.find_by_name("hms_app")
+n.priority = 'high'
+n.registration_ids = ["..."] # huawei device token
+n.data = { message: "hi mom!" }
+n.set_uri(n.app.hms_app_id)  # this is to generate the send push api path
+n.save!
+```
 
 ### Running Rpush
 
@@ -437,6 +467,10 @@ You should run `rpush init` after upgrading Rpush to check for configuration and
 * [Notification Options](https://github.com/rpush/rpush/wiki/GCM-Notification-Options)
 * [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
 * [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
+
+### HMS Push Notification Service
+* [RESTful Sending Downlink Messages](https://developer.huawei.com/consumer/en/doc/development/HMSCore-References-V5/https-send-api-0000001050986197-V5)
+* [Message receipt](https://developer.huawei.com/consumer/en/doc/development/HMSCore-Guides-V5/msg-receipt-guide-0000001050040176-V5)
 
 ### Contributing
 
