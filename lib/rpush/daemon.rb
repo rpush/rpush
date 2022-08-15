@@ -49,6 +49,9 @@ require 'rpush/daemon/apnsp8/delivery'
 require 'rpush/daemon/apnsp8/token'
 require 'rpush/daemon/apnsp8'
 
+require 'rpush/daemon/fcm/delivery'
+require 'rpush/daemon/fcm'
+
 require 'rpush/daemon/gcm/delivery'
 require 'rpush/daemon/gcm'
 
