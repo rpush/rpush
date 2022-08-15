@@ -83,6 +83,7 @@ n = Rpush::Apnsp8::Notification.new
 n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
+# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" } 
 n.data = { foo: :bar }
 n.save!
 ```
@@ -107,6 +108,7 @@ n = Rpush::Apns2::Notification.new
 n.app = Rpush::Apns2::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
+# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" } 
 n.data = {
   headers: { 'apns-topic': "BUNDLE ID" }, # the bundle id of the app, like com.example.appname. Not necessary if set on the app (see above)
   foo: :bar
@@ -133,6 +135,7 @@ n = Rpush::Apns::Notification.new
 n.app = Rpush::Apns::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
+# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" } 
 n.data = { foo: :bar }
 n.save!
 ```
