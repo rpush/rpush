@@ -14,7 +14,8 @@ Gem::Specification.new do |s|
   s.metadata    = {
     "bug_tracker_uri" => "https://github.com/rpush/rpush/issues",
     "changelog_uri" => "https://github.com/rpush/rpush/blob/master/CHANGELOG.md",
-    "source_code_uri" => "https://github.com/rpush/rpush"
+    "source_code_uri" => "https://github.com/rpush/rpush",
+    "rubygems_mfa_required" => "true"
   }
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
@@ -22,7 +23,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = '>= 2.3.0'
+  s.required_ruby_version = '>= 2.4.0'
 
   s.post_install_message = <<~POST_INSTALL_MESSAGE
     When upgrading Rpush, don't forget to run `bundle exec rpush init` to get all the latest migrations.
@@ -52,7 +53,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'appraisal'
   s.add_development_dependency 'codeclimate-test-reporter'
   s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'rubocop', '~> 1.12.0'
   s.add_development_dependency 'rubocop-performance'
   s.add_development_dependency 'byebug'
 
