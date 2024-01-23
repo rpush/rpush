@@ -19,10 +19,13 @@ module Rpush
             end
           end
 
+          def payload_data_size
+            multi_json_dump(as_json['message']['data']).bytesize
+          end
+
           # This is a hack. The schema defines `priority` to be an integer, but FCM expects a string.
           # But for users of rpush to have an API they might expect (setting priority to `high`, not 10)
           # we do a little conversion here.
-          # I'm not happy about it, but this will have to do until I can take a further look.
           def priority=(priority)
             case priority
               when 'high', FCM_PRIORITY_HIGH
@@ -32,6 +35,14 @@ module Rpush
               else
                 errors.add(:priority, 'must be one of either "normal" or "high"')
             end
+          end
+
+          def dry_run=(value)
+            fail ArgumentError, 'FCM does not support dry run' if value
+          end
+
+          def mutable_content=(value)
+            fail ArgumentError, 'RPush does not currently support mutable_content for FCM' if value
           end
 
           def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
@@ -51,7 +62,7 @@ module Rpush
             }
             json['data'] = data if data
             json['collapse_key'] = collapse_key if collapse_key
-            json['priority'] = priority if priority
+            json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
             json
           end
@@ -62,6 +73,14 @@ module Rpush
             json['sound'] = sound if sound
             json['default_sound'] = !sound || sound == 'default' ? true : false
             json
+          end
+
+          def priority_str
+            case
+            when priority <= 5 then 'normal'
+            else
+              'high'
+            end
           end
 
           def priority_for_notification
