@@ -110,7 +110,6 @@ module Rpush
 
         def parse_error(response)
           error = multi_json_load(response.body)['error']
-          puts "PARSED: #{error} #{error['message']}"
           "#{error['status']}: #{error['message']}"
         end
 
