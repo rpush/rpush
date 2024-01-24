@@ -132,6 +132,7 @@ module Rpush
 
         def obtain_access_token
           authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(scope: SCOPE)
+          log_debug("FCM - Obtaining access token.")
           authorizer.fetch_access_token
         end
 
