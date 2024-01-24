@@ -23,6 +23,7 @@ describe 'FCM' do
 
     allow(::Google::Auth::ServiceAccountCredentials).to receive(:fetch_access_token).and_return({access_token: 'bbbbbb'})
     allow(::Google::Auth::ServiceAccountCredentials).to receive(:make_creds).and_return(creds)
+    allow_any_instance_of(::Rpush::Daemon::Fcm::Delivery).to receive(:necessary_data_exists?).and_return(true)
   end
 
   it 'delivers a notification successfully' do
