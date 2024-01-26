@@ -9,13 +9,13 @@ module Rpush
         SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
 
         def initialize(app, http, notification, batch)
-          if necessary_data_exists?
+          if necessary_data_exists?(app)
             @app = app
             @http = http
             @notification = notification
             @batch = batch
 
-            @uri = URI.parse("#{HOST}/v1/projects/#{ENV['FIREBASE_PROJECT_ID']}/messages:send")
+            @uri = URI.parse("#{HOST}/v1/projects/#{@app.firebase_project_id || ENV['FIREBASE_PROJECT_ID']}/messages:send")
           else
             Rpush.logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables!")
           end
@@ -131,28 +131,31 @@ module Rpush
         end
 
         def obtain_access_token
-          authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(scope: SCOPE)
+          json_key_io = @app.json_key ? StringIO.new(@app.json_key) : nil
+          authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(scope: SCOPE, json_key_io: json_key_io)
           log_debug("FCM - Obtaining access token.")
           authorizer.fetch_access_token
         end
 
         def do_post
           token = obtain_access_token['access_token']
-          post = Net::HTTP::Post.new(@uri.path, 'Content-Type'  => 'application/json',
-                                                'Authorization' => "Bearer #{token}")
+          post = Net::HTTP::Post.new(@uri.path, 'Content-Type' => 'application/json',
+                                     'Authorization' => "Bearer #{token}")
           post.body = @notification.as_json.to_json
           @http.request(@uri, post)
         end
 
-        def necessary_data_exists?
+        def necessary_data_exists?(app)
           # Needed for Google Auth
           # See https://github.com/googleapis/google-auth-library-ruby#example-environment-variables
           # for further information
-          ENV.key?('FIREBASE_PROJECT_ID') &&
-          ENV.key?('GOOGLE_ACCOUNT_TYPE') && 
-          ENV.key?('GOOGLE_CLIENT_ID') &&
-          ENV.key?('GOOGLE_CLIENT_EMAIL') &&
-          ENV.key?('GOOGLE_PRIVATE_KEY')
+          (app.firebase_project_id || ENV.key?('FIREBASE_PROJECT_ID')) &&
+            (app.json_key || (
+              ENV.key?('GOOGLE_ACCOUNT_TYPE') &&
+                ENV.key?('GOOGLE_CLIENT_ID') &&
+                ENV.key?('GOOGLE_CLIENT_EMAIL') &&
+                ENV.key?('GOOGLE_PRIVATE_KEY')
+            ))
         end
       end
     end
