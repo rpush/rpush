@@ -60,7 +60,6 @@ module Rpush
             json = {
               'notification' => android_notification,
             }
-            json['data'] = data if data
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
