@@ -8,11 +8,10 @@ module Rpush
           FCM_PRIORITIES = [FCM_PRIORITY_HIGH, FCM_PRIORITY_NORMAL]
 
           ROOT_NOTIFICATION_KEYS = %w[title body image].freeze
-          ANDROID_NOTIFICATION_KEYS = %w[icon sound tag color click_action body_loc_key body_loc_args title_loc_key
+          ANDROID_NOTIFICATION_KEYS = %w[icon tag color click_action body_loc_key body_loc_args title_loc_key
                                          title_loc_args channel_id ticker sticky event_time local_only
-                                         notification_priority default_sound default_vibrate_timings
-                                         default_light_settings vibrate_timings visibility notification_count
-                                         light_settings].freeze
+                                         default_vibrate_timings default_light_settings vibrate_timings
+                                         visibility notification_count light_settings].freeze
 
           def self.included(base)
             base.instance_eval do
@@ -72,6 +71,10 @@ module Rpush
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
             json
+          end
+
+          def notification=(value)
+            super(value.with_indifferent_access)
           end
 
           def root_notification

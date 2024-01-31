@@ -18,6 +18,29 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     expect(notification.errors[:base]).to eq ["Number of registration_ids cannot be larger than 1000."]
   end
 
+  it "validates notification keys" do
+    notification.app = app
+    notification.device_token = "valid"
+    notification.notification = { "title" => "valid", "body" => "valid", "color" => "valid for android", "garbage" => "invalid" }
+    expect(notification.valid?).to be_falsey
+    expect(notification.errors[:notification]).to eq ["contains invalid keys: garbage"]
+  end
+
+  it "allows notifications with either symbol keys or string keys" do
+    notification.app = app
+    notification.notification = { "title" => "title", body: "body" }
+    expect(notification.as_json['message']['notification']).to eq({"title"=>"title", "body"=>"body"})
+  end
+
+  it "moves notification keys to the correcdt location" do
+    notification.app = app
+    notification.device_token = "valid"
+    notification.notification = { "title" => "valid", "body" => "valid", "color" => "valid for android" }
+    expect(notification.valid?).to be_truthy
+    expect(notification.as_json['message']['notification']).to eq("title"=>"valid", "body"=>"valid")
+    expect(notification.as_json['message']['android']['notification']['color']).to eq('valid for android')
+  end
+
   it 'validates expiry is present if collapse_key is set' do
     notification.collapse_key = 'test'
     notification.expiry = nil
