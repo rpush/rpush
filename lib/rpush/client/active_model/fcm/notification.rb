@@ -7,6 +7,13 @@ module Rpush
           FCM_PRIORITY_NORMAL = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
           FCM_PRIORITIES = [FCM_PRIORITY_HIGH, FCM_PRIORITY_NORMAL]
 
+          ROOT_NOTIFICATION_KEYS = %w[title body image].freeze
+          ANDROID_NOTIFICATION_KEYS = %w[icon sound tag color click_action body_loc_key body_loc_args title_loc_key
+                                         title_loc_args channel_id ticker sticky event_time local_only
+                                         notification_priority default_sound default_vibrate_timings
+                                         default_light_settings vibrate_timings visibility notification_count
+                                         light_settings].freeze
+
           def self.included(base)
             base.instance_eval do
               validates :device_token, presence: true
@@ -16,6 +23,7 @@ module Rpush
               validates_with Rpush::Client::ActiveModel::RegistrationIdsCountValidator, limit: 1000
 
               validates_with Rpush::Client::ActiveModel::Fcm::ExpiryCollapseKeyMutualInclusionValidator
+              validates_with Rpush::Client::ActiveModel::Fcm::NotificationKeysInAllowedListValidator
             end
           end
 
@@ -52,7 +60,7 @@ module Rpush
               'token' => device_token
             }
             json['content_available'] = content_available if content_available
-            json['notification'] = notification if notification
+            json['notification'] = root_notification if notification
             { 'message' => json }
           end
 
@@ -66,8 +74,14 @@ module Rpush
             json
           end
 
+          def root_notification
+            return {} unless notification
+
+            notification.slice(*ROOT_NOTIFICATION_KEYS)
+          end
+
           def android_notification
-            json = notification || {}
+            json = notification&.slice(*ANDROID_NOTIFICATION_KEYS) || {}
             json['notification_priority'] = priority_for_notification if priority
             json['sound'] = sound if sound
             json['default_sound'] = !sound || sound == 'default' ? true : false

@@ -21,6 +21,7 @@ require 'rpush/client/active_model/adm/app'
 require 'rpush/client/active_model/adm/notification'
 
 require 'rpush/client/active_model/fcm/expiry_collapse_key_mutual_inclusion_validator'
+require 'rpush/client/active_model/fcm/notification_keys_in_allowed_list_validator'
 require 'rpush/client/active_model/fcm/app'
 require 'rpush/client/active_model/fcm/notification'
 
