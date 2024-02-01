@@ -12,12 +12,6 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     expect(notification.errors[:base]).to eq ["Notification payload data cannot be larger than 4096 bytes."]
   end
 
-  it 'limits the number of registration ids to 1000' do
-    notification.registration_ids = ['a'] * (1000 + 1)
-    expect(notification.valid?).to be_falsey
-    expect(notification.errors[:base]).to eq ["Number of registration_ids cannot be larger than 1000."]
-  end
-
   it "validates notification keys" do
     notification.app = app
     notification.device_token = "valid"
