@@ -17,7 +17,7 @@ module Rpush
 
             @uri = URI.parse("#{HOST}/v1/projects/#{@app.firebase_project_id || ENV['FIREBASE_PROJECT_ID']}/messages:send")
           else
-            Rpush.logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables!")
+            Rpush.logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables or firebase_project_id and json_key attributes.")
           end
         end
 
@@ -81,7 +81,9 @@ module Rpush
         end
 
         def unregistered(response)
-          fail Rpush::DeliveryError.new(404, @notification.id, "Client was not registered for your app. (#{parse_error(response)})")
+          error = parse_error(response)
+          reflect(:fcm_invalid_device_token, @app, error, @notification.device_token)
+          fail Rpush::DeliveryError.new(404, @notification.id, "Client was not registered for your app. (#{error})")
         end
 
         def too_many_requests
