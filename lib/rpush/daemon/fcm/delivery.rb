@@ -133,10 +133,7 @@ module Rpush
         end
 
         def obtain_access_token
-          json_key_io = @app.json_key ? StringIO.new(@app.json_key) : nil
-          authorizer = ::Google::Auth::ServiceAccountCredentials.make_creds(scope: SCOPE, json_key_io: json_key_io)
-          log_debug("FCM - Obtaining access token.")
-          authorizer.fetch_access_token
+          GoogleCredentialCache.instance.access_token(SCOPE, @app.json_key)
         end
 
         def do_post
