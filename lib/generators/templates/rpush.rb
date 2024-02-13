@@ -83,6 +83,23 @@ Rpush.reflect do |on|
   # Called for each recipient which successfully receives a notification. This
   # can occur more than once for the same notification when there are multiple
   # recipients.
+  # on.fcm_delivered_to_recipient do |notification|
+  # end
+
+  # Called for each recipient which fails to receive a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients. (do not handle invalid registration IDs here)
+  # on.fcm_failed_to_recipient do |notification, error|
+  # end
+
+  # Called when the FCM returns a failure that indicates an invalid device token.
+  # You will need to delete the device token from your records.
+  # on.fcm_invalid_device_token do |app, error, device_token|
+  # end
+
+  # Called for each recipient which successfully receives a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients.
   # on.gcm_delivered_to_recipient do |notification, registration_id|
   # end
 
