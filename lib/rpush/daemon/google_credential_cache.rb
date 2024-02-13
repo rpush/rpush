@@ -34,7 +34,7 @@ module Rpush
       end
 
       def hash_key(scope, json_key)
-        scope.hash ^ json_key
+        scope.hash ^ json_key.hash
       end
     end
   end
