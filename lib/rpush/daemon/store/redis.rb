@@ -92,6 +92,11 @@ module Rpush
           Rpush::Client::Redis::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app_id: app.id)
         end
 
+        def create_fcm_notification(attrs, data, app)
+          notification = Rpush::Client::Redis::Fcm::Notification.new
+          create_fcm_like_notification(notification, attrs, data, app)
+        end
+
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
           notification = Rpush::Client::Redis::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
@@ -136,6 +141,14 @@ module Rpush
         rescue Modis::RecordNotFound
           Rpush.logger.warn("Couldn't find Rpush::Client::Redis::Notification with id=#{id}")
           nil
+        end
+
+        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
+          notification.assign_attributes(attrs)
+          notification.data = data
+          notification.app = app
+          notification.save!
+          notification
         end
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
