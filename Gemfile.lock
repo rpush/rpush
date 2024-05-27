@@ -10,7 +10,7 @@ PATH
       railties
       rainbow
       thor (>= 0.18.1, < 2.0)
-      webpush (~> 1.0)
+      web-push (~> 3.0)
 
 GEM
   remote: https://rubygems.org/
@@ -59,7 +59,6 @@ GEM
     diff-lcs (1.5.0)
     docile (1.4.0)
     erubi (1.10.0)
-    hkdf (0.3.0)
     http-2 (0.11.0)
     i18n (1.10.0)
       concurrent-ruby (~> 1.0)
@@ -85,6 +84,7 @@ GEM
       http-2 (~> 0.11)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
+    openssl (3.2.0)
     parallel (1.21.0)
     parser (3.1.0.0)
       ast (~> 2.4.1)
@@ -152,9 +152,9 @@ GEM
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
-    webpush (1.1.0)
-      hkdf (~> 0.2)
+    web-push (3.0.1)
       jwt (~> 2.0)
+      openssl (~> 3.0)
     zeitwerk (2.5.4)
 
 PLATFORMS
