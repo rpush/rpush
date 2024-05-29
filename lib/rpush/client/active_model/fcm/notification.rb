@@ -56,7 +56,8 @@ module Rpush
             json = {
               'data' => data,
               'android' => android_config,
-              'token' => device_token
+              'token' => device_token,
+              'apns' => apns_config
             }
             # Android does not appear to handle content_available anymore. Instead "priority" should be used
             # with "low" being a background only message. APN however should support this field.
@@ -75,6 +76,15 @@ module Rpush
             json
           end
 
+          def apns_config
+            json = {
+              'payload' => {
+                'aps' => apns_notification
+              }
+            }
+            json
+          end
+
           def notification=(value)
             super(value.with_indifferent_access)
           end
@@ -90,6 +100,12 @@ module Rpush
             json['notification_priority'] = priority_for_notification if priority
             json['sound'] = sound if sound
             json['default_sound'] = !sound || sound == 'default' ? true : false
+            json
+          end
+
+          def apns_notification
+            json = {}
+            json['sound'] = sound if sound
             json
           end
 
