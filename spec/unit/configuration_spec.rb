@@ -41,6 +41,6 @@ describe Rpush::Configuration do
   it 'delegate redis_options to Modis' do
     Rpush.config.client = :redis
     Rpush.config.redis_options = { hi: :mom }
-    expect(Modis.redis_options).to eq(hi: :mom)
+    expect(Modis.redis_options[:default]).to eq(hi: :mom)
   end
 end

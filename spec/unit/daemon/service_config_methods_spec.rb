@@ -23,7 +23,7 @@ describe Rpush::Daemon::ServiceConfigMethods do
     ServiceConfigMethodsSpec.dispatcher :http, an: :option
     app = double
     dispatcher = double
-    expect(Rpush::Daemon::Dispatcher::Http).to receive(:new).with(app, ServiceConfigMethodsSpec::Delivery, an: :option).and_return(dispatcher)
+    expect(Rpush::Daemon::Dispatcher::Http).to receive(:new).with(app, ServiceConfigMethodsSpec::Delivery, {an: :option}).and_return(dispatcher)
     expect(ServiceConfigMethodsSpec.new_dispatcher(app)).to eq dispatcher
   end
 
