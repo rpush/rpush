@@ -66,9 +66,7 @@ module Rpush
           end
 
           def android_config
-            json = {
-              'notification' => android_notification,
-            }
+            json = {}
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
