@@ -62,7 +62,7 @@ module Rpush
 
           def android_config
             json = ActiveSupport::OrderedHash.new
-            json['notification'] = android_notification
+            json['notification'] = android_notification if notification
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
