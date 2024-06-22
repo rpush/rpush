@@ -19,6 +19,8 @@ module Rpush
         attribute :team_id, :string
         attribute :bundle_id, :string
         attribute :feedback_enabled, :boolean, default: true
+        attribute :firebase_project_id, :string
+        attribute :json_key, :string
 
         index :name
 
