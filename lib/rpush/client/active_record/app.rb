@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveRecord
-      class App < ::ActiveRecord::Base
+      class App < Rpush::Client::ActiveRecord::Base
         self.table_name = 'rpush_apps'
 
         has_many :notifications, class_name: 'Rpush::Client::ActiveRecord::Notification', dependent: :destroy
