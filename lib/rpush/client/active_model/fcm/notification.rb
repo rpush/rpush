@@ -55,10 +55,10 @@ module Rpush
           def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
             json = {
               'data' => data,
-              'android' => android_config,
               'token' => device_token,
               'apns' => apns_config
             }
+            json['android'] = notification ? android_config : {}
             # Android does not appear to handle content_available anymore. Instead "priority" should be used
             # with "low" being a background only message. APN however should support this field.
             # json['content_available'] = content_available if content_available
