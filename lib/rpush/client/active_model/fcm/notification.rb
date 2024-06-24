@@ -48,30 +48,38 @@ module Rpush
             fail ArgumentError, 'FCM does not support dry run' if value
           end
 
-          def mutable_content=(value)
-            fail ArgumentError, 'RPush does not currently support mutable_content for FCM' if value
-          end
-
           def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
             json = {
               'data' => data,
               'android' => android_config,
+              'apns' => apns_config,
               'token' => device_token
             }
-            # Android does not appear to handle content_available anymore. Instead "priority" should be used
-            # with "low" being a background only message. APN however should support this field.
-            # json['content_available'] = content_available if content_available
+
             json['notification'] = root_notification if notification
             { 'message' => json }
           end
 
           def android_config
-            json = {
-              'notification' => android_notification,
-            }
+            json = ActiveSupport::OrderedHash.new
+            json['notification'] = android_notification if notification
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
+            json
+          end
+
+          def apns_config
+            json = ActiveSupport::OrderedHash.new
+            json['payload'] = ActiveSupport::OrderedHash.new
+
+            aps = ActiveSupport::OrderedHash.new
+            aps['mutable-content'] = 1 if mutable_content
+            aps['content-available'] = 1 if content_available
+            aps['sound'] = 'default' if sound == 'default'
+
+            json['payload']['aps'] = aps
+
             json
           end
 
@@ -89,7 +97,7 @@ module Rpush
             json = notification&.slice(*ANDROID_NOTIFICATION_KEYS) || {}
             json['notification_priority'] = priority_for_notification if priority
             json['sound'] = sound if sound
-            json['default_sound'] = !sound || sound == 'default' ? true : false
+            json['default_sound'] = sound == 'default' ? true : false
             json
           end
 
