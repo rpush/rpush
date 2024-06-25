@@ -80,7 +80,8 @@ module Rpush
             json = {
               'payload' => {
                 'aps' => apns_notification
-              }
+              },
+              'headers' => apns_headers
             }
             json
           end
@@ -106,6 +107,12 @@ module Rpush
           def apns_notification
             json = {}
             json['sound'] = sound if sound
+            json
+          end
+
+          def apns_headers
+            json = {}
+            json['apns-collapse-id'] = collapse_key if collapse_key
             json
           end
 
