@@ -67,9 +67,8 @@ module Rpush
           end
 
           def android_config
-            json = {
-              'notification' => android_notification,
-            }
+            json = {}
+            json['notification'] = android_notification if notification
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
@@ -100,7 +99,7 @@ module Rpush
             json = notification&.slice(*ANDROID_NOTIFICATION_KEYS) || {}
             json['notification_priority'] = priority_for_notification if priority
             json['sound'] = sound if sound
-            json['default_sound'] = !sound || sound == 'default' ? true : false
+            json['default_sound'] = (!sound || sound == 'default' ? true : false) if notification
             json
           end
 
