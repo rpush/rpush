@@ -48,9 +48,9 @@ module Rpush
             fail ArgumentError, 'FCM does not support dry run' if value
           end
 
-          def mutable_content=(value)
-            fail ArgumentError, 'RPush does not currently support mutable_content for FCM' if value
-          end
+          # def mutable_content=(value)
+          #   fail ArgumentError, 'RPush does not currently support mutable_content for FCM' if value
+          # end
 
           def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
             json = {
@@ -106,6 +106,7 @@ module Rpush
           def apns_notification
             json = {}
             json['sound'] = sound if sound
+            json['mutable-content'] = 1 if mutable_content
             json
           end
 
