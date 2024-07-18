@@ -50,6 +50,7 @@ jobs:
           - 6379:6379
 
     strategy:
+      fail-fast: false
       matrix:
         gemfile: ['rails_5.2', 'rails_6.0', 'rails_6.1', 'rails_7.0']
 
