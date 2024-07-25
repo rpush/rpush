@@ -17,6 +17,7 @@ describe 'FCM priority' do
     notification.app_id = app.id
     notification.device_token = fake_device_token
     notification.data = { message: 'test' }
+    notification.notification = { title: 'title' }
     notification.priority = priority
     notification.save!
 
