@@ -210,7 +210,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   byebug
-  codeclimate-test-reporter
+  codeclimate-test-reporter (= 1.0.7)
   database_cleaner
   debug
   modis (>= 2.0)
