@@ -84,7 +84,8 @@ module Rpush
           end
 
           def notification=(value)
-            super(value.with_indifferent_access)
+            value = value.with_indifferent_access if value.is_a?(Hash)
+            super(value)
           end
 
           def root_notification
