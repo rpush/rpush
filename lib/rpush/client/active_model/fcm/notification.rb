@@ -48,15 +48,16 @@ module Rpush
             fail ArgumentError, 'FCM does not support dry run' if value
           end
 
-          def mutable_content=(value)
-            fail ArgumentError, 'RPush does not currently support mutable_content for FCM' if value
-          end
+          # def mutable_content=(value)
+          #   fail ArgumentError, 'RPush does not currently support mutable_content for FCM' if value
+          # end
 
           def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
             json = {
               'data' => data,
               'android' => android_config,
-              'token' => device_token
+              'token' => device_token,
+              'apns' => apns_config
             }
             # Android does not appear to handle content_available anymore. Instead "priority" should be used
             # with "low" being a background only message. APN however should support this field.
@@ -66,12 +67,21 @@ module Rpush
           end
 
           def android_config
-            json = {
-              'notification' => android_notification,
-            }
+            json = {}
+            json['notification'] = android_notification if notification
             json['collapse_key'] = collapse_key if collapse_key
             json['priority'] = priority_str if priority
             json['ttl'] = "#{expiry}s" if expiry
+            json
+          end
+
+          def apns_config
+            json = {
+              'payload' => {
+                'aps' => apns_notification
+              },
+              'headers' => apns_headers
+            }
             json
           end
 
@@ -89,7 +99,20 @@ module Rpush
             json = notification&.slice(*ANDROID_NOTIFICATION_KEYS) || {}
             json['notification_priority'] = priority_for_notification if priority
             json['sound'] = sound if sound
-            json['default_sound'] = !sound || sound == 'default' ? true : false
+            json['default_sound'] = (!sound || sound == 'default' ? true : false) if notification
+            json
+          end
+
+          def apns_notification
+            json = {}
+            json['sound'] = sound if sound
+            json['mutable-content'] = 1 if mutable_content
+            json
+          end
+
+          def apns_headers
+            json = {}
+            json['apns-collapse-id'] = collapse_key if collapse_key
             json
           end
 

@@ -113,6 +113,7 @@ module Rpush
           headers['apns-priority'] = '10'
           headers['apns-topic'] = @app.bundle_id
           headers['apns-push-type'] = 'background' if notification.content_available?
+          headers['apns-collapse-id'] = notification.collapse_key if notification.collapse_key.present?
 
           headers.merge notification_data(notification)[HTTP2_HEADERS_KEY] || {}
         end
