@@ -15,6 +15,7 @@ describe Rpush::Daemon::TcpConnection do
   let(:connection) { Rpush::Daemon::TcpConnection.new(app, host, port) }
 
   before do
+    allow(x509_certificate).to receive(:not_after).and_return(Time.now + 1.year)
     allow(OpenSSL::SSL::SSLContext).to receive_messages(new: ssl_context)
     allow(OpenSSL::PKey::RSA).to receive_messages(new: rsa_key)
     allow(OpenSSL::X509::Certificate).to receive_messages(new: x509_certificate)
@@ -83,31 +84,31 @@ describe Rpush::Daemon::TcpConnection do
 
     describe 'certificate expiry' do
       it 'reflects if the certificate will expire soon' do
-        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        cert = x509_certificate
         expect(connection).to receive(:reflect).with(:ssl_certificate_will_expire, app, cert.not_after)
         Timecop.freeze(cert.not_after - 3.days) { connection.connect }
       end
 
       it 'logs that the certificate will expire soon' do
-        cert = OpenSSL::X509::Certificate.new(app.certificate)
-        expect(logger).to receive(:warn).with("[#{app.name}] Certificate will expire at 2022-09-07 03:18:32 UTC.")
+        cert = x509_certificate
+        expect(logger).to receive(:warn).with("[#{app.name}] Certificate will expire at #{cert.not_after.utc}.")
         Timecop.freeze(cert.not_after - 3.days) { connection.connect }
       end
 
       it 'does not reflect if the certificate will not expire soon' do
-        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        cert = x509_certificate
         expect(connection).not_to receive(:reflect).with(:ssl_certificate_will_expire, app, kind_of(Time))
         Timecop.freeze(cert.not_after - 2.months) { connection.connect }
       end
 
       it 'logs that the certificate has expired' do
-        cert = OpenSSL::X509::Certificate.new(app.certificate)
-        expect(logger).to receive(:error).with("[#{app.name}] Certificate expired at 2022-09-07 03:18:32 UTC.")
+        cert = x509_certificate
+        expect(logger).to receive(:error).with("[#{app.name}] Certificate expired at #{cert.not_after.utc}.")
         Timecop.freeze(cert.not_after + 1.day) { connection.connect rescue Rpush::CertificateExpiredError }
       end
 
       it 'raises an error if the certificate has expired' do
-        cert = OpenSSL::X509::Certificate.new(app.certificate)
+        cert = x509_certificate
         Timecop.freeze(cert.not_after + 1.day) do
           expect { connection.connect }.to raise_error(Rpush::CertificateExpiredError)
         end
