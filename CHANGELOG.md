@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
+
+**Merged pull requests:**
+
+* Support for FCMv1 [\#620](https://github.com/rpush/rpush/pull/620) ([mirkode](https://github.com/mirkode)), [\#660](https://github.com/rpush/rpush/pull/660) ([AnilRh](https://github.com/AnilRh)) and [\#673](https://github.com/rpush/rpush/pull/673) ([SixiS](https://github.com/SixiS), [Henridv](https://github.com/Henridv) & [benlangfeld](https://github.com/benlangfeld))
+
+**Breaking:**
+
+* Dropped support for Ruby 2.4, 2.5, 2.6 and Rails 5.2.
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.1...HEAD)
+
 ## [v7.0.1](https://github.com/rpush/rpush/tree/v7.0.1) (2022-03-02)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...v7.0.1)
@@ -7,10 +19,6 @@
 **Merged pull requests:**
 
 - Fix deprecation warnings from the redis gem [\#636](https://github.com/rpush/rpush/pull/636) ([sharang-d](https://github.com/sharang-d))
-
-## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
-
-[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...HEAD)
 
 ## [v7.0.0](https://github.com/rpush/rpush/tree/HEAD)
 
