@@ -145,6 +145,11 @@ module Rpush
           end
         end
 
+        def create_fcm_notification(attrs, data, app)
+          notification = Rpush::Client::ActiveRecord::Fcm::Notification.new
+          create_fcm_like_notification(notification, attrs, data, app)
+        end
+
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
           notification = Rpush::Client::ActiveRecord::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
@@ -181,7 +186,28 @@ module Rpush
           id
         end
 
+        def adapter_name
+          env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
+          if ::ActiveRecord::VERSION::MAJOR > 6
+            ::ActiveRecord::Base.configurations.configs_for(env_name: env).first.configuration_hash[:adapter]
+          else
+            config = ::ActiveRecord::Base.configurations[env]
+            return '' unless config
+            Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
+          end
+        end
+
         private
+
+        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
+          with_database_reconnect_and_retry do
+            notification.assign_attributes(attrs)
+            notification.data = data
+            notification.app = app
+            notification.save!
+            notification
+          end
+        end
 
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
           with_database_reconnect_and_retry do
@@ -198,13 +224,6 @@ module Rpush
         def ready_for_delivery
           relation = Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now)
           relation.order('deliver_after ASC, created_at ASC')
-        end
-
-        def adapter_name
-          env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
-          config = ::ActiveRecord::Base.configurations[env]
-          return '' unless config
-          Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
         end
       end
     end

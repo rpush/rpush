@@ -6,7 +6,8 @@ AllCops:
   Exclude:
     - lib/generators/**/*
     - vendor/bundle/**/*
-  TargetRubyVersion: 2.3
+  NewCops: enable
+  TargetRubyVersion: 2.4
 
 Layout/LineLength:
   Enabled: false

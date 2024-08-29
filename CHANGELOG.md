@@ -1,6 +1,52 @@
 # Changelog
 
-## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-06)
+## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
+
+**Merged pull requests:**
+
+* Support for FCMv1 [\#620](https://github.com/rpush/rpush/pull/620) ([mirkode](https://github.com/mirkode)), [\#660](https://github.com/rpush/rpush/pull/660) ([AnilRh](https://github.com/AnilRh)) and [\#673](https://github.com/rpush/rpush/pull/673) ([SixiS](https://github.com/SixiS), [Henridv](https://github.com/Henridv) & [benlangfeld](https://github.com/benlangfeld))
+
+**Breaking:**
+
+* Dropped support for Ruby 2.4, 2.5, 2.6 and Rails 5.2.
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.1...HEAD)
+
+## [v7.0.1](https://github.com/rpush/rpush/tree/v7.0.1) (2022-03-02)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...v7.0.1)
+
+**Merged pull requests:**
+
+- Fix deprecation warnings from the redis gem [\#636](https://github.com/rpush/rpush/pull/636) ([sharang-d](https://github.com/sharang-d))
+
+## [v7.0.0](https://github.com/rpush/rpush/tree/HEAD)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v6.0.1...v7.0.0)
+
+**Merged pull requests:**
+
+- Test with Ruby 3.1 [\#632](https://github.com/rpush/rpush/pull/632) ([aried3r](https://github.com/aried3r))
+- Resolves Rails 7 Time.now.to\_s deprecation warning [\#630](https://github.com/rpush/rpush/pull/630) ([gregblake](https://github.com/gregblake))
+- Adds Rails 7 Support [\#629](https://github.com/rpush/rpush/pull/629) ([gregblake](https://github.com/gregblake))
+- Test with Rails 7.0.0.alpha2 [\#626](https://github.com/rpush/rpush/pull/626) ([aried3r](https://github.com/aried3r))
+
+**Breaking:**
+
+- Drop support for Ruby 2.3 [\#631](https://github.com/rpush/rpush/pull/631) ([aried3r](https://github.com/aried3r))
+
+## [v6.0.1](https://github.com/rpush/rpush/tree/v6.0.1) (2021-10-08)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v6.0.0...v6.0.1)
+
+**Merged pull requests:**
+
+- Don't limit webpush registration keys [\#624](https://github.com/rpush/rpush/pull/624) ([treyrich](https://github.com/treyrich))
+- Add Prometheus Exporter plugin link to README [\#617](https://github.com/rpush/rpush/pull/617) ([maxsz](https://github.com/maxsz))
+- Reference current interface in config template [\#569](https://github.com/rpush/rpush/pull/569) ([benlangfeld](https://github.com/benlangfeld))
+- Default the Rails environment to RAILS\_ENV if set [\#562](https://github.com/rpush/rpush/pull/562) ([benlangfeld](https://github.com/benlangfeld))
+
+## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-21)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...v6.0.0)
 
@@ -9,6 +55,8 @@ Please see the details in the PRs below.
 
 **Merged pull requests:**
 
+- Switch to GitHub Actions for CI [\#615](https://github.com/rpush/rpush/pull/615) ([aried3r](https://github.com/aried3r))
+- Prepare 6.0.0 release [\#613](https://github.com/rpush/rpush/pull/613) ([aried3r](https://github.com/aried3r))
 - Bump activesupport version to 5.2 or later [\#610](https://github.com/rpush/rpush/pull/610) ([biow0lf](https://github.com/biow0lf))
 - Fixed infinite loop issue with Apnsp8 delivery [\#608](https://github.com/rpush/rpush/pull/608) ([diminish7](https://github.com/diminish7))
 - Eliminate deprecation warning in Ruby 3.0 [\#602](https://github.com/rpush/rpush/pull/602) ([rofreg](https://github.com/rofreg))

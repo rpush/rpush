@@ -46,10 +46,7 @@ Rpush.reflect do |on|
   # Called when a notification is queued internally for delivery.
   # The internal queue for each app runner can be inspected:
   #
-  # Rpush::Daemon::AppRunner.runners.each do |app_id, runner|
-  #   runner.app
-  #   runner.queue_size
-  # end
+  # Rpush::Daemon::AppRunner.status
   #
   # on.notification_enqueued do |notification|
   # end
@@ -81,6 +78,23 @@ Rpush.reflect do |on|
 
   # Called when a TCP connection is lost and will be reconnected.
   # on.tcp_connection_lost do |app, error|
+  # end
+
+  # Called for each recipient which successfully receives a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients.
+  # on.fcm_delivered_to_recipient do |notification|
+  # end
+
+  # Called for each recipient which fails to receive a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients. (do not handle invalid registration IDs here)
+  # on.fcm_failed_to_recipient do |notification, error|
+  # end
+
+  # Called when the FCM returns a failure that indicates an invalid device token.
+  # You will need to delete the device token from your records.
+  # on.fcm_invalid_device_token do |app, error, device_token|
   # end
 
   # Called for each recipient which successfully receives a notification. This

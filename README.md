@@ -24,7 +24,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 
 * Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord) or [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) for storage.
 * Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
-[**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd) or [write your own](https://github.com/rpush/rpush/wiki/Writing-a-Plugin).
+[**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd). Third party plugins: [**Prometheus Exporter**](https://github.com/equinux/rpush-plugin-prometheus-exporter). Or [write your own](https://github.com/rpush/rpush/wiki/Writing-a-Plugin).
 * Seamless integration with your projects, including **Rails**.
 * Run as a [daemon](https://github.com/rpush/rpush#as-a-daemon), inside a [job queue](https://github.com/rpush/rpush/wiki/Push-API), on the [command-line](https://github.com/rpush/rpush#on-the-command-line) or [embedded](https://github.com/rpush/rpush/wiki/Embedding-API) in another process.
 * Scales vertically (threading) and horizontally (multiple processes).
@@ -124,6 +124,40 @@ Using one of the notifications methods above, the `url_args` attribute is availa
 The app `environment` for any Apns* option is "development" for XCode installs, and "production" for app store and TestFlight. Note that you can now use one (production + sandbox) certificate (you don't need a separate "sandbox" or development certificate), but if you do generate a development/sandbox certificate it can only be used for "development". With Apnsp8 tokens, you can target either "development" or "production" environments.
 
 #### Firebase Cloud Messaging
+
+##### Firebase Cloud Messaging API (V1)
+
+You will need two params to make use of FCM via Rpush.
+- `firebase_project_id` - The `Project ID` in your Firebase Project Settings
+- `json_key` - The JSON key file for a service account with the `Firebase Admin SDK Administrator Service Agent` role.
+
+Create service account in the google cloud account attached to your firebase account:  
+https://console.cloud.google.com/iam-admin/serviceaccounts  
+Make sure it has Role `Firebase Admin SDK Administrator Service Agent`  
+Add + Download the json key for the service account.  
+
+Once you have those two params, you can create an FCM app and send notifications.
+
+```ruby
+fcm_app = Rpush::Fcm::App.new
+fcm_app.name = "fcm_app"
+fcm_app.firebase_project_id = "someapp-123456"
+fcm_app.json_key = Rails.root.join("your/key/somewhere.json").read # or from a ENV variable - just needs to be the whole json file
+fcm_app.connections = 30
+fcm_app.save!
+```
+
+```ruby
+n = Rpush::Fcm::Notification.new
+n.app = Rpush::Fcm::App.where(name: "fcm_app").first
+n.device_token = device_token # Note that device_token is used here instead of registration_ids
+n.data = {}.transform_values(&:to_s) # All values going in here have to be strings, if you have anything else - nothing goes through
+n.save!
+```
+
+##### Cloud Messaging API (Legacy)
+
+**Note:** Deprecated on 2023/6/20 and scheduled to be disabled on 2024/6/20.
 
 FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
 
@@ -448,7 +482,7 @@ This will run RSpec against all versions of Rails.
 You need to specify a `BUNDLE_GEMFILE` pointing to the gemfile before running the normal test command:
 
 ```
-BUNDLE_GEMFILE=gemfiles/rails_5.2.gemfile rspec spec/unit/apns_feedback_spec.rb
+BUNDLE_GEMFILE=gemfiles/rails_6.0.gemfile rspec spec/unit/apns_feedback_spec.rb
 ```
 
 ##### Multiple database adapter support

@@ -66,4 +66,11 @@ describe Rpush::Daemon::Store::ActiveRecord do
       expect(store.deliverable_notifications(Rpush.config.batch_size)).to be_empty
     end
   end
+
+  describe "#adapter_name" do
+    it "should return the adapter name" do
+      adapter = ENV["ADAPTER"] || "postgresql"
+      expect(store.adapter_name).to eq(adapter)
+    end
+  end
 end if active_record?

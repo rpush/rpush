@@ -92,6 +92,11 @@ module Rpush
           Rpush::Client::Redis::Apns2::Feedback.create!(failed_at: failed_at, device_token: device_token, app_id: app.id)
         end
 
+        def create_fcm_notification(attrs, data, app)
+          notification = Rpush::Client::Redis::Fcm::Notification.new
+          create_fcm_like_notification(notification, attrs, data, app)
+        end
+
         def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
           notification = Rpush::Client::Redis::Gcm::Notification.new
           create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
@@ -138,6 +143,14 @@ module Rpush
           nil
         end
 
+        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
+          notification.assign_attributes(attrs)
+          notification.data = data
+          notification.app = app
+          notification.save!
+          notification
+        end
+
         def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
           notification.assign_attributes(attrs)
           notification.data = data
@@ -152,10 +165,10 @@ module Rpush
           retryable_ns = Rpush::Client::Redis::Notification.absolute_retryable_namespace
 
           Modis.with_connection do |redis|
-            retryable_results = redis.multi do
+            retryable_results = redis.multi do |transaction|
               now = Time.now.to_i
-              redis.zrangebyscore(retryable_ns, 0, now)
-              redis.zremrangebyscore(retryable_ns, 0, now)
+              transaction.zrangebyscore(retryable_ns, 0, now)
+              transaction.zremrangebyscore(retryable_ns, 0, now)
             end
 
             retryable_results.first
@@ -167,9 +180,9 @@ module Rpush
           pending_ns = Rpush::Client::Redis::Notification.absolute_pending_namespace
 
           Modis.with_connection do |redis|
-            pending_results = redis.multi do
-              redis.zrange(pending_ns, 0, limit)
-              redis.zremrangebyrank(pending_ns, 0, limit)
+            pending_results = redis.multi do |transaction|
+              transaction.zrange(pending_ns, 0, limit)
+              transaction.zremrangebyrank(pending_ns, 0, limit)
             end
 
             pending_results.first
