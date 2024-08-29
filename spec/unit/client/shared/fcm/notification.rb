@@ -49,14 +49,11 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
 
   it 'includes content_available in the payload' do
     notification.content_available = true
-    expect(notification.as_json['message']['content_available']).to eq true
-  end
-
-  it 'fails if mutable_content is provided' do
-    expect { notification.mutable_content = true }.to raise_error(ArgumentError)
+    expect(notification.as_json["message"]["apns"]["payload"]["aps"]["content-available"]).to eq 1
   end
 
   it 'sets the priority to high when set to high' do
+    notification.notification = { title: "Title" }
     notification.priority = 'high'
     expect(notification.as_json['message']['android']['priority']).to eq 'high'
     expect(notification.as_json['message']['android']['notification']['notification_priority']).to eq 'PRIORITY_MAX'
@@ -64,6 +61,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
   end
 
   it 'sets the priority to normal when set to normal' do
+    notification.notification = { title: "Title" }
     notification.priority = 'normal'
     expect(notification.as_json['message']['android']['priority']).to eq 'normal'
     expect(notification.as_json['message']['android']['notification']['notification_priority']).to eq 'PRIORITY_DEFAULT'

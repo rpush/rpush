@@ -50,7 +50,7 @@ describe Rpush::Daemon::Wns::Delivery do
     end
 
     it 'set the access token for the app' do
-      expect(delivery).to receive(:update_access_token).with("access_token" => "dummy_access_token", "expires_in" => 60)
+      expect(delivery).to receive(:update_access_token).with({"access_token" => "dummy_access_token", "expires_in" => 60})
       expect(store).to receive(:update_app).with app
       perform
     end
