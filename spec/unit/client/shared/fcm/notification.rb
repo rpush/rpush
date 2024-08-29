@@ -49,7 +49,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
 
   it 'includes content_available in the payload' do
     notification.content_available = true
-    expect(notification.as_json['message']['content_available']).to eq true
+    expect(notification.as_json['message']['apns']['payload']['aps']['content-available']).to eq 1
   end
 
   it 'fails if mutable_content is provided' do
