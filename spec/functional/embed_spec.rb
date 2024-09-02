@@ -48,7 +48,6 @@ describe 'embedding' do
   let(:fake_http_resp_body) { '' }
 
   before do
-    create_app
     Rpush.config.push_poll = 0.5
 
     allow(NetHttp2::Client).
