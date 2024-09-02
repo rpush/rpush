@@ -45,7 +45,7 @@ describe Rpush::CLI do
       to receive(:on).with(:close).
       and_yield
 
-      Rpush.embed
+    Rpush.embed
   end
 
   after do
