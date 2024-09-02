@@ -3,8 +3,8 @@ module Rpush
     module ActiveModel
       module Fcm
         module Notification
-          FCM_PRIORITY_HIGH = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_IMMEDIATE
-          FCM_PRIORITY_NORMAL = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
+          FCM_PRIORITY_HIGH = Rpush::Client::ActiveModel::Apns2::Notification::APNS_PRIORITY_IMMEDIATE
+          FCM_PRIORITY_NORMAL = Rpush::Client::ActiveModel::Apns2::Notification::APNS_PRIORITY_CONSERVE_POWER
           FCM_PRIORITIES = [FCM_PRIORITY_HIGH, FCM_PRIORITY_NORMAL]
 
           ROOT_NOTIFICATION_KEYS = %w[title body image].freeze
