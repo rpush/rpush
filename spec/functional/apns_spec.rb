@@ -96,9 +96,6 @@ describe 'APNs' do
     end
 
     after do
-      Rpush.reflection_stack.clear
-      Rpush.reflection_stack.push(Rpush::ReflectionCollection.new)
-
       timeout { Rpush.shutdown }
     end
 
