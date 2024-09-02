@@ -257,7 +257,6 @@ describe 'APNs http2 adapter' do
         Rpush.reflect do |on|
           on.error do |error|
             expect(error).to be_kind_of(StandardError)
-           reflector.accept
           end
         end
 
@@ -292,7 +291,6 @@ describe 'APNs http2 adapter' do
           on.error do |error|
             reflected_error = true
             expect(error).to be_kind_of(StandardError)
-            reflector.accept
           end
         end
 
