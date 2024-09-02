@@ -4,7 +4,7 @@ module Rpush
       class Interface
         PUBLIC_METHODS = [:deliverable_notifications, :mark_retryable,
                           :mark_batch_retryable, :mark_delivered, :mark_batch_delivered,
-                          :mark_failed, :mark_batch_failed, :create_apns_feedback,
+                          :mark_failed, :mark_batch_failed,
                           :create_fcm_notification, :create_gcm_notification, :create_adm_notification,
                           :update_app, :update_notification, :release_connection,
                           :all_apps, :app, :mark_ids_failed, :mark_ids_retryable,

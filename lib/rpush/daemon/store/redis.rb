@@ -88,10 +88,6 @@ module Rpush
           end
         end
 
-        def create_apns_feedback(failed_at, device_token, app)
-          Rpush::Client::Redis::Apns::Feedback.create!(failed_at: failed_at, device_token: device_token, app_id: app.id)
-        end
-
         def create_fcm_notification(attrs, data, app)
           notification = Rpush::Client::Redis::Fcm::Notification.new
           create_fcm_like_notification(notification, attrs, data, app)

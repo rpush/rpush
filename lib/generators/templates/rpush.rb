@@ -30,9 +30,6 @@ Rpush.configure do |config|
   # If the logger goes to stdout, you can disable foreground logging to avoid duplication.
   # config.foreground_logging = false
 
-  # config.apns.feedback_receiver.enabled = true
-  # config.apns.feedback_receiver.frequency = 60
-
 end
 
 Rpush.reflect do |on|

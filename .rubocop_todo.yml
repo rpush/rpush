@@ -343,11 +343,6 @@ Lint/MissingSuper:
     - 'lib/rpush/daemon/wpns/delivery.rb'
     - 'spec/unit/daemon/delivery_spec.rb'
 
-# Offense count: 1
-Lint/NestedMethodDefinition:
-  Exclude:
-    - 'spec/unit/daemon/apns/feedback_receiver_spec.rb'
-
 # Offense count: 5
 # Cop supports --auto-correct.
 Lint/RedundantCopDisableDirective:
@@ -488,7 +483,6 @@ Performance/StringIdentifierArgument:
     - 'lib/rpush/daemon/service_config_methods.rb'
     - 'lib/rpush/logger.rb'
     - 'spec/spec_helper.rb'
-    - 'spec/unit/daemon/apns/feedback_receiver_spec.rb'
     - 'spec/unit/daemon/store/active_record/reconnectable_spec.rb'
     - 'spec/unit/daemon/tcp_connection_spec.rb'
     - 'spec/unit/logger_spec.rb'
@@ -587,7 +581,6 @@ Style/Encoding:
   Exclude:
     - 'lib/rpush/cli.rb'
     - 'lib/rpush/daemon.rb'
-    - 'lib/rpush/daemon/apns/feedback_receiver.rb'
     - 'lib/rpush/daemon/app_runner.rb'
     - 'rpush.gemspec'
 
@@ -646,7 +639,6 @@ Style/GuardClause:
     - 'lib/rpush/daemon/adm/delivery.rb'
     - 'lib/rpush/daemon/app_runner.rb'
     - 'lib/rpush/daemon/tcp_connection.rb'
-    - 'spec/unit/daemon/apns/feedback_receiver_spec.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -776,7 +768,6 @@ Style/RescueStandardError:
 Style/SafeNavigation:
   Exclude:
     - 'lib/rpush/client/active_model/apns/notification.rb'
-    - 'lib/rpush/daemon/apns/feedback_receiver.rb'
     - 'lib/rpush/daemon/app_runner.rb'
     - 'lib/rpush/daemon/dispatcher/apns_tcp.rb'
     - 'lib/rpush/daemon/dispatcher/tcp.rb'

@@ -39,7 +39,6 @@ require 'rpush/daemon/rpc/client'
 require 'rpush/daemon/store/interface'
 
 require 'rpush/daemon/apns/delivery'
-require 'rpush/daemon/apns/feedback_receiver'
 require 'rpush/daemon/apns'
 
 require 'rpush/daemon/apns2/delivery'

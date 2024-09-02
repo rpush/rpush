@@ -386,7 +386,6 @@ Rpush will deliver all pending notifications and then exit.
 
 ```ruby
 Rpush.push
-Rpush.apns_feedback
 ```
 
 See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.
