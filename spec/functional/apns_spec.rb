@@ -8,7 +8,10 @@ describe 'APNs' do
 
   before do
     Rpush.config.push_poll = 0.5
-    stub_tcp_connection(tcp_socket, ssl_socket, io_double)
+
+    allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(connect_socket: [tcp_socket, ssl_socket])
+    allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(setup_ssl_context: double.as_null_object)
+    stub_const('Rpush::Daemon::TcpConnection::IO', io_double)
   end
 
   def create_app
