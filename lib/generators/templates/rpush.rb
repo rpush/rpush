@@ -73,10 +73,6 @@ Rpush.reflect do |on|
   # on.notification_id_will_retry do |app, notification_id, retry_after|
   # end
 
-  # Called when a TCP connection is lost and will be reconnected.
-  # on.tcp_connection_lost do |app, error|
-  # end
-
   # Called for each recipient which successfully receives a notification. This
   # can occur more than once for the same notification when there are multiple
   # recipients.

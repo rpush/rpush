@@ -350,7 +350,6 @@ Lint/RedundantCopDisableDirective:
     - 'lib/rpush/client/active_model/gcm/notification.rb'
     - 'lib/rpush/daemon/interruptible_sleep.rb'
     - 'lib/rpush/daemon/rpc/client.rb'
-    - 'lib/rpush/daemon/tcp_connection.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -364,7 +363,6 @@ Lint/SuppressedException:
   Exclude:
     - 'lib/rpush/daemon/interruptible_sleep.rb'
     - 'lib/rpush/daemon/rpc/client.rb'
-    - 'lib/rpush/daemon/tcp_connection.rb'
 
 # Offense count: 2
 # Cop supports --auto-correct.
@@ -412,12 +410,6 @@ Metrics/BlockLength:
 # Configuration parameters: IgnoredMethods.
 Metrics/PerceivedComplexity:
   Max: 9
-
-# Offense count: 1
-# Cop supports --auto-correct.
-Migration/DepartmentName:
-  Exclude:
-    - 'lib/rpush/daemon/tcp_connection.rb'
 
 # Offense count: 1
 # Configuration parameters: MinNameLength, AllowNamesEndingInNumbers, AllowedNames, ForbiddenNames.
@@ -471,7 +463,6 @@ Performance/RegexpMatch:
   Exclude:
     - 'lib/rpush/client/active_model/apns/device_token_format_validator.rb'
     - 'lib/rpush/daemon/retry_header_parser.rb'
-    - 'lib/rpush/daemon/tcp_connection.rb'
     - 'spec/support/active_record_setup.rb'
 
 # Offense count: 16
@@ -484,14 +475,12 @@ Performance/StringIdentifierArgument:
     - 'lib/rpush/logger.rb'
     - 'spec/spec_helper.rb'
     - 'spec/unit/daemon/store/active_record/reconnectable_spec.rb'
-    - 'spec/unit/daemon/tcp_connection_spec.rb'
     - 'spec/unit/logger_spec.rb'
 
 # Offense count: 6
 # Cop supports --auto-correct.
 Performance/StringInclude:
   Exclude:
-    - 'lib/rpush/daemon/tcp_connection.rb'
     - 'lib/rpush/daemon/wns/post_request.rb'
     - 'spec/functional_spec_helper.rb'
     - 'spec/support/active_record_setup.rb'
@@ -638,7 +627,6 @@ Style/GuardClause:
     - 'lib/rpush/daemon.rb'
     - 'lib/rpush/daemon/adm/delivery.rb'
     - 'lib/rpush/daemon/app_runner.rb'
-    - 'lib/rpush/daemon/tcp_connection.rb'
 
 # Offense count: 1
 # Cop supports --auto-correct.
@@ -660,7 +648,6 @@ Style/IfUnlessModifier:
     - 'lib/rpush/client/active_model/apns/notification.rb'
     - 'lib/rpush/client/active_model/webpush/app.rb'
     - 'lib/rpush/daemon/delivery.rb'
-    - 'lib/rpush/daemon/tcp_connection.rb'
     - 'lib/rpush/embed.rb'
     - 'spec/support/simplecov_helper.rb'
 
@@ -705,7 +692,6 @@ Style/NumericPredicate:
     - 'lib/rpush/daemon.rb'
     - 'lib/rpush/daemon/apnsp8/delivery.rb'
     - 'lib/rpush/daemon/app_runner.rb'
-    - 'lib/rpush/daemon/dispatcher/apns_tcp.rb'
     - 'lib/rpush/daemon/feeder.rb'
     - 'lib/rpush/daemon/store/redis.rb'
     - 'lib/rpush/daemon/synchronizer.rb'
@@ -769,14 +755,11 @@ Style/SafeNavigation:
   Exclude:
     - 'lib/rpush/client/active_model/apns/notification.rb'
     - 'lib/rpush/daemon/app_runner.rb'
-    - 'lib/rpush/daemon/dispatcher/apns_tcp.rb'
-    - 'lib/rpush/daemon/dispatcher/tcp.rb'
     - 'lib/rpush/daemon/dispatcher_loop.rb'
     - 'lib/rpush/daemon/feeder.rb'
     - 'lib/rpush/daemon/interruptible_sleep.rb'
     - 'lib/rpush/daemon/rpc/server.rb'
     - 'lib/rpush/daemon/signal_handler.rb'
-    - 'lib/rpush/daemon/tcp_connection.rb'
     - 'lib/rpush/embed.rb'
     - 'lib/rpush/logger.rb'
 
@@ -848,4 +831,3 @@ Style/WhileUntilModifier:
 Style/ZeroLengthPredicate:
   Exclude:
     - 'lib/rpush/daemon/app_runner.rb'
-    - 'lib/rpush/daemon/dispatcher/apns_tcp.rb'

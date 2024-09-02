@@ -8,7 +8,7 @@ module Rpush
       :gcm_delivered_to_recipient, :gcm_failed_to_recipient, :gcm_canonical_id, :gcm_invalid_registration_id,
       :fcm_delivered_to_recipient, :fcm_failed_to_recipient, :fcm_canonical_id, :fcm_invalid_device_token,
       :error, :adm_canonical_id, :adm_failed_to_recipient, :wns_invalid_channel,
-      :tcp_connection_lost, :ssl_certificate_will_expire, :ssl_certificate_revoked,
+      :ssl_certificate_will_expire, :ssl_certificate_revoked,
       :notification_id_will_retry, :notification_id_failed
     ]
 

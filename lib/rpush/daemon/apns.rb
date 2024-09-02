@@ -10,7 +10,7 @@ module Rpush
       }
 
       batch_deliveries true
-      dispatcher :apns_tcp, host: proc { |app| HOSTS[app.environment.to_sym] }
+      dispatcher :apns_http2, host: proc { |app| HOSTS[app.environment.to_sym] }
     end
   end
 end
