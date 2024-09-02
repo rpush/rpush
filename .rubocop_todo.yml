@@ -329,7 +329,6 @@ Lint/IneffectiveAccessModifier:
 Lint/MissingSuper:
   Exclude:
     - 'lib/rpush/daemon/adm/delivery.rb'
-    - 'lib/rpush/daemon/apns/delivery.rb'
     - 'lib/rpush/daemon/apns2/delivery.rb'
     - 'lib/rpush/daemon/apnsp8/delivery.rb'
     - 'lib/rpush/daemon/delivery_error.rb'
