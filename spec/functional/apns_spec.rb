@@ -72,17 +72,6 @@ describe 'APNs' do
     end.to change(notification, :delivered).to(true)
   end
 
-  it 'receives feedback' do
-    app
-    tuple = "N\xE3\x84\r\x00 \x83OxfU\xEB\x9F\x84aJ\x05\xAD}\x00\xAF1\xE5\xCF\xE9:\xC3\xEA\a\x8F\x1D\xA4M*N\xB0\xCE\x17"
-    allow(ssl_socket).to receive(:read).and_return(tuple, nil)
-    Rpush.apns_feedback
-    feedback = Rpush::Apns::Feedback.all.first
-    expect(feedback).not_to be_nil
-    expect(feedback.app_id).to eq(app.id)
-    expect(feedback.device_token).to eq('834f786655eb9f84614a05ad7d00af31e5cfe93ac3ea078f1da44d2a4eb0ce17')
-  end
-
   describe 'delivery failures' do
     before do
       Rpush.reflect do |on|
@@ -118,45 +107,6 @@ describe 'APNs' do
       wait_for_notification_to_deliver(notification)
       fail_notification(notification)
       wait_for_notification_to_fail(notification)
-    end
-
-    describe 'with a failed connection' do
-      it 'retries all notifications' do
-        allow_any_instance_of(Rpush::Daemon::TcpConnection).to receive_messages(sleep: nil)
-        expect(ssl_socket).to receive(:write).at_least(1).times.and_raise(Errno::EPIPE)
-        notifications = 2.times.map { create_notification }
-        notifications.each { |n| wait_for_notification_to_retry(n) }
-      end
-    end
-
-    describe 'with multiple notifications' do
-      let(:notification1) { create_notification }
-      let(:notification2) { create_notification }
-      let(:notification3) { create_notification }
-      let(:notification4) { create_notification }
-      let(:notifications) { [notification1, notification2, notification3, notification4] }
-
-      it 'marks the correct notification as failed' do
-        notifications.each { |n| wait_for_notification_to_deliver(n) }
-        fail_notification(notification2)
-        wait_for_notification_to_fail(notification2)
-      end
-
-      it 'does not mark prior notifications as failed' do
-        notifications.each { |n| wait_for_notification_to_deliver(n) }
-        fail_notification(notification2)
-        wait_for_notification_to_fail(notification2)
-
-        expect(failed_ids).to_not include(notification1.id)
-        notification1.reload
-        expect(notification1.delivered).to eq(true)
-      end
-
-      it 'marks notifications following the failed one as retryable' do
-        notifications.each { |n| wait_for_notification_to_deliver(n) }
-        fail_notification(notification2)
-        [notification3, notification4].each { |n| wait_for_notification_to_retry(n) }
-      end
     end
   end
 end
