@@ -14,7 +14,7 @@ describe 'embedding' do
   let(:fake_device_token) { 'a' * 108 }
   let(:notification_data) { nil }
 
-  def create_notification(app)
+  def create_notification
     notification = Rpush::Apns2::Notification.new
     notification.app = app
     notification.sound = 'default'
@@ -27,7 +27,7 @@ describe 'embedding' do
   end
 
   let(:app) { create_app }
-  let(:notification) { create_notification(app) }
+  let(:notification) { create_notification }
 
   let(:fake_client) {
     double(
