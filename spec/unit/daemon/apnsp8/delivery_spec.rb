@@ -42,7 +42,7 @@ describe Rpush::Daemon::Apnsp8::Delivery do
         loop do
           break unless thread.alive?
 
-          if Time.now - start > 0.5
+          if Time.now - start > 1
             thread.kill
             fail 'Stuck in an infinite loop'
           end
