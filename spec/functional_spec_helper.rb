@@ -21,7 +21,7 @@ RSpec.configure do |config|
   config.before(:each) do
     Modis.with_connection do |redis|
       redis.keys('rpush:*').each { |key| redis.del(key) }
-    end if redis?
+    end if redis? && functional_example?(self.class.metadata)
 
     Rpush.config.logger = ::Logger.new(STDOUT) if functional_example?(self.class.metadata)
   end

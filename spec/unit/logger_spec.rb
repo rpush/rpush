@@ -92,7 +92,7 @@ describe Rpush::Logger do
     now = Time.now
     allow(Time).to receive(:now).and_return(now)
     logger = Rpush::Logger.new
-    expect(@logger).to receive(:info).with(/#{Regexp.escape("[#{now.to_s(:db)}]")}/)
+    expect(@logger).to receive(:info).with(/#{Regexp.escape("[#{now.to_formatted_s(:db)}]")}/)
     logger.info("blah")
   end
 
