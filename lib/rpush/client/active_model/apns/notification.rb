@@ -52,10 +52,6 @@ module Rpush
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
-          def content_available?
-            (self.data || {})[CONTENT_AVAILABLE_KEY]
-          end
-
           def as_json(options = nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             json = ActiveSupport::OrderedHash.new
 
