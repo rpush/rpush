@@ -12,7 +12,21 @@
 
 * Dropped support for Ruby 2.4, 2.5, 2.6 and Rails 5.2.
 
-[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.1...HEAD)
+[Full Changelog](https://github.com/rpush/rpush/compare/v8.0.0...HEAD)
+
+## [v7.0.1](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
+
+**Merged pull requests:**
+
+* Support for FCMv1 [\#620](https://github.com/rpush/rpush/pull/620) ([mirkode](https://github.com/mirkode)), [\#660](https://github.com/rpush/rpush/pull/660) ([AnilRh](https://github.com/AnilRh)) and [\#673](https://github.com/rpush/rpush/pull/673) ([SixiS](https://github.com/SixiS), [Henridv](https://github.com/Henridv) & [benlangfeld](https://github.com/benlangfeld))
+* No longer silence content-available notifications for APNs. Reverts the following change from the v6.0.0 release. See https://github.com/rpush/rpush/issues/647.
+  * Fix silent APNS notifications for Apns2 and Apnsp8 [\#596](https://github.com/rpush/rpush/pull/596) ([shved270189](https://github.com/shved270189))
+
+**Breaking:**
+
+* Dropped support for Ruby 2.4, 2.5, 2.6 and Rails 5.2.
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.1...v8.0.0)
 
 ## [v7.0.1](https://github.com/rpush/rpush/tree/v7.0.1) (2022-03-02)
 
