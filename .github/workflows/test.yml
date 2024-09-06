@@ -52,7 +52,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gemfile: ['rails_6.0', 'rails_6.1', 'rails_7.0', 'rails_7.1']
+        gemfile: ['rails_6.0', 'rails_6.1', 'rails_7.0', 'rails_7.1', 'rails_7.2']
 
         ruby: ['2.7', '3.0', '3.1']
 
@@ -63,6 +63,8 @@ jobs:
             gemfile: 'rails_7.0'
           - ruby: '2.7'
             gemfile: 'rails_7.1'
+          - ruby: '2.7'
+            gemfile: 'rails_7.2'
 
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
