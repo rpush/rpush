@@ -82,7 +82,7 @@ n = Rpush::Apnsp8::Notification.new
 n.app = Rpush::Apnsp8::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
-# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" } 
+# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" }
 n.data = { foo: :bar }
 n.save!
 ```
@@ -107,7 +107,7 @@ n = Rpush::Apns2::Notification.new
 n.app = Rpush::Apns2::App.find_by_name("ios_app")
 n.device_token = "..." # hex string
 n.alert = "hi mom!"
-# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" } 
+# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" }
 n.data = {
   headers: { 'apns-topic': "BUNDLE ID" }, # the bundle id of the app, like com.example.appname. Not necessary if set on the app (see above)
   foo: :bar
@@ -126,8 +126,6 @@ Using one of the notifications methods above, the `url_args` attribute is availa
 The app `environment` for any Apns* option is "development" for XCode installs, and "production" for app store and TestFlight. Note that you can now use one (production + sandbox) certificate (you don't need a separate "sandbox" or development certificate), but if you do generate a development/sandbox certificate it can only be used for "development". With Apnsp8 tokens, you can target either "development" or "production" environments.
 
 #### Firebase Cloud Messaging
-
-##### Firebase Cloud Messaging API (V1)
 
 You will need two params to make use of FCM via Rpush.
 - `firebase_project_id` - The `Project ID` in your Firebase Project Settings
@@ -154,37 +152,6 @@ n = Rpush::Fcm::Notification.new
 n.app = Rpush::Fcm::App.where(name: "fcm_app").first
 n.device_token = device_token # Note that device_token is used here instead of registration_ids
 n.data = {}.transform_values(&:to_s) # All values going in here have to be strings, if you have anything else - nothing goes through
-n.save!
-```
-
-##### Cloud Messaging API (Legacy)
-
-**Note:** Deprecated on 2023/6/20 and scheduled to be disabled on 2024/6/20.
-
-FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
-
-Please refer to the Firebase Console on where to find your `auth_key` (probably called _Server Key_ there). To verify you have the right key, use tools like [Postman](https://www.getpostman.com/), [HTTPie](https://httpie.org/), `curl` or similar before reporting a new issue. See also [this comment](https://github.com/rpush/rpush/issues/346#issuecomment-289218776).
-
-```ruby
-app = Rpush::Gcm::App.new
-app.name = "android_app"
-app.auth_key = "..."
-app.connections = 1
-app.save!
-```
-
-```ruby
-n = Rpush::Gcm::Notification.new
-n.app = Rpush::Gcm::App.find_by_name("android_app")
-n.registration_ids = ["..."]
-n.data = { message: "hi mom!" }
-n.priority = 'high'        # Optional, can be either 'normal' or 'high'
-n.content_available = true # Optional
-# Optional notification payload. See the reference below for more keys you can use!
-n.notification = { body: 'great match!',
-                   title: 'Portugal vs. Denmark',
-                   icon: 'myicon'
-                 }
 n.save!
 ```
 

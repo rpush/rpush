@@ -143,14 +143,9 @@ module Rpush
           create_fcm_like_notification(notification, attrs, data, app)
         end
 
-        def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
-          notification = Rpush::Client::ActiveRecord::Gcm::Notification.new
-          create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
-        end
-
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
           notification = Rpush::Client::ActiveRecord::Adm::Notification.new
-          create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
+          create_adm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def update_app(app)
@@ -202,7 +197,7 @@ module Rpush
           end
         end
 
-        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
+        def create_adm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
           with_database_reconnect_and_retry do
             notification.assign_attributes(attrs)
             notification.data = data

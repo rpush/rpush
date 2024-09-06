@@ -1,8 +1,8 @@
 require 'functional_spec_helper'
 
 describe 'Retries' do
-  let(:app) { Rpush::Gcm::App.new }
-  let(:notification) { Rpush::Gcm::Notification.new }
+  let(:app) { Rpush::Fcm::App.new }
+  let(:notification) { Rpush::Fcm::Notification.new }
   let(:response) { double(Net::HTTPResponse, code: 200) }
   let(:http) { double(Net::HTTP::Persistent, request: response, shutdown: nil) }
 
