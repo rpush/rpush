@@ -138,13 +138,6 @@ module Rpush
           end
         end
 
-        def create_apns_feedback(failed_at, device_token, app)
-          with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Apns::Feedback.create!(failed_at: failed_at,
-                                                                device_token: device_token, app_id: app.id)
-          end
-        end
-
         def create_fcm_notification(attrs, data, app)
           notification = Rpush::Client::ActiveRecord::Fcm::Notification.new
           create_fcm_like_notification(notification, attrs, data, app)

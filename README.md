@@ -57,10 +57,9 @@ There is a choice of two modes (and one legacy mode) using certificates or using
 
 * `Rpush::Apns2` This requires an annually renewable certificate. see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns
 * `Rpush::Apnsp8` This uses encrypted tokens and requires an encryption key id and encryption key (provide as a p8 file). (see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_token-based_connection_to_apns)
-* `Rpush::Apns` There is also the original APNS (the original version using certificates with a binary underlying protocol over TCP directly rather than over Http/2).
   Apple have [announced](https://developer.apple.com/news/?id=c88acm2b) that this is not supported after March 31, 2021.
 
-If this is your first time using the APNs, you will need to generate either SSL certificates (for Apns2 or Apns) or an Encryption Key (p8) and an Encryption Key ID (for Apnsp8). See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
+If this is your first time using the APNs, you will need to generate either SSL certificates (for standard Apns) or an Encryption Key (p8) and an Encryption Key ID (for Apnsp8). See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
 ##### Apnsp8
 
@@ -118,35 +117,13 @@ n.save!
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
-##### Apns (legacy protocol)
-
-```ruby
-app = Rpush::Apns::App.new
-app.name = "ios_app"
-app.certificate = File.read("/path/to/sandbox.pem")
-app.environment = "development" # APNs environment.
-app.password = "certificate password"
-app.connections = 1
-app.save!
-```
-
-```ruby
-n = Rpush::Apns::Notification.new
-n.app = Rpush::Apns::App.find_by_name("ios_app")
-n.device_token = "..." # hex string
-n.alert = "hi mom!"
-# n.alert = { title: "push title", subtitle: "more to say", body: "hi mom!" } 
-n.data = { foo: :bar }
-n.save!
-```
-
 ##### Safari Push Notifications
 
 Using one of the notifications methods above, the `url_args` attribute is available for Safari Push Notifications.
 
 ##### Environment
 
-The app `environment` for any Apns* option is "development" for XCode installs, and "production" for app store and TestFlight. Note that for Apns2 you can now use one (production + sandbox) certificate (you don't need a separate "sandbox" or development certificate), but if you do generate a development/sandbox certificate it can only be used for "development". With Apnsp8 tokens, you can target either "development" or "production" environments.
+The app `environment` for any Apns* option is "development" for XCode installs, and "production" for app store and TestFlight. Note that you can now use one (production + sandbox) certificate (you don't need a separate "sandbox" or development certificate), but if you do generate a development/sandbox certificate it can only be used for "development". With Apnsp8 tokens, you can target either "development" or "production" environments.
 
 #### Firebase Cloud Messaging
 
@@ -156,10 +133,10 @@ You will need two params to make use of FCM via Rpush.
 - `firebase_project_id` - The `Project ID` in your Firebase Project Settings
 - `json_key` - The JSON key file for a service account with the `Firebase Admin SDK Administrator Service Agent` role.
 
-Create service account in the google cloud account attached to your firebase account:  
-https://console.cloud.google.com/iam-admin/serviceaccounts  
-Make sure it has Role `Firebase Admin SDK Administrator Service Agent`  
-Add + Download the json key for the service account.  
+Create service account in the google cloud account attached to your firebase account:
+https://console.cloud.google.com/iam-admin/serviceaccounts
+Make sure it has Role `Firebase Admin SDK Administrator Service Agent`
+Add + Download the json key for the service account.
 
 Once you have those two params, you can create an FCM app and send notifications.
 
@@ -411,7 +388,6 @@ Rpush will deliver all pending notifications and then exit.
 
 ```ruby
 Rpush.push
-Rpush.apns_feedback
 ```
 
 See [Push API](https://github.com/rpush/rpush/wiki/Push-API) for more details.

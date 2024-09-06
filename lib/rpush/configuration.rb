@@ -16,26 +16,11 @@ module Rpush
     end
   end
 
-  CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :foreground_logging, :log_level, :plugin, :apns]
+  CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :foreground_logging, :log_level, :plugin]
   DEPRECATED_ATTRS = []
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
-
-  class ApnsFeedbackReceiverConfiguration < Struct.new(:frequency, :enabled) # rubocop:disable Style/StructInheritance
-    def initialize
-      super
-      self.enabled = true
-      self.frequency = 60
-    end
-  end
-
-  class ApnsConfiguration < Struct.new(:feedback_receiver) # rubocop:disable Style/StructInheritance
-    def initialize
-      super
-      self.feedback_receiver = ApnsFeedbackReceiverConfiguration.new
-    end
-  end
 
   class Configuration < Struct.new(*CONFIG_ATTRS) # rubocop:disable Style/StructInheritance
     include Deprecatable
@@ -54,8 +39,6 @@ module Rpush
       self.plugin = OpenStruct.new
       self.foreground = false
       self.foreground_logging = true
-
-      self.apns = ApnsConfiguration.new
 
       # Internal options.
       self.embedded = false
