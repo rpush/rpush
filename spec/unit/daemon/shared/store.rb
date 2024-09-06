@@ -233,15 +233,6 @@ shared_examples 'Rpush::Daemon::Store' do
     end
   end
 
-  describe 'create_apns_feedback' do
-    it 'creates the Feedback record' do
-      expect(Rpush::Apns::Feedback).to receive(:create!).with(
-        failed_at: time, device_token: 'ab' * 32, app_id: app.id
-      )
-      store.create_apns_feedback(time, 'ab' * 32, app)
-    end
-  end
-
   describe 'create_gcm_notification' do
     let(:data) { { 'data' => true } }
     let(:attributes) { { device_token: 'ab' * 32 } }

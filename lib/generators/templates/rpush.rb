@@ -30,9 +30,6 @@ Rpush.configure do |config|
   # If the logger goes to stdout, you can disable foreground logging to avoid duplication.
   # config.foreground_logging = false
 
-  # config.apns.feedback_receiver.enabled = true
-  # config.apns.feedback_receiver.frequency = 60
-
 end
 
 Rpush.reflect do |on|
@@ -74,10 +71,6 @@ Rpush.reflect do |on|
   # Called when a notification will be retried and only the notification ID
   # is present in memory.
   # on.notification_id_will_retry do |app, notification_id, retry_after|
-  # end
-
-  # Called when a TCP connection is lost and will be reconnected.
-  # on.tcp_connection_lost do |app, error|
   # end
 
   # Called for each recipient which successfully receives a notification. This
