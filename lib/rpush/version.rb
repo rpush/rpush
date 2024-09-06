@@ -1,7 +1,7 @@
 module Rpush
   module VERSION
-    MAJOR = 7
-    MINOR = 1
+    MAJOR = 8
+    MINOR = 0
     TINY = 0
     PRE = nil
 
