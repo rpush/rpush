@@ -108,7 +108,7 @@ describe 'APNs http2 adapter' do
         .with(
           :post,
           "/3/device/#{fake_device_token}",
-          { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\","\
+          { body: "{\"aps\":{\"alert\":\"test\",\"sound\":\"default\"," \
                   "\"content-available\":1},\"some_field\":\"some value\"}",
             headers: {
               'apns-topic' => bundle_id,

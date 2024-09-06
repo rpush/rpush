@@ -121,14 +121,14 @@ module Rpush
         end
 
         def retry_message_to_log(notification)
-          log_warn("Notification #{notification.id} will be retried after "\
-            "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} "\
-            "(retry #{notification.retries}).")
+          log_warn("Notification #{notification.id} will be retried after " \
+                   "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} " \
+                   "(retry #{notification.retries}).")
         end
 
         def failed_message_to_log(notification, response)
-          log_error("Notification #{notification.id} failed, "\
-            "#{response[:code]}/#{response[:failure_reason]}")
+          log_error("Notification #{notification.id} failed, " \
+                    "#{response[:code]}/#{response[:failure_reason]}")
         end
       end
     end

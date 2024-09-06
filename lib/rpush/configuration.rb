@@ -51,7 +51,7 @@ module Rpush
       self.log_file = 'log/rpush.log'
       self.pid_file = 'tmp/rpush.pid'
       self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::DEBUG
-      self.plugin = OpenStruct.new
+      self.plugin = Struct.new
       self.foreground = false
       self.foreground_logging = true
 
@@ -86,7 +86,7 @@ module Rpush
     end
 
     def logger=(logger)
-      super(logger)
+      super
     end
 
     def client=(client)

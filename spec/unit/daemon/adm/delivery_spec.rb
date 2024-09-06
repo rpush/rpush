@@ -161,7 +161,7 @@ describe Rpush::Daemon::Adm::Delivery do
       adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, notification.registration_ids.first))
       expect(http).to receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
-      expect(delivery).to receive(:mark_retryable).with(notification, Time.now + 2**(notification.retries + 1))
+      expect(delivery).to receive(:mark_retryable).with(notification, Time.now + (2**(notification.retries + 1)))
       perform
     end
 

@@ -35,7 +35,7 @@ module Rpush
 
           def data=(value)
             value = value.stringify_keys if value.respond_to?(:stringify_keys)
-            super value
+            super
           end
 
           def subscription

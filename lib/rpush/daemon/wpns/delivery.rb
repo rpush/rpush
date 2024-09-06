@@ -123,8 +123,8 @@ module Rpush
         end
 
         def clean_param_string(string)
-          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          string.gsub('&', "&amp;").gsub('<', "&lt;")
+            .gsub('>', "&gt;").gsub("'", "&apos;").gsub('"', "&quot;")
         end
       end
     end

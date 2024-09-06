@@ -69,7 +69,7 @@ describe Rpush::Daemon::Pushy::Delivery do
 
         let(:expected_log_message) do
           "Pushy responded with a #{response_code} error. Notification #{notification.id} " \
-          "will be retried after #{deliver_after} (retry 1)."
+            "will be retried after #{deliver_after} (retry 1)."
         end
 
         it 'logs that the notification will be retried' do

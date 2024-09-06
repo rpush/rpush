@@ -7,10 +7,13 @@ AllCops:
     - lib/generators/**/*
     - vendor/bundle/**/*
   NewCops: enable
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.7
 
 Layout/LineLength:
   Enabled: false
+
+Lint/DuplicateBranch:
+  IgnoreLiteralBranches: true
 
 Style/StringLiterals:
   Enabled: false
