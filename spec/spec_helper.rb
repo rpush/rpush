@@ -58,6 +58,8 @@ def after_example_cleanup
   end
   Rpush.plugins.values.each(&:unload)
   Rpush.instance_variable_set('@plugins', {})
+  Rpush.reflection_stack.clear
+  Rpush.reflection_stack.push(Rpush::ReflectionCollection.new)
 end
 
 RSpec.configure do |config|

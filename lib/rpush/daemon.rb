@@ -19,11 +19,8 @@ require 'rpush/daemon/batch'
 require 'rpush/daemon/queue_payload'
 require 'rpush/daemon/synchronizer'
 require 'rpush/daemon/app_runner'
-require 'rpush/daemon/tcp_connection'
 require 'rpush/daemon/dispatcher_loop'
 require 'rpush/daemon/dispatcher/http'
-require 'rpush/daemon/dispatcher/tcp'
-require 'rpush/daemon/dispatcher/apns_tcp'
 require 'rpush/daemon/dispatcher/apns_http2'
 require 'rpush/daemon/dispatcher/apnsp8_http2'
 require 'rpush/daemon/service_config_methods'
@@ -38,10 +35,6 @@ require 'rpush/daemon/rpc/client'
 
 require 'rpush/daemon/store/interface'
 
-require 'rpush/daemon/apns/delivery'
-require 'rpush/daemon/apns/feedback_receiver'
-require 'rpush/daemon/apns'
-
 require 'rpush/daemon/apns2/delivery'
 require 'rpush/daemon/apns2'
 
@@ -52,9 +45,6 @@ require 'rpush/daemon/apnsp8'
 require 'rpush/daemon/fcm/delivery'
 require 'rpush/daemon/fcm'
 require 'rpush/daemon/google_credential_cache'
-
-require 'rpush/daemon/gcm/delivery'
-require 'rpush/daemon/gcm'
 
 require 'rpush/daemon/wpns/delivery'
 require 'rpush/daemon/wpns'

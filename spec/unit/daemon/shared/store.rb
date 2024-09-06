@@ -233,48 +233,6 @@ shared_examples 'Rpush::Daemon::Store' do
     end
   end
 
-  describe 'create_apns_feedback' do
-    it 'creates the Feedback record' do
-      expect(Rpush::Apns::Feedback).to receive(:create!).with(
-        failed_at: time, device_token: 'ab' * 32, app_id: app.id
-      )
-      store.create_apns_feedback(time, 'ab' * 32, app)
-    end
-  end
-
-  describe 'create_gcm_notification' do
-    let(:data) { { 'data' => true } }
-    let(:attributes) { { device_token: 'ab' * 32 } }
-    let(:registration_ids) { %w[123 456] }
-    let(:deliver_after) { time + 10.seconds }
-    let(:args) { [attributes, data, registration_ids, deliver_after, app] }
-
-    it 'sets the given attributes' do
-      new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.device_token).to eq 'ab' * 32
-    end
-
-    it 'sets the given data' do
-      new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.data['data']).to be_truthy
-    end
-
-    it 'sets the given registration IDs' do
-      new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.registration_ids).to eq registration_ids
-    end
-
-    it 'sets the deliver_after timestamp' do
-      new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.deliver_after).to eq deliver_after
-    end
-
-    it 'saves the new notification' do
-      new_notification = store.create_gcm_notification(*args)
-      expect(new_notification.new_record?).to be_falsey
-    end
-  end
-
   describe 'create_adm_notification' do
     let(:data) { { 'data' => true } }
     let(:attributes) { { app_id: app.id, collapse_key: 'ckey', delay_while_idle: true } }

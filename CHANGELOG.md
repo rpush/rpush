@@ -4,9 +4,17 @@
 
 **Merged pull requests:**
 
+* Support for Ruby 3.2 & 3.3 [\#679](https://github.com/rpush/rpush/pull/679) ([benlangfeld](https://github.com/benlangfeld))
+
+**Breaking:**
+
+* Removed legacy APNSv1 implementation (Apple binary protocol) since this was shut down in 2021. [\#680](https://github.com/rpush/rpush/pull/680) ([benlangfeld](https://github.com/benlangfeld))
+* Removed legacy GCM implementation since this was shut down by Google in August 2024 and replaced by FCM (supported in RPush 8.0.0) [\#688](https://github.com/rpush/rpush/pull/688) ([benlangfeld](https://github.com/benlangfeld))
+* Drop support for Ruby 2.x [\#672](https://github.com/rpush/rpush/pull/672) ([benlangfeld](https://github.com/benlangfeld))
+
 [Full Changelog](https://github.com/rpush/rpush/compare/v8.0.0...HEAD)
 
-## [v7.0.1](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
+## [v8.0.0](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
 
 **Merged pull requests:**
 
