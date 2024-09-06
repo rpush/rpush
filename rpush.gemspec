@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.required_ruby_version = '>= 2.7.0'
+  s.required_ruby_version = '>= 3.0.0'
 
   s.post_install_message = <<~POST_INSTALL_MESSAGE
     When upgrading Rpush, don't forget to run `bundle exec rpush init` to get all the latest migrations.
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'net-http-persistent'
   s.add_runtime_dependency 'net-http2', '~> 0.18', '>= 0.18.3'
   s.add_runtime_dependency 'jwt', '>= 1.5.6'
-  s.add_runtime_dependency 'activesupport', '>= 5.2', '< 7.1.0'
+  s.add_runtime_dependency 'activesupport', '>= 6.0', '< 7.1.0'
   s.add_runtime_dependency 'thor', ['>= 0.18.1', '< 2.0']
   s.add_runtime_dependency 'railties'
   s.add_runtime_dependency 'rainbow'
