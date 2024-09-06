@@ -12,7 +12,7 @@
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v8.0.0...HEAD)
 
-## [v7.0.1](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
+## [v8.0.0](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
 
 **Merged pull requests:**
 
