@@ -81,7 +81,7 @@ Rpush.reflect do |on|
 
   # Called for each recipient which fails to receive a notification. This
   # can occur more than once for the same notification when there are multiple
-  # recipients. (do not handle invalid registration IDs here)
+  # recipients. (do not handle invalid device tokens here)
   # on.fcm_failed_to_recipient do |notification, error|
   # end
 
@@ -93,23 +93,23 @@ Rpush.reflect do |on|
   # Called for each recipient which successfully receives a notification. This
   # can occur more than once for the same notification when there are multiple
   # recipients.
-  # on.gcm_delivered_to_recipient do |notification, registration_id|
+  # on.fcm_delivered_to_recipient do |notification, device_token|
   # end
 
   # Called for each recipient which fails to receive a notification. This
   # can occur more than once for the same notification when there are multiple
-  # recipients. (do not handle invalid registration IDs here)
-  # on.gcm_failed_to_recipient do |notification, error, registration_id|
+  # recipients. (do not handle invalid device tokens here)
+  # on.fcm_failed_to_recipient do |notification, error, device_token|
   # end
 
-  # Called when the GCM returns a canonical registration ID.
+  # Called when the FCM returns a canonical device token.
   # You will need to replace old_id with canonical_id in your records.
-  # on.gcm_canonical_id do |old_id, canonical_id|
+  # on.fcm_canonical_id do |old_id, canonical_id|
   # end
 
-  # Called when the GCM returns a failure that indicates an invalid registration id.
-  # You will need to delete the registration_id from your records.
-  # on.gcm_invalid_registration_id do |app, error, registration_id|
+  # Called when the FCM returns a failure that indicates an invalid device token.
+  # You will need to delete the device_token from your records.
+  # on.fcm_invalid_device_token do |app, error, device_token|
   # end
 
   # Called when an SSL certificate will expire within 1 month.

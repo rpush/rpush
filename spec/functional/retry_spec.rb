@@ -1,10 +1,12 @@
 require 'functional_spec_helper'
 
 describe 'Retries' do
-  let(:app) { Rpush::Gcm::App.new }
-  let(:notification) { Rpush::Gcm::Notification.new }
+  let(:app) { Rpush::Fcm::App.new }
+  let(:notification) { Rpush::Fcm::Notification.new }
   let(:response) { double(Net::HTTPResponse, code: 200) }
   let(:http) { double(Net::HTTP::Persistent, request: response, shutdown: nil) }
+  let(:fake_device_token) { 'a' * 108 }
+  let(:creds) {double(Google::Auth::UserRefreshCredentials)}
 
   before do
     Rpush::Daemon.common_init
@@ -14,7 +16,7 @@ describe 'Retries' do
     app.save!
 
     notification.app_id = app.id
-    notification.registration_ids = ['foo']
+    notification.device_token = 'foo'
     notification.data = { message: 'test' }
     notification.save!
 
@@ -23,7 +25,22 @@ describe 'Retries' do
     end
 
     allow(Net::HTTP::Persistent).to receive_messages(new: http)
-    allow(response).to receive_messages(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))
+    allow(creds).to receive(:fetch_access_token).and_return({'access_token': 'face_access_token'})
+
+    allow(::Google::Auth::ServiceAccountCredentials).to receive(:fetch_access_token).and_return({access_token: 'bbbbbb'})
+    allow(::Google::Auth::ServiceAccountCredentials).to receive(:make_creds).and_return(creds)
+    allow_any_instance_of(::Rpush::Daemon::Fcm::Delivery).to receive(:necessary_data_exists?).and_return(true)
+
+    example_success_body = {
+      "multicast_id": 108,
+      "success": 1,
+      "failure": 0,
+      "canonical_ids": 0,
+      "results": [
+        { "message_id": "1:08" }
+      ]
+    }.to_json
+    allow(response).to receive_messages(body: example_success_body)
   end
 
   it 'delivers a notification due to be retried' do
