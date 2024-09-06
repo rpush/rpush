@@ -4,6 +4,8 @@
 
 **Merged pull requests:**
 
+* Support for Ruby 3.2 & 3.3 [\#679](https://github.com/rpush/rpush/pull/679) ([benlangfeld](https://github.com/benlangfeld))
+
 **Breaking:**
 
 * Removed legacy APNSv1 implementation (Apple binary protocol) since this was shut down in 2021. [\#680](https://github.com/rpush/rpush/pull/680) ([benlangfeld](https://github.com/benlangfeld))
