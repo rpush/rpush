@@ -87,10 +87,10 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
 
   context "should reconnect on" do
     [
-        ActiveRecord::ConnectionNotEstablished,
-        ActiveRecord::ConnectionTimeoutError,
-        ActiveRecord::JDBCError,
-        ActiveRecord::StatementInvalid,
+        ::ActiveRecord::ConnectionNotEstablished,
+        ::ActiveRecord::ConnectionTimeoutError,
+        ::ActiveRecord::JDBCError,
+        ::ActiveRecord::StatementInvalid,
         Mysql::Error,
         Mysql2::Error,
         PG::Error,
@@ -120,7 +120,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
       class << Rpush::Client::ActiveRecord::Notification
         def exists?
           @exists_calls += 1
-          return false if @exists_calls == 2
+          return if @exists_calls == 2
           fail @error
         end
       end

@@ -23,7 +23,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
   it "allows notifications with either symbol keys or string keys" do
     notification.app = app
     notification.notification = { "title" => "title", body: "body" }
-    expect(notification.as_json['message']['notification']).to eq({ "title" => "title", "body" => "body" })
+    expect(notification.as_json['message']['notification']).to eq({"title"=>"title", "body"=>"body"})
   end
 
   it "moves notification keys to the correcdt location" do
@@ -31,7 +31,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.device_token = "valid"
     notification.notification = { "title" => "valid", "body" => "valid", "color" => "valid for android" }
     expect(notification.valid?).to be_truthy
-    expect(notification.as_json['message']['notification']).to eq("title" => "valid", "body" => "valid")
+    expect(notification.as_json['message']['notification']).to eq("title"=>"valid", "body"=>"valid")
     expect(notification.as_json['message']['android']['notification']['color']).to eq('valid for android')
   end
 
@@ -57,7 +57,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.priority = 'high'
     expect(notification.as_json['message']['android']['priority']).to eq 'high'
     expect(notification.as_json['message']['android']['notification']['notification_priority']).to eq 'PRIORITY_MAX'
-    # TODO: Add notification_priority
+    # TODO Add notification_priority
   end
 
   it 'sets the priority to normal when set to normal' do
@@ -65,7 +65,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.priority = 'normal'
     expect(notification.as_json['message']['android']['priority']).to eq 'normal'
     expect(notification.as_json['message']['android']['notification']['notification_priority']).to eq 'PRIORITY_DEFAULT'
-    # TODO: Add notification_priority
+    # TODO Add notification_priority
   end
 
   it 'validates the priority is either "normal" or "high"' do

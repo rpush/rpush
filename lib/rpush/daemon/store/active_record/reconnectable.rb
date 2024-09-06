@@ -9,7 +9,7 @@ module ActiveRecord
 end
 
 # :nocov:
-unless defined?(SQLite3::Exception)
+unless defined?(::SQLite3::Exception)
   module SQLite3
     class Exception < StandardError; end
   end
@@ -47,13 +47,15 @@ module Rpush
             Rpush.logger.warn("Lost connection to database, reconnecting...")
             attempts = 0
             loop do
-              Rpush.logger.warn("Attempt #{attempts += 1}")
-              reconnect_database
-              check_database_is_connected
-              break
-            rescue *ADAPTER_ERRORS => e
-              Rpush.logger.error(e)
-              sleep_to_avoid_thrashing
+              begin
+                Rpush.logger.warn("Attempt #{attempts += 1}")
+                reconnect_database
+                check_database_is_connected
+                break
+              rescue *ADAPTER_ERRORS => e
+                Rpush.logger.error(e)
+                sleep_to_avoid_thrashing
+              end
             end
             Rpush.logger.warn("Database reconnected")
           end

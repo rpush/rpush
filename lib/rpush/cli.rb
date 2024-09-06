@@ -38,10 +38,12 @@ module Rpush
       Process.kill('TERM', pid)
 
       loop do
-        Process.getpgid(pid)
-        sleep 0.05
-      rescue Errno::ESRCH
-        break
+        begin
+          Process.getpgid(pid)
+          sleep 0.05
+        rescue Errno::ESRCH
+          break
+        end
       end
 
       puts Rainbow('✔').green

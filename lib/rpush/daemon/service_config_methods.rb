@@ -36,15 +36,15 @@ module Rpush
       end
 
       def loops(classes, options = {})
-        classes = [*classes]
+        classes = Array[*classes]
         @loops = classes.map { |cls| [cls, options] }
       end
 
       def loop_instances(app)
-        (@loops || []).filter_map do |cls, options|
+        (@loops || []).map do |cls, options|
           next unless options.key?(:if) ? options[:if].call : true
           cls.new(app)
-        end
+        end.compact
       end
     end
   end

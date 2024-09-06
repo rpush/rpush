@@ -234,7 +234,7 @@ describe Rpush::Daemon::Gcm::Delivery do
           ]
         }
       end
-      let(:error_description) { /#{Regexp.escape('Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, InvalidDataKey, Unavailable. 0, 2 will be retried as notification')} [\d]+\./ }
+      let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 1, 2. Errors: Unavailable, InvalidDataKey, Unavailable. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'a notification with some delivery failures'
     end
 
@@ -249,7 +249,7 @@ describe Rpush::Daemon::Gcm::Delivery do
           ]
         }
       end
-      let(:error_description) { /#{Regexp.escape('Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification')} [\d]+\./ }
+      let(:error_description) { /#{Regexp.escape("Failed to deliver to recipients 0, 2. Errors: Unavailable, InternalServerError. 0, 2 will be retried as notification")} [\d]+\./ }
       it_should_behave_like 'a notification with some delivery failures'
     end
   end
@@ -277,7 +277,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'defaults to exponential back-off if the Retry-After header is not present' do
-      expect(delivery).to receive(:mark_retryable).with(notification, now + (2**1))
+      expect(delivery).to receive(:mark_retryable).with(notification, now + 2**1)
       perform
     end
   end
@@ -305,7 +305,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'defaults to exponential back-off if the Retry-After header is not present' do
-      expect(delivery).to receive(:mark_retryable).with(notification, now + (2**1))
+      expect(delivery).to receive(:mark_retryable).with(notification, now + 2**1)
       perform
     end
   end
@@ -318,13 +318,13 @@ describe Rpush::Daemon::Gcm::Delivery do
 
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
-      notification.deliver_after = now + (2**3)
-      expect(Rpush.logger).to receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + (2**3)).strftime('%Y-%m-%d %H:%M:%S')} (retry 3).")
+      notification.deliver_after = now + 2**3
+      expect(Rpush.logger).to receive(:warn).with("[MyApp] GCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2**3).strftime('%Y-%m-%d %H:%M:%S')} (retry 3).")
       perform
     end
 
     it 'retries the notification in accordance with the exponential back-off strategy.' do
-      expect(delivery).to receive(:mark_retryable).with(notification, now + (2**3))
+      expect(delivery).to receive(:mark_retryable).with(notification, now + 2**3)
       perform
     end
   end
@@ -352,7 +352,7 @@ describe Rpush::Daemon::Gcm::Delivery do
     end
 
     it 'defaults to exponential back-off if the Retry-After header is not present' do
-      expect(delivery).to receive(:mark_retryable).with(notification, now + (2**1))
+      expect(delivery).to receive(:mark_retryable).with(notification, now + 2**1)
       perform
     end
   end

@@ -125,7 +125,7 @@ module Rpush
           reflect(:notification_id_failed, @app, notification_id, code, description)
 
           if failed_pos
-            retry_ids = delivered_buffer[(failed_pos + 1)..]
+            retry_ids = delivered_buffer[(failed_pos + 1)..-1]
             retry_notification_ids(retry_ids, notification_id)
           elsif delivered_buffer.size > 0
             log_error("Delivery sequence unknown for notifications following #{notification_id}.")

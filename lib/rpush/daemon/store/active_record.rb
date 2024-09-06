@@ -193,13 +193,13 @@ module Rpush
           else
             config = ::ActiveRecord::Base.configurations[env]
             return '' unless config
-            config.transform_keys(&:to_sym)[:adapter]
+            Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
           end
         end
 
         private
 
-        def create_fcm_like_notification(notification, attrs, data, app)
+        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
           with_database_reconnect_and_retry do
             notification.assign_attributes(attrs)
             notification.data = data

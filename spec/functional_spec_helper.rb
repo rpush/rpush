@@ -23,7 +23,7 @@ RSpec.configure do |config|
       redis.keys('rpush:*').each { |key| redis.del(key) }
     end if redis? && functional_example?(self.class.metadata)
 
-    Rpush.config.logger = Logger.new(STDOUT) if functional_example?(self.class.metadata)
+    Rpush.config.logger = ::Logger.new(STDOUT) if functional_example?(self.class.metadata)
   end
 
   config.after(:each) do

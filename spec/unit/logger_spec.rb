@@ -67,8 +67,8 @@ describe Rpush::Logger do
     stub_const('ActiveSupport::Logger', double)
     allow(ActiveSupport).to receive_messages(const_defined?: false)
     expect(ActiveSupport::Logger).to receive(:new).with(log).and_return(log)
-    Rpush.config.log_level = Logger::Severity::ERROR
-    expect(log).to receive(:level=).with(Logger::Severity::ERROR)
+    Rpush.config.log_level = ::Logger::Severity::ERROR
+    expect(log).to receive(:level=).with(::Logger::Severity::ERROR)
     Rpush::Logger.new
   end
 
@@ -99,14 +99,14 @@ describe Rpush::Logger do
   it "should prefix error logs with the ERROR label" do
     Rpush.config.foreground = false
     logger = Rpush::Logger.new
-    expect(@logger).to receive(:error).with(/#{Regexp.escape('[ERROR]')}/)
+    expect(@logger).to receive(:error).with(/#{Regexp.escape("[ERROR]")}/)
     logger.error("eeek")
   end
 
   it "should prefix warn logs with the WARNING label" do
     Rpush.config.foreground = false
     logger = Rpush::Logger.new
-    expect(@logger).to receive(:warn).with(/#{Regexp.escape('[WARNING]')}/)
+    expect(@logger).to receive(:warn).with(/#{Regexp.escape("[WARNING]")}/)
     logger.warn("eeek")
   end
 

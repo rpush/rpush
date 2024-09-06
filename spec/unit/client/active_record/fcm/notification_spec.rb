@@ -6,4 +6,5 @@ describe Rpush::Client::ActiveRecord::Fcm::Notification do
 
   subject(:notification) { described_class.new }
   let(:app) { Rpush::Fcm::App.create!(name: 'test', auth_key: 'abc') }
+
 end if active_record?

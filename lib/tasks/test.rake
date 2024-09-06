@@ -30,13 +30,15 @@ task :build_rails do
     cmd('echo "gem \'pg\'" >> Gemfile')
     cmd("echo \"gem 'rpush', path: '#{rpush_root}'\" >> Gemfile")
 
-    File.write('config/database.yml', <<-YML)
+    File.open('config/database.yml', 'w') do |fd|
+      fd.write(<<-YML)
 development:
   adapter: postgresql
   database: rpush_rails_test
   pool: 5
   timeout: 5000
-    YML
+      YML
+    end
   ensure
     Dir.chdir(pwd)
   end

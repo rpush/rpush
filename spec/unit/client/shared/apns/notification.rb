@@ -198,7 +198,7 @@ shared_examples 'Rpush::Client::Apns::Notification' do
       notification.badge = nil
       notification.sound = nil
       notification.content_available = true
-      bytes = notification.to_binary.bytes.to_a[-4..]
+      bytes = notification.to_binary.bytes.to_a[-4..-1]
       expect(bytes.first).to eq 5 # priority item ID
       expect(bytes.last).to eq described_class::APNS_PRIORITY_CONSERVE_POWER
     end
@@ -208,7 +208,7 @@ shared_examples 'Rpush::Client::Apns::Notification' do
       notification.badge = nil
       notification.sound = nil
       notification.content_available = true
-      bytes = notification.to_binary.bytes.to_a[-4..]
+      bytes = notification.to_binary.bytes.to_a[-4..-1]
       expect(bytes.first).to eq 5 # priority item ID
       expect(bytes.last).to eq described_class::APNS_PRIORITY_IMMEDIATE
     end

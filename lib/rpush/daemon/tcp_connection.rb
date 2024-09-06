@@ -41,9 +41,11 @@ module Rpush
         @connected = true
 
         @connection_callbacks.each do |blk|
-          blk.call
-        rescue StandardError => e
-          log_error(e)
+          begin
+            blk.call
+          rescue StandardError => e
+            log_error(e)
+          end
         end
 
         @connection_callbacks.clear
@@ -60,7 +62,7 @@ module Rpush
       end
 
       def select(timeout)
-        @ssl_socket.wait_readable(timeout) if @ssl_socket
+        IO.select([@ssl_socket], nil, nil, timeout) if @ssl_socket
       end
 
       def write(data)

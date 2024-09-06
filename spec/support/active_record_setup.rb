@@ -67,9 +67,11 @@ migrations = [
 
 unless ENV['CI']
   migrations.reverse_each do |m|
-    m.down
-  rescue ActiveRecord::StatementInvalid => e
-    p e
+    begin
+      m.down
+    rescue ActiveRecord::StatementInvalid => e
+      p e
+    end
   end
 end
 

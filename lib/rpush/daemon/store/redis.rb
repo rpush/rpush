@@ -17,7 +17,7 @@ module Rpush
           limit -= retryable_ids.size
           pending_ids = limit > 0 ? pending_notification_ids(limit) : []
           ids = retryable_ids + pending_ids
-          ids.filter_map { |id| find_notification_by_id(id) }
+          ids.map { |id| find_notification_by_id(id) }.compact
         end
 
         def mark_delivered(notification, time, opts = {})
@@ -143,7 +143,7 @@ module Rpush
           nil
         end
 
-        def create_fcm_like_notification(notification, attrs, data, app)
+        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
           notification.assign_attributes(attrs)
           notification.data = data
           notification.app = app

@@ -3,7 +3,7 @@ def client
   (ENV['CLIENT'] || :active_record).to_sym
 end
 
-if !ENV['CI'] || (ENV.fetch('CI', nil) && ENV['QUALITY'] == 'true')
+if !ENV['CI'] || (ENV['CI'] && ENV['QUALITY'] == 'true')
   begin
     require './spec/support/simplecov_helper'
     include SimpleCovHelper
@@ -38,7 +38,7 @@ RPUSH_ROOT = '/tmp/rails_root'
 
 Rpush.configure do |config|
   config.client = client
-  config.log_level = Logger::Severity::DEBUG
+  config.log_level = ::Logger::Severity::DEBUG
 end
 
 RPUSH_CLIENT = Rpush.config.client
@@ -56,7 +56,7 @@ def after_example_cleanup
     Rpush.config = nil
     Rpush.config.client = RPUSH_CLIENT
   end
-  Rpush.plugins.each_value(&:unload)
+  Rpush.plugins.values.each(&:unload)
   Rpush.instance_variable_set('@plugins', {})
 end
 

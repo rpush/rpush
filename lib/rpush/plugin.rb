@@ -16,7 +16,7 @@ module Rpush
       @name = name
       @url = nil
       @description = nil
-      @config = Struct.new
+      @config = OpenStruct.new
       @reflection_collection = Rpush::ReflectionCollection.new
       @init_block = -> {}
     end
