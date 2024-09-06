@@ -65,6 +65,8 @@ jobs:
             gemfile: 'rails_7.1'
           - ruby: '2.7'
             gemfile: 'rails_7.2'
+          - ruby: '3.0'
+            gemfile: 'rails_7.2'
 
     env: # $BUNDLE_GEMFILE must be set at the job level, so it is set for all steps
       BUNDLE_GEMFILE: gemfiles/${{ matrix.gemfile }}.gemfile
