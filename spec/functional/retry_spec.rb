@@ -14,7 +14,7 @@ describe 'Retries' do
     app.save!
 
     notification.app_id = app.id
-    notification.registration_ids = ['foo']
+    notification.device_token = 'foo'
     notification.data = { message: 'test' }
     notification.save!
 
@@ -23,7 +23,7 @@ describe 'Retries' do
     end
 
     allow(Net::HTTP::Persistent).to receive_messages(new: http)
-    allow(response).to receive_messages(body: JSON.dump(results: [{ message_id: notification.registration_ids.first.to_s }]))
+    allow(response).to receive_messages(body: JSON.dump(results: [{ message_id: notification.device_token }]))
   end
 
   it 'delivers a notification due to be retried' do
