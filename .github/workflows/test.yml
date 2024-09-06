@@ -54,17 +54,11 @@ jobs:
       matrix:
         gemfile: ['rails_6.0', 'rails_6.1', 'rails_7.0', 'rails_7.1', 'rails_7.2']
 
-        ruby: ['2.7', '3.0', '3.1']
+        ruby: ['3.0', '3.1', '3.2', '3.3']
 
         client: ['active_record', 'redis']
 
         exclude:
-          - ruby: '2.7'
-            gemfile: 'rails_7.0'
-          - ruby: '2.7'
-            gemfile: 'rails_7.1'
-          - ruby: '2.7'
-            gemfile: 'rails_7.2'
           - ruby: '3.0'
             gemfile: 'rails_7.2'
 
@@ -96,6 +90,9 @@ jobs:
         # The default PostgreSQL port
         POSTGRES_PORT: 5432
         CLIENT: ${{ matrix.client }}
+
+    - name: Run rubocop
+      run: bundle exec rubocop
 
   tests:
     runs-on: ubuntu-latest

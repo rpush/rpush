@@ -138,26 +138,14 @@ module Rpush
           end
         end
 
-        def create_apns_feedback(failed_at, device_token, app)
-          with_database_reconnect_and_retry do
-            Rpush::Client::ActiveRecord::Apns::Feedback.create!(failed_at: failed_at,
-                                                                device_token: device_token, app_id: app.id)
-          end
-        end
-
         def create_fcm_notification(attrs, data, app)
           notification = Rpush::Client::ActiveRecord::Fcm::Notification.new
           create_fcm_like_notification(notification, attrs, data, app)
         end
 
-        def create_gcm_notification(attrs, data, registration_ids, deliver_after, app)
-          notification = Rpush::Client::ActiveRecord::Gcm::Notification.new
-          create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
-        end
-
         def create_adm_notification(attrs, data, registration_ids, deliver_after, app)
           notification = Rpush::Client::ActiveRecord::Adm::Notification.new
-          create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
+          create_adm_like_notification(notification, attrs, data, registration_ids, deliver_after, app)
         end
 
         def update_app(app)
@@ -209,7 +197,7 @@ module Rpush
           end
         end
 
-        def create_gcm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
+        def create_adm_like_notification(notification, attrs, data, registration_ids, deliver_after, app) # rubocop:disable Metrics/ParameterLists
           with_database_reconnect_and_retry do
             notification.assign_attributes(attrs)
             notification.data = data

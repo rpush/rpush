@@ -8,7 +8,7 @@ shared_examples_for 'Rpush::Client::ActiveRecord::App' do
     app = Rpush::Apns::App.new(name: 'test', environment: 'development', certificate: TEST_CERT)
     expect(app.valid?).to eq(true)
 
-    app = Rpush::Gcm::App.new(name: 'test', environment: 'production', auth_key: TEST_CERT)
+    app = Rpush::Fcm::App.new(name: 'test', environment: 'production', json_key: TEST_CERT)
     expect(app.valid?).to eq(true)
   end
 end
