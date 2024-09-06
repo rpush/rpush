@@ -4,6 +4,10 @@
 
 **Merged pull requests:**
 
+**Breaking:**
+
+* Removed legacy APNSv1 implementation (Apple binary protocol) since this was shut down in 2021. [\#680](https://github.com/rpush/rpush/pull/680) ([benlangfeld](https://github.com/benlangfeld))
+
 [Full Changelog](https://github.com/rpush/rpush/compare/v8.0.0...HEAD)
 
 ## [v7.0.1](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
