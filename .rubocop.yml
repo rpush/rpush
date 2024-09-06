@@ -1,6 +1,10 @@
 inherit_from: .rubocop_todo.yml
 
-require: rubocop-performance
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rails
 
 AllCops:
   Exclude:
