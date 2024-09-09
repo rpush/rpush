@@ -122,7 +122,7 @@ describe Rpush::Daemon::Adm::Delivery do
       perform
     end
 
-    it 'logs the error and stop retrying if new access token can't be retrieved' do
+    it "logs the error and stop retrying if new access token can't be retrieved" do
       allow(token_response).to receive_messages(code: 404, body: "test")
       # request for access token
       expect(http).to receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
