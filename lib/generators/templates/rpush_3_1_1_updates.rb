@@ -1,4 +1,4 @@
-class Rpush311Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class Rpush311Updates < ActiveRecord::Migration[5.0]
   def self.up
     change_table :rpush_notifications do |t|
       t.remove_index name: 'index_rpush_notifications_multi'

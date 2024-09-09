@@ -1,13 +1,17 @@
 inherit_from: .rubocop_todo.yml
 
-require: rubocop-performance
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rails
 
 AllCops:
   Exclude:
-    - gemfiles/vendor/bundle/**/* # This dir only shows up on Travis
     - lib/generators/**/*
     - vendor/bundle/**/*
-  TargetRubyVersion: 2.3
+  NewCops: enable
+  TargetRubyVersion: 3.0
 
 Layout/LineLength:
   Enabled: false

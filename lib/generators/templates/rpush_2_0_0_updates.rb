@@ -1,4 +1,4 @@
-class Rpush200Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class Rpush200Updates < ActiveRecord::Migration[5.0]
   module Rpush
     class App < ActiveRecord::Base
       self.table_name = 'rpush_apps'
@@ -17,14 +17,8 @@ class Rpush200Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migrat
     add_column :rpush_notifications, :processing, :boolean, null: false, default: false
     add_column :rpush_notifications, :priority, :integer, null: true
 
-    if ActiveRecord.version >= Gem::Version.new('5.1')
-      if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi)
-        remove_index :rpush_notifications, name: :index_rpush_notifications_multi
-      end
-    else
-      if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi, true)
-        remove_index :rpush_notifications, name: :index_rpush_notifications_multi
-      end
+    if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi)
+      remove_index :rpush_notifications, name: :index_rpush_notifications_multi
     end
 
     add_index :rpush_notifications, [:delivered, :failed], name: 'index_rpush_notifications_multi', where: 'NOT delivered AND NOT failed'
@@ -52,14 +46,8 @@ class Rpush200Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migrat
     change_column :rpush_feedback, :app_id, :string
     rename_column :rpush_feedback, :app_id, :app
 
-    if ActiveRecord.version >= Gem::Version.new('5.1')
-      if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi)
-        remove_index :rpush_notifications, name: :index_rpush_notifications_multi
-      end
-    else
-      if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi, true)
-        remove_index :rpush_notifications, name: :index_rpush_notifications_multi
-      end
+    if index_name_exists?(:rpush_notifications, :index_rpush_notifications_multi)
+      remove_index :rpush_notifications, name: :index_rpush_notifications_multi
     end
 
     add_index :rpush_notifications, [:app_id, :delivered, :failed, :deliver_after], name: 'index_rpush_notifications_multi'
@@ -70,7 +58,11 @@ class Rpush200Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migrat
 
   def self.adapter_name
     env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
-    Hash[ActiveRecord::Base.configurations[env].map { |k,v| [k.to_sym,v] }][:adapter]
+    if ActiveRecord::VERSION::MAJOR > 6
+      ActiveRecord::Base.configurations.configs_for(env_name: env).first.configuration_hash[:adapter]
+    else
+      Hash[ActiveRecord::Base.configurations[env].map { |k,v| [k.to_sym,v] }][:adapter]
+    end
   end
 
   def self.postgresql?

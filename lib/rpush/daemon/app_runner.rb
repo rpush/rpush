@@ -29,7 +29,7 @@ module Rpush
         Rpush.logger.info("[#{app.name}] Starting #{pluralize(app.connections, 'dispatcher')}... ", true)
         runner = @runners[app.id] = new(app)
         runner.start_dispatchers
-        puts Rainbow('✔').green if Rpush.config.foreground
+        puts Rainbow('✔').green if Rpush.config.foreground && Rpush.config.foreground_logging
         runner.start_loops
       rescue StandardError => e
         @runners.delete(app.id)

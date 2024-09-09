@@ -1,4 +1,4 @@
-class Rpush420Updates < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration["#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}"] : ActiveRecord::Migration
+class Rpush420Updates < ActiveRecord::Migration["#{ActiveRecord::VERSION::MAJOR}.#{ActiveRecord::VERSION::MINOR}"]
   def self.up
     add_column :rpush_notifications, :sound_is_json, :boolean, null: true, default: false
   end

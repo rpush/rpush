@@ -7,6 +7,7 @@ module Rpush
 
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
+        CLIENT_JOIN_TIMEOUT = 60
 
         def initialize(app, http2_client, batch)
           @app = app
@@ -20,7 +21,11 @@ module Rpush
           end
 
           # Send all preprocessed requests at once
-          @client.join
+          @client.join(timeout: CLIENT_JOIN_TIMEOUT)
+        rescue NetHttp2::AsyncRequestTimeout => error
+          mark_batch_retryable(Time.now + 10.seconds, error)
+          @client.close
+          raise
         rescue Errno::ECONNREFUSED, SocketError => error
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
@@ -102,7 +107,13 @@ module Rpush
         end
 
         def prepare_headers(notification)
-          notification_data(notification)[HTTP2_HEADERS_KEY] || {}
+          headers = {}
+
+          headers['apns-expiration'] = '0'
+          headers['apns-priority'] = '10'
+          headers['apns-topic'] = @app.bundle_id
+
+          headers.merge notification_data(notification)[HTTP2_HEADERS_KEY] || {}
         end
 
         def notification_data(notification)

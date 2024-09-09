@@ -7,6 +7,8 @@ module Rpush
 
       class Delivery < Rpush::Daemon::Delivery
         RETRYABLE_CODES = [ 429, 500, 503 ]
+        CLIENT_JOIN_TIMEOUT = 60
+        DEFAULT_MAX_CONCURRENT_STREAMS = 100
 
         def initialize(app, http2_client, token_provider, batch)
           @app = app
@@ -22,7 +24,11 @@ module Rpush
           end
 
           # Send all preprocessed requests at once
-          @client.join
+          @client.join(timeout: CLIENT_JOIN_TIMEOUT)
+        rescue NetHttp2::AsyncRequestTimeout => error
+          mark_batch_retryable(Time.now + 10.seconds, error)
+          @client.close
+          raise
         rescue Errno::ECONNREFUSED, SocketError, HTTP2::Error::StreamLimitExceeded => error
           # TODO restart connection when StreamLimitExceeded
           mark_batch_retryable(Time.now + 10.seconds, error)
@@ -80,7 +86,11 @@ module Rpush
         def remote_max_concurrent_streams
           # 0x7fffffff is the default value from http-2 gem (2^31)
           if @client.remote_settings[:settings_max_concurrent_streams] == 0x7fffffff
-            0
+            # Ideally we'd fall back to `#local_settings` here, but `NetHttp2::Client`
+            # doesn't expose that attr from the `HTTP2::Client` it wraps. Instead, we
+            # chose a hard-coded value matching the default local setting from the
+            # `HTTP2::Client` class
+            DEFAULT_MAX_CONCURRENT_STREAMS
           else
             @client.remote_settings[:settings_max_concurrent_streams]
           end
@@ -133,7 +143,7 @@ module Rpush
           jwt_token = @token_provider.token
 
           headers = {}
-          
+
           headers['content-type'] = 'application/json'
           headers['apns-expiration'] = '0'
           headers['apns-priority'] = '10'

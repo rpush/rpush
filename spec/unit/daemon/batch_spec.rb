@@ -1,8 +1,8 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Batch do
-  let(:notification1) { double(:notification1, id: 1) }
-  let(:notification2) { double(:notification2, id: 2) }
+  let(:notification1) { double(:notification1, id: 1, delivered: false, failed: false) }
+  let(:notification2) { double(:notification2, id: 2, delivered: false, failed: false) }
   let(:batch) { Rpush::Daemon::Batch.new([notification1, notification2]) }
   let(:store) { double.as_null_object }
   let(:time) { Time.now }
@@ -47,6 +47,54 @@ describe Rpush::Daemon::Batch do
     it 'defers persisting' do
       batch.mark_all_delivered
       expect(batch.delivered).to eq [notification1, notification2]
+    end
+  end
+
+  describe 'mark_all_retryable' do
+    let(:error) { StandardError.new('Exception') }
+
+    it 'marks all notifications as retryable without persisting' do
+      expect(store).to receive(:mark_retryable).ordered.with(notification1, time, persist: false)
+      expect(store).to receive(:mark_retryable).ordered.with(notification2, time, persist: false)
+
+      batch.mark_all_retryable(time, error)
+    end
+
+    it 'defers persisting' do
+      batch.mark_all_retryable(time, error)
+      expect(batch.retryable).to eq(time => [notification1, notification2])
+    end
+
+    context 'when one of the notifications delivered' do
+      let(:notification2) { double(:notification2, id: 2, delivered: true, failed: false) }
+
+      it 'marks all only pending notification as retryable without persisting' do
+        expect(store).to receive(:mark_retryable).ordered.with(notification1, time, persist: false)
+        expect(store).not_to receive(:mark_retryable).ordered.with(notification2, time, persist: false)
+
+        batch.mark_all_retryable(time, error)
+      end
+
+      it 'defers persisting' do
+        batch.mark_all_retryable(time, error)
+        expect(batch.retryable).to eq(time => [notification1])
+      end
+    end
+
+    context 'when one of the notifications failed' do
+      let(:notification2) { double(:notification2, id: 2, delivered: false, failed: true) }
+
+      it 'marks all only pending notification as retryable without persisting' do
+        expect(store).to receive(:mark_retryable).ordered.with(notification1, time, persist: false)
+        expect(store).not_to receive(:mark_retryable).ordered.with(notification2, time, persist: false)
+
+        batch.mark_all_retryable(time, error)
+      end
+
+      it 'defers persisting' do
+        batch.mark_all_retryable(time, error)
+        expect(batch.retryable).to eq(time => [notification1])
+      end
     end
   end
 

@@ -14,7 +14,7 @@ module Rpush
     end
 
     class_option :config, type: :string, aliases: '-c', default: default_config_path
-    class_option 'rails-env', type: :string, aliases: '-e', default: 'development'
+    class_option 'rails-env', type: :string, aliases: '-e', default: ENV.fetch('RAILS_ENV', 'development')
 
     option :foreground, type: :boolean, aliases: '-f', default: false
     option 'pid-file', type: :string, aliases: '-p'

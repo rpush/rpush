@@ -10,7 +10,7 @@ module SimpleCovHelper
 
       formatters = [SimpleCov::Formatter::QualityFormatter]
 
-      if ENV['TRAVIS']
+      if ENV['CI']
         require 'codeclimate-test-reporter'
 
         if CodeClimate::TestReporter.run?
@@ -18,7 +18,7 @@ module SimpleCovHelper
         end
       end
 
-      formatter SimpleCov::Formatter::MultiFormatter[*formatters]
+      formatter SimpleCov::Formatter::MultiFormatter.new(formatters)
     end
   end
 end

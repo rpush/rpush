@@ -69,7 +69,7 @@ module Rpush
         msg = "#{msg.class.name}, #{msg.message}\n#{formatted_backtrace}"
       end
 
-      formatted_msg = "[#{Time.now.to_s(:db)}] "
+      formatted_msg = "[#{Time.now.to_formatted_s(:db)}]"
       formatted_msg << '[rpush] ' if Rpush.config.embedded
       formatted_msg << "[#{prefix}] " if prefix
       formatted_msg << msg
@@ -79,6 +79,7 @@ module Rpush
     end
 
     def log_foreground(io, formatted_msg, inline)
+      return unless Rpush.config.foreground_logging
       return unless io == STDERR || Rpush.config.foreground
 
       if inline

@@ -1,4 +1,4 @@
-class CreateRapnsFeedback < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class CreateRapnsFeedback < ActiveRecord::Migration[5.0]
   def self.up
     create_table :rapns_feedback do |t|
       t.string    :device_token,          null: false, limit: 64
@@ -10,14 +10,8 @@ class CreateRapnsFeedback < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Mi
   end
 
   def self.down
-    if ActiveRecord.version >= Gem::Version.new('5.1')
-      if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token)
-        remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
-      end
-    else
-      if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token, true)
-        remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
-      end
+    if index_name_exists?(:rapns_feedback, :index_rapns_feedback_on_device_token)
+      remove_index :rapns_feedback, name: :index_rapns_feedback_on_device_token
     end
 
     drop_table :rapns_feedback

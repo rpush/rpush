@@ -1,5 +1,141 @@
 # Changelog
 
+## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
+
+**Merged pull requests:**
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v9.0.0...HEAD)
+
+## [v9.0.0](https://github.com/rpush/rpush/tree/v9.0.0) (2024-09-09)
+
+**Merged pull requests:**
+
+* Support for Ruby 3.2 & 3.3 [\#679](https://github.com/rpush/rpush/pull/679) ([benlangfeld](https://github.com/benlangfeld))
+
+**Breaking:**
+
+* Removed legacy APNSv1 implementation (Apple binary protocol) since this was shut down in 2021. [\#680](https://github.com/rpush/rpush/pull/680) ([benlangfeld](https://github.com/benlangfeld))
+* Removed legacy GCM implementation since this was shut down by Google in August 2024 and replaced by FCM (supported in RPush 8.0.0) [\#688](https://github.com/rpush/rpush/pull/688) ([benlangfeld](https://github.com/benlangfeld))
+* Drop support for Ruby 2.x [\#672](https://github.com/rpush/rpush/pull/672) ([benlangfeld](https://github.com/benlangfeld))
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v8.0.0...v9.0.0)
+
+## [v8.0.0](https://github.com/rpush/rpush/tree/v8.0.0) (2024-09-06)
+
+**Merged pull requests:**
+
+* Support for FCMv1 [\#620](https://github.com/rpush/rpush/pull/620) ([mirkode](https://github.com/mirkode)), [\#660](https://github.com/rpush/rpush/pull/660) ([AnilRh](https://github.com/AnilRh)) and [\#673](https://github.com/rpush/rpush/pull/673) ([SixiS](https://github.com/SixiS), [Henridv](https://github.com/Henridv) & [benlangfeld](https://github.com/benlangfeld))
+* No longer silence content-available notifications for APNs. Reverts the following change from the v6.0.0 release. See https://github.com/rpush/rpush/issues/647.
+  * Fix silent APNS notifications for Apns2 and Apnsp8 [\#596](https://github.com/rpush/rpush/pull/596) ([shved270189](https://github.com/shved270189))
+
+**Breaking:**
+
+* Dropped support for Ruby 2.4, 2.5, 2.6 and Rails 5.2.
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.1...v8.0.0)
+
+## [v7.0.1](https://github.com/rpush/rpush/tree/v7.0.1) (2022-03-02)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v7.0.0...v7.0.1)
+
+**Merged pull requests:**
+
+- Fix deprecation warnings from the redis gem [\#636](https://github.com/rpush/rpush/pull/636) ([sharang-d](https://github.com/sharang-d))
+
+## [v7.0.0](https://github.com/rpush/rpush/tree/HEAD)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v6.0.1...v7.0.0)
+
+**Merged pull requests:**
+
+- Test with Ruby 3.1 [\#632](https://github.com/rpush/rpush/pull/632) ([aried3r](https://github.com/aried3r))
+- Resolves Rails 7 Time.now.to\_s deprecation warning [\#630](https://github.com/rpush/rpush/pull/630) ([gregblake](https://github.com/gregblake))
+- Adds Rails 7 Support [\#629](https://github.com/rpush/rpush/pull/629) ([gregblake](https://github.com/gregblake))
+- Test with Rails 7.0.0.alpha2 [\#626](https://github.com/rpush/rpush/pull/626) ([aried3r](https://github.com/aried3r))
+
+**Breaking:**
+
+- Drop support for Ruby 2.3 [\#631](https://github.com/rpush/rpush/pull/631) ([aried3r](https://github.com/aried3r))
+
+## [v6.0.1](https://github.com/rpush/rpush/tree/v6.0.1) (2021-10-08)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v6.0.0...v6.0.1)
+
+**Merged pull requests:**
+
+- Don't limit webpush registration keys [\#624](https://github.com/rpush/rpush/pull/624) ([treyrich](https://github.com/treyrich))
+- Add Prometheus Exporter plugin link to README [\#617](https://github.com/rpush/rpush/pull/617) ([maxsz](https://github.com/maxsz))
+- Reference current interface in config template [\#569](https://github.com/rpush/rpush/pull/569) ([benlangfeld](https://github.com/benlangfeld))
+- Default the Rails environment to RAILS\_ENV if set [\#562](https://github.com/rpush/rpush/pull/562) ([benlangfeld](https://github.com/benlangfeld))
+
+## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-21)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...v6.0.0)
+
+This release contains **breaking changes**, such as removing support for Rails versions older than 5.2.
+Please see the details in the PRs below.
+
+**Merged pull requests:**
+
+- Switch to GitHub Actions for CI [\#615](https://github.com/rpush/rpush/pull/615) ([aried3r](https://github.com/aried3r))
+- Prepare 6.0.0 release [\#613](https://github.com/rpush/rpush/pull/613) ([aried3r](https://github.com/aried3r))
+- Bump activesupport version to 5.2 or later [\#610](https://github.com/rpush/rpush/pull/610) ([biow0lf](https://github.com/biow0lf))
+- Fixed infinite loop issue with Apnsp8 delivery [\#608](https://github.com/rpush/rpush/pull/608) ([diminish7](https://github.com/diminish7))
+- Eliminate deprecation warning in Ruby 3.0 [\#602](https://github.com/rpush/rpush/pull/602) ([rofreg](https://github.com/rofreg))
+- Make ActiveRecord validations work with Apns2 client [\#601](https://github.com/rpush/rpush/pull/601) ([favrik](https://github.com/favrik))
+- Bump gemspec post\_install\_message [\#600](https://github.com/rpush/rpush/pull/600) ([fdoxyz](https://github.com/fdoxyz))
+- Remove references and checks for unsupported versions of Rails [\#599](https://github.com/rpush/rpush/pull/599) ([ericsaupe](https://github.com/ericsaupe))
+- Drop support for Rails 5.0 and 5.1 [\#597](https://github.com/rpush/rpush/pull/597) ([ericsaupe](https://github.com/ericsaupe))
+- Fix silent APNS notifications for Apns2 and Apnsp8 [\#596](https://github.com/rpush/rpush/pull/596) ([shved270189](https://github.com/shved270189))
+- Updates README to Apple's new EOL date for the APNs legacy binary protocol [\#595](https://github.com/rpush/rpush/pull/595) ([gregblake](https://github.com/gregblake))
+
+## [v5.4.0](https://github.com/rpush/rpush/tree/v5.4.0) (2021-02-15)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.3.0...v5.4.0)
+
+**Merged pull requests:**
+
+- fix typo in README.md [\#587](https://github.com/rpush/rpush/pull/587) ([yltsrc](https://github.com/yltsrc))
+- Support Ruby 3.0 & Rails 6.1 [\#586](https://github.com/rpush/rpush/pull/586) ([andreaslillebo](https://github.com/andreaslillebo))
+
+## [v5.3.0](https://github.com/rpush/rpush/tree/v5.3.0) (2021-01-07)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.2.0...v5.3.0)
+
+**Implemented enhancements:**
+
+- support for Webpush with VAPID [\#574](https://github.com/rpush/rpush/pull/574) ([jkraemer](https://github.com/jkraemer))
+
+**Merged pull requests:**
+
+- Bug fix: APNS P8 Notifications Are Marked as Invalid When the Payload Exceeds 2kb \(2048 bytes\) [\#583](https://github.com/rpush/rpush/pull/583) ([gregblake](https://github.com/gregblake))
+- Fix more Rails 6.1 deprecation warnings [\#582](https://github.com/rpush/rpush/pull/582) ([jas14](https://github.com/jas14))
+- Feature/apns2 default headers [\#579](https://github.com/rpush/rpush/pull/579) ([jkraemer](https://github.com/jkraemer))
+- Fix APNS2 documentation in README [\#578](https://github.com/rpush/rpush/pull/578) ([jamestjw](https://github.com/jamestjw))
+- Fixed typo with misspell [\#575](https://github.com/rpush/rpush/pull/575) ([hsbt](https://github.com/hsbt))
+
+## [v5.2.0](https://github.com/rpush/rpush/tree/v5.2.0) (2020-10-08)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.1.0...v5.2.0)
+
+**Merged pull requests:**
+
+- Allow opting out of foreground stdout logging [\#571](https://github.com/rpush/rpush/pull/571) ([benlangfeld](https://github.com/benlangfeld))
+- Do not retry notifications which already have been delivered/failed [\#567](https://github.com/rpush/rpush/pull/567) ([AlexTatarnikov](https://github.com/AlexTatarnikov))
+- Improve APNs documentation. [\#553](https://github.com/rpush/rpush/pull/553) ([timdiggins](https://github.com/timdiggins))
+
+## [v5.1.0](https://github.com/rpush/rpush/tree/v5.1.0) (2020-09-25)
+
+[Full Changelog](https://github.com/rpush/rpush/compare/v5.0.0...v5.1.0)
+
+**Merged pull requests:**
+
+- Resume APNS2 delivery when async requests timeout [\#564](https://github.com/rpush/rpush/pull/564) ([benlangfeld](https://github.com/benlangfeld))
+- Improve DB reconnection for big tables [\#563](https://github.com/rpush/rpush/pull/563) ([AlexTatarnikov](https://github.com/AlexTatarnikov))
+- Default the Rails environment to RAILS_ENV if set [\#562](https://github.com/rpush/rpush/pull/562) ([benlangfeld](https://github.com/benlangfeld))
+- Allow Apns2 payloads to be up to 4096 bytes [\#561](https://github.com/rpush/rpush/pull/561) ([benlangfeld](https://github.com/benlangfeld))
+- Improve test coverage [\#528](https://github.com/rpush/rpush/pull/528) ([jhottenstein](https://github.com/jhottenstein))
+
 ## [v5.0.0](https://github.com/rpush/rpush/tree/v5.0.0) (2020-02-21)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v4.2.0...v5.0.0)
@@ -469,4 +605,4 @@ Bug fixes:
 - Removed rpush.yml in favour of command line options.
 - Started the changelog!
 
-\* _This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)_
+\* *This Changelog was automatically generated by [github_changelog_generator](https://github.com/github-changelog-generator/github-changelog-generator)*
