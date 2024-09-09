@@ -4,6 +4,8 @@
 
 **Merged pull requests:**
 
+* Refactored to comply with Rubocop rules [\#695](https://github.com/rpush/rpush/pull/695) ([benlangfeld](https://github.com/benlangfeld))
+
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.0.0...HEAD)
 
 ## [v9.0.0](https://github.com/rpush/rpush/tree/v9.0.0) (2024-09-09)

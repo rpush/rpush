@@ -6,11 +6,11 @@ describe 'Webpush' do
   let(:http) { instance_double('Net::HTTP::Persistent', request: response, shutdown: nil) }
   let(:app) { Rpush::Webpush::App.create!(name: 'MyApp', vapid_keypair: VAPID_KEYPAIR) }
 
-  let(:device_reg) {
+  let(:device_reg) do
     { endpoint: 'https://webpush-provider.example.org/push/some-id',
       expirationTime: nil,
-      keys: {'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A'} }
-  }
+      keys: { 'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A' } }
+  end
   let(:notification) { Rpush::Webpush::Notification.create!(app: app, registration_ids: [device_reg], data: { message: 'test' }) }
 
   before do
@@ -23,9 +23,9 @@ describe 'Webpush' do
 
   context 'when delivery failed' do
     let(:code) { 404 }
+
     it 'marks a notification as failed' do
       expect { Rpush.push }.to change { notification.reload.failed }.to(true)
     end
   end
 end
-

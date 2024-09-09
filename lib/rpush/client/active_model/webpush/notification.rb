@@ -3,17 +3,17 @@ module Rpush
     module ActiveModel
       module Webpush
         module Notification
-
           class RegistrationValidator < ::ActiveModel::Validator
-            KEYS = %i[ endpoint keys ].freeze
+            KEYS = %i[endpoint keys].freeze
             def validate(record)
               return if record.registration_ids.blank?
               return if record.registration_ids.size > 1
+
               reg = record.registration_ids.first
               unless reg.is_a?(Hash) &&
-                  (KEYS-reg.keys).empty? &&
-                  reg[:endpoint].is_a?(String) &&
-                  reg[:keys].is_a?(Hash)
+                     (KEYS - reg.keys).empty? &&
+                     reg[:endpoint].is_a?(String) &&
+                     reg[:keys].is_a?(Hash)
                 record.errors.add(:base, 'Registration must have :endpoint (String) and :keys (Hash) keys')
               end
             end
@@ -35,7 +35,7 @@ module Rpush
 
           def data=(value)
             value = value.stringify_keys if value.respond_to?(:stringify_keys)
-            super value
+            super
           end
 
           def subscription
@@ -53,12 +53,11 @@ module Rpush
 
           def as_json(_options = nil)
             {
-              'data'             => data,
-              'time_to_live'     => time_to_live,
+              'data' => data,
+              'time_to_live' => time_to_live,
               'registration_ids' => registration_ids
             }
           end
-
         end
       end
     end

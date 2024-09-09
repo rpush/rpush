@@ -17,17 +17,17 @@ God.watch do |w|
   w.keepalive
 
   # determine when process has finished starting
-  w.transition([:start, :restart], :up) do |on|
+  w.transition(%i[start restart], :up) do |on|
     on.condition(:process_running) do |c|
-        c.running = true
-        c.interval = 5.seconds
+      c.running = true
+      c.interval = 5.seconds
     end
 
     # failsafe
     on.condition(:tries) do |c|
-        c.times = 5
-        c.transition = :start
-        c.interval = 5.seconds
+      c.times = 5
+      c.transition = :start
+      c.interval = 5.seconds
     end
   end
 end

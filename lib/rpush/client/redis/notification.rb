@@ -20,8 +20,8 @@ module Rpush
 
         attribute :badge, :integer
         attribute :device_token, :string
-        attribute :sound, [:string, :hash], strict: false, default: 'default'
-        attribute :alert, [:string, :hash], strict: false
+        attribute :sound, %i[string hash], strict: false, default: 'default'
+        attribute :alert, %i[string hash], strict: false
         attribute :data, :hash
         attribute :expiry, :integer, default: 1.day.to_i
         attribute :delivered, :boolean
@@ -51,16 +51,13 @@ module Rpush
 
         def app
           return nil unless app_id
+
           @app ||= Rpush::Client::Redis::App.find(app_id)
         end
 
         def app=(app)
           @app = app
-          if app
-            self.app_id = app.id
-          else
-            self.app_id = nil
-          end
+          self.app_id = (app.id if app)
         end
 
         private

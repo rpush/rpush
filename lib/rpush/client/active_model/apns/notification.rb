@@ -25,9 +25,9 @@ module Rpush
               validates_with Rpush::Client::ActiveModel::Apns::DeviceTokenFormatValidator
               validates_with Rpush::Client::ActiveModel::Apns::NotificationPayloadSizeValidator
 
-              base.const_set('APNS_DEFAULT_EXPIRY', APNS_DEFAULT_EXPIRY) unless base.const_defined?('APNS_DEFAULT_EXPIRY')
-              base.const_set('APNS_PRIORITY_IMMEDIATE', APNS_PRIORITY_IMMEDIATE) unless base.const_defined?('APNS_PRIORITY_IMMEDIATE')
-              base.const_set('APNS_PRIORITY_CONSERVE_POWER', APNS_PRIORITY_CONSERVE_POWER) unless base.const_defined?('APNS_PRIORITY_CONSERVE_POWER')
+              base.const_set(:APNS_DEFAULT_EXPIRY, APNS_DEFAULT_EXPIRY) unless base.const_defined?(:APNS_DEFAULT_EXPIRY)
+              base.const_set(:APNS_PRIORITY_IMMEDIATE, APNS_PRIORITY_IMMEDIATE) unless base.const_defined?(:APNS_PRIORITY_IMMEDIATE)
+              base.const_set(:APNS_PRIORITY_CONSERVE_POWER, APNS_PRIORITY_CONSERVE_POWER) unless base.const_defined?(:APNS_PRIORITY_CONSERVE_POWER)
             end
           end
 
@@ -43,16 +43,18 @@ module Rpush
           MUTABLE_CONTENT_KEY = '__rpush_mutable_content__'
           def mutable_content=(bool)
             return unless bool
+
             self.data = (data || {}).merge(MUTABLE_CONTENT_KEY => true)
           end
 
           CONTENT_AVAILABLE_KEY = '__rpush_content_available__'
           def content_available=(bool)
             return unless bool
+
             self.data = (data || {}).merge(CONTENT_AVAILABLE_KEY => true)
           end
 
-          def as_json(options = nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
+          def as_json(_options = nil) # rubocop:disable Metrics/AbcSize, Metrics/PerceivedComplexity
             json = ActiveSupport::OrderedHash.new
 
             if data && data.key?(MDM_KEY)
@@ -66,16 +68,12 @@ module Rpush
               json['aps']['url-args'] = url_args if url_args
               json['aps']['thread-id'] = thread_id if thread_id
 
-              if data && data[MUTABLE_CONTENT_KEY]
-                json['aps']['mutable-content'] = 1
-              end
+              json['aps']['mutable-content'] = 1 if data && data[MUTABLE_CONTENT_KEY]
 
-              if data && data[CONTENT_AVAILABLE_KEY]
-                json['aps']['content-available'] = 1
-              end
+              json['aps']['content-available'] = 1 if data && data[CONTENT_AVAILABLE_KEY]
 
               if data
-                non_aps_attributes = data.reject { |k, _| k == CONTENT_AVAILABLE_KEY || k == MUTABLE_CONTENT_KEY }
+                non_aps_attributes = data.reject { |k, _| [CONTENT_AVAILABLE_KEY, MUTABLE_CONTENT_KEY].include?(k) }
                 non_aps_attributes.each { |k, v| json[k.to_s] = v }
               end
             end

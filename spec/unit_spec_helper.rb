@@ -9,10 +9,12 @@ def unit_example?(metadata)
 end
 
 RSpec.configure do |config|
-  config.before(:each) do
-    Modis.with_connection do |redis|
-      redis.keys('rpush:*').each { |key| redis.del(key) }
-    end if redis? && unit_example?(self.class.metadata)
+  config.before do
+    if redis? && unit_example?(self.class.metadata)
+      Modis.with_connection do |redis|
+        redis.keys('rpush:*').each { |key| redis.del(key) }
+      end
+    end
 
     if active_record? && unit_example?(self.class.metadata)
       connection = ActiveRecord::Base.connection
@@ -20,7 +22,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.after(:each) do
+  config.after do
     if active_record? && unit_example?(self.class.metadata)
       connection = ActiveRecord::Base.connection
       connection.rollback_transaction if connection.transaction_open?

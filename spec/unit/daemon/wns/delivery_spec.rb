@@ -11,9 +11,7 @@ describe Rpush::Daemon::Wns::Delivery do
   let(:delivery) { Rpush::Daemon::Wns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(create_wpns_notification: double(id: 2), update_app: nil) }
 
-  def perform
-    delivery.perform
-  end
+  delegate :perform, to: :delivery
 
   def perform_with_rescue
     expect { perform }.to raise_error(StandardError)
@@ -27,7 +25,7 @@ describe Rpush::Daemon::Wns::Delivery do
   end
 
   shared_examples_for "an notification with some delivery faliures" do
-    let(:new_notification) { Rpush::Wns::Notification.where('id != ?', notification.id).first }
+    let(:new_notification) { Rpush::Wns::Notification.where.not(id: notification.id).first }
 
     before { allow(response).to receive_messages(body: JSON.dump(body)) }
 
@@ -50,7 +48,7 @@ describe Rpush::Daemon::Wns::Delivery do
     end
 
     it 'set the access token for the app' do
-      expect(delivery).to receive(:update_access_token).with({"access_token" => "dummy_access_token", "expires_in" => 60})
+      expect(delivery).to receive(:update_access_token).with({ "access_token" => "dummy_access_token", "expires_in" => 60 })
       expect(store).to receive(:update_app).with app
       perform
     end
@@ -91,6 +89,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
   describe "an 400 response" do
     before { allow(response).to receive_messages(code: 400) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(400, notification.id, 'One or more headers were specified incorrectly or conflict with another header.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -100,6 +99,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
   describe "an 404 response" do
     before { allow(response).to receive_messages(code: 404) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(404, notification.id, 'The channel URI is not valid or is not recognized by WNS.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -109,6 +109,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
   describe "an 405 response" do
     before { allow(response).to receive_messages(code: 405) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(405, notification.id, 'Invalid method (GET, CREATE); only POST (Windows or Windows Phone) or DELETE (Windows Phone only) is allowed.')
       expect(delivery).to receive(:mark_failed).with(error)

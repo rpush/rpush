@@ -5,7 +5,6 @@ require "web-push"
 module Rpush
   module Daemon
     module Webpush
-
       # Webpush::Request handles all the encryption / signing.
       # We just override #perform to inject the http instance that is managed
       # by Rpush.
@@ -19,9 +18,8 @@ module Rpush
       end
 
       class Delivery < Rpush::Daemon::Delivery
-
-        OK = [ 200, 201, 202 ].freeze
-        TEMPORARY_FAILURES = [ 429, 500, 502, 503, 504 ].freeze
+        OK = [200, 201, 202].freeze
+        TEMPORARY_FAILURES = [429, 500, 502, 503, 504].freeze
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -106,9 +104,7 @@ module Rpush
           end
           msg
         end
-
       end
     end
   end
 end
-

@@ -1,6 +1,8 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Pushy::Delivery do
+  subject(:delivery) { described_class.new(app, http, notification, batch) }
+
   let(:app) { Rpush::Pushy::App.create!(name: 'MyApp', api_key: 'my_api_key') }
   let(:token) { 'device token' }
   let(:data) { { message: 'some message' } }
@@ -17,8 +19,6 @@ describe Rpush::Daemon::Pushy::Delivery do
     allow(Rpush).to receive_messages(logger: logger)
     allow(Time).to receive_messages(now: now)
   end
-
-  subject(:delivery) { described_class.new(app, http, notification, batch) }
 
   describe '#pushy_uri' do
     it { expect(subject.pushy_uri).to eq URI.parse('https://api.pushy.me/push?api_key=my_api_key') }
@@ -69,7 +69,7 @@ describe Rpush::Daemon::Pushy::Delivery do
 
         let(:expected_log_message) do
           "Pushy responded with a #{response_code} error. Notification #{notification.id} " \
-          "will be retried after #{deliver_after} (retry 1)."
+            "will be retried after #{deliver_after} (retry 1)."
         end
 
         it 'logs that the notification will be retried' do
@@ -124,6 +124,7 @@ describe Rpush::Daemon::Pushy::Delivery do
     context 'when delivery failed' do
       let(:response_code) { 400 }
       let(:fail_message) { 'No devices matched the specified condition.' }
+
       before do
         allow(response).to receive(:body) { { error: fail_message }.to_json }
         allow(batch).to receive(:mark_failed)

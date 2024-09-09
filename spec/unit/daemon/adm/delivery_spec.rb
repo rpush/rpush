@@ -11,9 +11,7 @@ describe Rpush::Daemon::Adm::Delivery do
   let(:delivery) { Rpush::Daemon::Adm::Delivery.new(app, http, notification, batch) }
   let(:store) { double(create_adm_notification: double(id: 2)) }
 
-  def perform
-    delivery.perform
-  end
+  delegate :perform, to: :delivery
 
   before do
     app.access_token = 'ACCESS_TOKEN'
@@ -101,7 +99,7 @@ describe Rpush::Daemon::Adm::Delivery do
       expect(http).to receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
     end
 
-    it 'should retrieve a new access token and mark the notification for retry' do
+    it 'retrieves a new access token and mark the notification for retry' do
       # request for access token
       expect(http).to receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
@@ -111,7 +109,7 @@ describe Rpush::Daemon::Adm::Delivery do
       perform
     end
 
-    it 'should update the app with the new access token' do
+    it 'updates the app with the new access token' do
       # request for access token
       expect(http).to receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
 
@@ -124,7 +122,7 @@ describe Rpush::Daemon::Adm::Delivery do
       perform
     end
 
-    it 'should log the error and stop retrying if new access token can\'t be retrieved' do
+    it 'logs the error and stop retrying if new access token can't be retrieved' do
       allow(token_response).to receive_messages(code: 404, body: "test")
       # request for access token
       expect(http).to receive(:request).with(Rpush::Daemon::Adm::Delivery::AMAZON_TOKEN_URI, instance_of(Net::HTTP::Post)).and_return(token_response)
@@ -140,10 +138,10 @@ describe Rpush::Daemon::Adm::Delivery do
 
   describe 'a 429 (Too Many Request) response' do
     let(:http) { double(shutdown: nil) }
-    let(:notification) { Rpush::Adm::Notification.create!(app: app, registration_ids: %w(abc xyz), deliver_after: Time.now, collapse_key: 'sync', data: { 'message' => 'test' }) }
+    let(:notification) { Rpush::Adm::Notification.create!(app: app, registration_ids: %w[abc xyz], deliver_after: Time.now, collapse_key: 'sync', data: { 'message' => 'test' }) }
     let(:rate_limited_response) { double(code: 429, header: { 'retry-after' => 3600 }) }
 
-    it 'should retry the entire notification respecting the Retry-After header if none sent out yet' do
+    it 'retries the entire notification respecting the Retry-After header if none sent out yet' do
       allow(response).to receive_messages(code: 429, header: { 'retry-after' => 3600 })
 
       # first request to deliver message that returns too many request response
@@ -154,18 +152,18 @@ describe Rpush::Daemon::Adm::Delivery do
       perform
     end
 
-    it 'should retry the entire notification using exponential backoff' do
+    it 'retries the entire notification using exponential backoff' do
       allow(response).to receive_messages(code: 429, header: {})
 
       # first request to deliver message that returns too many request response
       adm_uri = URI.parse(format(Rpush::Daemon::Adm::Delivery::AMAZON_ADM_URL, notification.registration_ids.first))
       expect(http).to receive(:request).with(adm_uri, instance_of(Net::HTTP::Post)).and_return(response)
 
-      expect(delivery).to receive(:mark_retryable).with(notification, Time.now + 2**(notification.retries + 1))
+      expect(delivery).to receive(:mark_retryable).with(notification, Time.now + (2**(notification.retries + 1)))
       perform
     end
 
-    it 'should keep sent reg ids in original notification and create new notification with remaining reg ids for retry' do
+    it 'keeps sent reg ids in original notification and create new notification with remaining reg ids for retry' do
       allow(response).to receive_messages(code: 200, body: JSON.dump('registrationID' => 'abc'))
 
       # first request to deliver message succeeds
@@ -178,7 +176,7 @@ describe Rpush::Daemon::Adm::Delivery do
 
       expect(store).to receive(:update_notification) do |notif|
         expect(notif.registration_ids).to include('abc')
-        expect(notif.registration_ids).to_not include('xyz')
+        expect(notif.registration_ids).not_to include('xyz')
       end
 
       expect(store).to receive(:create_adm_notification) do |attrs, _notification_data, reg_ids, deliver_after, notification_app|
@@ -219,7 +217,7 @@ describe Rpush::Daemon::Adm::Delivery do
       allow(response).to receive_messages(code: 503, header: { 'retry-after' => 10 })
     end
 
-    it 'should retry the notification respecting the Retry-After header' do
+    it 'retries the notification respecting the Retry-After header' do
       expect(delivery).to receive(:mark_retryable).with(notification, now + 10.seconds)
       perform
     end
@@ -227,10 +225,10 @@ describe Rpush::Daemon::Adm::Delivery do
 
   describe 'some registration ids succeeding and some failing' do
     let(:http) { double(shutdown: nil) }
-    let(:notification) { Rpush::Adm::Notification.create!(app: app, registration_ids: %w(abc xyz), deliver_after: Time.now, collapse_key: 'sync', data: { 'message' => 'test' }) }
+    let(:notification) { Rpush::Adm::Notification.create!(app: app, registration_ids: %w[abc xyz], deliver_after: Time.now, collapse_key: 'sync', data: { 'message' => 'test' }) }
     let(:bad_request_response) { double(code: 400, body: JSON.dump('reason' => 'InvalidData')) }
 
-    it 'should keep sent reg ids in original notification and create new notification with remaining reg ids for retry' do
+    it 'keeps sent reg ids in original notification and create new notification with remaining reg ids for retry' do
       allow(response).to receive_messages(code: 200, body: JSON.dump('registrationID' => 'abc'))
 
       # first request to deliver message succeeds

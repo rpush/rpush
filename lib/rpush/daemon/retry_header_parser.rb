@@ -12,7 +12,7 @@ module Rpush
       def parse
         return unless @header
 
-        if @header.to_s =~ /^[0-9]+$/
+        if /^[0-9]+$/.match?(@header.to_s)
           Time.now + @header.to_i
         else
           Time.httpdate(@header)

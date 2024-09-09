@@ -34,19 +34,19 @@ describe Rpush::Daemon, "when starting" do
 
     it "does not fork into a daemon if the foreground option is true" do
       Rpush.config.foreground = true
-      expect(Process).to_not receive(:daemon)
+      expect(Process).not_to receive(:daemon)
       Rpush::Daemon.start
     end
 
     it "does not fork into a daemon if the push option is true" do
       Rpush.config.push = true
-      expect(Process).to_not receive(:daemon)
+      expect(Process).not_to receive(:daemon)
       Rpush::Daemon.start
     end
 
     it "does not fork into a daemon if the embedded option is true" do
       Rpush.config.embedded = true
-      expect(Process).to_not receive(:daemon)
+      expect(Process).not_to receive(:daemon)
       Rpush::Daemon.start
     end
   end
@@ -65,7 +65,7 @@ describe Rpush::Daemon, "when starting" do
   it 'instantiates the store' do
     Rpush.config.client = :active_record
     Rpush::Daemon.start
-    expect(Rpush::Daemon.store).to be_kind_of(Rpush::Daemon::Store::ActiveRecord)
+    expect(Rpush::Daemon.store).to be_a(Rpush::Daemon::Store::ActiveRecord)
   end
 
   it 'initializes plugins' do
@@ -118,20 +118,20 @@ describe Rpush::Daemon, "when starting" do
 
     it "removes the PID file if one was written" do
       Rpush.config.pid_file = "/rails_root/rpush.pid"
-      allow(File).to receive(:exist?) { true }
+      allow(File).to receive(:exist?).and_return(true)
       expect(File).to receive(:delete).with("/rails_root/rpush.pid")
       Rpush::Daemon.shutdown
     end
 
     it "does not attempt to remove the PID file if it does not exist" do
-      allow(File).to receive(:exist?) { false }
-      expect(File).to_not receive(:delete)
+      allow(File).to receive(:exist?).and_return(false)
+      expect(File).not_to receive(:delete)
       Rpush::Daemon.shutdown
     end
 
     it "does not attempt to remove the PID file if one was not written" do
       Rpush.config.pid_file = nil
-      expect(File).to_not receive(:delete)
+      expect(File).not_to receive(:delete)
       Rpush::Daemon.shutdown
     end
   end

@@ -85,12 +85,12 @@ describe Rpush::Daemon::Feeder do
   end
 
   describe 'wakeup' do
+    after { Rpush::Daemon::Feeder.stop }
+
     it 'interrupts sleep' do
       expect(interruptible_sleeper).to receive(:stop)
       Rpush::Daemon::Feeder.start
       Rpush::Daemon::Feeder.wakeup
     end
-
-    after { Rpush::Daemon::Feeder.stop }
   end
 end

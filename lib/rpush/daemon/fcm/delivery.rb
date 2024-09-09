@@ -15,7 +15,7 @@ module Rpush
             @notification = notification
             @batch = batch
 
-            @uri = URI.parse("#{HOST}/v1/projects/#{@app.firebase_project_id || ENV['FIREBASE_PROJECT_ID']}/messages:send")
+            @uri = URI.parse("#{HOST}/v1/projects/#{@app.firebase_project_id || ENV.fetch('FIREBASE_PROJECT_ID', nil)}/messages:send")
           else
             Rpush.logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables or firebase_project_id and json_key attributes.")
           end
@@ -139,7 +139,7 @@ module Rpush
         def do_post
           token = obtain_access_token['access_token']
           post = Net::HTTP::Post.new(@uri.path, 'Content-Type' => 'application/json',
-                                     'Authorization' => "Bearer #{token}")
+                                                'Authorization' => "Bearer #{token}")
           post.body = @notification.as_json.to_json
           @http.request(@uri, post)
         end

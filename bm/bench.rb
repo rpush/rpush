@@ -47,7 +47,7 @@ class Bench
       @profiles << out
       StackProf.run(mode: mode, out: out, &blk)
     else
-      blk.call
+      yield
     end
   end
 

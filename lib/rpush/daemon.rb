@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 require 'thread'
 require 'socket'
 require 'pathname'
@@ -119,10 +117,10 @@ module Rpush
       init_plugins
     end
 
-    protected
 
     def self.init_store
       return if store
+
       begin
         name = Rpush.config.client.to_s
         require "rpush/daemon/store/#{name}"
@@ -146,14 +144,14 @@ module Rpush
     end
 
     def self.write_pid_file
-      unless Rpush.config.pid_file.blank?
+      return if Rpush.config.pid_file.blank?
         begin
           FileUtils.mkdir_p(File.dirname(Rpush.config.pid_file))
           File.open(Rpush.config.pid_file, 'w') { |f| f.puts Process.pid }
         rescue SystemCallError => e
           Rpush.logger.error("Failed to write PID to '#{Rpush.config.pid_file}': #{e.inspect}")
         end
-      end
+      
     end
 
     def self.delete_pid_file
@@ -162,8 +160,8 @@ module Rpush
     end
 
     def self.show_welcome_if_needed
-      if Rpush::Daemon::AppRunner.app_ids.count == 0
-        puts <<-EOS
+      return unless Rpush::Daemon::AppRunner.app_ids.count == 0
+        puts <<~EOS
 
 * #{Rainbow('Is this your first time using Rpush?').green}
   You need to create an App before you can start using Rpush.

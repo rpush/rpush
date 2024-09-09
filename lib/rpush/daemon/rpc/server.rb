@@ -21,19 +21,18 @@ module Rpush
           @stop = false
 
           @thread = Thread.new(UNIXServer.open(Rpc.socket_path)) do |server|
-            begin
-              loop do
-                socket = server.accept
-                break if @stop
-                read_loop(socket)
-              end
+            loop do
+              socket = server.accept
+              break if @stop
 
-              server.close
-            rescue StandardError => e
-              log_error(e)
-            ensure
-              File.unlink(Rpc.socket_path) if File.exist?(Rpc.socket_path)
+              read_loop(socket)
             end
+
+            server.close
+          rescue StandardError => e
+            log_error(e)
+          ensure
+            File.unlink(Rpc.socket_path) if File.exist?(Rpc.socket_path)
           end
         end
 

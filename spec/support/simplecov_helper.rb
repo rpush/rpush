@@ -13,9 +13,7 @@ module SimpleCovHelper
       if ENV['CI']
         require 'codeclimate-test-reporter'
 
-        if CodeClimate::TestReporter.run?
-          formatters << CodeClimate::TestReporter::Formatter
-        end
+        formatters << CodeClimate::TestReporter::Formatter if CodeClimate::TestReporter.run?
       end
 
       formatter SimpleCov::Formatter::MultiFormatter.new(formatters)

@@ -6,7 +6,7 @@ module Rpush
       HTTP2_HEADERS_KEY = 'headers'
 
       class Delivery < Rpush::Daemon::Delivery
-        RETRYABLE_CODES = [ 429, 500, 503 ]
+        RETRYABLE_CODES = [429, 500, 503]
         CLIENT_JOIN_TIMEOUT = 60
         DEFAULT_MAX_CONCURRENT_STREAMS = 100
 
@@ -30,7 +30,7 @@ module Rpush
           @client.close
           raise
         rescue Errno::ECONNREFUSED, SocketError, HTTP2::Error::StreamLimitExceeded => error
-          # TODO restart connection when StreamLimitExceeded
+          # TODO: restart connection when StreamLimitExceeded
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
         rescue StandardError => error
@@ -41,6 +41,7 @@ module Rpush
         end
 
         protected
+
         ######################################################################
 
         def prepare_async_post(notification)
@@ -48,9 +49,8 @@ module Rpush
 
           request = build_request(notification)
           http_request = @client.prepare_request(:post, request[:path],
-            body:    request[:body],
-            headers: request[:headers]
-          )
+                                                 body: request[:body],
+                                                 headers: request[:headers])
 
           http_request.on(:headers) do |hdrs|
             response[:code] = hdrs[':status'].to_i
@@ -73,9 +73,7 @@ module Rpush
         end
 
         def delayed_push_async(http_request)
-          until streams_available? do
-            sleep 0.001
-          end
+          sleep 0.001 until streams_available?
           @client.call_async(http_request)
         end
 
@@ -105,9 +103,9 @@ module Rpush
             service_unavailable(notification, response)
           else
             reflect(:notification_id_failed,
-              @app,
-              notification.id, code,
-              response[:failure_reason])
+                    @app,
+                    notification.id, code,
+                    response[:failure_reason])
             @batch.mark_failed(notification, response[:code], response[:failure_reason])
             failed_message_to_log(notification, response)
           end
@@ -128,9 +126,9 @@ module Rpush
 
         def build_request(notification)
           {
-            path:    "/3/device/#{notification.device_token}",
+            path: "/3/device/#{notification.device_token}",
             headers: prepare_headers(notification),
-            body:    prepare_body(notification)
+            body: prepare_body(notification)
           }
         end
 
@@ -158,14 +156,14 @@ module Rpush
         end
 
         def retry_message_to_log(notification)
-          log_warn("Notification #{notification.id} will be retried after "\
-            "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} "\
-            "(retry #{notification.retries}).")
+          log_warn("Notification #{notification.id} will be retried after " \
+                   "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} " \
+                   "(retry #{notification.retries}).")
         end
 
         def failed_message_to_log(notification, response)
-          log_error("Notification #{notification.id} failed, "\
-            "#{response[:code]}/#{response[:failure_reason]}")
+          log_error("Notification #{notification.id} failed, " \
+                    "#{response[:code]}/#{response[:failure_reason]}")
         end
       end
     end

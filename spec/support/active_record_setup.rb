@@ -18,7 +18,7 @@ if ENV['CI']
   db_config[SPEC_ADAPTER]['username'] = 'postgres'
 else
   require 'etc'
-  username = SPEC_ADAPTER =~ /mysql/ ? 'root' : Etc.getlogin
+  username = SPEC_ADAPTER.match?(/mysql/) ? 'root' : Etc.getlogin
   db_config[SPEC_ADAPTER]['username'] = username
 end
 
@@ -67,11 +67,9 @@ migrations = [
 
 unless ENV['CI']
   migrations.reverse_each do |m|
-    begin
-      m.down
-    rescue ActiveRecord::StatementInvalid => e
-      p e
-    end
+    m.down
+  rescue ActiveRecord::StatementInvalid => e
+    p e
   end
 end
 

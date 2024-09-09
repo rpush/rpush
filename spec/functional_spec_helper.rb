@@ -12,15 +12,17 @@ def timeout(&blk)
 end
 
 RSpec.configure do |config|
-  config.before(:each) do
-    Modis.with_connection do |redis|
-      redis.keys('rpush:*').each { |key| redis.del(key) }
-    end if redis? && functional_example?(self.class.metadata)
+  config.before do
+    if redis? && functional_example?(self.class.metadata)
+      Modis.with_connection do |redis|
+        redis.keys('rpush:*').each { |key| redis.del(key) }
+      end
+    end
 
-    Rpush.config.logger = ::Logger.new(STDOUT) if functional_example?(self.class.metadata)
+    Rpush.config.logger = Logger.new(STDOUT) if functional_example?(self.class.metadata)
   end
 
-  config.after(:each) do
+  config.after do
     DatabaseCleaner.clean if active_record? && functional_example?(self.class.metadata)
   end
 end

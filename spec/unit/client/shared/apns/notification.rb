@@ -6,13 +6,13 @@ shared_examples 'Rpush::Client::Apns::Notification' do
   let(:notification) { described_class.new }
   let(:app) { Rpush::Apns::App.create!(name: 'my_app', environment: 'development', certificate: TEST_CERT) }
 
-  it "should validate the format of the device_token" do
+  it "validates the format of the device_token" do
     notification = described_class.new(device_token: "{$%^&*()}")
     expect(notification.valid?).to be_falsey
     expect(notification.errors[:device_token].include?("is invalid")).to be_truthy
   end
 
-  it "should store long alerts" do
+  it "stores long alerts" do
     notification.app = app
     notification.device_token = "a" * 108
     notification.alert = "*" * 300
@@ -23,71 +23,71 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     expect(notification.alert).to eq("*" * 300)
   end
 
-  it "should default the expiry to 1 day" do
+  it "defaults the expiry to 1 day" do
     expect(notification.expiry).to eq 1.day.to_i
   end
 
   describe "when assigning the device token" do
-    it "should strip spaces from the given string" do
+    it "strips spaces from the given string" do
       notification = described_class.new(device_token: "o m g")
       expect(notification.device_token).to eq "omg"
     end
 
-    it "should strip chevrons from the given string" do
+    it "strips chevrons from the given string" do
       notification = described_class.new(device_token: "<omg>")
       expect(notification.device_token).to eq "omg"
     end
   end
 
   describe "as_json" do
-    it "should include the alert if present" do
+    it "includes the alert if present" do
       notification = described_class.new(alert: "hi mom")
       expect(notification.as_json["aps"]["alert"]).to eq "hi mom"
     end
 
-    it "should not include the alert key if the alert is not present" do
+    it "does not include the alert key if the alert is not present" do
       notification = described_class.new(alert: nil)
       expect(notification.as_json["aps"].key?("alert")).to be_falsey
     end
 
-    it "should encode the alert as JSON if it is a Hash" do
+    it "encodes the alert as JSON if it is a Hash" do
       notification = described_class.new(alert: { 'body' => "hi mom", 'alert-loc-key' => "View" })
       expect(notification.as_json["aps"]["alert"]).to eq('body' => "hi mom", 'alert-loc-key' => "View")
     end
 
-    it "should include the badge if present" do
+    it "includes the badge if present" do
       notification = described_class.new(badge: 6)
       expect(notification.as_json["aps"]["badge"]).to eq 6
     end
 
-    it "should not include the badge key if the badge is not present" do
+    it "does not include the badge key if the badge is not present" do
       notification = described_class.new(badge: nil)
       expect(notification.as_json["aps"].key?("badge")).to be_falsey
     end
 
-    it "should include the sound if present" do
+    it "includes the sound if present" do
       notification = described_class.new(sound: "my_sound.aiff")
       expect(notification.as_json["aps"]["sound"]).to eq "my_sound.aiff"
     end
 
-    it "should not include the sound key if the sound is not present" do
+    it "does not include the sound key if the sound is not present" do
       notification = described_class.new(sound: nil)
       expect(notification.as_json["aps"].key?("sound")).to be_falsey
     end
 
-    it "should encode the sound as JSON if it is a Hash" do
+    it "encodes the sound as JSON if it is a Hash" do
       notification = described_class.new(sound: { 'name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5 })
       expect(notification.as_json["aps"]["sound"]).to eq('name' => "my_sound.aiff", 'critical' => 1, 'volume' => 0.5)
     end
 
-    it "should include attributes for the device" do
+    it "includes attributes for the device" do
       notification = described_class.new
       notification.data = { 'omg' => 'lol', 'wtf' => 'dunno' }
       expect(notification.as_json["omg"]).to eq "lol"
       expect(notification.as_json["wtf"]).to eq "dunno"
     end
 
-    it "should allow attributes to include a hash" do
+    it "allows attributes to include a hash" do
       notification = described_class.new
       notification.data = { 'omg' => { 'ilike' => 'hashes' } }
       expect(notification.as_json["omg"]["ilike"]).to eq "hashes"
@@ -213,7 +213,7 @@ shared_examples 'Rpush::Client::Apns::Notification' do
       expect(bytes.last).to eq described_class::APNS_PRIORITY_IMMEDIATE
     end
 
-    it "should correctly convert the notification to binary" do
+    it "correctlies convert the notification to binary" do
       notification.sound = "1.aiff"
       notification.badge = 3
       notification.alert = "Don't panic Mr Mainwaring, don't panic!"
@@ -236,7 +236,7 @@ shared_examples 'Rpush::Client::Apns::Notification' do
   end
 
   describe "bug #35" do
-    it "should limit payload size to 256 bytes but not the entire packet" do
+    it "limits payload size to 256 bytes but not the entire packet" do
       notification = described_class.new.tap do |n|
         n.device_token = "a" * 108
         n.alert = "a" * 210
@@ -256,7 +256,7 @@ shared_examples 'Rpush::Client::Apns::Notification' do
     end
 
     it 'does not include thread-id in the payload if not set' do
-      expect(notification.as_json['aps']).to_not have_key('thread-id')
+      expect(notification.as_json['aps']).not_to have_key('thread-id')
     end
   end
 end

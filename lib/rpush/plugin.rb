@@ -24,12 +24,13 @@ module Rpush
     def reflect
       yield(@reflection_collection)
       return if Rpush.reflection_stack.include?(@reflection_collection)
+
       Rpush.reflection_stack << @reflection_collection
     end
 
     def configure
       yield(@config)
-      Rpush.config.plugin.send("#{@name}=", @config)
+      Rpush.config.plugin.send(:"#{@name}=", @config)
     end
 
     def init(&block)
@@ -38,7 +39,7 @@ module Rpush
 
     def unload
       Rpush.reflection_stack.delete(@reflection_collection)
-      Rpush.config.plugin.send("#{name}=", nil)
+      Rpush.config.plugin.send(:"#{name}=", nil)
     end
   end
 end
