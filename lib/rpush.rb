@@ -3,6 +3,7 @@ require 'multi_json'
 require 'active_support/all'
 require 'net-http2'
 require 'jwt'
+require 'googleauth'
 
 require 'rails'
 
@@ -19,7 +20,6 @@ require 'rpush/reflectable'
 require 'rpush/plugin'
 require 'rpush/embed'
 require 'rpush/push'
-require 'rpush/apns_feedback'
 
 module Rpush
   def self.jruby?

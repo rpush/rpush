@@ -1,8 +1,8 @@
 module Rpush
   module VERSION
-    MAJOR = 7
+    MAJOR = 9
     MINOR = 0
-    TINY = 2
+    TINY = 0
     PRE = nil
 
     STRING = [MAJOR, MINOR, TINY, PRE].compact.join(".").freeze

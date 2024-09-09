@@ -13,6 +13,7 @@ if !ENV['CI'] || (ENV['CI'] && ENV['QUALITY'] == 'true')
   end
 end
 
+require 'debug'
 require 'timecop'
 require 'activerecord-jdbc-adapter' if defined? JRUBY_VERSION
 
@@ -47,7 +48,7 @@ path = File.join(File.dirname(__FILE__), 'support')
 TEST_CERT = File.read(File.join(path, 'cert_without_password.pem'))
 TEST_CERT_WITH_PASSWORD = File.read(File.join(path, 'cert_with_password.pem'))
 
-VAPID_KEYPAIR = Webpush.generate_key.to_hash.merge(subject: 'rpush-test@example.org').to_json
+VAPID_KEYPAIR = WebPush.generate_key.to_hash.merge(subject: 'rpush-test@example.org').to_json
 
 def after_example_cleanup
   Rpush.logger = nil
@@ -58,6 +59,8 @@ def after_example_cleanup
   end
   Rpush.plugins.values.each(&:unload)
   Rpush.instance_variable_set('@plugins', {})
+  Rpush.reflection_stack.clear
+  Rpush.reflection_stack.push(Rpush::ReflectionCollection.new)
 end
 
 RSpec.configure do |config|

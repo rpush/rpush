@@ -2,7 +2,7 @@ require 'functional_spec_helper'
 
 describe 'Synchronization' do
   let(:timeout) { 10 }
-  let(:app) { Rpush::Gcm::App.new }
+  let(:app) { Rpush::Fcm::App.new }
 
   def wait_for_num_dispatchers(num)
     Timeout.timeout(timeout) do

@@ -3,8 +3,6 @@ module Rpush
     module ServiceConfigMethods
       DISPATCHERS = {
         http:       Rpush::Daemon::Dispatcher::Http,
-        tcp:        Rpush::Daemon::Dispatcher::Tcp,
-        apns_tcp:   Rpush::Daemon::Dispatcher::ApnsTcp,
         apns_http2: Rpush::Daemon::Dispatcher::ApnsHttp2,
         apnsp8_http2: Rpush::Daemon::Dispatcher::Apnsp8Http2,
         hms_http: Rpush::Daemon::Dispatcher::HmsHttp

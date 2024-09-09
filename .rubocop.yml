@@ -1,13 +1,17 @@
 inherit_from: .rubocop_todo.yml
 
-require: rubocop-performance
+require:
+  - rubocop-performance
+  - rubocop-rake
+  - rubocop-rspec
+  - rubocop-rails
 
 AllCops:
   Exclude:
     - lib/generators/**/*
     - vendor/bundle/**/*
   NewCops: enable
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 3.0
 
 Layout/LineLength:
   Enabled: false

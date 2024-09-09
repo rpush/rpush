@@ -79,8 +79,7 @@ describe 'APNs http2 adapter' do
           headers: {
             'apns-expiration' => '0',
             'apns-priority' => '10',
-            'apns-topic' => 'com.example.app',
-            'apns-push-type' => 'background'
+            'apns-topic' => 'com.example.app'
           }
         }
       )
@@ -114,8 +113,7 @@ describe 'APNs http2 adapter' do
             headers: {
               'apns-topic' => bundle_id,
               'apns-expiration' => '0',
-              'apns-priority' => '10',
-              'apns-push-type' => 'background'
+              'apns-priority' => '10'
             }
           }
         ).and_return(fake_http2_request)
@@ -257,7 +255,6 @@ describe 'APNs http2 adapter' do
         Rpush.reflect do |on|
           on.error do |error|
             expect(error).to be_kind_of(StandardError)
-           reflector.accept
           end
         end
 
@@ -292,7 +289,6 @@ describe 'APNs http2 adapter' do
           on.error do |error|
             reflected_error = true
             expect(error).to be_kind_of(StandardError)
-            reflector.accept
           end
         end
 

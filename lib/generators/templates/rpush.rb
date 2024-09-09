@@ -30,9 +30,6 @@ Rpush.configure do |config|
   # If the logger goes to stdout, you can disable foreground logging to avoid duplication.
   # config.foreground_logging = false
 
-  # config.apns.feedback_receiver.enabled = true
-  # config.apns.feedback_receiver.frequency = 60
-
 end
 
 Rpush.reflect do |on|
@@ -76,30 +73,43 @@ Rpush.reflect do |on|
   # on.notification_id_will_retry do |app, notification_id, retry_after|
   # end
 
-  # Called when a TCP connection is lost and will be reconnected.
-  # on.tcp_connection_lost do |app, error|
+  # Called for each recipient which successfully receives a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients.
+  # on.fcm_delivered_to_recipient do |notification|
+  # end
+
+  # Called for each recipient which fails to receive a notification. This
+  # can occur more than once for the same notification when there are multiple
+  # recipients. (do not handle invalid device tokens here)
+  # on.fcm_failed_to_recipient do |notification, error|
+  # end
+
+  # Called when the FCM returns a failure that indicates an invalid device token.
+  # You will need to delete the device token from your records.
+  # on.fcm_invalid_device_token do |app, error, device_token|
   # end
 
   # Called for each recipient which successfully receives a notification. This
   # can occur more than once for the same notification when there are multiple
   # recipients.
-  # on.gcm_delivered_to_recipient do |notification, registration_id|
+  # on.fcm_delivered_to_recipient do |notification, device_token|
   # end
 
   # Called for each recipient which fails to receive a notification. This
   # can occur more than once for the same notification when there are multiple
-  # recipients. (do not handle invalid registration IDs here)
-  # on.gcm_failed_to_recipient do |notification, error, registration_id|
+  # recipients. (do not handle invalid device tokens here)
+  # on.fcm_failed_to_recipient do |notification, error, device_token|
   # end
 
-  # Called when the GCM returns a canonical registration ID.
+  # Called when the FCM returns a canonical device token.
   # You will need to replace old_id with canonical_id in your records.
-  # on.gcm_canonical_id do |old_id, canonical_id|
+  # on.fcm_canonical_id do |old_id, canonical_id|
   # end
 
-  # Called when the GCM returns a failure that indicates an invalid registration id.
-  # You will need to delete the registration_id from your records.
-  # on.gcm_invalid_registration_id do |app, error, registration_id|
+  # Called when the FCM returns a failure that indicates an invalid device token.
+  # You will need to delete the device_token from your records.
+  # on.fcm_invalid_device_token do |app, error, device_token|
   # end
 
   # Called when an SSL certificate will expire within 1 month.
