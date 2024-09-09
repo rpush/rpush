@@ -1,5 +1,5 @@
 # migration 3_1_1_a is mapped to version 3.1.1.1
-class Rpush702AddHms < ActiveRecord::VERSION::MAJOR >= 5 ? ActiveRecord::Migration[5.0] : ActiveRecord::Migration
+class Rpush910AddHms < ActiveRecord::Migration[6.0]
   def self.up
     add_column :rpush_apps, :hms_app_id, :string
     add_column :rpush_apps, :hms_key_id, :string
