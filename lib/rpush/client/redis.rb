@@ -47,6 +47,9 @@ require 'rpush/client/redis/pushy/notification'
 require 'rpush/client/redis/webpush/app'
 require 'rpush/client/redis/webpush/notification'
 
+require 'rpush/client/redis/hms/app'
+require 'rpush/client/redis/hms/notification'
+
 Modis.configure do |config|
   config.namespace = :rpush
 end
