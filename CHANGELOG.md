@@ -5,7 +5,7 @@
 **Merged pull requests:**
 
 * Support for Ruby 3.2 & 3.3 [\#679](https://github.com/rpush/rpush/pull/679) ([benlangfeld](https://github.com/benlangfeld))
-* Support for Rails 7.1 and 7.2 [\#675](https://github.com/rpush/rpush/pull/675) ([benlangfeld](https://github.com/benlangfeld))
+* Support for Rails 7.1 [\#675](https://github.com/rpush/rpush/pull/675) ([benlangfeld](https://github.com/benlangfeld))
 
 **Breaking:**
 
