@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::Wns::RawNotification' do
@@ -10,12 +12,12 @@ shared_examples 'Rpush::Client::Wns::RawNotification' do
   end
 
   it 'allows exact payload of 5 KB' do
-    allow(notification).to receive(:payload_data_size) { 5120 }
+    allow(notification).to receive(:payload_data_size).and_return(5120)
     expect(notification.valid?).to be(true)
   end
 
   it 'allows the size of payload under 5 KB' do
-    allow(notification).to receive(:payload_data_size) { 5119 }
+    allow(notification).to receive(:payload_data_size).and_return(5119)
     expect(notification.valid?).to be(true)
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logger'
 require 'multi_json'
 require 'active_support/all'

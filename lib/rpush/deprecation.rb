@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   class Deprecation
     def self.muted
@@ -14,12 +16,14 @@ module Rpush
 
     def self.warn(msg)
       return if Rpush::Deprecation.muted?
-      STDERR.puts "DEPRECATION WARNING: #{msg}"
+
+      $stderr.puts "DEPRECATION WARNING: #{msg}"
     end
 
     def self.warn_with_backtrace(msg)
       return if Rpush::Deprecation.muted?
-      trace = "\n\nCALLED FROM:\n" + caller.join("\n")
+
+      trace = "\n\nCALLED FROM:\n#{caller.join("\n")}"
       warn(msg + trace)
     end
   end

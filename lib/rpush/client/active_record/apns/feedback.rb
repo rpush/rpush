@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveRecord
       module Apns
-        class Feedback < ::ActiveRecord::Base
+        class Feedback < ApplicationRecord
           self.table_name = 'rpush_feedback'
 
           belongs_to :app, class_name: 'Rpush::Client::ActiveRecord::App'

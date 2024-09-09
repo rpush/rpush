@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -19,8 +21,8 @@ module Rpush
 
           def as_json(_options = nil)
             {
-              'data'             => data,
-              'time_to_live'     => time_to_live,
+              'data' => data,
+              'time_to_live' => time_to_live,
               'registration_ids' => registration_ids
             }
           end

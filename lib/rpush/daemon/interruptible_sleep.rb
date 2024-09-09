@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class InterruptibleSleep
@@ -7,15 +9,15 @@ module Rpush
 
         begin
           @thread.join
-        rescue StandardError # rubocop:disable Lint/HandleExceptions
+        rescue StandardError
         ensure
           @thread = nil
         end
       end
 
       def stop
-        @thread.kill if @thread
-      rescue StandardError # rubocop:disable Lint/HandleExceptions
+        @thread&.kill
+      rescue StandardError
       ensure
         @thread = nil
       end

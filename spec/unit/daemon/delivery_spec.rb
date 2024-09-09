@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Delivery do
@@ -7,7 +9,7 @@ describe Rpush::Daemon::Delivery do
     end
   end
 
-  let(:now) { Time.parse("2014-10-14 00:00:00") }
+  let(:now) { Time.zone.parse("2014-10-14 00:00:00") }
   let(:batch) { double(Rpush::Daemon::Batch) }
   let(:delivery) { DeliverySpecDelivery.new(batch) }
   let(:notification) { Rpush::Apns::Notification.new }
@@ -17,20 +19,20 @@ describe Rpush::Daemon::Delivery do
   describe 'mark_retryable' do
     it 'does not retry a notification with an expired fail_after' do
       expect(batch).to receive(:mark_failed).with(notification, nil, "Notification failed to be delivered before 2014-10-13 23:00:00.")
-      notification.fail_after = Time.now - 1.hour
-      delivery.mark_retryable(notification, Time.now + 1.hour)
+      notification.fail_after = 1.hour.ago
+      delivery.mark_retryable(notification, 1.hour.from_now)
     end
 
     it 'retries the notification if does not have a fail_after time' do
       expect(batch).to receive(:mark_retryable)
       notification.fail_after = nil
-      delivery.mark_retryable(notification, Time.now + 1.hour)
+      delivery.mark_retryable(notification, 1.hour.from_now)
     end
 
     it 'retries the notification if the fail_after time has not been reached' do
       expect(batch).to receive(:mark_retryable)
-      notification.fail_after = Time.now + 1.hour
-      delivery.mark_retryable(notification, Time.now + 1.hour)
+      notification.fail_after = 1.hour.from_now
+      delivery.mark_retryable(notification, 1.hour.from_now)
     end
   end
 
@@ -47,7 +49,7 @@ describe Rpush::Daemon::Delivery do
 
     it 'marks all notifications as retryable' do
       expect(batch).to receive(:mark_all_retryable)
-      delivery.mark_batch_retryable(Time.now + 1.hour, error)
+      delivery.mark_batch_retryable(1.hour.from_now, error)
     end
   end
 

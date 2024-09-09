@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Wns
@@ -7,7 +9,7 @@ module Rpush
         WPN_TOKEN_URI = URI.parse('https://login.live.com/accesstoken.srf')
 
         # Data used to request authorization tokens.
-        ACCESS_TOKEN_REQUEST_DATA = { "grant_type" => "client_credentials", "scope" => "notify.windows.com" }
+        ACCESS_TOKEN_REQUEST_DATA = { "grant_type" => "client_credentials", "scope" => "notify.windows.com" }.freeze
 
         MAX_RETRIES = 14
 
@@ -22,7 +24,7 @@ module Rpush
           413 => 'The notification payload exceeds the 5000 byte size limit.',
           500 => 'An internal failure caused notification delivery to fail.',
           503 => 'The server is currently unavailable.'
-        }
+        }.freeze
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -34,7 +36,7 @@ module Rpush
         def perform
           handle_response(do_post)
         rescue SocketError => error
-          mark_retryable(@notification, Time.now + 10.seconds, error)
+          mark_retryable(@notification, 10.seconds.from_now, error)
           raise
         rescue StandardError => error
           mark_failed(error)
@@ -68,9 +70,7 @@ module Rpush
         end
 
         def handle_failure(code, msg = nil)
-          unless msg
-            msg = FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
-          end
+          msg ||= FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
           fail Rpush::DeliveryError.new(code, @notification.id, msg)
         end
 
@@ -81,7 +81,7 @@ module Rpush
             mark_delivered
             log_info("#{@notification.id} sent successfully")
           when ["channelthrottled"]
-            mark_retryable(@notification, Time.now + (60 * 10))
+            mark_retryable(@notification, Time.zone.now + (60 * 10))
             log_warn("#{@notification.id} cannot be sent. The Queue is full.")
           when ["dropped"]
             log_error("#{@notification.id} was dropped. Headers: #{status}")
@@ -101,9 +101,7 @@ module Rpush
         end
 
         def invalid_channel(code, msg = nil)
-          unless msg
-            msg = FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
-          end
+          msg ||= FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
           reflect(:wns_invalid_channel, @notification, @notification.uri, "#{code}. #{msg}")
           handle_failure(code, msg)
         end
@@ -118,7 +116,7 @@ module Rpush
 
         def service_unavailable
           mark_retryable_exponential(@notification)
-          log_warn("Service Unavailable. " + retry_message)
+          log_warn("Service Unavailable. #{retry_message}")
         end
 
         def retry_message
@@ -126,7 +124,7 @@ module Rpush
         end
 
         def retry_notification(reason)
-          deliver_after = Time.now + (60 * 60)
+          deliver_after = Time.zone.now + (60 * 60)
           mark_retryable(@notification, deliver_after)
           log_warn("#{reason} " + retry_message)
         end
@@ -139,11 +137,11 @@ module Rpush
         def status_from_response(response)
           headers = response.to_hash.each_with_object({}) { |e, a| a[e[0].downcase] = e[1] }
           {
-            notification:         headers["x-wns-status"],
-            device_connection:    headers["x-wns-deviceconnectionstatus"],
-            msg_id:               headers["x-wns-msg-id"],
-            error_description:    headers["x-wns-error-description"],
-            debug_trace:          headers["x-wns-debug-trace"]
+            notification: headers["x-wns-status"],
+            device_connection: headers["x-wns-deviceconnectionstatus"],
+            msg_id: headers["x-wns-msg-id"],
+            error_description: headers["x-wns-error-description"],
+            debug_trace: headers["x-wns-debug-trace"]
           }
         end
 
@@ -170,7 +168,7 @@ module Rpush
 
         def update_access_token(data)
           @notification.app.access_token = data['access_token']
-          @notification.app.access_token_expiration = Time.now + data['expires_in'].to_i
+          @notification.app.access_token_expiration = Time.zone.now + data['expires_in'].to_i
         end
       end
     end

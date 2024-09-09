@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Fcm
@@ -5,8 +7,8 @@ module Rpush
       class Delivery < Rpush::Daemon::Delivery
         include MultiJsonHelper
 
-        HOST = 'https://fcm.googleapis.com'.freeze
-        SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'.freeze
+        HOST = 'https://fcm.googleapis.com'
+        SCOPE = 'https://www.googleapis.com/auth/firebase.messaging'
 
         def initialize(app, http, notification, batch)
           if necessary_data_exists?(app)
@@ -15,7 +17,7 @@ module Rpush
             @notification = notification
             @batch = batch
 
-            @uri = URI.parse("#{HOST}/v1/projects/#{@app.firebase_project_id || ENV['FIREBASE_PROJECT_ID']}/messages:send")
+            @uri = URI.parse("#{HOST}/v1/projects/#{@app.firebase_project_id || ENV.fetch('FIREBASE_PROJECT_ID', nil)}/messages:send")
           else
             Rpush.logger.error("Cannot find necessary configuration! Please make sure you have set all necessary ENV variables or firebase_project_id and json_key attributes.")
           end
@@ -24,7 +26,7 @@ module Rpush
         def perform
           handle_response(do_post)
         rescue SocketError => error
-          mark_retryable(@notification, Time.now + 10.seconds, error)
+          mark_retryable(@notification, 10.seconds.from_now, error)
           raise
         rescue StandardError => error
           mark_failed(error)
@@ -92,22 +94,22 @@ module Rpush
 
         def internal_server_error(response)
           retry_delivery(@notification, response)
-          log_warn("FCM responded with an Internal Error. " + retry_message)
+          log_warn("FCM responded with an Internal Error. #{retry_message}")
         end
 
         def bad_gateway(response)
           retry_delivery(@notification, response)
-          log_warn("FCM responded with a Bad Gateway Error. " + retry_message)
+          log_warn("FCM responded with a Bad Gateway Error. #{retry_message}")
         end
 
         def service_unavailable(response)
           retry_delivery(@notification, response)
-          log_warn("FCM responded with an Service Unavailable Error. " + retry_message)
+          log_warn("FCM responded with an Service Unavailable Error. #{retry_message}")
         end
 
         def other_5xx_error(response)
           retry_delivery(@notification, response)
-          log_warn("FCM responded with a 5xx Error. " + retry_message)
+          log_warn("FCM responded with a 5xx Error. #{retry_message}")
         end
 
         def parse_error(response)
@@ -139,7 +141,7 @@ module Rpush
         def do_post
           token = obtain_access_token['access_token']
           post = Net::HTTP::Post.new(@uri.path, 'Content-Type' => 'application/json',
-                                     'Authorization' => "Bearer #{token}")
+                                                'Authorization' => "Bearer #{token}")
           post.body = @notification.as_json.to_json
           @http.request(@uri, post)
         end

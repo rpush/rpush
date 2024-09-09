@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class Synchronizer
       extend Loggable
       extend StringHelpers
 
-      APP_ATTRIBUTES_TO_CHECK = [:certificate, :environment, :auth_key, :client_id, :client_secret].freeze
+      APP_ATTRIBUTES_TO_CHECK = %i[certificate environment auth_key client_id client_secret].freeze
 
       def self.sync
         apps = Rpush::Daemon.store.all_apps
@@ -18,7 +20,7 @@ module Rpush
       def self.sync_app(app)
         if !AppRunner.app_running?(app)
           AppRunner.start_app(app)
-        elsif (changed_attrs = changed_attributes(app)).count > 0
+        elsif (changed_attrs = changed_attributes(app)).count.positive?
           changed_attrs_str = changed_attrs.map(&:to_s).join(", ")
           log_info("[#{app.name}] #{changed_attrs_str} changed, restarting...")
           AppRunner.stop_app(app.id)
@@ -31,9 +33,9 @@ module Rpush
       def self.sync_dispatcher_count(app)
         num_dispatchers = AppRunner.num_dispatchers_for_app(app)
         diff = num_dispatchers - app.connections
-        return if diff == 0
+        return if diff.zero?
 
-        if diff > 0
+        if diff.positive?
           AppRunner.decrement_dispatchers(app, diff)
           start_stop_str = "Stopped"
         else

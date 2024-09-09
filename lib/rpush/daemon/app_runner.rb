@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# frozen_string_literal: true
 
 module Rpush
   module Daemon
@@ -15,7 +15,7 @@ module Rpush
       def self.enqueue(notifications)
         notifications.group_by(&:app_id).each do |app_id, group|
           start_app_with_id(app_id) unless @runners[app_id]
-          @runners[app_id].enqueue(group) if @runners[app_id]
+          @runners[app_id]&.enqueue(group)
         end
 
         ProcTitle.update
@@ -29,7 +29,7 @@ module Rpush
         Rpush.logger.info("[#{app.name}] Starting #{pluralize(app.connections, 'dispatcher')}... ", true)
         runner = @runners[app.id] = new(app)
         runner.start_dispatchers
-        puts Rainbow('✔').green if Rpush.config.foreground && Rpush.config.foreground_logging
+        Rails.logger.debug Rainbow('✔').green if Rpush.config.foreground && Rpush.config.foreground_logging
         runner.start_loops
       rescue StandardError => e
         @runners.delete(app.id)
@@ -40,10 +40,10 @@ module Rpush
 
       def self.stop_app(app_id)
         runner = @runners.delete(app_id)
-        if runner
-          runner.stop
-          log_info("[#{runner.app.name}] Stopped.")
-        end
+        return unless runner
+
+        runner.stop
+        log_info("[#{runner.app.name}] Stopped.")
       end
 
       def self.app_with_id(app_id)
@@ -89,6 +89,7 @@ module Rpush
       end
 
       attr_reader :app
+
       delegate :size, to: :queue, prefix: true
 
       def initialize(app)
@@ -113,7 +114,7 @@ module Rpush
       end
 
       def wait_until_idle
-        sleep 0.5 while queue.size > 0
+        sleep 0.5 while queue.size.positive?
       end
 
       def enqueue(notifications)
@@ -179,6 +180,7 @@ module Rpush
 
       def service
         return @service if defined? @service
+
         @service = "Rpush::Daemon::#{@app.service_name.camelize}".constantize
       end
 

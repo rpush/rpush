@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module MultiJsonHelper
     def multi_json_load(string, options = {})

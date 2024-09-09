@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::Wns::BadgeNotification' do
@@ -9,7 +11,7 @@ shared_examples 'Rpush::Client::Wns::BadgeNotification' do
     notif
   end
 
-  it 'should allow a notification without data' do
+  it 'allows a notification without data' do
     expect(notification.valid?).to be(true)
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class RingBuffer < Array
@@ -10,7 +12,7 @@ module Rpush
         super
       end
 
-      alias_method :push, :<<
+      alias push <<
     end
   end
 end

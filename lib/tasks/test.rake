@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fileutils'
 
 def cmd(str, clean_env = true)
@@ -13,7 +15,7 @@ def add_ruby_dot_files
 end
 
 desc 'Build Rails app bundled with Rpush'
-task :build_rails do
+task build_rails: :environment do
   rpush_root = Dir.pwd
   path = '/tmp/rpush/rails_test'
   cmd("rm -rf #{path}")
@@ -30,15 +32,13 @@ task :build_rails do
     cmd('echo "gem \'pg\'" >> Gemfile')
     cmd("echo \"gem 'rpush', path: '#{rpush_root}'\" >> Gemfile")
 
-    File.open('config/database.yml', 'w') do |fd|
-      fd.write(<<-YML)
-development:
-  adapter: postgresql
-  database: rpush_rails_test
-  pool: 5
-  timeout: 5000
-      YML
-    end
+    File.write('config/database.yml', <<~YML)
+      development:
+        adapter: postgresql
+        database: rpush_rails_test
+        pool: 5
+        timeout: 5000
+    YML
   ensure
     Dir.chdir(pwd)
   end
@@ -47,7 +47,7 @@ development:
 end
 
 desc 'Build blank app bundled with Rpush'
-task :build_standalone do
+task build_standalone: :environment do
   rpush_root = Dir.pwd
   path = '/tmp/rpush/standalone_test'
   cmd("rm -rf #{path}")

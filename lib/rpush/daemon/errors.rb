@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   class CertificateExpiredError < StandardError
     attr_reader :app, :time

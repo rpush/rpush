@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'socket'
 require 'singleton'
 
@@ -21,26 +23,25 @@ module Rpush
           @stop = false
 
           @thread = Thread.new(UNIXServer.open(Rpc.socket_path)) do |server|
-            begin
-              loop do
-                socket = server.accept
-                break if @stop
-                read_loop(socket)
-              end
+            loop do
+              socket = server.accept
+              break if @stop
 
-              server.close
-            rescue StandardError => e
-              log_error(e)
-            ensure
-              File.unlink(Rpc.socket_path) if File.exist?(Rpc.socket_path)
+              read_loop(socket)
             end
+
+            server.close
+          rescue StandardError => e
+            log_error(e)
+          ensure
+            FileUtils.rm_f(Rpc.socket_path)
           end
         end
 
         def stop
           @stop = true
           UNIXSocket.new(Rpc.socket_path)
-          @thread.join if @thread
+          @thread&.join
         rescue StandardError => e
           log_error(e)
         end
@@ -53,7 +54,7 @@ module Rpush
             break unless line
 
             begin
-              cmd, args = JSON.load(line)
+              cmd, args = JSON.parse(line)
               log_debug("[rpc:server] #{cmd.to_sym.inspect}, args: #{args.inspect}")
               response = process(cmd, args)
               socket.puts(JSON.dump(response))

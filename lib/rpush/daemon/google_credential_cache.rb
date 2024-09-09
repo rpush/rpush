@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'singleton'
 module Rpush
   module Daemon
@@ -15,9 +17,9 @@ module Rpush
       def access_token(scope, json_key)
         key = hash_key(scope, json_key)
 
-        if @credentials_cache[key].nil? || Time.now > @credentials_cache[key][:expires_at]
+        if @credentials_cache[key].nil? || Time.zone.now > @credentials_cache[key][:expires_at]
           token = fetch_fresh_token(scope, json_key)
-          expires_at = Time.now + TOKEN_VALID_FOR_SEC
+          expires_at = Time.zone.now + TOKEN_VALID_FOR_SEC
           @credentials_cache[key] = { token: token, expires_at: expires_at }
         end
 

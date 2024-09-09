@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ENV['RAILS_ENV'] = 'test'
 
 require 'benchmark'
@@ -47,7 +49,7 @@ class Bench
       @profiles << out
       StackProf.run(mode: mode, out: out, &blk)
     else
-      blk.call
+      yield
     end
   end
 

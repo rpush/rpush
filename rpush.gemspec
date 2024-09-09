@@ -1,5 +1,6 @@
-# -*- encoding: utf-8 -*-
-$LOAD_PATH.push File.expand_path("../lib", __FILE__)
+# frozen_string_literal: true
+
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 require "rpush/version"
 
 Gem::Specification.new do |s|
@@ -19,7 +20,6 @@ Gem::Specification.new do |s|
   }
 
   s.files         = `git ls-files -- lib README.md CHANGELOG.md LICENSE`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}`.split("\n")
   s.executables   = `git ls-files -- bin`.split("\n").map { |f| File.basename(f) }
   s.require_paths = ["lib"]
 
@@ -32,37 +32,14 @@ Gem::Specification.new do |s|
     https://github.com/rpush/rpush/blob/master/CHANGELOG.md
   POST_INSTALL_MESSAGE
 
-  s.add_runtime_dependency 'multi_json', '~> 1.0'
-  s.add_runtime_dependency 'net-http-persistent'
-  s.add_runtime_dependency 'net-http2', '~> 0.18', '>= 0.18.3'
-  s.add_runtime_dependency 'jwt', '>= 1.5.6'
-  s.add_runtime_dependency 'activesupport', '>= 6.0', '< 7.1.0'
-  s.add_runtime_dependency 'thor', ['>= 0.18.1', '< 2.0']
-  s.add_runtime_dependency 'railties'
-  s.add_runtime_dependency 'rainbow'
-  s.add_runtime_dependency 'web-push'
-  s.add_runtime_dependency 'googleauth'
-
-  s.add_development_dependency 'debug'
-  s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec'
-  s.add_development_dependency 'database_cleaner'
-  s.add_development_dependency 'timecop'
-  s.add_development_dependency 'stackprof'
-  s.add_development_dependency 'modis', '>= 2.0'
-  s.add_development_dependency 'rpush-redis', '~> 1.0'
-
-  s.add_development_dependency 'appraisal'
-  s.add_development_dependency 'codeclimate-test-reporter', '1.0.7'
-  s.add_development_dependency 'simplecov'
-  s.add_development_dependency 'rubocop', '~> 1.66'
-  s.add_development_dependency 'rubocop-performance'
-  s.add_development_dependency 'rubocop-rake'
-  s.add_development_dependency 'rubocop-rspec'
-  s.add_development_dependency 'rubocop-rails'
-  s.add_development_dependency 'byebug'
-
-  s.add_development_dependency 'pg'
-  s.add_development_dependency 'mysql2'
-  s.add_development_dependency 'sqlite3'
+  s.add_dependency 'activesupport', '>= 6.0', '< 7.1.0'
+  s.add_dependency 'googleauth'
+  s.add_dependency 'jwt', '>= 1.5.6'
+  s.add_dependency 'multi_json', '~> 1.0'
+  s.add_dependency 'net-http2', '~> 0.18', '>= 0.18.3'
+  s.add_dependency 'net-http-persistent'
+  s.add_dependency 'railties'
+  s.add_dependency 'rainbow'
+  s.add_dependency 'thor', ['>= 0.18.1', '< 2.0']
+  s.add_dependency 'web-push'
 end

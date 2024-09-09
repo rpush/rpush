@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Dispatcher
@@ -9,7 +11,7 @@ module Rpush
           production: 'https://api.push.apple.com:443',
           development: 'https://api.sandbox.push.apple.com:443',
           sandbox: 'https://api.sandbox.push.apple.com:443'
-        }
+        }.freeze
 
         DEFAULT_TIMEOUT = 60
 
@@ -41,7 +43,7 @@ module Rpush
         end
 
         def prepare_ssl_context
-          @ssl_context ||= begin
+          @prepare_ssl_context ||= begin
             ctx = OpenSSL::SSL::SSLContext.new
             begin
               p12      = OpenSSL::PKCS12.new(@app.certificate, @app.password)

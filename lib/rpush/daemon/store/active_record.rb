@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 
 require 'rpush/daemon/store/active_record/reconnectable'
@@ -8,7 +10,7 @@ module Rpush
       class ActiveRecord
         include Reconnectable
 
-        DEFAULT_MARK_OPTIONS = { persist: true }
+        DEFAULT_MARK_OPTIONS = { persist: true }.freeze
 
         def initialize
           reopen_log unless Rpush.config.embedded
@@ -32,13 +34,13 @@ module Rpush
               relation = ready_for_delivery
               relation = relation.limit(limit)
               ids = relation.lock(true).ids
-              unless ids.empty?
+              if ids.empty?
+                []
+              else
                 relation = Rpush::Client::ActiveRecord::Notification.where(id: ids)
                 # mark processing
-                relation.update_all(processing: true, updated_at: Time.now)
+                relation.update_all(processing: true, updated_at: Time.zone.now)
                 relation
-              else
-                []
               end
             end
 
@@ -92,7 +94,7 @@ module Rpush
         def mark_batch_delivered(notifications)
           return if notifications.empty?
 
-          now = Time.now
+          now = Time.zone.now
           ids = []
           notifications.each do |n|
             mark_delivered(n, now, persist: false)
@@ -121,7 +123,7 @@ module Rpush
         end
 
         def mark_batch_failed(notifications, code, description)
-          now = Time.now
+          now = Time.zone.now
           ids = []
           notifications.each do |n|
             mark_failed(n, code, description, now, persist: false)
@@ -175,19 +177,20 @@ module Rpush
         end
 
         def adapter_name
-          env = (defined?(Rails) && Rails.env) ? Rails.env : 'development'
+          env = defined?(Rails) && Rails.env ? Rails.env : 'development'
           if ::ActiveRecord::VERSION::MAJOR > 6
             ::ActiveRecord::Base.configurations.configs_for(env_name: env).first.configuration_hash[:adapter]
           else
             config = ::ActiveRecord::Base.configurations[env]
             return '' unless config
-            Hash[config.map { |k, v| [k.to_sym, v] }][:adapter]
+
+            config.transform_keys(&:to_sym)[:adapter]
           end
         end
 
         private
 
-        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
+        def create_fcm_like_notification(notification, attrs, data, app)
           with_database_reconnect_and_retry do
             notification.assign_attributes(attrs)
             notification.data = data
@@ -210,7 +213,7 @@ module Rpush
         end
 
         def ready_for_delivery
-          relation = Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.now)
+          relation = Rpush::Client::ActiveRecord::Notification.where('processing = ? AND delivered = ? AND failed = ? AND (deliver_after IS NULL OR deliver_after < ?)', false, false, false, Time.zone.now)
           relation.order('deliver_after ASC, created_at ASC')
         end
       end

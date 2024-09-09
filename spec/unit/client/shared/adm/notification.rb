@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::Adm::Notification' do
@@ -6,13 +8,13 @@ shared_examples 'Rpush::Client::Adm::Notification' do
 
   it "has a 'data' payload limit of 6144 bytes" do
     notification.data = { key: "a" * 6144 }
-    expect(notification.valid?).to eq(false)
+    expect(notification.valid?).to be(false)
     expect(notification.errors[:base]).to eq ["Notification payload data cannot be larger than 6144 bytes."]
   end
 
   it 'limits the number of registration ids to 100' do
     notification.registration_ids = ['a'] * (100 + 1)
-    expect(notification.valid?).to eq(false)
+    expect(notification.valid?).to be(false)
     expect(notification.errors[:base]).to eq ["Number of registration_ids cannot be larger than 100."]
   end
 
@@ -21,14 +23,14 @@ shared_examples 'Rpush::Client::Adm::Notification' do
     notification.registration_ids = ['a']
     notification.collapse_key = 'test'
     notification.data = nil
-    expect(notification.valid?).to eq(true)
+    expect(notification.valid?).to be(true)
     expect(notification.errors[:data]).to be_empty
   end
 
   it 'validates data is present if collapse_key is not set' do
     notification.collapse_key = nil
     notification.data = nil
-    expect(notification.valid?).to eq(false)
+    expect(notification.valid?).to be(false)
     expect(notification.errors[:data]).to eq ['must be set unless collapse_key is specified']
   end
 

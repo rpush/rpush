@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::Fcm::Notification' do
@@ -8,7 +10,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.app = app
     notification.device_token = "valid"
     notification.data = { key: "a" * 4096 }
-    expect(notification.valid?).to be_falsey
+    expect(notification).not_to be_valid
     expect(notification.errors[:base]).to eq ["Notification payload data cannot be larger than 4096 bytes."]
   end
 
@@ -16,29 +18,29 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.app = app
     notification.device_token = "valid"
     notification.notification = { "title" => "valid", "body" => "valid", "color" => "valid for android", "garbage" => "invalid" }
-    expect(notification.valid?).to be_falsey
+    expect(notification).not_to be_valid
     expect(notification.errors[:notification]).to eq ["contains invalid keys: garbage"]
   end
 
   it "allows notifications with either symbol keys or string keys" do
     notification.app = app
     notification.notification = { "title" => "title", body: "body" }
-    expect(notification.as_json['message']['notification']).to eq({"title"=>"title", "body"=>"body"})
+    expect(notification.as_json['message']['notification']).to eq({ "title" => "title", "body" => "body" })
   end
 
   it "moves notification keys to the correcdt location" do
     notification.app = app
     notification.device_token = "valid"
     notification.notification = { "title" => "valid", "body" => "valid", "color" => "valid for android" }
-    expect(notification.valid?).to be_truthy
-    expect(notification.as_json['message']['notification']).to eq("title"=>"valid", "body"=>"valid")
+    expect(notification).to be_valid
+    expect(notification.as_json['message']['notification']).to eq("title" => "valid", "body" => "valid")
     expect(notification.as_json['message']['android']['notification']['color']).to eq('valid for android')
   end
 
   it 'validates expiry is present if collapse_key is set' do
     notification.collapse_key = 'test'
     notification.expiry = nil
-    expect(notification.valid?).to be_falsey
+    expect(notification).not_to be_valid
     expect(notification.errors[:expiry]).to eq ['must be set when using a collapse_key']
   end
 
@@ -57,7 +59,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.priority = 'high'
     expect(notification.as_json['message']['android']['priority']).to eq 'high'
     expect(notification.as_json['message']['android']['notification']['notification_priority']).to eq 'PRIORITY_MAX'
-    # TODO Add notification_priority
+    # TODO: Add notification_priority
   end
 
   it 'sets the priority to normal when set to normal' do
@@ -65,7 +67,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     notification.priority = 'normal'
     expect(notification.as_json['message']['android']['priority']).to eq 'normal'
     expect(notification.as_json['message']['android']['notification']['notification_priority']).to eq 'PRIORITY_DEFAULT'
-    # TODO Add notification_priority
+    # TODO: Add notification_priority
   end
 
   it 'validates the priority is either "normal" or "high"' do

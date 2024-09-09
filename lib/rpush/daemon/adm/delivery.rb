@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Adm
@@ -12,7 +14,7 @@ module Rpush
         AMAZON_ADM_URL = 'https://api.amazon.com/messaging/registrations/%s/messages'
 
         # Data used to request authorization tokens.
-        ACCESS_TOKEN_REQUEST_DATA = { "grant_type" => "client_credentials", "scope" => "messaging:push" }
+        ACCESS_TOKEN_REQUEST_DATA = { "grant_type" => "client_credentials", "scope" => "messaging:push" }.freeze
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -27,21 +29,19 @@ module Rpush
           @notification.registration_ids.each do |registration_id|
             handle_response(do_post(registration_id), registration_id)
           end
-          if @sent_registration_ids.empty?
-            fail Rpush::DeliveryError.new(nil, @notification.id, describe_errors)
-          else
-            unless @failed_registration_ids.empty?
-              @notification.error_description = describe_errors
-              Rpush::Daemon.store.update_notification(@notification)
-            end
-            mark_delivered
+          fail Rpush::DeliveryError.new(nil, @notification.id, describe_errors) if @sent_registration_ids.empty?
+
+          unless @failed_registration_ids.empty?
+            @notification.error_description = describe_errors
+            Rpush::Daemon.store.update_notification(@notification)
           end
+          mark_delivered
         rescue Rpush::RateLimitError => error
           handle_rate_limited(error)
         rescue Rpush::RetryableError => error
           handle_retryable(error)
         rescue SocketError => error
-          mark_retryable(@notification, Time.now + 10.seconds, error)
+          mark_retryable(@notification, 10.seconds.from_now, error)
           raise
         rescue StandardError => error
           mark_failed(error)
@@ -90,10 +90,10 @@ module Rpush
             # clear app access_token so a new one is fetched
             @notification.app.access_token = nil
             access_token
-            mark_retryable(@notification, Time.now) if @notification.app.access_token
+            mark_retryable(@notification, Time.zone.now) if @notification.app.access_token
           when 503
             retry_delivery(@notification, error.response)
-            log_warn("ADM responded with an Service Unavailable Error. " + retry_message)
+            log_warn("ADM responded with an Service Unavailable Error. #{retry_message}")
           end
         end
 
@@ -103,10 +103,10 @@ module Rpush
             retry_delivery(@notification, error.response)
           else
             # save unsent registration ids
-            unsent_registration_ids = @notification.registration_ids.select { |reg_id| !@sent_registration_ids.include?(reg_id) }
+            unsent_registration_ids = @notification.registration_ids.reject { |reg_id| @sent_registration_ids.include?(reg_id) }
 
             # update the current notification so it only contains the sent reg ids
-            @notification.registration_ids.reject! { |reg_id| !@sent_registration_ids.include?(reg_id) }
+            @notification.registration_ids.select! { |reg_id| @sent_registration_ids.include?(reg_id) }
 
             Rpush::Daemon.store.update_notification(@notification)
 
@@ -218,7 +218,7 @@ module Rpush
 
         def update_access_token(data)
           @notification.app.access_token = data['access_token']
-          @notification.app.access_token_expiration = Time.now + data['expires_in'].to_i
+          @notification.app.access_token_expiration = Time.zone.now + data['expires_in'].to_i
         end
       end
     end

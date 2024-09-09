@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class ProcTitle
       def self.update
         return if Rpush.config.embedded || Rpush.config.push
+
         Process.respond_to?(:setproctitle) ? Process.setproctitle(proc_title) : $0 = proc_title
       end
 

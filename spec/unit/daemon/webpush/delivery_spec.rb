@@ -1,32 +1,34 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Webpush::Delivery do
+  subject(:delivery) { described_class.new(app, http, notification, batch) }
+
   let(:app) { Rpush::Webpush::App.create!(name: 'MyApp', vapid_keypair: VAPID_KEYPAIR) }
 
   # Push subscription information as received from a client browser when the
   # user subscribed to push notifications.
-  let(:device_reg) {
+  let(:device_reg) do
     { endpoint: 'https://webpush-provider.example.org/push/some-id',
-      keys: {'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A'} }
-  }
+      keys: { 'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A' } }
+  end
 
   let(:data) { { message: 'some message' } }
   let(:notification) { Rpush::Webpush::Notification.create!(app: app, registration_ids: [device_reg], data: data) }
-  let(:batch) { instance_double('Rpush::Daemon::Batch', notification_processed: nil) }
-  let(:response) { instance_double('Net::HTTPResponse', code: response_code, header: response_header, body: response_body) }
+  let(:batch) { instance_double(Rpush::Daemon::Batch, notification_processed: nil) }
+  let(:response) { instance_double(Net::HTTPResponse, code: response_code, header: response_header, body: response_body) }
   let(:response_code) { 201 }
   let(:response_header) { {} }
   let(:response_body) { nil }
-  let(:http) { instance_double('Net::HTTP::Persistent', request: response) }
-  let(:logger) { instance_double('Rpush::Logger', error: nil, info: nil, warn: nil, internal_logger: nil) }
+  let(:http) { instance_double(Net::HTTP::Persistent, request: response) }
+  let(:logger) { instance_double(Rpush::Logger, error: nil, info: nil, warn: nil, internal_logger: nil) }
   let(:now) { Time.parse('2020-10-13 00:00:00 UTC') }
 
   before do
     allow(Rpush).to receive_messages(logger: logger)
     allow(Time).to receive_messages(now: now)
   end
-
-  subject(:delivery) { described_class.new(app, http, notification, batch) }
 
   describe '#perform' do
     shared_examples 'process notification' do
@@ -112,6 +114,7 @@ describe Rpush::Daemon::Webpush::Delivery do
     context 'when delivery failed' do
       let(:response_code) { 400 }
       let(:fail_message) { 'that was a bad request' }
+
       before do
         allow(response).to receive(:body) { fail_message }
         allow(batch).to receive(:mark_failed)

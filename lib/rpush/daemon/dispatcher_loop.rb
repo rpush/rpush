@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class DispatcherLoop
@@ -19,7 +21,7 @@ module Rpush
       end
 
       def start
-        @started_at = Time.now
+        @started_at = Time.zone.now
 
         @thread = Thread.new do
           loop do
@@ -42,7 +44,7 @@ module Rpush
 
       def stop
         @queue.push([STOP, object_id]) if @thread
-        @thread.join if @thread
+        @thread&.join
         @dispatcher.cleanup
       rescue StandardError => e
         log_error(e)

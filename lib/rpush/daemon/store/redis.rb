@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Store
       class Redis
-        DEFAULT_MARK_OPTIONS = { persist: true }
+        DEFAULT_MARK_OPTIONS = { persist: true }.freeze
 
         def app(app_id)
           Rpush::Client::Redis::App.find(app_id)
@@ -15,9 +17,9 @@ module Rpush
         def deliverable_notifications(limit)
           retryable_ids = retryable_notification_ids
           limit -= retryable_ids.size
-          pending_ids = limit > 0 ? pending_notification_ids(limit) : []
+          pending_ids = limit.positive? ? pending_notification_ids(limit) : []
           ids = retryable_ids + pending_ids
-          ids.map { |id| find_notification_by_id(id) }.compact
+          ids.filter_map { |id| find_notification_by_id(id) }
         end
 
         def mark_delivered(notification, time, opts = {})
@@ -28,7 +30,7 @@ module Rpush
         end
 
         def mark_batch_delivered(notifications)
-          now = Time.now
+          now = Time.zone.now
           notifications.each { |n| mark_delivered(n, now) }
         end
 
@@ -44,7 +46,7 @@ module Rpush
         end
 
         def mark_batch_failed(notifications, code, description)
-          now = Time.now
+          now = Time.zone.now
           notifications.each { |n| mark_failed(n, code, description, now) }
         end
 
@@ -106,11 +108,9 @@ module Rpush
           notification.save!
         end
 
-        def release_connection
-        end
+        def release_connection; end
 
-        def reopen_log
-        end
+        def reopen_log; end
 
         def pending_delivery_count
           Modis.with_connection do |redis|
@@ -134,7 +134,7 @@ module Rpush
           nil
         end
 
-        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
+        def create_fcm_like_notification(notification, attrs, data, app)
           notification.assign_attributes(attrs)
           notification.data = data
           notification.app = app

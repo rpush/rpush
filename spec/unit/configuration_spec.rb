@@ -1,28 +1,30 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush do
-  let(:config) { Rpush.config }
+  let(:config) { described_class.config }
 
   before do
-    allow(Rpush).to receive_messages(require: nil)
-    allow(Rpush).to receive_messages(config: config)
+    allow(described_class).to receive_messages(require: nil)
+    allow(described_class).to receive_messages(config: config)
   end
 
   it 'yields a configure block' do
-    expect { |b| Rpush.configure(&b) }.to yield_with_args(config)
+    expect { |b| described_class.configure(&b) }.to yield_with_args(config)
   end
 end
 
 describe Rpush::Configuration do
   let(:config) do
     Rpush::Deprecation.muted do
-      Rpush::Configuration.new
+      described_class.new
     end
   end
 
   it 'can be updated' do
     Rpush::Deprecation.muted do
-      new_config = Rpush::Configuration.new
+      new_config = described_class.new
       new_config.batch_size = 200
       expect { config.update(new_config) }.to change(config, :batch_size).to(200)
     end

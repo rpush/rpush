@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'active_record'
 
 jruby = defined?(RUBY_ENGINE) && RUBY_ENGINE == 'jruby'
 
 SPEC_ADAPTER = ENV['ADAPTER'] || 'postgresql'
-SPEC_ADAPTER = 'jdbc' + SPEC_ADAPTER if jruby
+SPEC_ADAPTER = "jdbc#{SPEC_ADAPTER}".freeze if jruby
 
 require 'yaml'
 db_config_path = File.expand_path("config/database.yml", File.dirname(__FILE__))
-db_config = YAML.load(ERB.new(File.read(db_config_path)).result)
+db_config = YAML.safe_load(ERB.new(File.read(db_config_path)).result)
 
 if db_config[SPEC_ADAPTER].nil?
   puts "No such adapter '#{SPEC_ADAPTER}'. Valid adapters are #{db_config.keys.join(', ')}."
@@ -18,7 +20,7 @@ if ENV['CI']
   db_config[SPEC_ADAPTER]['username'] = 'postgres'
 else
   require 'etc'
-  username = SPEC_ADAPTER =~ /mysql/ ? 'root' : Etc.getlogin
+  username = SPEC_ADAPTER.include?('mysql') ? 'root' : Etc.getlogin
   db_config[SPEC_ADAPTER]['username'] = username
 end
 
@@ -67,11 +69,9 @@ migrations = [
 
 unless ENV['CI']
   migrations.reverse_each do |m|
-    begin
-      m.down
-    rescue ActiveRecord::StatementInvalid => e
-      p e
-    end
+    m.down
+  rescue ActiveRecord::StatementInvalid => e
+    p e
   end
 end
 

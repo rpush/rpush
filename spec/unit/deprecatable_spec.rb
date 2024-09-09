@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Deprecatable do
@@ -27,6 +29,6 @@ describe Rpush::Deprecatable do
 
   it 'calls the original method' do
     klass.deprecated_method
-    expect(klass.original_called?).to eq(true)
+    expect(klass.original_called?).to be(true)
   end
 end

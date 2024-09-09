@@ -1,19 +1,19 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Wns::Delivery do
-  let(:app) { Rpush::Wns::App.create!(name: "MyApp", client_id: "someclient", client_secret: "somesecret", access_token: "access_token", access_token_expiration: Time.now + (60 * 10)) }
-  let(:notification) { Rpush::Wns::Notification.create!(app: app, data: { title: "MyApp", body: "Example notification", param: "/param1" }, uri: "http://some.example/", deliver_after: Time.now) }
+  let(:app) { Rpush::Wns::App.create!(name: "MyApp", client_id: "someclient", client_secret: "somesecret", access_token: "access_token", access_token_expiration: Time.zone.now + (60 * 10)) }
+  let(:notification) { Rpush::Wns::Notification.create!(app: app, data: { title: "MyApp", body: "Example notification", param: "/param1" }, uri: "http://some.example/", deliver_after: Time.zone.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}, body: '') }
   let(:http) { double(shutdown: nil, request: response) }
-  let(:now) { Time.parse('2012-10-14 00:00:00') }
+  let(:now) { Time.zone.parse('2012-10-14 00:00:00') }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil, notification_processed: nil) }
-  let(:delivery) { Rpush::Daemon::Wns::Delivery.new(app, http, notification, batch) }
+  let(:delivery) { described_class.new(app, http, notification, batch) }
   let(:store) { double(create_wpns_notification: double(id: 2), update_app: nil) }
 
-  def perform
-    delivery.perform
-  end
+  delegate :perform, to: :delivery
 
   def perform_with_rescue
     expect { perform }.to raise_error(StandardError)
@@ -27,7 +27,7 @@ describe Rpush::Daemon::Wns::Delivery do
   end
 
   shared_examples_for "an notification with some delivery faliures" do
-    let(:new_notification) { Rpush::Wns::Notification.where('id != ?', notification.id).first }
+    let(:new_notification) { Rpush::Wns::Notification.where.not(id: notification.id).first }
 
     before { allow(response).to receive_messages(body: JSON.dump(body)) }
 
@@ -50,7 +50,7 @@ describe Rpush::Daemon::Wns::Delivery do
     end
 
     it 'set the access token for the app' do
-      expect(delivery).to receive(:update_access_token).with({"access_token" => "dummy_access_token", "expires_in" => 60})
+      expect(delivery).to receive(:update_access_token).with({ "access_token" => "dummy_access_token", "expires_in" => 60 })
       expect(store).to receive(:update_app).with app
       perform
     end
@@ -76,7 +76,7 @@ describe Rpush::Daemon::Wns::Delivery do
     it "retries the notification when the queue is full" do
       allow(response).to receive_messages(body: JSON.dump("failure" => 0))
       allow(response).to receive_messages(to_hash: { "X-WNS-Status" => ["channelthrottled"] })
-      expect(batch).to receive(:mark_retryable).with(notification, Time.now + (60 * 10))
+      expect(batch).to receive(:mark_retryable).with(notification, Time.zone.now + (60 * 10))
       perform
     end
 
@@ -91,6 +91,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
   describe "an 400 response" do
     before { allow(response).to receive_messages(code: 400) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(400, notification.id, 'One or more headers were specified incorrectly or conflict with another header.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -100,6 +101,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
   describe "an 404 response" do
     before { allow(response).to receive_messages(code: 404) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(404, notification.id, 'The channel URI is not valid or is not recognized by WNS.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -109,6 +111,7 @@ describe Rpush::Daemon::Wns::Delivery do
 
   describe "an 405 response" do
     before { allow(response).to receive_messages(code: 405) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(405, notification.id, 'Invalid method (GET, CREATE); only POST (Windows or Windows Phone) or DELETE (Windows Phone only) is allowed.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -120,7 +123,7 @@ describe Rpush::Daemon::Wns::Delivery do
     before { allow(response).to receive_messages(code: 406) }
 
     it "retries the notification" do
-      expect(batch).to receive(:mark_retryable).with(notification, Time.now + (60 * 60))
+      expect(batch).to receive(:mark_retryable).with(notification, Time.zone.now + (60 * 60))
       perform
     end
 
@@ -136,7 +139,7 @@ describe Rpush::Daemon::Wns::Delivery do
     before { allow(response).to receive_messages(code: 412) }
 
     it "retries the notification" do
-      expect(batch).to receive(:mark_retryable).with(notification, Time.now + (60 * 60))
+      expect(batch).to receive(:mark_retryable).with(notification, Time.zone.now + (60 * 60))
       perform
     end
 

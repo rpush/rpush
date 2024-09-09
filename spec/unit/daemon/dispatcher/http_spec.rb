@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Dispatcher::Http do
@@ -7,13 +9,13 @@ describe Rpush::Daemon::Dispatcher::Http do
   let(:batch) { double }
   let(:http) { double }
   let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch, notification) }
-  let(:dispatcher) { Rpush::Daemon::Dispatcher::Http.new(app, delivery_class) }
+  let(:dispatcher) { described_class.new(app, delivery_class) }
 
   before { allow(Net::HTTP::Persistent).to receive_messages(new: http) }
 
   it 'constructs a new persistent connection' do
     expect(Net::HTTP::Persistent).to receive(:new)
-    Rpush::Daemon::Dispatcher::Http.new(app, delivery_class)
+    described_class.new(app, delivery_class)
   end
 
   describe 'dispatch' do

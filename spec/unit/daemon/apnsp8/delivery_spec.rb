@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Apnsp8::Delivery do
@@ -36,13 +38,13 @@ describe Rpush::Daemon::Apnsp8::Delivery do
       let(:max_concurrent_streams) { 0x7fffffff }
 
       it 'does not fall into an infinite loop on notifications after the first' do
-        start = Time.now
+        start = Time.zone.now
         thread = Thread.new { delivery.perform }
 
         loop do
           break unless thread.alive?
 
-          if Time.now - start > 1
+          if Time.zone.now - start > 1
             thread.kill
             fail 'Stuck in an infinite loop'
           end

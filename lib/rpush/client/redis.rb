@@ -1,15 +1,16 @@
+# frozen_string_literal: true
 
 # :nocov:
 begin
   require 'modis'
   require 'redis'
 rescue LoadError
-  puts
+  Rails.logger.debug
   str = "* Please add 'rpush-redis' to your Gemfile to use the Redis client. *"
-  puts "*" * str.size
-  puts str
-  puts "*" * str.size
-  puts
+  Rails.logger.debug "*" * str.size
+  Rails.logger.debug str
+  Rails.logger.debug "*" * str.size
+  Rails.logger.debug
 end
 
 require 'rpush/client/active_model'

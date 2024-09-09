@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Dispatcher
@@ -9,7 +11,7 @@ module Rpush
           production: 'https://api.push.apple.com',
           development: 'https://api.sandbox.push.apple.com',
           sandbox: 'https://api.sandbox.push.apple.com'
-        }
+        }.freeze
 
         DEFAULT_TIMEOUT = 60
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Apnsp8
@@ -18,7 +20,7 @@ module Rpush
         private
 
         def new_token
-          @cached_token_at = Time.now
+          @cached_token_at = Time.zone.now
           ec_key = OpenSSL::PKey::EC.new(@app.apn_key)
           @cached_token = JWT.encode(
             {
@@ -35,7 +37,7 @@ module Rpush
         end
 
         def expired_token?
-          Time.now - @cached_token_at >= TOKEN_TTL
+          Time.zone.now - @cached_token_at >= TOKEN_TTL
         end
       end
     end

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'functional_spec_helper'
 
 describe 'Pushy' do
   let(:external_device_id) { '5a622ae5813e2875bfdbe496' }
-  let(:response) { instance_double('Net::HTTPResponse', code: 200, body: { id: external_device_id }.to_json) }
-  let(:http) { instance_double('Net::HTTP::Persistent', request: response, shutdown: nil) }
+  let(:response) { instance_double(Net::HTTPResponse, code: 200, body: { id: external_device_id }.to_json) }
+  let(:http) { instance_double(Net::HTTP::Persistent, request: response, shutdown: nil) }
   let(:app) { Rpush::Pushy::App.create!(name: 'MyApp', api_key: 'my_api_key') }
 
   let(:notification) do

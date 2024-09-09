@@ -1,10 +1,14 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
-describe Rpush::Client::ActiveRecord::Fcm::Notification do
-  it_behaves_like 'Rpush::Client::Fcm::Notification'
-  it_behaves_like 'Rpush::Client::ActiveRecord::Notification'
+if active_record?
+  describe Rpush::Client::ActiveRecord::Fcm::Notification do
+    let(:app) { Rpush::Fcm::App.create!(name: 'test', auth_key: 'abc') }
 
-  subject(:notification) { described_class.new }
-  let(:app) { Rpush::Fcm::App.create!(name: 'test', auth_key: 'abc') }
+    it_behaves_like 'Rpush::Client::Fcm::Notification'
+    it_behaves_like 'Rpush::Client::ActiveRecord::Notification'
 
-end if active_record?
+    subject(:notification) { described_class.new }
+  end
+end

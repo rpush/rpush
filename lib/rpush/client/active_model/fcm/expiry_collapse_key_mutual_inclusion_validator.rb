@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -5,6 +7,7 @@ module Rpush
         class ExpiryCollapseKeyMutualInclusionValidator < ::ActiveModel::Validator
           def validate(record)
             return unless record.collapse_key && !record.expiry
+
             record.errors.add :expiry, 'must be set when using a collapse_key'
           end
         end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'pathname'
 require 'ostruct'
 
@@ -11,13 +13,14 @@ module Rpush
 
     def configure
       return unless block_given?
+
       yield config
       config.initialize_client
     end
   end
 
-  CURRENT_ATTRS = [:push_poll, :embedded, :pid_file, :batch_size, :push, :client, :logger, :log_file, :foreground, :foreground_logging, :log_level, :plugin]
-  DEPRECATED_ATTRS = []
+  CURRENT_ATTRS = %i[push_poll embedded pid_file batch_size push client logger log_file foreground foreground_logging log_level plugin].freeze
+  DEPRECATED_ATTRS = [].freeze
   CONFIG_ATTRS = CURRENT_ATTRS + DEPRECATED_ATTRS
 
   class ConfigurationError < StandardError; end
@@ -35,7 +38,7 @@ module Rpush
       self.logger = nil
       self.log_file = 'log/rpush.log'
       self.pid_file = 'tmp/rpush.pid'
-      self.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::DEBUG
+      self.log_level = defined?(Rails) && Rails.logger ? Rails.logger.level : ::Logger::Severity::DEBUG
       self.plugin = OpenStruct.new
       self.foreground = false
       self.foreground_logging = true
@@ -48,7 +51,7 @@ module Rpush
     def update(other)
       CONFIG_ATTRS.each do |attr|
         other_value = other.send(attr)
-        send("#{attr}=", other_value) unless other_value.nil?
+        send(:"#{attr}=", other_value) unless other_value.nil?
       end
     end
 
@@ -68,10 +71,6 @@ module Rpush
       end
     end
 
-    def logger=(logger)
-      super(logger)
-    end
-
     def client=(client)
       super
       initialize_client
@@ -84,12 +83,13 @@ module Rpush
     def initialize_client
       return if @client_initialized
       raise ConfigurationError, 'Rpush.config.client is not set.' unless client
+
       require "rpush/client/#{client}"
 
       client_module = Rpush::Client.const_get(client.to_s.camelize)
-      Rpush.send(:include, client_module) unless Rpush.ancestors.include?(client_module)
+      Rpush.send(:include, client_module) unless client_module >= Rpush
 
-      [:Apns, :Fcm, :Wpns, :Wns, :Adm, :Pushy, :Webpush].each do |service|
+      %i[Apns Fcm Wpns Wns Adm Pushy Webpush].each do |service|
         Rpush.const_set(service, client_module.const_get(service)) unless Rpush.const_defined?(service)
       end
 

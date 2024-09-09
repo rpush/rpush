@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Daemon::Store' do
@@ -12,7 +14,7 @@ shared_examples 'Rpush::Daemon::Store' do
     allow(Rpush).to receive_messages(logger: logger)
   end
 
-  before(:each) do
+  before do
     Timecop.freeze(time)
   end
 
@@ -147,7 +149,7 @@ shared_examples 'Rpush::Daemon::Store' do
   describe 'mark_failed' do
     it 'marks the notification as not delivered' do
       store.mark_failed(notification, nil, '', time)
-      expect(notification.delivered).to eq(false)
+      expect(notification.delivered).to be(false)
     end
 
     it 'marks the notification as failed' do
@@ -192,7 +194,7 @@ shared_examples 'Rpush::Daemon::Store' do
       store.mark_batch_failed([notification], 123, 'an error')
       expect(notification.failed_at.to_s).to eq time.to_s
       expect(notification.delivered_at).to be_nil
-      expect(notification.delivered).to eq(false)
+      expect(notification.delivered).to be(false)
       expect(notification.failed).to be_truthy
       expect(notification.error_code).to eq 123
       expect(notification.error_description).to eq 'an error'
@@ -264,7 +266,7 @@ shared_examples 'Rpush::Daemon::Store' do
 
     it 'saves the new notification' do
       new_notification = store.create_adm_notification(*args)
-      expect(new_notification.new_record?).to be_falsey
+      expect(new_notification).not_to be_new_record
     end
   end
 end

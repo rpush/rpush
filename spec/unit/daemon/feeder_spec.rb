@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "unit_spec_helper"
 
 describe Rpush::Daemon::Feeder do
@@ -16,7 +18,7 @@ describe Rpush::Daemon::Feeder do
 
     allow(Rpush).to receive_messages(logger: logger)
     allow(Rpush::Daemon).to receive_messages(store: store)
-    allow(Rpush::Daemon::Feeder).to receive_messages(should_stop: true, interruptible_sleeper: interruptible_sleeper)
+    allow(described_class).to receive_messages(should_stop: true, interruptible_sleeper: interruptible_sleeper)
     allow(Rpush::Daemon::AppRunner).to receive_messages(enqueue: nil, num_queued: 0)
   end
 
@@ -44,9 +46,9 @@ describe Rpush::Daemon::Feeder do
   end
 
   it 'enqueues notifications without looping if in push mode' do
-    expect(Rpush::Daemon::Feeder).not_to receive(:feed_forever)
-    expect(Rpush::Daemon::Feeder).to receive(:feed_all)
-    Rpush::Daemon::Feeder.start(true)
+    expect(described_class).not_to receive(:feed_forever)
+    expect(described_class).to receive(:feed_all)
+    described_class.start(true)
   end
 
   it "enqueues the notifications" do
@@ -74,8 +76,8 @@ describe Rpush::Daemon::Feeder do
   end
 
   it 'enqueues notifications when started' do
-    expect(Rpush::Daemon::Feeder).to receive(:enqueue_notifications).at_least(:once)
-    allow(Rpush::Daemon::Feeder).to receive(:loop).and_yield
+    expect(described_class).to receive(:enqueue_notifications).at_least(:once)
+    allow(described_class).to receive(:loop).and_yield
     start_and_stop
   end
 
@@ -85,12 +87,12 @@ describe Rpush::Daemon::Feeder do
   end
 
   describe 'wakeup' do
+    after { described_class.stop }
+
     it 'interrupts sleep' do
       expect(interruptible_sleeper).to receive(:stop)
-      Rpush::Daemon::Feeder.start
-      Rpush::Daemon::Feeder.wakeup
+      described_class.start
+      described_class.wakeup
     end
-
-    after { Rpush::Daemon::Feeder.stop }
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class Batch
@@ -53,7 +55,7 @@ module Rpush
         @mutex.synchronize do
           @delivered << notification
         end
-        Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
+        Rpush::Daemon.store.mark_delivered(notification, Time.zone.now, persist: false)
       end
 
       def mark_all_delivered
@@ -62,7 +64,7 @@ module Rpush
         end
 
         each_notification do |notification|
-          Rpush::Daemon.store.mark_delivered(notification, Time.now, persist: false)
+          Rpush::Daemon.store.mark_delivered(notification, Time.zone.now, persist: false)
         end
       end
 
@@ -72,7 +74,7 @@ module Rpush
           @failed[key] ||= []
           @failed[key] << notification
         end
-        Rpush::Daemon.store.mark_failed(notification, code, description, Time.now, persist: false)
+        Rpush::Daemon.store.mark_failed(notification, code, description, Time.zone.now, persist: false)
       end
 
       def mark_all_failed(code, message)
@@ -81,7 +83,7 @@ module Rpush
           @failed[key] = @notifications
         end
         each_notification do |notification|
-          Rpush::Daemon.store.mark_failed(notification, code, message, Time.now, persist: false)
+          Rpush::Daemon.store.mark_failed(notification, code, message, Time.zone.now, persist: false)
         end
       end
 
@@ -104,13 +106,11 @@ module Rpush
       def complete
         return if complete?
 
-        [:complete_delivered, :complete_failed, :complete_retried].each do |method|
-          begin
-            send(method)
-          rescue StandardError => e
-            Rpush.logger.error(e)
-            reflect(:error, e)
-          end
+        %i[complete_delivered complete_failed complete_retried].each do |method|
+          send(method)
+        rescue StandardError => e
+          Rpush.logger.error(e)
+          reflect(:error, e)
         end
 
         @complete = true

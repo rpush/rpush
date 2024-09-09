@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -5,6 +7,7 @@ module Rpush
         class DataValidator < ::ActiveModel::Validator
           def validate(record)
             return unless record.collapse_key.nil? && record.data.nil?
+
             record.errors.add :data, 'must be set unless collapse_key is specified'
           end
         end

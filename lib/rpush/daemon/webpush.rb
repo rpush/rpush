@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Webpush
@@ -7,4 +9,3 @@ module Rpush
     end
   end
 end
-

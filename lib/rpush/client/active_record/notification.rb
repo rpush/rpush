@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveRecord
-      class Notification < ::ActiveRecord::Base
+      class Notification < ApplicationRecord
         include Rpush::MultiJsonHelper
         include Rpush::Client::ActiveModel::Notification
 
@@ -15,12 +17,14 @@ module Rpush
         def data=(attrs)
           return unless attrs
           fail ArgumentError, 'must be a Hash' unless attrs.is_a?(Hash)
+
           write_attribute(:data, multi_json_dump(attrs.merge(data || {})))
         end
 
         def notification=(attrs)
           return unless attrs
           fail ArgumentError, 'must be a Hash' unless attrs.is_a?(Hash)
+
           write_attribute(:notification, multi_json_dump(attrs.merge(notification || {})))
         end
 

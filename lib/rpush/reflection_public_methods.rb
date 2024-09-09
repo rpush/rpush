@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   @reflection_stack ||= [ReflectionCollection.new]
 

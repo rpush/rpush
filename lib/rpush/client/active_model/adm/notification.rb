@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -14,7 +16,7 @@ module Rpush
             end
           end
 
-          def as_json(options = nil)
+          def as_json(_options = nil)
             json = { 'data' => data }
             json['consolidationKey'] = collapse_key if collapse_key
             # number of seconds before message is expired

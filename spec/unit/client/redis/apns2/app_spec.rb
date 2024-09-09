@@ -1,4 +1,3 @@
-require 'unit_spec_helper'
+# frozen_string_literal: true
 
-describe Rpush::Client::Redis::Apns2::App do
-end if redis?
+require 'unit_spec_helper'

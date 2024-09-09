@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
-describe Rpush::Client::Redis::Adm::Notification do
-  it_behaves_like 'Rpush::Client::Adm::Notification'
-end if redis?
+if redis?
+  describe Rpush::Client::Redis::Adm::Notification do
+    it_behaves_like 'Rpush::Client::Adm::Notification'
+  end
+end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Wpns
@@ -6,7 +8,7 @@ module Rpush
         FAILURE_MESSAGES = {
           400 => 'Bad XML or malformed notification URI.',
           401 => 'Unauthorized to send a notification to this app.'
-        }
+        }.freeze
 
         def initialize(app, http, notification, batch)
           @app = app
@@ -18,7 +20,7 @@ module Rpush
         def perform
           handle_response(do_post)
         rescue SocketError => error
-          mark_retryable(@notification, Time.now + 10.seconds, error)
+          mark_retryable(@notification, 10.seconds.from_now, error)
           raise
         rescue StandardError => error
           mark_failed(error)
@@ -46,9 +48,7 @@ module Rpush
         end
 
         def handle_failure(code, msg = nil)
-          unless msg
-            msg = FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
-          end
+          msg ||= FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
           fail Rpush::DeliveryError.new(code, @notification.id, msg)
         end
 
@@ -59,7 +59,7 @@ module Rpush
             mark_delivered
             log_info("#{@notification.id} sent successfully")
           when ["QueueFull"]
-            mark_retryable(@notification, Time.now + (60 * 10))
+            mark_retryable(@notification, Time.zone.now + (60 * 10))
             log_warn("#{@notification.id} cannot be sent. The Queue is full.")
           when ["Suppressed"]
             handle_failure(200, "Notification was received but suppressed by the service.")
@@ -76,7 +76,7 @@ module Rpush
 
         def service_unavailable
           mark_retryable_exponential(@notification)
-          log_warn("Service Unavailable. " + retry_message)
+          log_warn("Service Unavailable. #{retry_message}")
         end
 
         def retry_message
@@ -84,7 +84,7 @@ module Rpush
         end
 
         def retry_notification(reason)
-          deliver_after = Time.now + (60 * 60)
+          deliver_after = Time.zone.now + (60 * 60)
           mark_retryable(@notification, deliver_after)
           log_warn("#{reason} " + retry_message)
         end
@@ -102,9 +102,9 @@ module Rpush
         def status_from_response(response)
           headers = response.to_hash
           {
-            notification:         headers["x-notificationstatus"],
+            notification: headers["x-notificationstatus"],
             notification_channel: headers["x-subscriptionstatus"],
-            device_connection:    headers["x-deviceconnectionstatus"]
+            device_connection: headers["x-deviceconnectionstatus"]
           }
         end
 
@@ -123,8 +123,8 @@ module Rpush
         end
 
         def clean_param_string(string)
-          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          string.gsub('&', "&amp;").gsub('<', "&lt;")
+                .gsub('>', "&gt;").gsub("'", "&apos;").gsub('"', "&quot;")
         end
       end
     end

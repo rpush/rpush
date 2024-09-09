@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples_for 'Rpush::Client::ActiveRecord::Notification' do
   let(:notification) { described_class.new }
 

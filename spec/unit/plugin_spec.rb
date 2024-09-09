@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Plugin do
   include Rpush::Reflectable
 
   it 'can only be initialized once' do
-    plugin = double(Rpush::Plugin, unload: nil)
-    expect(Rpush::Plugin).to receive(:new).once.and_return(plugin)
+    plugin = double(described_class, unload: nil)
+    expect(described_class).to receive(:new).once.and_return(plugin)
     Rpush.plugin(:test)
     Rpush.plugin(:test)
   end
@@ -20,7 +22,7 @@ describe Rpush::Plugin do
     plugin.configure do |config|
       config.is_configured = true
     end
-    expect(Rpush.config.plugin.test.is_configured).to eq(true)
+    expect(Rpush.config.plugin.test.is_configured).to be(true)
   end
 
   it 'can hook up reflections' do

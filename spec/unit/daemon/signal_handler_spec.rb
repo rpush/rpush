@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::SignalHandler do
@@ -36,7 +38,7 @@ describe Rpush::Daemon::SignalHandler do
 
     it 'does not trap signals' do
       expect(Signal).not_to receive(:trap)
-      Rpush::Daemon::SignalHandler.start
+      described_class.start
     end
   end
 

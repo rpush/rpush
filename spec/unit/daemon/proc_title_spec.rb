@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::ProcTitle do
@@ -6,6 +8,6 @@ describe Rpush::Daemon::ProcTitle do
     Rpush.config.push = false
     allow(Rpush::Daemon::AppRunner).to receive_messages(total_dispatchers: 2, total_queued: 10)
     expect(Process).to receive(:setproctitle).with('rpush | 10 queued | 2 dispatchers')
-    Rpush::Daemon::ProcTitle.update
+    described_class.update
   end
 end

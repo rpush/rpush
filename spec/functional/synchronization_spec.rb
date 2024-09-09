@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'functional_spec_helper'
 
 describe 'Synchronization' do
@@ -6,9 +8,7 @@ describe 'Synchronization' do
 
   def wait_for_num_dispatchers(num)
     Timeout.timeout(timeout) do
-      until Rpush::Daemon::AppRunner.num_dispatchers_for_app(app) == num
-        sleep 0.1
-      end
+      sleep 0.1 until Rpush::Daemon::AppRunner.num_dispatchers_for_app(app) == num
     end
   end
 
@@ -46,7 +46,7 @@ describe 'Synchronization' do
   it 'stops a deleted app' do
     app.destroy
     Rpush.sync
-    expect(Rpush::Daemon::AppRunner.app_running?(app)).to eq(false)
+    expect(Rpush::Daemon::AppRunner.app_running?(app)).to be(false)
   end
 
   it 'restarts an app when the certificate is changed' do

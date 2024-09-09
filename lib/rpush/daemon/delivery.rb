@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class Delivery
@@ -5,18 +7,16 @@ module Rpush
       include Loggable
 
       def mark_retryable(notification, deliver_after, error = nil)
-        if notification.fail_after && notification.fail_after < Time.now
+        if notification.fail_after && notification.fail_after < Time.zone.now
           @batch.mark_failed(notification, nil, "Notification failed to be delivered before #{notification.fail_after.strftime('%Y-%m-%d %H:%M:%S')}.")
         else
-          if error
-            log_warn("Will retry notification #{notification.id} after #{deliver_after.strftime('%Y-%m-%d %H:%M:%S')} due to error (#{error.class.name}, #{error.message})")
-          end
+          log_warn("Will retry notification #{notification.id} after #{deliver_after.strftime('%Y-%m-%d %H:%M:%S')} due to error (#{error.class.name}, #{error.message})") if error
           @batch.mark_retryable(notification, deliver_after)
         end
       end
 
       def mark_retryable_exponential(notification)
-        mark_retryable(notification, Time.now + 2**(notification.retries + 1))
+        mark_retryable(notification, Time.zone.now + (2**(notification.retries + 1)))
       end
 
       def mark_batch_retryable(deliver_after, error)

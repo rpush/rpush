@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Rpc
@@ -12,7 +14,7 @@ module Rpush
 
         def close
           @socket.close
-        rescue StandardError # rubocop:disable Lint/HandleExceptions
+        rescue StandardError
         end
 
         private

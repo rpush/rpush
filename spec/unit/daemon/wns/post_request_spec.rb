@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Wns::PostRequest do
@@ -7,7 +9,7 @@ describe Rpush::Daemon::Wns::PostRequest do
       client_id: "someclient",
       client_secret: "somesecret",
       access_token: "access_token",
-      access_token_expiration: Time.now + (60 * 10)
+      access_token_expiration: Time.zone.now + (60 * 10)
     )
   end
 
@@ -24,7 +26,7 @@ describe Rpush::Daemon::Wns::PostRequest do
     end
 
     it 'creates a request characteristic for toast notification' do
-      request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+      request = described_class.create(notification, 'token')
       expect(request['X-WNS-Type']).to eq('wns/toast')
       expect(request['Content-Type']).to eq('text/xml')
       expect(request.body).to include('<toast>')
@@ -48,7 +50,7 @@ describe Rpush::Daemon::Wns::PostRequest do
       end
 
       it 'creates a request characteristic for toast notification with launch' do
-        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        request = described_class.create(notification, 'token')
         expect(request['X-WNS-Type']).to eq('wns/toast')
         expect(request['Content-Type']).to eq('text/xml')
         expect(request.body).to include("<toast launch='MyLaunchArgument'>")
@@ -71,7 +73,7 @@ describe Rpush::Daemon::Wns::PostRequest do
       end
 
       it 'creates a request characteristic for toast notification with priority' do
-        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        request = described_class.create(notification, 'token')
         expect(request['X-WNS-Type']).to eq('wns/toast')
         expect(request['Content-Type']).to eq('text/xml')
         expect(request['X-WNS-PRIORITY']).to eq('1')
@@ -94,7 +96,7 @@ describe Rpush::Daemon::Wns::PostRequest do
       end
 
       it 'creates a request characteristic for toast notification' do
-        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        request = described_class.create(notification, 'token')
         expect(request['X-WNS-Type']).to eq('wns/toast')
         expect(request['Content-Type']).to eq('text/xml')
         expect(request.body).to include('<toast>')
@@ -115,7 +117,7 @@ describe Rpush::Daemon::Wns::PostRequest do
     end
 
     it 'creates a request characteristic for raw notification' do
-      request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+      request = described_class.create(notification, 'token')
       expect(request['X-WNS-Type']).to eq('wns/raw')
       expect(request['Content-Type']).to eq('application/octet-stream')
       expect(request.body).to eq("{\"foo\":\"foo\",\"bar\":\"bar\"}")
@@ -132,7 +134,7 @@ describe Rpush::Daemon::Wns::PostRequest do
       end
 
       it 'creates a request characteristic for raw notification with priority' do
-        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        request = described_class.create(notification, 'token')
         expect(request['X-WNS-Type']).to eq('wns/raw')
         expect(request['X-WNS-PRIORITY']).to eq('3')
         expect(request['Content-Type']).to eq('application/octet-stream')
@@ -151,7 +153,7 @@ describe Rpush::Daemon::Wns::PostRequest do
     end
 
     it 'creates a request characteristic for badge notification' do
-      request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+      request = described_class.create(notification, 'token')
       expect(request['X-WNS-Type']).to eq('wns/badge')
       expect(request['Content-Type']).to eq('text/xml')
       expect(request.body).to include('<badge')
@@ -169,7 +171,7 @@ describe Rpush::Daemon::Wns::PostRequest do
       end
 
       it 'creates a request characteristic for badge notification with priority' do
-        request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+        request = described_class.create(notification, 'token')
         expect(request['X-WNS-Type']).to eq('wns/badge')
         expect(request['X-WNS-PRIORITY']).to eq('4')
         expect(request['Content-Type']).to eq('text/xml')

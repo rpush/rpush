@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'functional_spec_helper'
 
 describe 'ADM' do
@@ -36,7 +38,7 @@ describe 'ADM' do
     allow(response).to receive_messages(code: 400, body: JSON.dump(reason: 'error', registrationID: notification.registration_ids.first.to_s))
     Rpush.push
     notification.reload
-    expect(notification.delivered).to eq(false)
+    expect(notification.delivered).to be(false)
   end
 
   it 'retries notification that fail due to a SocketError' do

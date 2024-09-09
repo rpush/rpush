@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -5,7 +7,7 @@ module Rpush
         module App
           def self.included(base)
             base.instance_eval do
-              validates :environment, presence: true, inclusion: { in: %w(development production sandbox) }
+              validates :environment, presence: true, inclusion: { in: %w[development production sandbox] }
               validates :apn_key, presence: true
               validates :apn_key_id, presence: true
               validates :team_id, presence: true

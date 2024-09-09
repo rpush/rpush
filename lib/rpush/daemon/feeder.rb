@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class Feeder
@@ -23,7 +25,7 @@ module Rpush
       def self.stop
         self.should_stop = true
         interruptible_sleeper.stop
-        @thread.join if @thread
+        @thread&.join
       rescue StandardError => e
         log_error(e)
         reflect(:error, e)
@@ -40,7 +42,7 @@ module Rpush
       end
 
       def self.feed_all
-        enqueue_notifications until Rpush::Daemon.store.pending_delivery_count == 0
+        enqueue_notifications until Rpush::Daemon.store.pending_delivery_count.zero?
       end
 
       def self.feed_forever
@@ -54,6 +56,7 @@ module Rpush
       def self.enqueue_notifications
         batch_size = Rpush.config.batch_size - Rpush::Daemon::AppRunner.total_queued
         return if batch_size <= 0
+
         notifications = Rpush::Daemon.store.deliverable_notifications(batch_size)
         Rpush::Daemon::AppRunner.enqueue(notifications)
       rescue StandardError => e

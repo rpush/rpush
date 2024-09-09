@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class SignalHandler
@@ -12,14 +14,14 @@ module Rpush
 
         read_io, @write_io = IO.pipe
         start_handler(read_io)
-        %w(INT TERM HUP USR2).each do |signal|
+        %w[INT TERM HUP USR2].each do |signal|
           Signal.trap(signal) { @write_io.puts(signal) }
         end
       end
 
       def self.stop
-        @write_io.puts('break') if @write_io
-        @thread.join if @thread
+        @write_io&.puts('break')
+        @thread&.join
       rescue StandardError => e
         log_error(e)
         reflect(:error, e)

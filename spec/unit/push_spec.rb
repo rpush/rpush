@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush, 'push' do
@@ -8,27 +10,27 @@ describe Rpush, 'push' do
   end
 
   it 'sets the push config option to true' do
-    Rpush.push
-    expect(Rpush.config.push).to eq(true)
+    described_class.push
+    expect(described_class.config.push).to be(true)
   end
 
   it 'initializes the daemon' do
     expect(Rpush::Daemon).to receive(:common_init)
-    Rpush.push
+    described_class.push
   end
 
   it 'syncs' do
     expect(Rpush::Daemon::Synchronizer).to receive(:sync)
-    Rpush.push
+    described_class.push
   end
 
   it 'starts the feeder' do
     expect(Rpush::Daemon::Feeder).to receive(:start)
-    Rpush.push
+    described_class.push
   end
 
   it 'stops on the app runner' do
     expect(Rpush::Daemon::AppRunner).to receive(:stop)
-    Rpush.push
+    described_class.push
   end
 end

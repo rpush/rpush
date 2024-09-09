@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Pushy
@@ -17,7 +19,7 @@ module Rpush
           response = send_request
           process_response(response)
         rescue SocketError => error
-          mark_retryable(notification, Time.now + 10.seconds, error)
+          mark_retryable(notification, 10.seconds.from_now, error)
           raise
         rescue StandardError => error
           mark_failed(error)

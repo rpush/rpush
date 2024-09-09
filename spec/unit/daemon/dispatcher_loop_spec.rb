@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::DispatcherLoop do
@@ -10,7 +12,7 @@ describe Rpush::Daemon::DispatcherLoop do
   let(:batch) { double(notification_processed: nil) }
   let(:queue) { Queue.new }
   let(:dispatcher) { double(dispatch: nil, cleanup: nil) }
-  let(:dispatcher_loop) { Rpush::Daemon::DispatcherLoop.new(queue, dispatcher) }
+  let(:dispatcher_loop) { described_class.new(queue, dispatcher) }
   let(:store) { double(Rpush::Daemon::Store::ActiveRecord, release_connection: nil) }
 
   before do

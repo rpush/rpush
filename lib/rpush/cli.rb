@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# frozen_string_literal: true
 
 require 'thor'
 require 'rainbow'
@@ -33,20 +33,18 @@ module Rpush
       pid = rpush_process_pid
       return unless pid
 
-      STDOUT.write "* Stopping Rpush (pid #{pid})... "
-      STDOUT.flush
+      Rails.logger.debug { "* Stopping Rpush (pid #{pid})... " }
+      $stdout.flush
       Process.kill('TERM', pid)
 
       loop do
-        begin
-          Process.getpgid(pid)
-          sleep 0.05
-        rescue Errno::ESRCH
-          break
-        end
+        Process.getpgid(pid)
+        sleep 0.05
+      rescue Errno::ESRCH
+        break
       end
 
-      puts Rainbow('✔').green
+      Rails.logger.debug Rainbow('✔').green
     end
 
     desc 'init', 'Initialize Rpush into the current directory'
@@ -55,7 +53,7 @@ module Rpush
       underscore_option_names
       require 'rails/generators'
 
-      puts "* " + Rainbow('Installing config...').green
+      Rails.logger.debug { "* #{Rainbow('Installing config...').green}" }
       $RPUSH_CONFIG_PATH = default_config_path # rubocop:disable Style/GlobalVars
       Rails::Generators.invoke('rpush_config')
 
@@ -68,11 +66,11 @@ module Rpush
 
       Rails::Generators.invoke('rpush_migration', ['--force']) if install_migrations
 
-      puts "\n* #{Rainbow('Next steps:').green}"
-      puts "  - Run 'bundle exec rake db:migrate'." if install_migrations
-      puts "  - Review and update your configuration in #{default_config_path}."
-      puts "  - Create your first app, see https://github.com/rpush/rpush for examples."
-      puts "  - Run 'rpush help' for commands and options."
+      Rails.logger.debug { "\n* #{Rainbow('Next steps:').green}" }
+      Rails.logger.debug "  - Run 'bundle exec rake db:migrate'." if install_migrations
+      Rails.logger.debug { "  - Review and update your configuration in #{default_config_path}." }
+      Rails.logger.debug "  - Create your first app, see https://github.com/rpush/rpush for examples."
+      Rails.logger.debug "  - Run 'rpush help' for commands and options."
     end
 
     desc 'push', 'Deliver all pending notifications and then exit'
@@ -91,12 +89,12 @@ module Rpush
       rpc = Rpush::Daemon::Rpc::Client.new(rpush_process_pid)
       status = rpc.status
       rpc.close
-      puts humanize_json(status)
+      Rails.logger.debug humanize_json(status)
     end
 
     desc 'version', 'Print Rpush version'
     def version
-      puts Rpush::VERSION
+      Rails.logger.debug Rpush::VERSION
     end
 
     private
@@ -112,12 +110,12 @@ module Rpush
 
     def load_rails_environment
       if detect_rails? && options['rails_env']
-        STDOUT.write "* Booting Rails '#{options[:rails_env]}' environment... "
-        STDOUT.flush
+        Rails.logger.debug { "* Booting Rails '#{options[:rails_env]}' environment... " }
+        $stdout.flush
         ENV['RAILS_ENV'] = options['rails_env']
         load 'config/environment.rb'
         Rpush.config.update(options)
-        puts Rainbow('✔').green
+        Rails.logger.debug Rainbow('✔').green
 
         return true
       end
@@ -126,12 +124,12 @@ module Rpush
     end
 
     def load_standalone
-      if !File.exist?(options[:config])
-        STDERR.puts(Rainbow('ERROR: ').red + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
-        exit 1
-      else
+      if File.exist?(options[:config])
         load options[:config]
         Rpush.config.update(options)
+      else
+        $stderr.puts(Rainbow('ERROR: ').red + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
+        exit 1
       end
     end
 
@@ -162,12 +160,12 @@ module Rpush
 
     def rpush_process_pid
       if Rpush.config.pid_file.blank?
-        STDERR.puts(Rainbow('ERROR: ').red + 'config.pid_file is not set.')
+        $stderr.puts("#{Rainbow('ERROR: ').red}config.pid_file is not set.")
         exit 1
       end
 
       unless File.exist?(Rpush.config.pid_file)
-        STDERR.puts("* Rpush isn't running? #{Rpush.config.pid_file} does not exist.")
+        $stderr.puts("* Rpush isn't running? #{Rpush.config.pid_file} does not exist.")
         exit 1
       end
 

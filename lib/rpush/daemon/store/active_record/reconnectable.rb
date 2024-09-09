@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PGError < StandardError; end unless defined?(PGError)
 module PG
   class Error < StandardError; end unless defined?(::PG::Error)
@@ -9,7 +11,7 @@ module ActiveRecord
 end
 
 # :nocov:
-unless defined?(::SQLite3::Exception)
+unless defined?(SQLite3::Exception)
   module SQLite3
     class Exception < StandardError; end
   end
@@ -21,21 +23,19 @@ module Rpush
       class ActiveRecord
         module Reconnectable
           ADAPTER_ERRORS = [
-              ::ActiveRecord::ConnectionNotEstablished,
-              ::ActiveRecord::ConnectionTimeoutError,
-              ::ActiveRecord::JDBCError,
-              ::ActiveRecord::StatementInvalid,
-              Mysql::Error,
-              Mysql2::Error,
-              PG::Error,
-              PGError,
-              SQLite3::Exception
-          ]
+            ::ActiveRecord::ConnectionNotEstablished,
+            ::ActiveRecord::ConnectionTimeoutError,
+            ::ActiveRecord::JDBCError,
+            ::ActiveRecord::StatementInvalid,
+            Mysql::Error,
+            Mysql2::Error,
+            PG::Error,
+            PGError,
+            SQLite3::Exception
+          ].freeze
 
-          def with_database_reconnect_and_retry
-            ::ActiveRecord::Base.connection_pool.with_connection do
-              yield
-            end
+          def with_database_reconnect_and_retry(&block)
+            ::ActiveRecord::Base.connection_pool.with_connection(&block)
           rescue *ADAPTER_ERRORS => e
             Rpush.logger.error(e)
             sleep_to_avoid_thrashing
@@ -47,15 +47,13 @@ module Rpush
             Rpush.logger.warn("Lost connection to database, reconnecting...")
             attempts = 0
             loop do
-              begin
-                Rpush.logger.warn("Attempt #{attempts += 1}")
-                reconnect_database
-                check_database_is_connected
-                break
-              rescue *ADAPTER_ERRORS => e
-                Rpush.logger.error(e)
-                sleep_to_avoid_thrashing
-              end
+              Rpush.logger.warn("Attempt #{attempts += 1}")
+              reconnect_database
+              check_database_is_connected
+              break
+            rescue *ADAPTER_ERRORS => e
+              Rpush.logger.error(e)
+              sleep_to_avoid_thrashing
             end
             Rpush.logger.warn("Database reconnected")
           end

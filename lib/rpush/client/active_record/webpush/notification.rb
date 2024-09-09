@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveRecord
@@ -9,4 +11,3 @@ module Rpush
     end
   end
 end
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   class RetryableError < StandardError
     attr_reader :code, :description, :response

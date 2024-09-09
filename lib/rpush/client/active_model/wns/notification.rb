@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -8,11 +10,12 @@ module Rpush
           WNS_PRIORITY_LOW = 3
           WNS_PRIORITY_VERY_LOW = 4
 
-          WNS_PRIORITIES = [WNS_PRIORITY_HIGH, WNS_PRIORITY_MEDIUM, WNS_PRIORITY_LOW, WNS_PRIORITY_VERY_LOW]
+          WNS_PRIORITIES = [WNS_PRIORITY_HIGH, WNS_PRIORITY_MEDIUM, WNS_PRIORITY_LOW, WNS_PRIORITY_VERY_LOW].freeze
 
           module InstanceMethods
             def alert=(value)
               return unless value
+
               data = self.data || {}
               data['title'] = value
               self.data = data

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -10,7 +12,7 @@ module Rpush
           end
 
           def access_token_expired?
-            access_token_expiration.nil? || access_token_expiration < Time.now
+            access_token_expiration.nil? || access_token_expiration < Time.zone.now
           end
 
           def service_name

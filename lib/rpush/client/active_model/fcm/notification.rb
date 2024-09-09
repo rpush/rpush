@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Client
     module ActiveModel
@@ -5,7 +7,7 @@ module Rpush
         module Notification
           FCM_PRIORITY_HIGH = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_IMMEDIATE
           FCM_PRIORITY_NORMAL = Rpush::Client::ActiveModel::Apns::Notification::APNS_PRIORITY_CONSERVE_POWER
-          FCM_PRIORITIES = [FCM_PRIORITY_HIGH, FCM_PRIORITY_NORMAL]
+          FCM_PRIORITIES = [FCM_PRIORITY_HIGH, FCM_PRIORITY_NORMAL].freeze
 
           ROOT_NOTIFICATION_KEYS = %w[title body image].freeze
           ANDROID_NOTIFICATION_KEYS = %w[icon tag color click_action body_loc_key body_loc_args title_loc_key
@@ -35,12 +37,12 @@ module Rpush
           # we do a little conversion here.
           def priority=(priority)
             case priority
-              when 'high', FCM_PRIORITY_HIGH
-                super(FCM_PRIORITY_HIGH)
-              when 'normal', FCM_PRIORITY_NORMAL
-                super(FCM_PRIORITY_NORMAL)
-              else
-                errors.add(:priority, 'must be one of either "normal" or "high"')
+            when 'high', FCM_PRIORITY_HIGH
+              super(FCM_PRIORITY_HIGH)
+            when 'normal', FCM_PRIORITY_NORMAL
+              super(FCM_PRIORITY_NORMAL)
+            else
+              errors.add(:priority, 'must be one of either "normal" or "high"')
             end
           end
 
@@ -48,7 +50,7 @@ module Rpush
             fail ArgumentError, 'FCM does not support dry run' if value
           end
 
-          def as_json(options = nil) # rubocop:disable Metrics/PerceivedComplexity
+          def as_json(_options = nil)
             json = {
               'data' => data,
               'android' => android_config,
@@ -85,7 +87,7 @@ module Rpush
 
           def notification=(value)
             value = value.with_indifferent_access if value.is_a?(Hash)
-            super(value)
+            super
           end
 
           def root_notification
@@ -98,13 +100,13 @@ module Rpush
             json = notification&.slice(*ANDROID_NOTIFICATION_KEYS) || {}
             json['notification_priority'] = priority_for_notification if priority
             json['sound'] = sound if sound
-            json['default_sound'] = sound == 'default' ? true : false
+            json['default_sound'] = sound == 'default'
             json
           end
 
           def priority_str
-            case
-            when priority <= 5 then 'normal'
+            if priority <= 5
+              'normal'
             else
               'high'
             end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Wns
@@ -14,18 +16,16 @@ module Rpush
           end
         end
 
-        private_class_method
-
         def self.raw_notification?(notification)
-          notification.class.name.match(/RawNotification/)
+          notification.class.name.include?('RawNotification')
         end
 
         def self.badge_notification?(notification)
-          notification.class.name.match(/BadgeNotification/)
+          notification.class.name.include?('BadgeNotification')
         end
 
         def self.stringify_keys(data)
-          data.keys.each { |key| data[key.to_s || key] = data.delete(key) }
+          data.each_key { |key| data[key.to_s || key] = data.delete(key) }
         end
       end
     end

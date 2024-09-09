@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require "unit_spec_helper"
 
 describe Rpush::DeliveryError do
-  let(:error) { Rpush::DeliveryError.new(4, 12, "Missing payload") }
+  let(:error) { described_class.new(4, 12, "Missing payload") }
 
   it "returns an informative message" do
     expect(error.to_s).to eq "Unable to deliver notification 12, received error 4 (Missing payload)"

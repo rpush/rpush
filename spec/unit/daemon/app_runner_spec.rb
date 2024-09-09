@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 require 'rpush/daemon/store/active_record'
 
@@ -12,14 +14,11 @@ module Rpush
       extend ServiceConfigMethods
 
       class ServiceLoop
-        def initialize(*)
-        end
+        def initialize(*); end
 
-        def start
-        end
+        def start; end
 
-        def stop
-        end
+        def stop; end
       end
 
       dispatcher :http
@@ -34,35 +33,35 @@ end
 describe Rpush::Daemon::AppRunner, 'enqueue' do
   let(:app) { double(id: 1, name: 'Test', connections: 1) }
   let(:notification) { double(app_id: 1) }
-  let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start_dispatchers: nil, start_loops: nil, stop: nil) }
+  let(:runner) { double(described_class, enqueue: nil, start_dispatchers: nil, start_loops: nil, stop: nil) }
   let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
 
   before do
     allow(Rpush).to receive_messages(logger: logger)
     allow(Rpush::Daemon::ProcTitle).to receive(:update)
-    allow(Rpush::Daemon::AppRunner).to receive_messages(new: runner)
-    Rpush::Daemon::AppRunner.start_app(app)
+    allow(described_class).to receive_messages(new: runner)
+    described_class.start_app(app)
   end
 
-  after { Rpush::Daemon::AppRunner.stop }
+  after { described_class.stop }
 
   it 'enqueues notifications on the runner' do
     expect(runner).to receive(:enqueue).with([notification])
-    Rpush::Daemon::AppRunner.enqueue([notification])
+    described_class.enqueue([notification])
   end
 
   it 'starts the app if a runner does not exist' do
     notification = double(app_id: 3)
     new_app = double(Rpush::App, id: 3, name: 'NewApp', connections: 1)
     Rpush::Daemon.store = double(app: new_app)
-    Rpush::Daemon::AppRunner.enqueue([notification])
-    expect(Rpush::Daemon::AppRunner.app_running?(new_app)).to eq(true)
+    described_class.enqueue([notification])
+    expect(described_class.app_running?(new_app)).to be(true)
   end
 end
 
 describe Rpush::Daemon::AppRunner, 'start_app' do
   let(:app) { double(id: 1, name: 'test', connections: 1) }
-  let(:runner) { double(Rpush::Daemon::AppRunner, enqueue: nil, start_dispatchers: nil, stop: nil) }
+  let(:runner) { double(described_class, enqueue: nil, start_dispatchers: nil, stop: nil) }
   let(:logger) { double(Rpush::Logger, error: nil, info: nil) }
 
   before do
@@ -70,10 +69,10 @@ describe Rpush::Daemon::AppRunner, 'start_app' do
   end
 
   it 'logs an error if the runner could not be started' do
-    expect(Rpush::Daemon::AppRunner).to receive(:new).with(app).and_return(runner)
+    expect(described_class).to receive(:new).with(app).and_return(runner)
     allow(runner).to receive(:start_dispatchers).and_raise(StandardError)
     expect(Rpush.logger).to receive(:error)
-    Rpush::Daemon::AppRunner.start_app(app)
+    described_class.start_app(app)
   end
 end
 
@@ -89,13 +88,13 @@ describe Rpush::Daemon::AppRunner, 'debug' do
   before do
     allow(Rpush::Daemon).to receive_messages(config: {}, store: store)
     allow(Rpush).to receive_messages(logger: logger)
-    Rpush::Daemon::AppRunner.start_app(app)
+    described_class.start_app(app)
   end
 
-  after { Rpush::Daemon::AppRunner.stop_app(app.id) }
+  after { described_class.stop_app(app.id) }
 
   it 'returns the app runner status' do
-    expect(Rpush::Daemon::AppRunner.status.key?(:app_runners)).to eq(true)
+    expect(described_class.status.key?(:app_runners)).to be(true)
   end
 end
 
@@ -105,7 +104,7 @@ describe Rpush::Daemon::AppRunner do
                                              connections: 1, service_name: 'app_runner_spec_service',
                                              name: 'test')
   end
-  let(:runner) { Rpush::Daemon::AppRunner.new(app) }
+  let(:runner) { described_class.new(app) }
   let(:logger) { double(Rpush::Logger, info: nil) }
   let(:queue) { Queue.new }
   let(:service_loop) { double(Rpush::Daemon::AppRunnerSpecService::ServiceLoop, start: nil, stop: nil) }

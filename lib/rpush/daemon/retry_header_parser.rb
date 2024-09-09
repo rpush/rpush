@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     class RetryHeaderParser
@@ -12,8 +14,8 @@ module Rpush
       def parse
         return unless @header
 
-        if @header.to_s =~ /^[0-9]+$/
-          Time.now + @header.to_i
+        if /^[0-9]+$/.match?(@header.to_s)
+          Time.zone.now + @header.to_i
         else
           Time.httpdate(@header)
         end

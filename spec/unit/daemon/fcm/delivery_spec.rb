@@ -1,19 +1,19 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Fcm::Delivery do
-  let(:app) { Rpush::Fcm::App.create!(name: 'MyApp', firebase_project_id: 'abc123', json_key:'{}') }
-  let(:notification) { Rpush::Fcm::Notification.create!(app: app, device_token: 'xyz', deliver_after: Time.now) }
+  let(:app) { Rpush::Fcm::App.create!(name: 'MyApp', firebase_project_id: 'abc123', json_key: '{}') }
+  let(:notification) { Rpush::Fcm::Notification.create!(app: app, device_token: 'xyz', deliver_after: Time.zone.now) }
   let(:logger) { double(error: nil, info: nil, warn: nil) }
   let(:response) { double(code: 200, header: {}) }
   let(:http) { double(shutdown: nil, request: response) }
-  let(:now) { Time.parse('2012-10-14 00:00:00') }
+  let(:now) { Time.zone.parse('2012-10-14 00:00:00') }
   let(:batch) { double(mark_failed: nil, mark_delivered: nil, mark_retryable: nil, notification_processed: nil) }
-  let(:delivery) { Rpush::Daemon::Fcm::Delivery.new(app, http, notification, batch) }
+  let(:delivery) { described_class.new(app, http, notification, batch) }
   let(:store) { double(create_fcm_notification: double(id: 2)) }
 
-  def perform
-    delivery.perform
-  end
+  delegate :perform, to: :delivery
 
   def perform_with_rescue
     expect { perform }.to raise_error(StandardError)
@@ -24,7 +24,7 @@ describe Rpush::Daemon::Fcm::Delivery do
     allow(Rpush::Daemon).to receive_messages(store: store)
     allow(Time).to receive_messages(now: now)
     allow(Rpush).to receive_messages(logger: logger)
-    allow_any_instance_of(Rpush::Daemon::Fcm::Delivery).to receive_messages(obtain_access_token: "access_token")
+    allow_any_instance_of(described_class).to receive_messages(obtain_access_token: "access_token")
   end
 
   describe 'a 200 response' do
@@ -94,14 +94,14 @@ describe Rpush::Daemon::Fcm::Delivery do
 
     it 'logs a warning that the notification has been re-queued.' do
       notification.retries = 3
-      notification.deliver_after = now + 2**3
-      expect(Rpush.logger).to receive(:warn).with("[MyApp] FCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + 2**3).strftime('%Y-%m-%d %H:%M:%S')} (retry 3).")
+      notification.deliver_after = now + (2**3)
+      expect(Rpush.logger).to receive(:warn).with("[MyApp] FCM responded with an Internal Error. Notification #{notification.id} will be retried after #{(now + (2**3)).strftime('%Y-%m-%d %H:%M:%S')} (retry 3).")
       perform
     end
 
     it 'retries the notification in accordance with the exponential back-off strategy.' do
       notification.update_attribute(:retries, 2)
-      expect(delivery).to receive(:mark_retryable).with(notification, now + 2**3)
+      expect(delivery).to receive(:mark_retryable).with(notification, now + (2**3))
       perform
     end
   end

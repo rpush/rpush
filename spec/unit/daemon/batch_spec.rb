@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Batch do
   let(:notification1) { double(:notification1, id: 1, delivered: false, failed: false) }
   let(:notification2) { double(:notification2, id: 2, delivered: false, failed: false) }
-  let(:batch) { Rpush::Daemon::Batch.new([notification1, notification2]) }
+  let(:batch) { described_class.new([notification1, notification2]) }
   let(:store) { double.as_null_object }
-  let(:time) { Time.now }
+  let(:time) { Time.zone.now }
 
   before do
     allow(Time).to receive_messages(now: time)

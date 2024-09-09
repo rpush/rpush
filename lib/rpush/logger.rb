@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   class Logger
     attr_reader :internal_logger
@@ -20,11 +22,11 @@ module Rpush
     end
 
     def error(msg, inline = false)
-      log(:error, msg, inline, 'ERROR', STDERR)
+      log(:error, msg, inline, 'ERROR', $stderr)
     end
 
     def warn(msg, inline = false)
-      log(:warn, msg, inline, 'WARNING', STDERR)
+      log(:warn, msg, inline, 'WARNING', $stderr)
     end
 
     def reopen
@@ -46,7 +48,7 @@ module Rpush
     end
 
     def setup_logger(log)
-      if ActiveSupport.const_defined?('BufferedLogger')
+      if ActiveSupport.const_defined?(:BufferedLogger)
         logger = ActiveSupport::BufferedLogger.new(log)
         logger.auto_flushing = auto_flushing
         logger
@@ -63,24 +65,24 @@ module Rpush
       end
     end
 
-    def log(where, msg, inline = false, prefix = nil, io = STDOUT)
+    def log(where, msg, inline = false, prefix = nil, io = $stdout)
       if msg.is_a?(Exception)
         formatted_backtrace = msg.backtrace&.join("\n")
         msg = "#{msg.class.name}, #{msg.message}\n#{formatted_backtrace}"
       end
 
-      formatted_msg = "[#{Time.now.to_formatted_s(:db)}]"
+      formatted_msg = "[#{Time.zone.now.to_fs(:db)}]"
       formatted_msg << '[rpush] ' if Rpush.config.embedded
       formatted_msg << "[#{prefix}] " if prefix
       formatted_msg << msg
 
       log_foreground(io, formatted_msg, inline)
-      @internal_logger.send(where, formatted_msg) if @internal_logger
+      @internal_logger&.send(where, formatted_msg)
     end
 
     def log_foreground(io, formatted_msg, inline)
       return unless Rpush.config.foreground_logging
-      return unless io == STDERR || Rpush.config.foreground
+      return unless io == $stderr || Rpush.config.foreground
 
       if inline
         io.write(formatted_msg)

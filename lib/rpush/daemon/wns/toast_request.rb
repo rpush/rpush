@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Wns
@@ -27,7 +29,7 @@ module Rpush
           @title = notification.data['title'] || ''
           @body = notification.data['body'] || ''
           @launch = notification.data['launch']
-          @sound = notification.sound unless notification.sound.eql?("default".freeze)
+          @sound = notification.sound unless notification.sound.eql?("default")
         end
 
         def to_xml
@@ -49,8 +51,8 @@ module Rpush
 
       class CleanParamString
         def self.clean(string)
-          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          string.gsub('&', "&amp;").gsub('<', "&lt;")
+                .gsub('>', "&gt;").gsub("'", "&apos;").gsub('"', "&quot;")
         end
       end
     end

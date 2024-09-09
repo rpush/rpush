@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'unit_spec_helper'
 
 shared_examples 'Rpush::Client::App' do
@@ -5,7 +7,7 @@ shared_examples 'Rpush::Client::App' do
     it 'rescues from certificate error' do
       app = Rpush::Apns::App.new(name: 'test', environment: 'development', certificate: 'bad')
       expect { app.valid? }.not_to raise_error
-      expect(app.valid?).to eq(false)
+      expect(app.valid?).to be(false)
     end
 
     it 'raises other errors' do

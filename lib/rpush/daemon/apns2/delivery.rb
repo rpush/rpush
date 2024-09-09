@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Rpush
   module Daemon
     module Apns2
@@ -6,7 +8,7 @@ module Rpush
       HTTP2_HEADERS_KEY = 'headers'
 
       class Delivery < Rpush::Daemon::Delivery
-        RETRYABLE_CODES = [ 429, 500, 503 ]
+        RETRYABLE_CODES = [429, 500, 503].freeze
         CLIENT_JOIN_TIMEOUT = 60
 
         def initialize(app, http2_client, batch)
@@ -23,11 +25,11 @@ module Rpush
           # Send all preprocessed requests at once
           @client.join(timeout: CLIENT_JOIN_TIMEOUT)
         rescue NetHttp2::AsyncRequestTimeout => error
-          mark_batch_retryable(Time.now + 10.seconds, error)
+          mark_batch_retryable(10.seconds.from_now, error)
           @client.close
           raise
         rescue Errno::ECONNREFUSED, SocketError => error
-          mark_batch_retryable(Time.now + 10.seconds, error)
+          mark_batch_retryable(10.seconds.from_now, error)
           raise
         rescue StandardError => error
           mark_batch_failed(error)
@@ -37,6 +39,7 @@ module Rpush
         end
 
         protected
+
         ######################################################################
 
         def prepare_async_post(notification)
@@ -44,16 +47,15 @@ module Rpush
 
           request = build_request(notification)
           http_request = @client.prepare_request(:post, request[:path],
-            body:    request[:body],
-            headers: request[:headers]
-          )
+                                                 body: request[:body],
+                                                 headers: request[:headers])
 
           http_request.on(:headers) do |hdrs|
             response[:code] = hdrs[':status'].to_i
           end
 
           http_request.on(:body_chunk) do |body_chunk|
-            next unless body_chunk.present?
+            next if body_chunk.blank?
 
             response[:failure_reason] = JSON.parse(body_chunk)['reason']
           end
@@ -72,9 +74,9 @@ module Rpush
             service_unavailable(notification, response)
           else
             reflect(:notification_id_failed,
-              @app,
-              notification.id, code,
-              response[:failure_reason])
+                    @app,
+                    notification.id, code,
+                    response[:failure_reason])
             @batch.mark_failed(notification, response[:code], response[:failure_reason])
             failed_message_to_log(notification, response)
           end
@@ -86,7 +88,7 @@ module Rpush
         end
 
         def service_unavailable(notification, response)
-          @batch.mark_retryable(notification, Time.now + 10.seconds)
+          @batch.mark_retryable(notification, 10.seconds.from_now)
           # Logs should go last as soon as we need to initialize
           # retry time to display it in log
           failed_message_to_log(notification, response)
@@ -95,9 +97,9 @@ module Rpush
 
         def build_request(notification)
           {
-            path:    "/3/device/#{notification.device_token}",
+            path: "/3/device/#{notification.device_token}",
             headers: prepare_headers(notification),
-            body:    prepare_body(notification)
+            body: prepare_body(notification)
           }
         end
 
@@ -121,14 +123,14 @@ module Rpush
         end
 
         def retry_message_to_log(notification)
-          log_warn("Notification #{notification.id} will be retried after "\
-            "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} "\
-            "(retry #{notification.retries}).")
+          log_warn("Notification #{notification.id} will be retried after " \
+                   "#{notification.deliver_after.strftime('%Y-%m-%d %H:%M:%S')} " \
+                   "(retry #{notification.retries}).")
         end
 
         def failed_message_to_log(notification, response)
-          log_error("Notification #{notification.id} failed, "\
-            "#{response[:code]}/#{response[:failure_reason]}")
+          log_error("Notification #{notification.id} failed, " \
+                    "#{response[:code]}/#{response[:failure_reason]}")
         end
       end
     end
