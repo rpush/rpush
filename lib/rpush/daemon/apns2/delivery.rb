@@ -45,25 +45,26 @@ module Rpush
 
         def prepare_async_post(notification)
           response = {}
-
+          log_warn("RPush prepare_async_post[48] - notification: #{notification}")
           request = build_request(notification)
+          log_warn("RPush prepare_async_post[50] - request: #{request}")
           http_request = @client.prepare_request(:post, request[:path],
             body:    request[:body],
             headers: request[:headers]
           )
-
+          log_warn("RPush prepare_async_post[55] - http_request: #{http_request}")
           http_request.on(:headers) do |hdrs|
             response[:code] = hdrs[':status'].to_i
           end
 
           http_request.on(:body_chunk) do |body_chunk|
             next unless body_chunk.present?
-
+            log_warn("RPush prepare_async_post[62] - JSON.parse(body_chunk)['reason']: #{JSON.parse(body_chunk)['reason']}")
             response[:failure_reason] = JSON.parse(body_chunk)['reason']
           end
 
           http_request.on(:close) { handle_response(notification, response) }
-
+          log_warn("RPush prepare_async_post[67] - handle_response")
           @client.call_async(http_request)
         end
 
