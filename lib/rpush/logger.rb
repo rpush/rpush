@@ -46,7 +46,7 @@ module Rpush
     end
 
     def setup_logger(log)
-      if ActiveSupport.const_defined?('BufferedLogger')
+      if ActiveSupport.const_defined?(:BufferedLogger)
         logger = ActiveSupport::BufferedLogger.new(log)
         logger.auto_flushing = auto_flushing
         logger
@@ -69,7 +69,7 @@ module Rpush
         msg = "#{msg.class.name}, #{msg.message}\n#{formatted_backtrace}"
       end
 
-      formatted_msg = "[#{Time.now.to_formatted_s(:db)}]"
+      formatted_msg = "[#{Time.now.to_fs(:db)}]"
       formatted_msg << '[rpush] ' if Rpush.config.embedded
       formatted_msg << "[#{prefix}] " if prefix
       formatted_msg << msg

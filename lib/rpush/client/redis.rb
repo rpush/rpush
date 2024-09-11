@@ -1,4 +1,3 @@
-
 # :nocov:
 begin
   require 'modis'

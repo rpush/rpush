@@ -24,7 +24,7 @@ module Rpush
       private
 
       def app_prefix(msg)
-        app = instance_variable_get('@app')
+        app = instance_variable_get(:@app)
         msg = "[#{app.name}] #{msg}" if app
         msg
       end

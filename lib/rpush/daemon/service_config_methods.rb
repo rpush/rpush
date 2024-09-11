@@ -2,13 +2,14 @@ module Rpush
   module Daemon
     module ServiceConfigMethods
       DISPATCHERS = {
-        http:       Rpush::Daemon::Dispatcher::Http,
+        http: Rpush::Daemon::Dispatcher::Http,
         apns_http2: Rpush::Daemon::Dispatcher::ApnsHttp2,
         apnsp8_http2: Rpush::Daemon::Dispatcher::Apnsp8Http2
       }
 
       def batch_deliveries(value = nil)
         return batch_deliveries? if value.nil?
+
         @batch_deliveries = value
       end
 
@@ -26,7 +27,7 @@ module Rpush
       end
 
       def delivery_class
-        const_get('Delivery')
+        const_get(:Delivery)
       end
 
       def new_dispatcher(app)
@@ -34,13 +35,14 @@ module Rpush
       end
 
       def loops(classes, options = {})
-        classes = Array[*classes]
+        classes = [*classes]
         @loops = classes.map { |cls| [cls, options] }
       end
 
       def loop_instances(app)
         (@loops || []).map do |cls, options|
           next unless options.key?(:if) ? options[:if].call : true
+
           cls.new(app)
         end.compact
       end

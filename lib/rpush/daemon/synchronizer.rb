@@ -4,7 +4,7 @@ module Rpush
       extend Loggable
       extend StringHelpers
 
-      APP_ATTRIBUTES_TO_CHECK = [:certificate, :environment, :auth_key, :client_id, :client_secret].freeze
+      APP_ATTRIBUTES_TO_CHECK = %i[certificate environment auth_key client_id client_secret].freeze
 
       def self.sync
         apps = Rpush::Daemon.store.all_apps

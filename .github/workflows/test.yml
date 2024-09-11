@@ -88,7 +88,7 @@ jobs:
         CLIENT: ${{ matrix.client }}
 
     - name: Run rubocop
-      run: bundle exec rubocop
+      run: bundle exec rubocop --extra-details --display-style-guide
 
   tests:
     runs-on: ubuntu-latest

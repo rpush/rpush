@@ -3,17 +3,15 @@ module Rpush
     module ActiveModel
       module Webpush
         module App
-
           class VapidKeypairValidator < ::ActiveModel::Validator
             def validate(record)
               return if record.vapid_keypair.blank?
+
               keypair = record.vapid
-              %i[ subject public_key private_key ].each do |key|
-                unless keypair.key?(key)
-                  record.errors.add(:vapid_keypair, "must have a #{key} entry")
-                end
+              %i[subject public_key private_key].each do |key|
+                record.errors.add(:vapid_keypair, "must have a #{key} entry") unless keypair.key?(key)
               end
-            rescue
+            rescue StandardError
               record.errors.add(:vapid_keypair, 'must be valid JSON')
             end
           end
@@ -33,7 +31,6 @@ module Rpush
           def vapid
             @vapid ||= JSON.parse(vapid_keypair).symbolize_keys
           end
-
         end
       end
     end

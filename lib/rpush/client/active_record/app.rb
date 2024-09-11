@@ -6,7 +6,7 @@ module Rpush
 
         has_many :notifications, class_name: 'Rpush::Client::ActiveRecord::Notification', dependent: :destroy
 
-        validates :name, presence: true, uniqueness: { scope: [:type, :environment], case_sensitive: true }
+        validates :name, presence: true, uniqueness: { scope: %i[type environment], case_sensitive: true }
       end
     end
   end

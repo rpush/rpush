@@ -12,7 +12,7 @@ module Rpush
 
         def close
           @socket.close
-        rescue StandardError # rubocop:disable Lint/HandleExceptions
+        rescue StandardError
         end
 
         private

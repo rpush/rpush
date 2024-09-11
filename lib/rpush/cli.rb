@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 require 'thor'
 require 'rainbow'
 
@@ -38,12 +36,10 @@ module Rpush
       Process.kill('TERM', pid)
 
       loop do
-        begin
-          Process.getpgid(pid)
-          sleep 0.05
-        rescue Errno::ESRCH
-          break
-        end
+        Process.getpgid(pid)
+        sleep 0.05
+      rescue Errno::ESRCH
+        break
       end
 
       puts Rainbow('✔').green
@@ -126,12 +122,12 @@ module Rpush
     end
 
     def load_standalone
-      if !File.exist?(options[:config])
-        STDERR.puts(Rainbow('ERROR: ').red + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
-        exit 1
-      else
+      if File.exist?(options[:config])
         load options[:config]
         Rpush.config.update(options)
+      else
+        STDERR.puts(Rainbow('ERROR: ').red + "#{options[:config]} does not exist. Please run 'rpush init' to generate it or specify the --config option.")
+        exit 1
       end
     end
 

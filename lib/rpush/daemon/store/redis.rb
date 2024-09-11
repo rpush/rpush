@@ -106,11 +106,9 @@ module Rpush
           notification.save!
         end
 
-        def release_connection
-        end
+        def release_connection; end
 
-        def reopen_log
-        end
+        def reopen_log; end
 
         def pending_delivery_count
           Modis.with_connection do |redis|
@@ -134,7 +132,7 @@ module Rpush
           nil
         end
 
-        def create_fcm_like_notification(notification, attrs, data, app) # rubocop:disable Metrics/ParameterLists
+        def create_fcm_like_notification(notification, attrs, data, app)
           notification.assign_attributes(attrs)
           notification.data = data
           notification.app = app

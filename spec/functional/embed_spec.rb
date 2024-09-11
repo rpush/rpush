@@ -12,6 +12,25 @@ describe 'embedding' do
   end
 
   let(:fake_device_token) { 'a' * 108 }
+  let(:app) { create_app }
+  let(:notification) { create_notification(app) }
+  let(:fake_client) do
+    double(
+      prepare_request: fake_http2_request,
+      close: 'ok',
+      call_async: 'ok',
+      join: 'ok',
+      on: 'ok'
+    )
+  end
+  let(:fake_http2_request) { double }
+  let(:fake_http_resp_headers) do
+    {
+      ":status" => "200",
+      "apns-id" => "C6D65840-5E3F-785A-4D91-B97D305C12F6"
+    }
+  end
+  let(:fake_http_resp_body) { '' }
   let(:notification_data) { nil }
 
   def create_notification(app)
@@ -26,41 +45,20 @@ describe 'embedding' do
     notification
   end
 
-  let(:app) { create_app }
-  let(:notification) { create_notification(app) }
-
-  let(:fake_client) {
-    double(
-      prepare_request: fake_http2_request,
-      close:           'ok',
-      call_async:      'ok',
-      join:            'ok',
-      on:              'ok'
-    )
-  }
-  let(:fake_http2_request) { double }
-  let(:fake_http_resp_headers) {
-    {
-      ":status" => "200",
-      "apns-id"=>"C6D65840-5E3F-785A-4D91-B97D305C12F6"
-    }
-  }
-  let(:fake_http_resp_body) { '' }
-
   before do
     Rpush.config.push_poll = 0.5
 
-    allow(NetHttp2::Client).
-      to receive(:new).and_return(fake_client)
-    allow(fake_http2_request).
-      to receive(:on).with(:headers).
-      and_yield(fake_http_resp_headers)
-    allow(fake_http2_request).
-      to receive(:on).with(:body_chunk).
-      and_yield(fake_http_resp_body)
-    allow(fake_http2_request).
-      to receive(:on).with(:close).
-      and_yield
+    allow(NetHttp2::Client)
+      .to receive(:new).and_return(fake_client)
+    allow(fake_http2_request)
+      .to receive(:on).with(:headers)
+      .and_yield(fake_http_resp_headers)
+    allow(fake_http2_request)
+      .to receive(:on).with(:body_chunk)
+      .and_yield(fake_http_resp_body)
+    allow(fake_http2_request)
+      .to receive(:on).with(:close)
+      .and_yield
 
     Rpush.embed
   end

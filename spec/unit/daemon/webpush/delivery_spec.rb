@@ -1,14 +1,16 @@
 require 'unit_spec_helper'
 
 describe Rpush::Daemon::Webpush::Delivery do
+  subject(:delivery) { described_class.new(app, http, notification, batch) }
+
   let(:app) { Rpush::Webpush::App.create!(name: 'MyApp', vapid_keypair: VAPID_KEYPAIR) }
 
   # Push subscription information as received from a client browser when the
   # user subscribed to push notifications.
-  let(:device_reg) {
+  let(:device_reg) do
     { endpoint: 'https://webpush-provider.example.org/push/some-id',
-      keys: {'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A'} }
-  }
+      keys: { 'auth' => 'DgN9EBia1o057BdhCOGURA', 'p256dh' => 'BAtxJ--7vHq9IVm8utUB3peJ4lpxRqk1rukCIkVJOomS83QkCnrQ4EyYQsSaCRgy_c8XPytgXxuyAvRJdnTPK4A' } }
+  end
 
   let(:data) { { message: 'some message' } }
   let(:notification) { Rpush::Webpush::Notification.create!(app: app, registration_ids: [device_reg], data: data) }
@@ -25,8 +27,6 @@ describe Rpush::Daemon::Webpush::Delivery do
     allow(Rpush).to receive_messages(logger: logger)
     allow(Time).to receive_messages(now: now)
   end
-
-  subject(:delivery) { described_class.new(app, http, notification, batch) }
 
   describe '#perform' do
     shared_examples 'process notification' do
@@ -112,6 +112,7 @@ describe Rpush::Daemon::Webpush::Delivery do
     context 'when delivery failed' do
       let(:response_code) { 400 }
       let(:fail_message) { 'that was a bad request' }
+
       before do
         allow(response).to receive(:body) { fail_message }
         allow(batch).to receive(:mark_failed)

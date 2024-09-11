@@ -27,15 +27,13 @@ module Rpush
           @notification.registration_ids.each do |registration_id|
             handle_response(do_post(registration_id), registration_id)
           end
-          if @sent_registration_ids.empty?
-            fail Rpush::DeliveryError.new(nil, @notification.id, describe_errors)
-          else
-            unless @failed_registration_ids.empty?
-              @notification.error_description = describe_errors
-              Rpush::Daemon.store.update_notification(@notification)
-            end
-            mark_delivered
+          fail Rpush::DeliveryError.new(nil, @notification.id, describe_errors) if @sent_registration_ids.empty?
+
+          unless @failed_registration_ids.empty?
+            @notification.error_description = describe_errors
+            Rpush::Daemon.store.update_notification(@notification)
           end
+          mark_delivered
         rescue Rpush::RateLimitError => error
           handle_rate_limited(error)
         rescue Rpush::RetryableError => error

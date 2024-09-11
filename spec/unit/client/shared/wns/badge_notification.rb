@@ -9,7 +9,7 @@ shared_examples 'Rpush::Client::Wns::BadgeNotification' do
     notif
   end
 
-  it 'should allow a notification without data' do
+  it 'allows a notification without data' do
     expect(notification.valid?).to be(true)
   end
 end

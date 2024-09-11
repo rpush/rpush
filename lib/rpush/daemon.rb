@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 require 'thread'
 require 'socket'
 require 'pathname'
@@ -119,10 +117,9 @@ module Rpush
       init_plugins
     end
 
-    protected
-
     def self.init_store
       return if store
+
       begin
         name = Rpush.config.client.to_s
         require "rpush/daemon/store/#{name}"
@@ -146,31 +143,31 @@ module Rpush
     end
 
     def self.write_pid_file
-      unless Rpush.config.pid_file.blank?
-        begin
-          FileUtils.mkdir_p(File.dirname(Rpush.config.pid_file))
-          File.open(Rpush.config.pid_file, 'w') { |f| f.puts Process.pid }
-        rescue SystemCallError => e
-          Rpush.logger.error("Failed to write PID to '#{Rpush.config.pid_file}': #{e.inspect}")
-        end
+      return if Rpush.config.pid_file.blank?
+
+      begin
+        FileUtils.mkdir_p(File.dirname(Rpush.config.pid_file))
+        File.open(Rpush.config.pid_file, 'w') { |f| f.puts Process.pid }
+      rescue SystemCallError => e
+        Rpush.logger.error("Failed to write PID to '#{Rpush.config.pid_file}': #{e.inspect}")
       end
     end
 
     def self.delete_pid_file
       pid_file = Rpush.config.pid_file
-      File.delete(pid_file) if !pid_file.blank? && File.exist?(pid_file)
+      File.delete(pid_file) if pid_file.present? && File.exist?(pid_file)
     end
 
     def self.show_welcome_if_needed
-      if Rpush::Daemon::AppRunner.app_ids.count == 0
-        puts <<-EOS
+      return unless Rpush::Daemon::AppRunner.app_ids.count == 0
 
-* #{Rainbow('Is this your first time using Rpush?').green}
-  You need to create an App before you can start using Rpush.
-  Please refer to the documentation at https://github.com/rpush/rpush
+      puts <<~EOS
 
-        EOS
-      end
+        * #{Rainbow('Is this your first time using Rpush?').green}
+          You need to create an App before you can start using Rpush.
+          Please refer to the documentation at https://github.com/rpush/rpush
+
+      EOS
     end
   end
 end

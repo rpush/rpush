@@ -46,9 +46,7 @@ module Rpush
         end
 
         def handle_failure(code, msg = nil)
-          unless msg
-            msg = FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
-          end
+          msg ||= FAILURE_MESSAGES.key?(code) ? FAILURE_MESSAGES[code] : Rpush::Daemon::HTTP_STATUS_CODES[code]
           fail Rpush::DeliveryError.new(code, @notification.id, msg)
         end
 
@@ -102,9 +100,9 @@ module Rpush
         def status_from_response(response)
           headers = response.to_hash
           {
-            notification:         headers["x-notificationstatus"],
+            notification: headers["x-notificationstatus"],
             notification_channel: headers["x-subscriptionstatus"],
-            device_connection:    headers["x-deviceconnectionstatus"]
+            device_connection: headers["x-deviceconnectionstatus"]
           }
         end
 
@@ -123,8 +121,8 @@ module Rpush
         end
 
         def clean_param_string(string)
-          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          string.gsub('&', "&amp;").gsub('<', "&lt;")
+                .gsub('>', "&gt;").gsub("'", "&apos;").gsub('"', "&quot;")
         end
       end
     end

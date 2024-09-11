@@ -12,14 +12,11 @@ module Rpush
       extend ServiceConfigMethods
 
       class ServiceLoop
-        def initialize(*)
-        end
+        def initialize(*); end
 
-        def start
-        end
+        def start; end
 
-        def stop
-        end
+        def stop; end
       end
 
       dispatcher :http

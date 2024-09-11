@@ -6,6 +6,7 @@ module Rpush
           module InstanceMethods
             def alert=(value)
               return unless value
+
               data = self.data || {}
               data['title'] = value
               self.data = data

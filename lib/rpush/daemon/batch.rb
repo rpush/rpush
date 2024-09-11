@@ -104,13 +104,11 @@ module Rpush
       def complete
         return if complete?
 
-        [:complete_delivered, :complete_failed, :complete_retried].each do |method|
-          begin
-            send(method)
-          rescue StandardError => e
-            Rpush.logger.error(e)
-            reflect(:error, e)
-          end
+        %i[complete_delivered complete_failed complete_retried].each do |method|
+          send(method)
+        rescue StandardError => e
+          Rpush.logger.error(e)
+          reflect(:error, e)
         end
 
         @complete = true

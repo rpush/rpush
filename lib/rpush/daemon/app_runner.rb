@@ -1,5 +1,3 @@
-# encoding: UTF-8
-
 module Rpush
   module Daemon
     class AppRunner
@@ -40,10 +38,10 @@ module Rpush
 
       def self.stop_app(app_id)
         runner = @runners.delete(app_id)
-        if runner
-          runner.stop
-          log_info("[#{runner.app.name}] Stopped.")
-        end
+        return unless runner
+
+        runner.stop
+        log_info("[#{runner.app.name}] Stopped.")
       end
 
       def self.app_with_id(app_id)
@@ -89,6 +87,7 @@ module Rpush
       end
 
       attr_reader :app
+
       delegate :size, to: :queue, prefix: true
 
       def initialize(app)
@@ -179,6 +178,7 @@ module Rpush
 
       def service
         return @service if defined? @service
+
         @service = "Rpush::Daemon::#{@app.service_name.camelize}".constantize
       end
 

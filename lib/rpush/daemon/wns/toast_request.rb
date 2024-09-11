@@ -49,8 +49,8 @@ module Rpush
 
       class CleanParamString
         def self.clean(string)
-          string.gsub(/&/, "&amp;").gsub(/</, "&lt;") \
-            .gsub(/>/, "&gt;").gsub(/'/, "&apos;").gsub(/"/, "&quot;")
+          string.gsub('&', "&amp;").gsub('<', "&lt;")
+                .gsub('>', "&gt;").gsub("'", "&apos;").gsub('"', "&quot;")
         end
       end
     end

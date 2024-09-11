@@ -30,7 +30,7 @@ describe Rpush::Logger do
     Rpush::Logger.new
   end
 
-  it "should open the a log file in the Rails log directory" do
+  it "opens the a log file in the Rails log directory" do
     expect(File).to receive(:open).with('/tmp/rails_root/log/rpush.log', 'a')
     Rpush::Logger.new
   end
@@ -50,7 +50,7 @@ describe Rpush::Logger do
   end
 
   it 'uses ActiveSupport::BufferedLogger if a user-defined logger is not set' do
-    if ActiveSupport.const_defined?('BufferedLogger')
+    if ActiveSupport.const_defined?(:BufferedLogger)
       expect(ActiveSupport::BufferedLogger).to receive(:new).with(log)
       Rpush::Logger.new
     end
@@ -67,19 +67,19 @@ describe Rpush::Logger do
     stub_const('ActiveSupport::Logger', double)
     allow(ActiveSupport).to receive_messages(const_defined?: false)
     expect(ActiveSupport::Logger).to receive(:new).with(log).and_return(log)
-    Rpush.config.log_level = ::Logger::Severity::ERROR
-    expect(log).to receive(:level=).with(::Logger::Severity::ERROR)
+    Rpush.config.log_level = Logger::Severity::ERROR
+    expect(log).to receive(:level=).with(Logger::Severity::ERROR)
     Rpush::Logger.new
   end
 
-  it "should print out the msg if running in the foreground" do
+  it "prints out the msg if running in the foreground" do
     logger = Rpush::Logger.new
     expect(STDOUT).to receive(:puts).with(/hi mom/)
     logger.info("hi mom")
   end
 
   unless Rpush.jruby? # These tests do not work on JRuby.
-    it "should not print out the msg if not running in the foreground" do
+    it "does not print out the msg if not running in the foreground" do
       Rpush.config.foreground = false
       logger = Rpush::Logger.new
       expect(STDOUT).not_to receive(:puts).with(/hi mom/)
@@ -87,30 +87,30 @@ describe Rpush::Logger do
     end
   end
 
-  it "should prefix log lines with the current time" do
+  it "prefixes log lines with the current time" do
     Rpush.config.foreground = false
     now = Time.now
     allow(Time).to receive(:now).and_return(now)
     logger = Rpush::Logger.new
-    expect(@logger).to receive(:info).with(/#{Regexp.escape("[#{now.to_formatted_s(:db)}]")}/)
+    expect(@logger).to receive(:info).with(/#{Regexp.escape("[#{now.to_fs(:db)}]")}/)
     logger.info("blah")
   end
 
-  it "should prefix error logs with the ERROR label" do
+  it "prefixes error logs with the ERROR label" do
     Rpush.config.foreground = false
     logger = Rpush::Logger.new
-    expect(@logger).to receive(:error).with(/#{Regexp.escape("[ERROR]")}/)
+    expect(@logger).to receive(:error).with(/#{Regexp.escape('[ERROR]')}/)
     logger.error("eeek")
   end
 
-  it "should prefix warn logs with the WARNING label" do
+  it "prefixes warn logs with the WARNING label" do
     Rpush.config.foreground = false
     logger = Rpush::Logger.new
-    expect(@logger).to receive(:warn).with(/#{Regexp.escape("[WARNING]")}/)
+    expect(@logger).to receive(:warn).with(/#{Regexp.escape('[WARNING]')}/)
     logger.warn("eeek")
   end
 
-  it "should handle an Exception instance" do
+  it "handles an Exception instance" do
     Rpush.config.foreground = false
     e = RuntimeError.new("hi mom")
     allow(e).to receive_messages(backtrace: [])

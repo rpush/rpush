@@ -14,8 +14,6 @@ module Rpush
           end
         end
 
-        private_class_method
-
         def self.raw_notification?(notification)
           notification.class.name.match(/RawNotification/)
         end

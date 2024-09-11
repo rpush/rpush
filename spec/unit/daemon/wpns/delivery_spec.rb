@@ -11,9 +11,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   let(:delivery) { Rpush::Daemon::Wpns::Delivery.new(app, http, notification, batch) }
   let(:store) { double(create_wpns_notification: double(id: 2)) }
 
-  def perform
-    delivery.perform
-  end
+  delegate :perform, to: :delivery
 
   def perform_with_rescue
     expect { perform }.to raise_error(StandardError)
@@ -27,7 +25,7 @@ describe Rpush::Daemon::Wpns::Delivery do
   end
 
   shared_examples_for "an notification with some delivery faliures" do
-    let(:new_notification) { Rpush::Wpns::Notification.where('id != ?', notification.id).first }
+    let(:new_notification) { Rpush::Wpns::Notification.where.not(id: notification.id).first }
 
     before { allow(response).to receive_messages(body: JSON.dump(body)) }
 
@@ -73,6 +71,7 @@ describe Rpush::Daemon::Wpns::Delivery do
 
   describe "an 400 response" do
     before { allow(response).to receive_messages(code: 400) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(400, notification.id, 'Bad XML or malformed notification URI.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -82,6 +81,7 @@ describe Rpush::Daemon::Wpns::Delivery do
 
   describe "an 401 response" do
     before { allow(response).to receive_messages(code: 401) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(401, notification.id, 'Unauthorized to send a notification to this app.')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -91,6 +91,7 @@ describe Rpush::Daemon::Wpns::Delivery do
 
   describe "an 404 response" do
     before { allow(response).to receive_messages(code: 404) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(404, notification.id, 'Not Found')
       expect(delivery).to receive(:mark_failed).with(error)
@@ -100,6 +101,7 @@ describe Rpush::Daemon::Wpns::Delivery do
 
   describe "an 405 response" do
     before { allow(response).to receive_messages(code: 405) }
+
     it "marks notifications as failed" do
       error = Rpush::DeliveryError.new(405, notification.id, 'Method Not Allowed')
       expect(delivery).to receive(:mark_failed).with(error)

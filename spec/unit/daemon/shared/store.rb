@@ -12,7 +12,7 @@ shared_examples 'Rpush::Daemon::Store' do
     allow(Rpush).to receive_messages(logger: logger)
   end
 
-  before(:each) do
+  before do
     Timecop.freeze(time)
   end
 
