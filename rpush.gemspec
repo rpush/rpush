@@ -40,4 +40,27 @@ Gem::Specification.new do |s|
   s.add_dependency 'rainbow'
   s.add_dependency 'thor', ['>= 0.18.1', '< 2.0']
   s.add_dependency 'web-push'
+
+  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'debug'
+  s.add_development_dependency 'modis', '>= 2.0'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'rpush-redis', '~> 1.0'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'stackprof'
+  s.add_development_dependency 'timecop'
+
+  s.add_development_dependency 'appraisal'
+  s.add_development_dependency 'byebug'
+  s.add_development_dependency 'codeclimate-test-reporter', '1.0.7'
+  s.add_development_dependency 'rubocop', '~> 1.66'
+  s.add_development_dependency 'rubocop-performance'
+  s.add_development_dependency 'rubocop-rails'
+  s.add_development_dependency 'rubocop-rake'
+  s.add_development_dependency 'rubocop-rspec'
+  s.add_development_dependency 'simplecov'
+
+  s.add_development_dependency 'mysql2'
+  s.add_development_dependency 'pg'
+  s.add_development_dependency 'sqlite3'
 end
