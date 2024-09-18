@@ -26,7 +26,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     expect(notification.as_json['message']['notification']).to eq({"title"=>"title", "body"=>"body"})
   end
 
-  it "moves notification keys to the correcdt location" do
+  it "moves notification keys to the correct location" do
     notification.app = app
     notification.device_token = "valid"
     notification.notification = { "title" => "valid", "body" => "valid", "color" => "valid for android" }
@@ -80,6 +80,11 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
   it 'includes the notification payload if defined' do
     notification.notification = { key: 'any key is allowed' }
     expect(notification.as_json['message']).to have_key 'notification'
+  end
+
+  it 'includes the badge if defined' do
+    notification.badge = 3
+    expect(notification.as_json['payload']['aps']['badge']).to eq(3)
   end
 
   it 'excludes the notification payload if undefined' do
