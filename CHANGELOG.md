@@ -68,6 +68,10 @@
 - Reference current interface in config template [\#569](https://github.com/rpush/rpush/pull/569) ([benlangfeld](https://github.com/benlangfeld))
 - Default the Rails environment to RAILS\_ENV if set [\#562](https://github.com/rpush/rpush/pull/562) ([benlangfeld](https://github.com/benlangfeld))
 
+**Merged pull requests:**
+
+- Add support for active_record multiple databases [\#618](https://github.com/rpush/rpush/pull/618) ([n-studio](https://github.com/n-studio))
+
 ## [v6.0.0](https://github.com/rpush/rpush/tree/v6.0.0) (2021-05-21)
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v5.4.0...v6.0.0)

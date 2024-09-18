@@ -1,7 +1,7 @@
 module Rpush
   module Client
     module ActiveRecord
-      class Notification < ::ActiveRecord::Base
+      class Notification < Rpush::Client::ActiveRecord::Base
         include Rpush::MultiJsonHelper
         include Rpush::Client::ActiveModel::Notification
 
