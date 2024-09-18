@@ -4,6 +4,8 @@
 
 **Merged pull requests:**
 
+* Add support for FSM iOS badges [\#704](https://github.com/rpush/rpush/pull/704) ([WoutDev](https://github.com/WoutDev))
+
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.0.0...HEAD)
 
 ## [v9.0.0](https://github.com/rpush/rpush/tree/v9.0.0) (2024-09-09)

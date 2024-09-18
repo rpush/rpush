@@ -77,6 +77,7 @@ module Rpush
             aps['mutable-content'] = 1 if mutable_content
             aps['content-available'] = 1 if content_available
             aps['sound'] = 'default' if sound == 'default'
+            aps['badge'] = badge if badge
 
             json['payload']['aps'] = aps
 
