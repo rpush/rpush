@@ -84,7 +84,7 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
 
   it 'includes the badge if defined' do
     notification.badge = 3
-    expect(notification.as_json['payload']['aps']['badge']).to eq(3)
+    expect(notification.as_json['message']['apns']['payload']['aps']['badge']).to eq(3)
   end
 
   it 'excludes the notification payload if undefined' do
