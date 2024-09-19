@@ -17,6 +17,14 @@ require 'debug'
 require 'timecop'
 require 'activerecord-jdbc-adapter' if defined? JRUBY_VERSION
 
+def active_record?
+  client == :active_record
+end
+
+def redis?
+  client == :redis
+end
+
 if active_record?
   require 'active_record'
   if ActiveRecord::Base.respond_to?(:default_column_serializer)
@@ -31,14 +39,6 @@ require 'rpush/client/redis'
 require 'rpush/client/active_record'
 require 'rpush/daemon/store/active_record'
 require 'rpush/daemon/store/redis'
-
-def active_record?
-  client == :active_record
-end
-
-def redis?
-  client == :redis
-end
 
 require 'support/active_record_setup' if active_record?
 
