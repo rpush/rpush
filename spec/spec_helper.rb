@@ -17,6 +17,14 @@ require 'debug'
 require 'timecop'
 require 'activerecord-jdbc-adapter' if defined? JRUBY_VERSION
 
+if active_record?
+  require 'active_record'
+  if ActiveRecord::Base.respond_to?(:default_column_serializer)
+    # New default in Rails 7.1: https://github.com/rails/rails/pull/47422
+    ActiveRecord::Base.default_column_serializer = nil
+  end
+end
+
 require 'rpush'
 require 'rpush/daemon'
 require 'rpush/client/redis'
