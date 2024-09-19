@@ -7,6 +7,8 @@ module Rpush
 
         self.table_name = 'rpush_notifications'
 
+        self.default_column_serializer = YAML if respond_to?(:default_column_serializer)
+
         serialize :registration_ids
         serialize :url_args
 

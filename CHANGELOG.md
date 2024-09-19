@@ -5,6 +5,7 @@
 **Merged pull requests:**
 
 * Add support for FSM iOS badges [\#704](https://github.com/rpush/rpush/pull/704) ([WoutDev](https://github.com/WoutDev))
+* Support for Rails 7.1 [\#675](https://github.com/rpush/rpush/pull/675) ([benlangfeld](https://github.com/benlangfeld))
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.0.0...HEAD)
 
