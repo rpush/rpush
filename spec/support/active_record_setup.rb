@@ -81,4 +81,7 @@ Rpush::Client::ActiveRecord::Notification.reset_column_information
 Rpush::Client::ActiveRecord::App.reset_column_information
 Rpush::Client::ActiveRecord::Apns::Feedback.reset_column_information
 
-ActiveRecord::Base.default_column_serializer = nil # New default in Rails 7.1: https://github.com/rails/rails/pull/47422
+if ActiveRecord::Base.respond_to?(:default_column_serializer)
+  # New default in Rails 7.1: https://github.com/rails/rails/pull/47422
+  ActiveRecord::Base.default_column_serializer = nil
+end
