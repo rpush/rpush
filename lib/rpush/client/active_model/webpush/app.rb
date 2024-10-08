@@ -20,10 +20,18 @@ module Rpush
 
           def self.included(base)
             base.class_eval do
-              alias_attribute :vapid_keypair, :certificate
+              # alias_attribute :vapid_keypair, :certificate # Removed due to a breaking change in rails 7.2. Waiting for a fix to be implemented
               validates :vapid_keypair, presence: true
               validates_with VapidKeypairValidator
             end
+          end
+          
+          def vapid_keypair
+            certificate
+          end
+
+          def vapid_keypair=(value)
+            self.certificate = value
           end
 
           def service_name

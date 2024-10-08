@@ -12,8 +12,8 @@ module Rpush
               reg = record.registration_ids.first
               unless reg.is_a?(Hash) &&
                   (KEYS-reg.keys).empty? &&
-                  reg[:endpoint].is_a?(String) &&
-                  reg[:keys].is_a?(Hash)
+                     reg[:endpoint].is_a?(String) &&
+                     reg[:keys].is_a?(Hash)
                 record.errors.add(:base, 'Registration must have :endpoint (String) and :keys (Hash) keys')
               end
             end
@@ -21,8 +21,8 @@ module Rpush
 
           def self.included(base)
             base.instance_eval do
-              alias_attribute :time_to_live, :expiry
-
+              # alias_attribute :time_to_live, :expiry # Removed due to a breaking change in rails 7.2. Waiting for a fix to be implemented
+              
               validates :registration_ids, presence: true
               validates :data, presence: true
               validates :time_to_live, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
@@ -31,6 +31,14 @@ module Rpush
               validates_with Rpush::Client::ActiveModel::RegistrationIdsCountValidator, limit: 1
               validates_with RegistrationValidator
             end
+          end
+          
+          def time_to_live
+            expiry
+          end
+
+          def time_to_live=(value)
+            self.expiry = value
           end
 
           def data=(value)
