@@ -319,7 +319,7 @@ GEM
     zeitwerk (2.6.18)
 
 PLATFORMS
-  arm64-darwin-23
+  ruby
 
 DEPENDENCIES
   activesupport (~> 7.1.0)
