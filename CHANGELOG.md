@@ -2,6 +2,10 @@
 
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
+[Full Changelog](https://github.com/rpush/rpush/compare/v9.1.0...HEAD)
+
+## [v9.1.0](https://github.com/rpush/rpush/tree/v9.1.0) (2024-09-24)
+
 **Merged pull requests:**
 
 * Add support for FSM iOS badges [\#704](https://github.com/rpush/rpush/pull/704) ([WoutDev](https://github.com/WoutDev))
@@ -9,7 +13,7 @@
 * Support for Rails 7.2 [\#706](https://github.com/rpush/rpush/pull/706) ([benlangfeld](https://github.com/benlangfeld))
 * Enable running tests on sqlite3 [\#705](https://github.com/rpush/rpush/pull/705) ([benlangfeld](https://github.com/benlangfeld))
 
-[Full Changelog](https://github.com/rpush/rpush/compare/v9.0.0...HEAD)
+[Full Changelog](https://github.com/rpush/rpush/compare/v9.0.0...v9.1.0)
 
 ## [v9.0.0](https://github.com/rpush/rpush/tree/v9.0.0) (2024-09-09)
 
