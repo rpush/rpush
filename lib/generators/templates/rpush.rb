@@ -85,11 +85,6 @@ Rpush.reflect do |on|
   # on.fcm_failed_to_recipient do |notification, error|
   # end
 
-  # Called when the FCM returns a failure that indicates an invalid device token.
-  # You will need to delete the device token from your records.
-  # on.fcm_invalid_device_token do |app, error, device_token|
-  # end
-
   # Called for each recipient which successfully receives a notification. This
   # can occur more than once for the same notification when there are multiple
   # recipients.
