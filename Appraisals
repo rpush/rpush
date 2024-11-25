@@ -41,3 +41,11 @@ appraise "rails-7.1" do
     gem "rails", "~> 7.1.0"
   end
 end
+
+appraise "rails-7.2" do
+  gem "activesupport", "~> 7.2.0"
+
+  group :development do
+    gem "rails", "~> 7.2.0"
+  end
+end
