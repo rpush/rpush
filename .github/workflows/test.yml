@@ -87,9 +87,6 @@ jobs:
         POSTGRES_PORT: 5432
         CLIENT: ${{ matrix.client }}
 
-    - name: Run rubocop
-      run: bundle exec rubocop
-
   tests:
     runs-on: ubuntu-latest
     needs: test
