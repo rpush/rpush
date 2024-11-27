@@ -128,7 +128,7 @@ The app `environment` for any Apns* option is "development" for XCode installs, 
 #### Firebase Cloud Messaging
 
 You will need two params to make use of FCM via Rpush.
-- `firebase_project_id` - The `Project ID` in your Firebase Project Settings
+- `firebase_project_id` - The `Project number` in your Firebase Project Settings
 - `json_key` - The JSON key file for a service account with the `Firebase Admin SDK Administrator Service Agent` role.
 
 Create service account in the google cloud account attached to your firebase account:
@@ -151,6 +151,7 @@ fcm_app.save!
 n = Rpush::Fcm::Notification.new
 n.app = Rpush::Fcm::App.where(name: "fcm_app").first
 n.device_token = device_token # Note that device_token is used here instead of registration_ids
+n.notification = { title: "push title", body: "hi mom!" } # either title or body needs to be set, or nothing goes through
 n.data = {}.transform_values(&:to_s) # All values going in here have to be strings, if you have anything else - nothing goes through
 n.save!
 ```
