@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'net-http-persistent'
   s.add_runtime_dependency 'net-http2', '~> 0.18', '>= 0.18.3'
   s.add_runtime_dependency 'jwt', '>= 1.5.6'
-  s.add_runtime_dependency 'activesupport', '>= 6.0', '!= 7.1.4', '< 7.2.0' # https://github.com/rails/rails/issues/52820
+  s.add_runtime_dependency 'activesupport', '>= 6.0', '!= 7.1.4', '!= 7.2.0', '!= 7.2.1' # https://github.com/rails/rails/issues/52820
   s.add_runtime_dependency 'thor', ['>= 0.18.1', '< 2.0']
   s.add_runtime_dependency 'railties'
   s.add_runtime_dependency 'rainbow'
