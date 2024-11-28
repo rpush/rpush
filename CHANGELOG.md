@@ -2,9 +2,13 @@
 
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
+[Full Changelog](https://github.com/rpush/rpush/compare/v9.2.0...HEAD)
+
+## [v9.2.0](https://github.com/rpush/rpush/tree/v9.2.0) (2024-11-28)
+
 * Support for Rails 7.2 [\#706](https://github.com/rpush/rpush/pull/706) ([benlangfeld](https://github.com/benlangfeld))
 
-[Full Changelog](https://github.com/rpush/rpush/compare/v9.1.0...HEAD)
+[Full Changelog](https://github.com/rpush/rpush/compare/v9.1.0...v9.2.0)
 
 ## [v9.1.0](https://github.com/rpush/rpush/tree/v9.1.0) (2024-09-24)
 
