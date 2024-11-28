@@ -22,6 +22,7 @@ jobs:
         with:
           # setup-ruby implicitly uses .ruby-version
           bundler-cache: true
+          rubygems: latest
 
       # Run `rake release` to create git tag and push to repository based on `lib/rpush/version.rb`.
       # Then publish the new gem via trusted publishing
