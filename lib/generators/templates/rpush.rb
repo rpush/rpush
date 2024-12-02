@@ -30,6 +30,8 @@ Rpush.configure do |config|
   # If the logger goes to stdout, you can disable foreground logging to avoid duplication.
   # config.foreground_logging = false
 
+  # Define proxy
+  # config.proxy = URI('http://localhost:3128')
 end
 
 Rpush.reflect do |on|
