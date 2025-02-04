@@ -31,7 +31,11 @@ module Rpush
           mark_batch_retryable(Time.now + 10.seconds, error)
           @client.close
           raise
-        rescue Errno::ECONNREFUSED, SocketError, HTTP2::Error::StreamLimitExceeded => error
+        rescue OpenSSL::SSL::SSLError,
+               Errno::ECONNRESET,
+               Errno::ECONNREFUSED,
+               SocketError,
+               HTTP2::Error::StreamLimitExceeded => error
           # TODO restart connection when StreamLimitExceeded
           mark_batch_retryable(Time.now + 10.seconds, error)
           raise
