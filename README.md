@@ -302,7 +302,7 @@ case of problems) in the `certificates` field of the Rpush Application record:
 vapid_keypair = Webpush.generate_key.to_hash
 app = Rpush::Webpush::App.new
 app.name = 'webpush'
-app.certificate = vapid_keypair.merge(subject: 'user@example.org').to_json
+app.certificate = vapid_keypair.merge(subject: 'mailto:user@example.org').to_json
 app.connections = 1
 app.save!
 ```
