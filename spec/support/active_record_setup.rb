@@ -19,7 +19,7 @@ if ENV['CI']
 else
   require 'etc'
   username = SPEC_ADAPTER =~ /mysql/ ? 'root' : Etc.getlogin
-  db_config[SPEC_ADAPTER]['username'] = username
+  db_config[SPEC_ADAPTER]['username'] = 'postgres'
 end
 
 puts "Using #{SPEC_ADAPTER} adapter."
