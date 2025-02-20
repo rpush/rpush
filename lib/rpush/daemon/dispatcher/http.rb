@@ -6,6 +6,7 @@ module Rpush
           @app = app
           @delivery_class = delivery_class
           @http = Net::HTTP::Persistent.new(name: 'rpush')
+          @http.proxy = Rpush.config.proxy_uri if Rpush.config.proxy_uri.present?
         end
 
         def dispatch(payload)

@@ -23,6 +23,9 @@ Rpush.configure do |config|
 
   config.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::INFO
 
+  # Define proxy
+  # config.proxy_uri = URI('http://localhost:3128')
+
   # Define a custom logger.
   # config.logger = MyLogger.new
 
