@@ -7,6 +7,7 @@
 ## [v9.2.0](https://github.com/rpush/rpush/tree/v9.2.0) (2024-11-28)
 
 * Support for Rails 7.2 [\#706](https://github.com/rpush/rpush/pull/706) ([benlangfeld](https://github.com/benlangfeld))
+* Support for proxying HTTP requests [\#728](https://github.com/rpush/rpush/pull/728) ([jaspreet-3911](https://github.com/jaspreet-3911))
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.1.0...v9.2.0)
 
