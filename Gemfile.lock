@@ -5,6 +5,7 @@ PATH
       activesupport (>= 6.0, != 7.2.1, != 7.2.0, != 7.1.4)
       googleauth
       jwt (>= 1.5.6)
+      logger
       multi_json (~> 1.0)
       net-http-persistent
       net-http2 (~> 0.18, >= 0.18.3)
@@ -41,7 +42,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    appraisal (2.4.1)
+    appraisal (2.5.0)
       bundler
       rake
       thor (>= 0.14.0)
@@ -217,7 +218,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
-    uri (1.0.2)
+    uri (1.0.3)
     web-push (3.0.1)
       jwt (~> 2.0)
       openssl (~> 3.0)
