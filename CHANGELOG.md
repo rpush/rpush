@@ -2,6 +2,7 @@
 
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
+* Support for proxying HTTP requests [\#728](https://github.com/rpush/rpush/pull/728) ([jaspreet-3911](https://github.com/jaspreet-3911))
 * Fix active record logger dependency for older rails versions that was breaking the build [\#731](https://github.com/rpush/rpush/pull/731) ([SixiS](https://github.com/sixis))
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.2.0...HEAD)

@@ -4,6 +4,7 @@ module Rpush
       class Apnsp8Http2
         include Loggable
         include Reflectable
+        include Proxy
 
         URLS = {
           production: 'https://api.push.apple.com',
@@ -33,7 +34,11 @@ module Rpush
 
         def create_http2_client(app)
           url = URLS[app.environment.to_sym]
-          client = NetHttp2::Client.new(url, connect_timeout: DEFAULT_TIMEOUT)
+          options = { connect_timeout: DEFAULT_TIMEOUT }
+
+          configure_proxy(options)
+
+          client = NetHttp2::Client.new(url, options)
           client.on(:error) do |error|
             log_error(error)
             reflect(:error, error)
