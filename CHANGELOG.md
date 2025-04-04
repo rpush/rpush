@@ -2,6 +2,8 @@
 
 ## [Unreleased](https://github.com/rpush/rpush/tree/HEAD)
 
+* Fix active record logger dependency for older rails versions that was breaking the build [\#731](https://github.com/rpush/rpush/pull/731) ([SixiS](https://github.com/sixis))
+
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.2.0...HEAD)
 
 ## [v9.2.0](https://github.com/rpush/rpush/tree/v9.2.0) (2024-11-28)
