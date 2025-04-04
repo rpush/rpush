@@ -26,6 +26,7 @@ def redis?
 end
 
 if active_record?
+  require 'logger'
   require 'active_record'
   if ActiveRecord::Base.respond_to?(:default_column_serializer)
     # New default in Rails 7.1: https://github.com/rails/rails/pull/47422
