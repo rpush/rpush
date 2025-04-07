@@ -20,6 +20,7 @@ describe Rpush::Daemon::Dispatcher::Apnsp8Http2 do
       allow(NetHttp2::Client).to receive_messages(new: http2)
       allow(Rpush::Daemon::Apnsp8::Token).to receive_messages(new: token_provider)
     end
+
     it 'delivers the notification' do
       delivery = double
       expect(delivery_class).to receive(:new).with(app, http2, token_provider, batch).and_return(delivery)
