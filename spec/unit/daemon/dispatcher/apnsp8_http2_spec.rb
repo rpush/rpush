@@ -8,7 +8,7 @@ describe Rpush::Daemon::Dispatcher::Apnsp8Http2 do
   let(:http2) { double(on: true) }
   let!(:token_provider) { double }
   let(:queue_payload) { Rpush::Daemon::QueuePayload.new(batch, notification) }
-  let(:dispatcher) { Rpush::Daemon::Dispatcher::Apnsp8Http2.new(app, delivery_class) }
+  let(:dispatcher) { described_class.new(app, delivery_class) }
 
   it 'constructs a new persistent connection' do
     expect(NetHttp2::Client).to receive(:new).and_call_original
