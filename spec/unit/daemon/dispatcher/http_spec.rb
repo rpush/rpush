@@ -31,4 +31,19 @@ describe Rpush::Daemon::Dispatcher::Http do
       dispatcher.cleanup
     end
   end
+
+  describe 'proxy configuration' do
+    it 'sets the proxy if present' do
+      proxy_uri = 'http://proxy.example.com'
+      allow(Rpush.config).to receive(:proxy_uri).and_return(proxy_uri)
+      expect(http).to receive(:proxy=).with(proxy_uri)
+      Rpush::Daemon::Dispatcher::Http.new(app, delivery_class)
+    end
+
+    it 'does not set the proxy if not present' do
+      allow(Rpush.config).to receive(:proxy_uri).and_return(nil)
+      expect(http).not_to receive(:proxy=)
+      Rpush::Daemon::Dispatcher::Http.new(app, delivery_class)
+    end
+  end
 end

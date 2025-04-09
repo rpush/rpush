@@ -23,6 +23,9 @@ Rpush.configure do |config|
 
   config.log_level = (defined?(Rails) && Rails.logger) ? Rails.logger.level : ::Logger::Severity::INFO
 
+  # Define proxy
+  # config.proxy_uri = URI('http://localhost:3128')
+
   # Define a custom logger.
   # config.logger = MyLogger.new
 
@@ -83,11 +86,6 @@ Rpush.reflect do |on|
   # can occur more than once for the same notification when there are multiple
   # recipients. (do not handle invalid device tokens here)
   # on.fcm_failed_to_recipient do |notification, error|
-  # end
-
-  # Called when the FCM returns a failure that indicates an invalid device token.
-  # You will need to delete the device token from your records.
-  # on.fcm_invalid_device_token do |app, error, device_token|
   # end
 
   # Called for each recipient which successfully receives a notification. This

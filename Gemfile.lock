@@ -1,10 +1,11 @@
 PATH
   remote: .
   specs:
-    rpush (9.0.0)
-      activesupport (>= 6.0, < 7.2.0, != 7.1.4)
+    rpush (9.2.0)
+      activesupport (>= 6.0, != 7.2.1, != 7.2.0, != 7.1.4)
       googleauth
       jwt (>= 1.5.6)
+      logger
       multi_json (~> 1.0)
       net-http-persistent
       net-http2 (~> 0.18, >= 0.18.3)
@@ -41,7 +42,7 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
-    appraisal (2.4.1)
+    appraisal (2.5.0)
       bundler
       rake
       thor (>= 0.14.0)
@@ -66,14 +67,15 @@ GEM
     diff-lcs (1.5.1)
     docile (1.4.0)
     erubi (1.13.0)
-    faraday (2.11.0)
+    faraday (2.12.0)
       faraday-net_http (>= 2.0, < 3.4)
+      json
       logger
     faraday-net_http (3.3.0)
       net-http
-    google-cloud-env (2.2.0)
+    google-cloud-env (2.2.1)
       faraday (>= 1.0, < 3.a)
-    googleauth (1.11.0)
+    googleauth (1.11.2)
       faraday (>= 1.0, < 3.a)
       google-cloud-env (~> 2.1)
       jwt (>= 1.4, < 3.0)
@@ -89,11 +91,11 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.7.2)
-    jwt (2.8.2)
+    jwt (2.9.3)
       base64
     language_server-protocol (3.17.0.3)
     logger (1.6.1)
-    loofah (2.22.0)
+    loofah (2.23.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
     method_source (1.1.0)
@@ -110,7 +112,7 @@ GEM
     mysql2 (0.5.6)
     net-http (0.4.1)
       uri
-    net-http-persistent (4.0.2)
+    net-http-persistent (4.0.4)
       connection_pool (~> 2.2)
     net-http2 (0.18.5)
       http-2 (~> 0.11)
@@ -123,7 +125,7 @@ GEM
     parser (3.3.5.0)
       ast (~> 2.4.1)
       racc
-    pg (1.2.3)
+    pg (1.5.9)
     psych (5.1.2)
       stringio
     public_suffix (6.0.1)
@@ -216,11 +218,11 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.5.0)
-    uri (0.13.1)
+    uri (1.0.3)
     web-push (3.0.1)
       jwt (~> 2.0)
       openssl (~> 3.0)
-    zeitwerk (2.6.18)
+    zeitwerk (2.7.1)
 
 PLATFORMS
   ruby
@@ -249,4 +251,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   2.3.5
+   2.5.23

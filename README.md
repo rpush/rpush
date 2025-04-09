@@ -53,11 +53,10 @@ $ bundle exec rpush init
 
 #### Apple Push Notification Service
 
-There is a choice of two modes (and one legacy mode) using certificates or using tokens:
+There is a choice of two modes, using certificates or using tokens:
 
 * `Rpush::Apns2` This requires an annually renewable certificate. see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_certificate-based_connection_to_apns
 * `Rpush::Apnsp8` This uses encrypted tokens and requires an encryption key id and encryption key (provide as a p8 file). (see https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/establishing_a_token-based_connection_to_apns)
-  Apple have [announced](https://developer.apple.com/news/?id=c88acm2b) that this is not supported after March 31, 2021.
 
 If this is your first time using the APNs, you will need to generate either SSL certificates (for standard Apns) or an Encryption Key (p8) and an Encryption Key ID (for Apnsp8). See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
@@ -302,7 +301,7 @@ case of problems) in the `certificates` field of the Rpush Application record:
 vapid_keypair = Webpush.generate_key.to_hash
 app = Rpush::Webpush::App.new
 app.name = 'webpush'
-app.certificate = vapid_keypair.merge(subject: 'user@example.org').to_json
+app.certificate = vapid_keypair.merge(subject: 'mailto:user@example.org').to_json
 app.connections = 1
 app.save!
 ```

@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  workflow_dispatch: # allow repo collaborators to publish gem
+
+permissions:
+  contents: write # required for `rake release` to push the release tag
+  id-token: write # required for workflow to publish gem
+
+jobs:
+  release:
+    if: github.repository == 'rpush/rpush' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # required to run `rake release`.
+      - name: Setup Ruby and install dependencies
+        uses: ruby/setup-ruby@v1
+        with:
+          # setup-ruby implicitly uses .ruby-version
+          bundler-cache: true
+          rubygems: latest
+
+      # Run `rake release` to create git tag and push to repository based on `lib/rpush/version.rb`.
+      # Then publish the new gem via trusted publishing
+      # Read more on https://guides.rubygems.org/trusted-publishing/releasing-gems/
+      - name: Publish gem
+        uses: rubygems/release-gem@v1
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="v$(bundle exec ruby -e 'puts Rpush::VERSION.to_s.chomp')"
+
+          gh release create \
+            $VERSION \
+            --verify-tag \
+            --generate-notes \
+            --latest
