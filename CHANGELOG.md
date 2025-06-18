@@ -4,6 +4,7 @@
 
 * Support for proxying HTTP requests [\#728](https://github.com/rpush/rpush/pull/728) ([jaspreet-3911](https://github.com/jaspreet-3911))
 * Fix active record logger dependency for older rails versions that was breaking the build [\#731](https://github.com/rpush/rpush/pull/731) ([SixiS](https://github.com/sixis))
+* Adds ostruct to gemspec (which wont be bundled with ruby 3.5 anymore see [here](https://github.com/ruby/ruby/blob/4eaa245fccd3dd9a61fe1b5f114a6fb47907640a/lib/bundled_gems.rb#L18))
 
 [Full Changelog](https://github.com/rpush/rpush/compare/v9.2.0...HEAD)
 
