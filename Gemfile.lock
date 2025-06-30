@@ -9,6 +9,7 @@ PATH
       multi_json (~> 1.0)
       net-http-persistent
       net-http2 (~> 0.18, >= 0.18.3)
+      ostruct
       railties
       rainbow
       thor (>= 0.18.1, < 2.0)
@@ -121,6 +122,7 @@ GEM
       racc (~> 1.4)
     openssl (3.2.0)
     os (1.1.4)
+    ostruct (0.6.1)
     parallel (1.26.3)
     parser (3.3.5.0)
       ast (~> 2.4.1)

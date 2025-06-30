@@ -43,6 +43,7 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'rainbow'
   s.add_runtime_dependency 'web-push'
   s.add_runtime_dependency 'googleauth'
+  s.add_runtime_dependency 'ostruct'
 
   s.add_development_dependency 'debug'
   s.add_development_dependency 'rake'
