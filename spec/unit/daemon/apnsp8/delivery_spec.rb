@@ -49,5 +49,16 @@ describe Rpush::Daemon::Apnsp8::Delivery do
         end
       end
     end
+
+    context 'with an HTTP2 client that raises Errno::ECONNRESET' do
+      before do
+        allow(http2_client).to receive(:call_async).and_raise(Errno::ECONNRESET)
+      end
+
+      it 'marks the batch as retryable' do
+        expect(batch).to receive(:mark_all_retryable).with(anything, anything)
+        expect { delivery.perform }.to raise_error(Errno::ECONNRESET)
+      end
+    end
   end
 end
