@@ -322,6 +322,7 @@ In order to send the same message to multiple devices, create one
 `Notification` per device, as passing multiple subscriptions at once as
 `registration_ids` is not supported.
 
+For more information on Web Push, see the [pushpad/web-push](https://github.com/pushpad/web-push) documentation.
 
 ### Running Rpush
 
