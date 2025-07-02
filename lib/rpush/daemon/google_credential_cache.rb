@@ -30,11 +30,15 @@ module Rpush
         json_key_io = json_key ? StringIO.new(json_key) : nil
         log_debug("FCM - Obtaining access token.")
         authorizer = Google::Auth::ServiceAccountCredentials.make_creds(scope: scope, json_key_io: json_key_io)
-        authorizer.fetch_access_token
+        authorizer.fetch_access_token({connection: faraday_connection})
       end
 
       def hash_key(scope, json_key)
         scope.hash ^ json_key.hash
+      end
+
+      def faraday_connection
+        Faraday.new(proxy: Rpush.config.proxy_uri.presence)
       end
     end
   end
