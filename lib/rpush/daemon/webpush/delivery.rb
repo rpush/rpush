@@ -92,6 +92,9 @@ module Rpush
 
         def deliver_after_header(response)
           Rpush::Daemon::RetryHeaderParser.parse(response.header['retry-after'])
+        rescue ArgumentError
+          log_error("Invalid retry-after header: #{response.header['retry-after']}")
+          nil
         end
 
         def retry_message

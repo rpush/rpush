@@ -101,6 +101,25 @@ describe Rpush::Daemon::Webpush::Delivery do
         it_behaves_like 'logs', deliver_after: '2020-10-13 00:00:02'
         it_behaves_like 'process notification'
       end
+
+      context 'when Retry-After header is negative value' do
+        let(:response_header) { { 'retry-after' => '-1' } }
+
+        before do
+          allow(delivery).to receive(:mark_retryable_exponential) do
+            notification.deliver_after = now + 2.seconds
+            notification.retries = 1
+          end
+        end
+
+        it 'retry the notification' do
+          delivery.perform
+          expect(delivery).to have_received(:mark_retryable_exponential).with(notification)
+        end
+
+        it_behaves_like 'logs', deliver_after: '2020-10-13 00:00:02'
+        it_behaves_like 'process notification'
+      end
     end
 
     it_behaves_like 'retry delivery', response_code: 429
