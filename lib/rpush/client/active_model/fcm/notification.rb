@@ -13,6 +13,9 @@ module Rpush
                                          default_vibrate_timings default_light_settings vibrate_timings
                                          visibility notification_count light_settings].freeze
 
+          IOS_NOTIFICATION_KEYS = %w[title subtitle body launch-image title-loc-key title-loc-args
+                                      subtitle-loc-key subtitle-loc-args loc-key loc-args].freeze
+
           def self.included(base)
             base.instance_eval do
               validates :device_token, presence: true
@@ -78,6 +81,7 @@ module Rpush
             aps['content-available'] = 1 if content_available
             aps['sound'] = 'default' if sound == 'default'
             aps['badge'] = badge if badge
+            aps['alert'] = ios_notification if notification
 
             json['payload']['aps'] = aps
 
@@ -101,6 +105,12 @@ module Rpush
             json['sound'] = sound if sound
             json['default_sound'] = sound == 'default' ? true : false
             json
+          end
+
+          def ios_notification
+            return {} unless notification
+
+            notification.slice(*IOS_NOTIFICATION_KEYS)
           end
 
           def priority_str
