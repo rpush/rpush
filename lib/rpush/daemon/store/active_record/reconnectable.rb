@@ -1,36 +1,20 @@
-class PGError < StandardError; end unless defined?(PGError)
-module PG
-  class Error < StandardError; end unless defined?(::PG::Error)
-end
-class Mysql; class Error < StandardError; end; end unless defined?(Mysql)
-module Mysql2; class Error < StandardError; end; end unless defined?(Mysql2)
-module ActiveRecord
-  class JDBCError < StandardError; end unless defined?(::ActiveRecord::JDBCError)
-end
-
-# :nocov:
-unless defined?(::SQLite3::Exception)
-  module SQLite3
-    class Exception < StandardError; end
-  end
-end
-
 module Rpush
   module Daemon
     module Store
       class ActiveRecord
         module Reconnectable
-          ADAPTER_ERRORS = [
+          adapter_errors = [
               ::ActiveRecord::ConnectionNotEstablished,
               ::ActiveRecord::ConnectionTimeoutError,
-              ::ActiveRecord::JDBCError,
-              ::ActiveRecord::StatementInvalid,
-              Mysql::Error,
-              Mysql2::Error,
-              PG::Error,
-              PGError,
-              SQLite3::Exception
+              ::ActiveRecord::StatementInvalid
           ]
+          adapter_errors << ::ActiveRecord::JDBCError if defined?(::ActiveRecord::JDBCError)
+          adapter_errors << Mysql::Error if defined?(Mysql::Error)
+          adapter_errors << Mysql2::Error if defined?(Mysql2::Error)
+          adapter_errors << PG::Error if defined?(PG::Error)
+          adapter_errors << PGError if defined?(PGError)
+          adapter_errors << SQLite3::Exception if defined?(SQLite3::Exception)
+          ADAPTER_ERRORS = adapter_errors
 
           def with_database_reconnect_and_retry
             ::ActiveRecord::Base.connection_pool.with_connection do
