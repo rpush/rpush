@@ -76,7 +76,7 @@ module Rpush
             aps = ActiveSupport::OrderedHash.new
             aps['mutable-content'] = 1 if mutable_content
             aps['content-available'] = 1 if content_available
-            aps['sound'] = 'default' if sound == 'default'
+            aps['sound'] = sound if sound
             aps['badge'] = badge if badge
 
             json['payload']['aps'] = aps
