@@ -87,6 +87,16 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
     expect(notification.as_json['message']['apns']['payload']['aps']['badge']).to eq(3)
   end
 
+  it 'passes through a custom sound to the apns payload' do
+    notification.sound = 'custom.aiff'
+    expect(notification.as_json['message']['apns']['payload']['aps']['sound']).to eq('custom.aiff')
+  end
+
+  it 'omits the apns sound when no sound is set' do
+    notification.sound = nil
+    expect(notification.as_json['message']['apns']['payload']['aps']).not_to have_key('sound')
+  end
+
   it 'excludes the notification payload if undefined' do
     expect(notification.as_json['message']).not_to have_key 'notification'
   end
