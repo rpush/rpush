@@ -122,6 +122,9 @@ module Rpush
           notifications.in_groups_of(batch_size, false).each do |batch_notifications|
             batch = Batch.new(batch_notifications)
             queue.push(QueuePayload.new(batch))
+            batch_notifications.each do |notification|
+              reflect(:notification_enqueued, notification)
+            end
           end
         else
           batch = Batch.new(notifications)
