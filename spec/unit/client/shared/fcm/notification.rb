@@ -94,4 +94,45 @@ shared_examples 'Rpush::Client::Fcm::Notification' do
   it 'fails when trying to set the dry_run option' do
     expect { notification.dry_run = true }.to raise_error(ArgumentError)
   end
+
+  describe 'device identifier' do
+    let(:fid) { 'cR_fx6xHT5mt8xTbQXFwKu' }
+    let(:registration_token) { "#{fid}:APA91bHPRgkF3JUikC4ENAHEeMrd41Zxv3hVZjC9KtT8OvPVGJ-hQMRKRrZuJAEcl7B338qju59zJMjw2DELjzEvxwYv7hH5Ynpc1ODQ0aT4U4OFEeco8ohsN5PjL1iC2dNtk2BAokeMCg2ZXKqpc8FXKmhX94kIxQ" }
+
+    it 'sends the device token as a registration token by default' do
+      notification.device_token = registration_token
+      expect(notification.as_json['message']['token']).to eq(registration_token)
+      expect(notification.as_json['message']).not_to have_key('fid')
+    end
+
+    it 'sends the device token as an FID when device_token_is_fid is set' do
+      notification.device_token = fid
+      notification.device_token_is_fid = true
+      expect(notification.as_json['message']['fid']).to eq(fid)
+      expect(notification.as_json['message']).not_to have_key('token')
+    end
+
+    it 'is valid with an FID marked as an FID' do
+      notification.app = app
+      notification.device_token = fid
+      notification.device_token_is_fid = true
+      expect(notification.valid?).to be_truthy
+    end
+
+    it 'is invalid when a registration token is marked as an FID' do
+      notification.app = app
+      notification.device_token = registration_token
+      notification.device_token_is_fid = true
+      expect(notification.valid?).to be_falsey
+      expect(notification.errors[:device_token]).to eq ['is a registration token, not a Firebase Installation ID']
+    end
+
+    it 'keeps device_token_is_fid when saved and loaded' do
+      notification.app = app
+      notification.device_token = fid
+      notification.device_token_is_fid = true
+      notification.save!
+      expect(described_class.find(notification.id).device_token_is_fid).to be true
+    end
+  end
 end

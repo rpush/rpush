@@ -155,6 +155,13 @@ n.data = {}.transform_values(&:to_s) # All values going in here have to be strin
 n.save!
 ```
 
+If the device registered with a [Firebase Installation ID](https://firebase.google.com/docs/cloud-messaging/manage-tokens) (FID) instead of a registration token, set `device_token_is_fid`. Rpush then sends it in the `fid` field instead of `token`. Do not mark a registration token as an FID; such a notification is invalid.
+
+```ruby
+n.device_token = fid
+n.device_token_is_fid = true
+```
+
 FCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
 
 Check the [FCM reference](https://firebase.google.com/docs/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.

@@ -20,6 +20,7 @@ module Rpush
 
         attribute :badge, :integer
         attribute :device_token, :string
+        attribute :device_token_is_fid, :boolean, default: false
         attribute :sound, [:string, :hash], strict: false, default: 'default'
         attribute :alert, [:string, :hash], strict: false
         attribute :data, :hash

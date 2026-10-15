@@ -66,6 +66,25 @@ describe 'FCM' do
     expect(notification.delivered).to eq(false)
   end
 
+  it 'sends an FID notification with the fid field' do
+    fid = 'cR_fx6xHT5mt8xTbQXFwKu'
+    notification.device_token = fid
+    notification.device_token_is_fid = true
+    notification.save!
+
+    sent_message = nil
+    allow(http).to receive(:request) do |_uri, post|
+      sent_message = JSON.parse(post.body)['message']
+      response
+    end
+    allow(response).to receive_messages(body: { name: 'projects/abc/messages/1' }.to_json)
+
+    Rpush.push
+
+    expect(sent_message['fid']).to eq(fid)
+    expect(sent_message).not_to have_key('token')
+  end
+
   it 'retries notification that fail due to a SocketError' do
     expect(http).to receive(:request).and_raise(SocketError.new)
     expect(notification.deliver_after).to be_nil

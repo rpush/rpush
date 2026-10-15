@@ -16,6 +16,7 @@ module Rpush
           def self.included(base)
             base.instance_eval do
               validates :device_token, presence: true
+              validates :device_token, format: { without: /:/, message: 'is a registration token, not a Firebase Installation ID' }, if: :device_token_is_fid
               validates :priority, inclusion: { in: FCM_PRIORITIES }, allow_nil: true
 
               validates_with Rpush::Client::ActiveModel::PayloadDataSizeValidator, limit: 4096
@@ -52,9 +53,16 @@ module Rpush
             json = {
               'data' => data,
               'android' => android_config,
-              'apns' => apns_config,
-              'token' => device_token
+              'apns' => apns_config
             }
+
+            # FCM HTTP v1 deprecated `token` in favour of `fid` (Firebase Installation ID).
+            # Both are accepted, but a registration token must not be sent as `fid`.
+            if device_token_is_fid
+              json['fid'] = device_token
+            else
+              json['token'] = device_token
+            end
 
             json['notification'] = root_notification if notification
             { 'message' => json }
