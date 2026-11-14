@@ -46,11 +46,22 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   let(:timeout) { ActiveRecord::ConnectionTimeoutError.new("db lazy!") }
   let(:test_doubles) { [TestDouble.new(error, 1), TestDouble.new(timeout, 1)]  }
 
+  # Without verification, stubbing a method Active Record no longer has still
+  # passes, which is how ActiveRecord::Base.clear_all_connections! (removed in
+  # Rails 7.2) went unnoticed here while the daemon raised NoMethodError.
+  around do |example|
+    verify = RSpec::Mocks.configuration.verify_partial_doubles?
+    RSpec::Mocks.configuration.verify_partial_doubles = true
+    example.run
+  ensure
+    RSpec::Mocks.configuration.verify_partial_doubles = verify
+  end
+
   before do
     @logger = double("Logger", info: nil, error: nil, warn: nil)
     allow(Rpush).to receive(:logger).and_return(@logger)
 
-    allow(ActiveRecord::Base).to receive(:clear_all_connections!)
+    allow(ActiveRecord::Base.connection_handler).to receive(:clear_all_connections!)
     allow(ActiveRecord::Base).to receive(:establish_connection)
     test_doubles.each { |td| allow(td).to receive(:sleep) }
   end
@@ -71,7 +82,7 @@ describe Rpush::Daemon::Store::ActiveRecord::Reconnectable do
   end
 
   it "should clear all connections" do
-    expect(ActiveRecord::Base).to receive(:clear_all_connections!)
+    expect(ActiveRecord::Base.connection_handler).to receive(:clear_all_connections!).twice
     test_doubles.each(&:perform)
   end
 

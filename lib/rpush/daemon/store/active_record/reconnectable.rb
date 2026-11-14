@@ -61,8 +61,21 @@ module Rpush
           end
 
           def reconnect_database
-            ::ActiveRecord::Base.clear_all_connections!
+            clear_all_database_connections
             ::ActiveRecord::Base.establish_connection
+          end
+
+          # ActiveRecord::Base.clear_all_connections! was deprecated in Rails 7.1
+          # and removed in 7.2; the connection handler has the method in every
+          # supported version. From 7.1, calling it without a role is deprecated
+          # (7.1) or means every role (7.2+), so ask for :all explicitly.
+          def clear_all_database_connections
+            handler = ::ActiveRecord::Base.connection_handler
+            if ::ActiveRecord.version >= Gem::Version.new('7.1')
+              handler.clear_all_connections!(:all)
+            else
+              handler.clear_all_connections!
+            end
           end
 
           def check_database_is_connected
